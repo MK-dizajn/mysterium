@@ -1,6 +1,5 @@
 import type { GameState } from "../types/game";
-
-export const SAVE_KEY = "mysterium-progress-v2";
+import { SAVE_KEY } from "./constants";
 
 export function loadGameState(): GameState | null {
   const savedProgress = localStorage.getItem(SAVE_KEY);
