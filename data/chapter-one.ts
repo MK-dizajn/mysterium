@@ -10,7 +10,7 @@ export const chapterOne: Chapter = {
     "Niektoré tajomstvá čakali celé stáročia.",
     "Ak toto čítaš, znamená to, že som zlyhal.",
   ],
-  steps: [
+  scenes: [
     {
       id: "michalska-brana",
       location: "Michalská brána",
@@ -19,18 +19,24 @@ export const chapterOne: Chapter = {
         "Pod klenbou Michalskej brány sa stretávajú cesty sveta. Starý pátrač tu zanechal prvú stopu.",
       voiceLine:
         "Začni tam, kde králi vstupovali do mesta. Pozri sa pod nohy. Nie všetko, čo je vyryté v kove, je iba ozdoba.",
-      puzzleQuestion:
-        "Postav sa na kovový kruh nultého kilometra. Nájdi mesto s najmenšou a najväčšou vzdialenosťou. Zadaj jeho názov.",
-      acceptedAnswers: ["vieden", "viedeň", "vienna"],
-      hints: [
-        "Hľadaj mesto s najmenším číslom kilometrov.",
-        "Je to hlavné mesto Rakúska.",
-      ],
-      historyTitle: "Michalská brána",
-      historyShort:
-        "Jediná zachovaná brána stredovekého opevnenia Bratislavy.",
-      historyFull:
-        "Michalská brána pochádza zo stredovekého opevnenia mesta a dodnes tvorí jeden z najvýraznejších vstupov do historického jadra. Kovový nultý kilometer pod bránou ukazuje vzdialenosti viacerých svetových miest. Väčšina ľudí po ňom prejde bez povšimnutia, no práve takéto detaily budú v Mysteriách rozhodovať.",
+      puzzle: {
+        id: "puzzle-michalska-brana",
+        question:
+          "Postav sa na kovový kruh nultého kilometra. Nájdi mesto s najmenšou a najväčšou vzdialenosťou. Zadaj jeho názov.",
+        acceptedAnswers: ["vieden", "viedeň", "vienna"],
+        hints: [
+          "Hľadaj mesto s najmenším číslom kilometrov.",
+          "Je to hlavné mesto Rakúska.",
+        ],
+      },
+      history: {
+        id: "history-michalska-brana",
+        title: "Michalská brána",
+        shortText:
+          "Jediná zachovaná brána stredovekého opevnenia Bratislavy.",
+        fullText:
+          "Michalská brána pochádza zo stredovekého opevnenia mesta a dodnes tvorí jeden z najvýraznejších vstupov do historického jadra. Kovový nultý kilometer pod bránou ukazuje vzdialenosti viacerých svetových miest. Väčšina ľudí po ňom prejde bez povšimnutia, no práve takéto detaily budú v Mysteriách rozhodovať.",
+      },
       artifact: {
         id: "artifact-michalska-brana",
         title: "Michalská brána",
@@ -42,9 +48,5 @@ export const chapterOne: Chapter = {
       nextInstruction:
         "Pokračuj dole Michalskou ulicou smerom do mesta. Keď sa ulica zmení na Ventúrsku, hľadaj po pravej strane Lekáreň U Salvátora.",
     },
-    
   ],
-
-  
-
 };

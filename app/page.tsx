@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { chapterOne } from "../data/chapter-one";
+import { mysteriumGame } from "../data/mysterium-game";
 import { IntroScreen } from "../components/screens/IntroScreen";
 import { LandingScreen } from "../components/screens/LandingScreen";
 import { PuzzleScreen } from "../components/screens/PuzzleScreen";
@@ -9,137 +9,175 @@ import { HistoryScreen } from "../components/screens/HistoryScreen";
 import { FinishScreen } from "../components/screens/FinishScreen";
 import { ArtifactScreen } from "../components/screens/ArtifactScreen";
 import { CodexBar } from "../components/ui/CodexBar";
-import type { Artifact } from "../types/game";
+import type { Artifact, GameState, GameScreen } from "../types/game";
 
-type Screen = "landing" | "intro" | "puzzle" | "history" | "finish" | "artifact";
+const SAVE_KEY = "mysterium-progress-v2";
+
+const initialGameState: GameState = {
+  screen: "landing",
+  currentChapterIndex: 0,
+  currentSceneIndex: 0,
+  score: 0,
+  artifacts: [],
+};
 
 export default function Home() {
-  const [screen, setScreen] = useState<Screen>("landing");
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [score, setScore] = useState(0);
-  const [artifacts, setArtifacts] = useState<Artifact[]>([]);
+  const [gameState, setGameState] = useState<GameState>(initialGameState);
   const [selectedArtifact, setSelectedArtifact] = useState<Artifact | null>(null);
-  const [previousScreen, setPreviousScreen] = useState<Screen>("puzzle");
+  const [previousScreen, setPreviousScreen] = useState<GameScreen>("puzzle");
+  const [hasSavedProgress, setHasSavedProgress] = useState(false);
+
+  const currentChapter =
+    mysteriumGame.chapters[gameState.currentChapterIndex];
+
+  const currentScene =
+    currentChapter.scenes[gameState.currentSceneIndex];
 
   useEffect(() => {
-    const savedProgress = localStorage.getItem("mysterium-progress");
-    if (!savedProgress) return;
+    const savedProgress = localStorage.getItem(SAVE_KEY);
 
-    const progress = JSON.parse(savedProgress);
+    if (!savedProgress) {
+      setHasSavedProgress(false);
+      return;
+    }
 
-    setScreen(progress.screen ?? "landing");
-    setCurrentStepIndex(progress.currentStepIndex ?? 0);
-    setScore(progress.score ?? 0);
-    setArtifacts(progress.artifacts ?? []);
+    const progress = JSON.parse(savedProgress) as GameState;
+
+    setHasSavedProgress(true);
+    setGameState(progress);
   }, []);
 
   useEffect(() => {
-    const progress = {
-      screen,
-      currentStepIndex,
-      score,
-      artifacts,
-    };
+    if (gameState.screen === "landing") return;
 
-    localStorage.setItem("mysterium-progress", JSON.stringify(progress));
-  }, [screen, currentStepIndex, score, artifacts]);
+    localStorage.setItem(SAVE_KEY, JSON.stringify(gameState));
+    setHasSavedProgress(true);
+  }, [gameState]);
 
-  function openArtifact(artifact: Artifact) {
-    setPreviousScreen(screen);
-    setSelectedArtifact(artifact);
-    setScreen("artifact");
+  function updateGameState(nextState: Partial<GameState>) {
+    setGameState((currentState) => ({
+      ...currentState,
+      ...nextState,
+    }));
   }
 
-  if (screen === "artifact" && selectedArtifact) {
+  function startNewGame() {
+    localStorage.removeItem(SAVE_KEY);
+    setSelectedArtifact(null);
+    setHasSavedProgress(false);
+    setGameState({
+      ...initialGameState,
+      screen: "intro",
+    });
+  }
+
+  function continueGame() {
+    const savedProgress = localStorage.getItem(SAVE_KEY);
+
+    if (!savedProgress) {
+      startNewGame();
+      return;
+    }
+
+    const progress = JSON.parse(savedProgress) as GameState;
+
+    setGameState(progress);
+  }
+
+  function openArtifact(artifact: Artifact) {
+    setPreviousScreen(gameState.screen);
+    setSelectedArtifact(artifact);
+    updateGameState({ screen: "artifact" });
+  }
+
+  if (gameState.screen === "artifact" && selectedArtifact) {
     return (
       <ArtifactScreen
         artifact={selectedArtifact}
-        onBack={() => setScreen(previousScreen)}
+        onBack={() => updateGameState({ screen: previousScreen })}
       />
     );
   }
 
-  if (screen === "intro") {
+  if (gameState.screen === "intro") {
     return (
       <IntroScreen
-        chapter={chapterOne}
-        onContinue={() => setScreen("puzzle")}
+        chapter={currentChapter}
+        onContinue={() => updateGameState({ screen: "puzzle" })}
       />
     );
   }
 
-  if (screen === "puzzle") {
+  if (gameState.screen === "puzzle") {
     return (
       <>
         <CodexBar
-          artifacts={artifacts}
-          score={score}
+          artifacts={gameState.artifacts}
+          score={gameState.score}
           onOpenArtifact={openArtifact}
         />
+
         <PuzzleScreen
-          step={chapterOne.steps[currentStepIndex]}
+          scene={currentScene}
           onSolved={(hintsUsed) => {
             const points = Math.max(20, 100 - hintsUsed * 20);
-            setScore((currentScore) => currentScore + points);
+            const artifact = currentScene.artifact;
 
-            const artifact = chapterOne.steps[currentStepIndex].artifact;
+            const alreadyCollected = gameState.artifacts.some(
+              (item) => item.id === artifact.id
+            );
 
-            setArtifacts((currentArtifacts) => {
-              const alreadyCollected = currentArtifacts.some(
-                (item) => item.id === artifact.id
-              );
-
-              if (alreadyCollected) return currentArtifacts;
-
-              return [...currentArtifacts, artifact];
+            updateGameState({
+              score: gameState.score + points,
+              artifacts: alreadyCollected
+                ? gameState.artifacts
+                : [...gameState.artifacts, artifact],
+              screen: "history",
             });
-
-            setScreen("history");
           }}
         />
       </>
     );
   }
 
-  if (screen === "history") {
+  if (gameState.screen === "history") {
     return (
       <>
         <CodexBar
-          artifacts={artifacts}
-          score={score}
+          artifacts={gameState.artifacts}
+          score={gameState.score}
           onOpenArtifact={openArtifact}
         />
-        <HistoryScreen
-          step={chapterOne.steps[currentStepIndex]}
-          onContinue={() => {
-            const nextIndex = currentStepIndex + 1;
 
-            if (nextIndex >= chapterOne.steps.length) {
-              setScreen("finish");
+        <HistoryScreen
+          scene={currentScene}
+          onContinue={() => {
+            const nextIndex = gameState.currentSceneIndex + 1;
+
+            if (nextIndex >= currentChapter.scenes.length) {
+              updateGameState({ screen: "finish" });
               return;
             }
 
-            setCurrentStepIndex(nextIndex);
-            setScreen("puzzle");
+            updateGameState({
+              currentSceneIndex: nextIndex,
+              screen: "puzzle",
+            });
           }}
         />
       </>
     );
   }
 
-  if (screen === "finish") {
-    return (
-      <FinishScreen
-        onRestart={() => {
-          localStorage.removeItem("mysterium-progress");
-          setCurrentStepIndex(0);
-          setArtifacts([]);
-          setScore(0);
-          setScreen("landing");
-        }}
-      />
-    );
+  if (gameState.screen === "finish") {
+    return <FinishScreen onRestart={startNewGame} />;
   }
 
-  return <LandingScreen onStart={() => setScreen("intro")} />;
+  return (
+    <LandingScreen
+      hasSavedProgress={hasSavedProgress}
+      onContinueGame={continueGame}
+      onStartNewGame={startNewGame}
+    />
+  );
 }

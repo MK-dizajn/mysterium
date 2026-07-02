@@ -11,13 +11,19 @@ export function CodexBar({ artifacts, score, onOpenArtifact }: CodexBarProps) {
     <div className="fixed left-0 right-0 top-0 z-50 border-b border-amber-400/10 bg-slate-950/90 px-4 py-3 backdrop-blur">
       <div className="mx-auto flex max-w-md items-center justify-between">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500">
-            Codex
-          </p>
-          <p className="text-xs text-amber-300">
-            Získané artefakty: {artifacts.length}
-            <p className="text-xs text-slate-400">Skóre: {score}</p>
-          </p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500">
+                Codex
+            </p>
+
+            <div>
+                <p className="text-xs text-amber-300">
+                Získané artefakty: {artifacts.length}
+                </p>
+
+                <p className="text-xs text-slate-400">
+                Skóre: {score}
+                </p>
+            </div>
         </div>
 
         <div className="flex gap-2">

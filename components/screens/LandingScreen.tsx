@@ -1,10 +1,16 @@
 import { GameButton } from "../ui/GameButton";
 
 type LandingScreenProps = {
-  onStart: () => void;
+  hasSavedProgress: boolean;
+  onStartNewGame: () => void;
+  onContinueGame: () => void;
 };
 
-export function LandingScreen({ onStart }: LandingScreenProps) {
+export function LandingScreen({
+  hasSavedProgress,
+  onStartNewGame,
+  onContinueGame,
+}: LandingScreenProps) {
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#05070d] text-white">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(212,175,55,0.18),_transparent_35%,_transparent_100%)]" />
@@ -27,8 +33,14 @@ export function LandingScreen({ onStart }: LandingScreenProps) {
           pozerať.
         </p>
 
-        <div className="mt-10 w-full max-w-xs">
-          <GameButton onClick={onStart}>Začať pátranie</GameButton>
+        <div className="mt-10 flex w-full max-w-xs flex-col gap-3">
+          {hasSavedProgress && (
+            <GameButton onClick={onContinueGame}>Pokračovať</GameButton>
+          )}
+
+          <GameButton onClick={onStartNewGame}>
+            {hasSavedProgress ? "Začať odznova" : "Začať pátranie"}
+          </GameButton>
         </div>
 
         <p className="mt-6 text-xs text-slate-500">

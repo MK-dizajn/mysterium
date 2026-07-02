@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import type { GameStep } from "../../types/game";
+import type { Scene } from "../../types/game";
 import { GameButton } from "../ui/GameButton";
 import { StoryCard } from "../ui/StoryCard";
 
 type PuzzleScreenProps = {
-  step: GameStep;
+  scene: Scene;
   onSolved: (hintsUsed: number) => void;
 };
 
@@ -18,18 +18,18 @@ function normalizeAnswer(value: string) {
     .replace(/[\u0300-\u036f]/g, "");
 }
 
-export function PuzzleScreen({ step, onSolved }: PuzzleScreenProps) {
+export function PuzzleScreen({ scene, onSolved }: PuzzleScreenProps) {
   const [answer, setAnswer] = useState("");
   const [error, setError] = useState("");
   const [hintIndex, setHintIndex] = useState(0);
 
-  const visibleHints = step.hints.slice(0, hintIndex);
-  const hasMoreHints = hintIndex < step.hints.length;
+  const visibleHints = scene.puzzle.hints.slice(0, hintIndex);
+  const hasMoreHints = hintIndex < scene.puzzle.hints.length;
 
   function checkAnswer() {
     const userAnswer = normalizeAnswer(answer);
 
-    const isCorrect = step.acceptedAnswers.some(
+    const isCorrect = scene.puzzle.acceptedAnswers.some(
       (correctAnswer) => normalizeAnswer(correctAnswer) === userAnswer
     );
 
@@ -49,17 +49,17 @@ export function PuzzleScreen({ step, onSolved }: PuzzleScreenProps) {
 
   return (
     <main className="min-h-screen bg-[#05070d] px-6 py-10 text-white">
-      <StoryCard label={step.location} title={step.title}>
-        <p className="text-amber-200">{step.cinematicText}</p>
+      <StoryCard label={scene.location} title={scene.title}>
+        <p className="text-amber-200">{scene.cinematicText}</p>
 
         <div className="rounded-2xl border border-slate-700 bg-slate-950/70 p-4 text-slate-300">
           <p className="text-xs font-bold uppercase tracking-widest text-slate-500">
             Hlas pátrača
           </p>
-          <p className="mt-2 italic">„{step.voiceLine}“</p>
+          <p className="mt-2 italic">„{scene.voiceLine}“</p>
         </div>
 
-        <p>{step.puzzleQuestion}</p>
+        <p>{scene.puzzle.question}</p>
 
         <input
           value={answer}
