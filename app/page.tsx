@@ -10,8 +10,18 @@ import { FinishScreen } from "../components/screens/FinishScreen";
 import { ArtifactScreen } from "../components/screens/ArtifactScreen";
 import { CodexBar } from "../components/ui/CodexBar";
 import type { Artifact, GameState, GameScreen } from "../types/game";
+import { calculatePuzzleScore } from "../engine/gameScoring";
 
-const SAVE_KEY = "mysterium-progress-v2";
+import {
+  getNextSceneIndex,
+  isChapterFinished,
+} from "../engine/gameProgress";
+
+import {
+  clearGameState,
+  loadGameState,
+  saveGameState,
+} from "../engine/gameStorage";
 
 const initialGameState: GameState = {
   screen: "landing",
@@ -34,23 +44,21 @@ export default function Home() {
     currentChapter.scenes[gameState.currentSceneIndex];
 
   useEffect(() => {
-    const savedProgress = localStorage.getItem(SAVE_KEY);
+    const savedProgress = loadGameState();
 
     if (!savedProgress) {
-      setHasSavedProgress(false);
-      return;
-    }
+  setHasSavedProgress(false);
+  return;
+  }
 
-    const progress = JSON.parse(savedProgress) as GameState;
-
-    setHasSavedProgress(true);
-    setGameState(progress);
+  setHasSavedProgress(true);
+  setGameState(savedProgress);
   }, []);
 
   useEffect(() => {
     if (gameState.screen === "landing") return;
 
-    localStorage.setItem(SAVE_KEY, JSON.stringify(gameState));
+    saveGameState(gameState);
     setHasSavedProgress(true);
   }, [gameState]);
 
@@ -62,14 +70,14 @@ export default function Home() {
   }
 
   function resetToMainMenu() {
-  localStorage.removeItem(SAVE_KEY);
+  clearGameState();
   setSelectedArtifact(null);
   setHasSavedProgress(false);
   setGameState(initialGameState);
   }
 
 function startNewGame() {
-  localStorage.removeItem(SAVE_KEY);
+  clearGameState();
   setSelectedArtifact(null);
   setHasSavedProgress(false);
   setGameState({
@@ -79,16 +87,14 @@ function startNewGame() {
   }
 
   function continueGame() {
-    const savedProgress = localStorage.getItem(SAVE_KEY);
+    const savedProgress = loadGameState();
 
-    if (!savedProgress) {
-      startNewGame();
-      return;
-    }
+  if (!savedProgress) {
+  startNewGame();
+  return;
+  }
 
-    const progress = JSON.parse(savedProgress) as GameState;
-
-    setGameState(progress);
+  setGameState(savedProgress);
   }
 
   function openArtifact(artifact: Artifact) {
@@ -127,7 +133,7 @@ function startNewGame() {
         <PuzzleScreen
           scene={currentScene}
           onSolved={(hintsUsed) => {
-            const points = Math.max(20, 100 - hintsUsed * 20);
+            const points = calculatePuzzleScore(hintsUsed);
             const artifact = currentScene.artifact;
 
             const alreadyCollected = gameState.artifacts.some(
@@ -159,11 +165,11 @@ function startNewGame() {
         <HistoryScreen
           scene={currentScene}
           onContinue={() => {
-            const nextIndex = gameState.currentSceneIndex + 1;
+            const nextIndex = getNextSceneIndex(gameState.currentSceneIndex);
 
-            if (nextIndex >= currentChapter.scenes.length) {
-              updateGameState({ screen: "finish" });
-              return;
+            if (isChapterFinished(currentChapter, nextIndex)) {
+            updateGameState({ screen: "finish" });
+            return;
             }
 
             updateGameState({
