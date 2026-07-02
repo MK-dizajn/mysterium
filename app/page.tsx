@@ -10,6 +10,7 @@ import { FinishScreen } from "../components/screens/FinishScreen";
 import { ArtifactScreen } from "../components/screens/ArtifactScreen";
 import { CodexBar } from "../components/ui/CodexBar";
 import type { Artifact, GameState, GameScreen } from "../types/game";
+import { useGameEngine } from "../hooks/useGameEngine";
 import {
   createNewGameState,
   clearGameState,
@@ -22,7 +23,7 @@ import {
 const initialGameState = createNewGameState();
 
 export default function Home() {
-  const [gameState, setGameState] = useState<GameState>(initialGameState);
+  const { gameState, setGameState } = useGameEngine();
   const [selectedArtifact, setSelectedArtifact] = useState<Artifact | null>(null);
   const [previousScreen, setPreviousScreen] = useState<GameScreen>("puzzle");
   const [hasSavedProgress, setHasSavedProgress] = useState(false);
