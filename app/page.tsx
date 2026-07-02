@@ -11,13 +11,8 @@ import { ArtifactScreen } from "../components/screens/ArtifactScreen";
 import { CodexBar } from "../components/ui/CodexBar";
 import type { Artifact, GameState, GameScreen } from "../types/game";
 import {
-  addArtifact,
-  addScore,
   createNewGameState,
-  calculatePuzzleScore,
   clearGameState,
-  getNextSceneIndex,
-  isChapterFinished,
   loadGameState,
   saveGameState,
   solvePuzzle,
