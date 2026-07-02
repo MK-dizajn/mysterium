@@ -1,6 +1,7 @@
 import type { Artifact, Chapter, GameState, Scene } from "../types/game";
 import { getNextSceneIndex, isChapterFinished } from "./gameProgress";
 import { calculatePuzzleScore } from "./gameScoring";
+import { runSceneEvents } from "./events";
 
 export function createNewGameState(): GameState {
   return {
@@ -47,8 +48,12 @@ export function solvePuzzle(
 ): GameState {
   const points = calculatePuzzleScore(hintsUsed);
 
+  const baseState = addArtifact(addScore(gameState, points), scene.artifact);
+
+  const eventState = runSceneEvents(baseState, scene, "puzzleSolved");
+
   return {
-    ...addArtifact(addScore(gameState, points), scene.artifact),
+    ...eventState,
     screen: "history",
   };
 }

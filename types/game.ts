@@ -34,6 +34,28 @@ export type SceneBranch = {
   conditions?: Condition[];
 };
 
+export type GameAction =
+  | {
+      type: "addScore";
+      value: number;
+    }
+  | {
+      type: "addArtifact";
+      artifact: Artifact;
+    }
+  | {
+      type: "setScreen";
+      screen: GameScreen;
+    };
+
+export type GameEventTrigger = "puzzleSolved" | "sceneEntered";
+
+export type GameEvent = {
+  trigger: GameEventTrigger;
+  conditions?: Condition[];
+  actions: GameAction[];
+};
+
 export type Scene = {
   id: SceneId;
   location: string;
@@ -48,6 +70,8 @@ export type Scene = {
   conditions?: Condition[];
 
   branches?: SceneBranch[];
+
+  events?: GameEvent[];
 };
 
 export type Chapter = {

@@ -47,6 +47,18 @@ export const chapterOne: Chapter = {
       },
       nextInstruction:
         "Pokračuj dole Michalskou ulicou smerom do mesta. Keď sa ulica zmení na Ventúrsku, hľadaj po pravej strane Lekáreň U Salvátora.",
+
+      events: [
+        {
+          trigger: "puzzleSolved",
+          actions: [
+            {
+              type: "addScore",
+              value: 10,
+            },
+          ],
+        },
+      ],
     },
   ],
 };
