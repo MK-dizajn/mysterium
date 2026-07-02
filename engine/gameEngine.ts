@@ -74,9 +74,13 @@ export function continueAfterHistory(
     };
   }
 
-  return {
+  const nextState: GameState = {
     ...gameState,
     currentSceneIndex: nextIndex,
     screen: "puzzle",
   };
+
+  const nextScene = chapter.scenes[nextIndex];
+
+  return runSceneEvents(nextState, nextScene, "sceneEntered");
 }
