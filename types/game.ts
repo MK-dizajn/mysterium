@@ -52,6 +52,14 @@ export type GameAction =
     }
   | {
       type: "addCalculatedPuzzleScore";
+    }
+      | {
+      type: "startQuest";
+      questId: string;
+    }
+  | {
+      type: "completeQuest";
+      questId: string;
     };
 
 export type GameEventTrigger = "puzzleSolved" | "sceneEntered";
@@ -105,10 +113,24 @@ export type GameScreen =
   | "finish"
   | "artifact";
 
+export type QuestStatus = "locked" | "active" | "completed";
+
+export type Quest = {
+  id: string;
+  title: string;
+  description: string;
+};
+
+export type QuestProgress = {
+  questId: string;
+  status: QuestStatus;
+};
+
 export type GameState = {
   screen: GameScreen;
   currentChapterIndex: number;
   currentSceneIndex: number;
   score: number;
   artifacts: Artifact[];
+  quests: QuestProgress[];
 };

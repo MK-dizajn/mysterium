@@ -10,6 +10,7 @@ export function createNewGameState(): GameState {
     currentSceneIndex: 0,
     score: 0,
     artifacts: [],
+    quests: [],
   };
 }
 
