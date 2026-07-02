@@ -60,9 +60,13 @@ export const chapterOne: Chapter = {
             type: "addCalculatedPuzzleScore",
             },
             {
-              type: "addSceneArtifact",
+            type: "addSceneArtifact",
             },
-          ],
+            {
+            type: "completeQuest",
+            questId: "quest-golden-key",
+            },
+        ],
         },
       ],
     },
