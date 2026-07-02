@@ -53,6 +53,10 @@ export const chapterOne: Chapter = {
           trigger: "puzzleSolved",
           actions: [
             {
+            type: "startQuest",
+            questId: "quest-golden-key",
+            },
+            {
             type: "addCalculatedPuzzleScore",
             },
             {
