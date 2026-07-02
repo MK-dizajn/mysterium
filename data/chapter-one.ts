@@ -56,6 +56,9 @@ export const chapterOne: Chapter = {
               type: "addScore",
               value: 10,
             },
+            {
+              type: "addSceneArtifact",
+            },
           ],
         },
       ],

@@ -5,6 +5,7 @@ import { evaluateConditions } from "./conditions";
 
 export function applyGameAction(
   gameState: GameState,
+  scene: Scene,
   action: GameAction
 ): GameState {
   switch (action.type) {
@@ -13,6 +14,9 @@ export function applyGameAction(
 
     case "addArtifact":
       return addArtifact(gameState, action.artifact);
+
+    case "addSceneArtifact":
+      return addArtifact(gameState, scene.artifact);
 
     case "setScreen":
       return {
@@ -43,7 +47,7 @@ export function runSceneEvents(
   return matchingEvents.reduce((currentState, event) => {
     return event.actions.reduce(
       (stateAfterAction, action) =>
-        applyGameAction(stateAfterAction, action),
+        applyGameAction(stateAfterAction, scene, action),
       currentState
     );
   }, gameState);

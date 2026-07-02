@@ -46,6 +46,9 @@ export type GameAction =
   | {
       type: "setScreen";
       screen: GameScreen;
+    }
+  | {
+      type: "addSceneArtifact";
     };
 
 export type GameEventTrigger = "puzzleSolved" | "sceneEntered";

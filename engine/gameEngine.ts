@@ -48,7 +48,7 @@ export function solvePuzzle(
 ): GameState {
   const points = calculatePuzzleScore(hintsUsed);
 
-  const baseState = addArtifact(addScore(gameState, points), scene.artifact);
+  const baseState = addScore(gameState, points);
 
   const eventState = runSceneEvents(baseState, scene, "puzzleSolved");
 
