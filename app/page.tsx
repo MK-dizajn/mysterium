@@ -10,18 +10,14 @@ import { FinishScreen } from "../components/screens/FinishScreen";
 import { ArtifactScreen } from "../components/screens/ArtifactScreen";
 import { CodexBar } from "../components/ui/CodexBar";
 import type { Artifact, GameState, GameScreen } from "../types/game";
-import { calculatePuzzleScore } from "../engine/gameScoring";
-
 import {
+  calculatePuzzleScore,
+  clearGameState,
   getNextSceneIndex,
   isChapterFinished,
-} from "../engine/gameProgress";
-
-import {
-  clearGameState,
   loadGameState,
   saveGameState,
-} from "../engine/gameStorage";
+} from "../engine";
 
 const initialGameState: GameState = {
   screen: "landing",
