@@ -61,14 +61,21 @@ export default function Home() {
     }));
   }
 
-  function startNewGame() {
-    localStorage.removeItem(SAVE_KEY);
-    setSelectedArtifact(null);
-    setHasSavedProgress(false);
-    setGameState({
-      ...initialGameState,
-      screen: "intro",
-    });
+  function resetToMainMenu() {
+  localStorage.removeItem(SAVE_KEY);
+  setSelectedArtifact(null);
+  setHasSavedProgress(false);
+  setGameState(initialGameState);
+  }
+
+function startNewGame() {
+  localStorage.removeItem(SAVE_KEY);
+  setSelectedArtifact(null);
+  setHasSavedProgress(false);
+  setGameState({
+    ...initialGameState,
+    screen: "intro",
+  });
   }
 
   function continueGame() {
@@ -170,7 +177,7 @@ export default function Home() {
   }
 
   if (gameState.screen === "finish") {
-    return <FinishScreen onRestart={startNewGame} />;
+    return <FinishScreen onRestart={resetToMainMenu} />;
   }
 
   return (
