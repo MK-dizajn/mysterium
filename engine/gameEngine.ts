@@ -1,4 +1,5 @@
-import type { Artifact, GameState } from "../types/game";
+import type { Artifact, GameState, Scene } from "../types/game";
+import { calculatePuzzleScore } from "./gameScoring";
 
 export function createNewGameState(): GameState {
   return {
@@ -35,5 +36,18 @@ export function addScore(
   return {
     ...gameState,
     score: gameState.score + points,
+  };
+}
+
+export function solvePuzzle(
+  gameState: GameState,
+  scene: Scene,
+  hintsUsed: number
+): GameState {
+  const points = calculatePuzzleScore(hintsUsed);
+
+  return {
+    ...addArtifact(addScore(gameState, points), scene.artifact),
+    screen: "history",
   };
 }

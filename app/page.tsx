@@ -11,21 +11,19 @@ import { ArtifactScreen } from "../components/screens/ArtifactScreen";
 import { CodexBar } from "../components/ui/CodexBar";
 import type { Artifact, GameState, GameScreen } from "../types/game";
 import {
+  addArtifact,
+  addScore,
+  createNewGameState,
   calculatePuzzleScore,
   clearGameState,
   getNextSceneIndex,
   isChapterFinished,
   loadGameState,
   saveGameState,
+  solvePuzzle,
 } from "../engine";
 
-const initialGameState: GameState = {
-  screen: "landing",
-  currentChapterIndex: 0,
-  currentSceneIndex: 0,
-  score: 0,
-  artifacts: [],
-};
+const initialGameState = createNewGameState();
 
 export default function Home() {
   const [gameState, setGameState] = useState<GameState>(initialGameState);
@@ -129,20 +127,7 @@ function startNewGame() {
         <PuzzleScreen
           scene={currentScene}
           onSolved={(hintsUsed) => {
-            const points = calculatePuzzleScore(hintsUsed);
-            const artifact = currentScene.artifact;
-
-            const alreadyCollected = gameState.artifacts.some(
-              (item) => item.id === artifact.id
-            );
-
-            updateGameState({
-              score: gameState.score + points,
-              artifacts: alreadyCollected
-                ? gameState.artifacts
-                : [...gameState.artifacts, artifact],
-              screen: "history",
-            });
+            setGameState(solvePuzzle(gameState, currentScene, hintsUsed));
           }}
         />
       </>
