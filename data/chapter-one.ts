@@ -53,8 +53,7 @@ export const chapterOne: Chapter = {
           trigger: "puzzleSolved",
           actions: [
             {
-              type: "addScore",
-              value: 10,
+            type: "addCalculatedPuzzleScore",
             },
             {
               type: "addSceneArtifact",

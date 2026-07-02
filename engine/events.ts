@@ -2,15 +2,20 @@ import type { GameAction, GameEventTrigger, GameState } from "../types/game";
 import { addArtifact, addScore } from "./gameEngine";
 import type { Scene } from "../types/game";
 import { evaluateConditions } from "./conditions";
+import { calculatePuzzleScore } from "./gameScoring";
 
 export function applyGameAction(
   gameState: GameState,
   scene: Scene,
+  hintsUsed: number,
   action: GameAction
 ): GameState {
   switch (action.type) {
     case "addScore":
       return addScore(gameState, action.value);
+
+    case "addCalculatedPuzzleScore":
+      return addScore(gameState, calculatePuzzleScore(hintsUsed));
 
     case "addArtifact":
       return addArtifact(gameState, action.artifact);
@@ -32,7 +37,8 @@ export function applyGameAction(
 export function runSceneEvents(
   gameState: GameState,
   scene: Scene,
-  trigger: GameEventTrigger
+  trigger: GameEventTrigger,
+  hintsUsed = 0
 ): GameState {
   const matchingEvents = scene.events?.filter(
     (event) =>
@@ -47,7 +53,7 @@ export function runSceneEvents(
   return matchingEvents.reduce((currentState, event) => {
     return event.actions.reduce(
       (stateAfterAction, action) =>
-        applyGameAction(stateAfterAction, scene, action),
+        applyGameAction(stateAfterAction, scene, hintsUsed, action),
       currentState
     );
   }, gameState);

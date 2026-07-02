@@ -49,6 +49,9 @@ export type GameAction =
     }
   | {
       type: "addSceneArtifact";
+    }
+  | {
+      type: "addCalculatedPuzzleScore";
     };
 
 export type GameEventTrigger = "puzzleSolved" | "sceneEntered";

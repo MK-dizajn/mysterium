@@ -46,11 +46,14 @@ export function solvePuzzle(
   scene: Scene,
   hintsUsed: number
 ): GameState {
-  const points = calculatePuzzleScore(hintsUsed);
+  const baseState = gameState;
 
-  const baseState = addScore(gameState, points);
-
-  const eventState = runSceneEvents(baseState, scene, "puzzleSolved");
+  const eventState = runSceneEvents(
+  baseState,
+  scene,
+  "puzzleSolved",
+  hintsUsed
+  );
 
   return {
     ...eventState,
