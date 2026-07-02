@@ -57,7 +57,7 @@ export function continueAfterHistory(
   gameState: GameState,
   chapter: Chapter
 ): GameState {
-  const nextIndex = getNextSceneIndex(gameState.currentSceneIndex);
+  const nextIndex = getNextSceneIndex(chapter, gameState);
 
   if (isChapterFinished(chapter, nextIndex)) {
     return {

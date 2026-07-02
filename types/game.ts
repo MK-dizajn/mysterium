@@ -1,3 +1,5 @@
+import type { Condition } from "../engine/conditions";
+
 export type GameId = string;
 export type ChapterId = string;
 export type SceneId = string;
@@ -27,6 +29,11 @@ export type Puzzle = {
   hints: string[];
 };
 
+export type SceneBranch = {
+  targetSceneId: SceneId;
+  conditions?: Condition[];
+};
+
 export type Scene = {
   id: SceneId;
   location: string;
@@ -37,6 +44,10 @@ export type Scene = {
   history: CodexEntry;
   artifact: Artifact;
   nextInstruction: string;
+
+  conditions?: Condition[];
+
+  branches?: SceneBranch[];
 };
 
 export type Chapter = {
