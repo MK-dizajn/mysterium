@@ -21,6 +21,7 @@ import {
   loadGameState,
   saveGameState,
   solvePuzzle,
+  continueAfterHistory,
 } from "../engine";
 
 const initialGameState = createNewGameState();
@@ -146,17 +147,7 @@ function startNewGame() {
         <HistoryScreen
           scene={currentScene}
           onContinue={() => {
-            const nextIndex = getNextSceneIndex(gameState.currentSceneIndex);
-
-            if (isChapterFinished(currentChapter, nextIndex)) {
-            updateGameState({ screen: "finish" });
-            return;
-            }
-
-            updateGameState({
-              currentSceneIndex: nextIndex,
-              screen: "puzzle",
-            });
+            setGameState(continueAfterHistory(gameState, currentChapter));
           }}
         />
       </>

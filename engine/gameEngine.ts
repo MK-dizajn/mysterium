@@ -1,4 +1,5 @@
-import type { Artifact, GameState, Scene } from "../types/game";
+import type { Artifact, Chapter, GameState, Scene } from "../types/game";
+import { getNextSceneIndex, isChapterFinished } from "./gameProgress";
 import { calculatePuzzleScore } from "./gameScoring";
 
 export function createNewGameState(): GameState {
@@ -49,5 +50,25 @@ export function solvePuzzle(
   return {
     ...addArtifact(addScore(gameState, points), scene.artifact),
     screen: "history",
+  };
+}
+
+export function continueAfterHistory(
+  gameState: GameState,
+  chapter: Chapter
+): GameState {
+  const nextIndex = getNextSceneIndex(gameState.currentSceneIndex);
+
+  if (isChapterFinished(chapter, nextIndex)) {
+    return {
+      ...gameState,
+      screen: "finish",
+    };
+  }
+
+  return {
+    ...gameState,
+    currentSceneIndex: nextIndex,
+    screen: "puzzle",
   };
 }
