@@ -41,7 +41,8 @@ export const chapterOne: Chapter = {
         id: "artifact-michalska-brana",
         title: "Michalská brána",
         icon: "🏰",
-        shortFact: "Brána, kadiaľ do mesta vstupovali kupci, stráže aj králi.",
+        shortFact:
+          "Brána, kadiaľ do mesta vstupovali kupci, stráže aj králi.",
         fullText:
           "Michalská brána je poslednou zachovanou mestskou bránou Bratislavy. Kedysi bola súčasťou obranného systému mesta a jej veža slúžila ako pozorovací bod.",
       },
@@ -53,31 +54,99 @@ export const chapterOne: Chapter = {
           trigger: "puzzleSolved",
           conditions: [
             {
-                type: "flag",
-                id: "michalska_brana_solved",
-                value: false,
+              type: "flag",
+              id: "michalska_brana_solved",
+              value: false,
             },
-        ],
+          ],
           actions: [
             {
-            type: "startQuest",
-            questId: "quest-golden-key",
+              type: "startQuest",
+              questId: "quest-golden-key",
             },
             {
-            type: "addCalculatedPuzzleScore",
+              type: "addCalculatedPuzzleScore",
             },
             {
-            type: "addSceneArtifact",
+              type: "addSceneArtifact",
             },
             {
-            type: "setFlag",
-            flagId: "michalska_brana_solved",
+              type: "setFlag",
+              flagId: "michalska_brana_solved",
             },
             {
-            type: "completeQuest",
-            questId: "quest-golden-key",
+              type: "completeQuest",
+              questId: "quest-golden-key",
             },
+          ],
+        },
+      ],
+
+      branches: [
+        {
+          targetSceneId: "tajna-stopa-michalska",
+          conditions: [
+            {
+              type: "flag",
+              id: "michalska_brana_solved",
+            },
+          ],
+        },
+      ],
+    },
+
+    {
+      id: "tajna-stopa-michalska",
+      location: "Michalská ulica",
+      title: "2. Tajná stopa",
+      cinematicText:
+        "Keď sa obzrieš späť k Michalskej bráne, všimneš si detail, ktorý predtým splýval s okolím.",
+      voiceLine:
+        "Nie každá stopa je určená pre každého. Niektoré sa ukážu až tým, ktorí pochopili prvý odkaz.",
+      puzzle: {
+        id: "puzzle-tajna-stopa-michalska",
+        question:
+          "Aká bola prvá zastávka tvojej cesty?",
+        acceptedAnswers: [
+          "michalska brana",
+          "michalská brána",
         ],
+        hints: [
+          "Je to miesto, kde sa dobrodružstvo začalo.",
+          "Je to jediná zachovaná mestská brána.",
+        ],
+      },
+      history: {
+        id: "history-tajna-stopa",
+        title: "Skrytá stopa",
+        shortText:
+          "Mesto odhaľuje nové tajomstvá tým, ktorí si ich zaslúžia.",
+        fullText:
+          "Niektoré časti príbehu sa otvoria až po splnení konkrétnych podmienok. Toto je prvý príklad vetvenia Living Adventure Engine.",
+      },
+      artifact: {
+        id: "artifact-tajna-stopa",
+        title: "Skrytá stopa",
+        icon: "🗝️",
+        shortFact:
+          "Prvý dôkaz, že svet reaguje na tvoje rozhodnutia.",
+        fullText:
+          "Tento artefakt reprezentuje prvú vetvu príbehu odomknutú pomocou World State.",
+      },
+      nextInstruction:
+        "Pokračuj ďalej po trase.",
+
+      events: [
+        {
+          trigger: "puzzleSolved",
+          actions: [
+            {
+              type: "addCalculatedPuzzleScore",
+            },
+            {
+              type: "addSceneArtifact",
+            },
+          ],
         },
       ],
     },
