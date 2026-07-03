@@ -1,6 +1,5 @@
-import type { GameAction, GameEventTrigger, GameState } from "../types/game";
+import type { GameAction, GameEventTrigger, GameState, InventoryItem, Scene } from "../types/game";
 import { addArtifact, addScore } from "./gameEngine";
-import type { Scene } from "../types/game";
 import { evaluateConditions } from "./conditions";
 import { calculatePuzzleScore } from "./gameScoring";
 
@@ -31,6 +30,36 @@ function toggleFlag(gameState: GameState, flagId: string): GameState {
       ...gameState.flags,
       [flagId]: !gameState.flags[flagId],
     },
+  };
+}
+
+function addInventoryItem(
+  gameState: GameState,
+  item: InventoryItem
+): GameState {
+  const alreadyInInventory = gameState.inventory.some(
+    (inventoryItem) => inventoryItem.id === item.id
+  );
+
+  if (alreadyInInventory) {
+    return gameState;
+  }
+
+  return {
+    ...gameState,
+    inventory: [...gameState.inventory, item],
+  };
+}
+
+function removeInventoryItem(
+  gameState: GameState,
+  itemId: string
+): GameState {
+  return {
+    ...gameState,
+    inventory: gameState.inventory.filter(
+      (item) => item.id !== itemId
+    ),
   };
 }
 
@@ -74,6 +103,12 @@ function applyGameAction(
         activeDialogueId: action.dialogueId,
         activeDialogueNodeId: action.nodeId,
       };
+
+    case "addInventoryItem":
+      return addInventoryItem(gameState, action.item);
+
+    case "removeInventoryItem":
+      return removeInventoryItem(gameState, action.itemId);
 
     default:
       return gameState;

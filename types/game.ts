@@ -15,6 +15,14 @@ export type Artifact = {
   fullText: string;
 };
 
+export type InventoryItem = {
+  id: string;
+  title: string;
+  icon: string;
+  description: string;
+  consumable?: boolean;
+};
+
 export type CodexEntry = {
   id: CodexEntryId;
   title: string;
@@ -77,6 +85,14 @@ export type GameAction =
   | {
         type: "setScreen";
         screen: GameScreen;
+    }
+  | {
+      type: "addInventoryItem";
+      item: InventoryItem;
+    }
+  | {
+      type: "removeInventoryItem";
+      itemId: string;
     };
 
 export type GameEventTrigger = "puzzleSolved" | "sceneEntered";
@@ -172,6 +188,7 @@ export type GameState = {
   currentSceneIndex: number;
   score: number;
   artifacts: Artifact[];
+  inventory: InventoryItem[];
   quests: QuestProgress[];
   flags: Record<string, boolean>;
   activeDialogueId?: string;

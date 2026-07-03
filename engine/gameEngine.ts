@@ -12,6 +12,7 @@ export function createNewGameState(): GameState {
     artifacts: [],
     quests: [],
     flags: {},
+    inventory: [],
   };
 }
 
