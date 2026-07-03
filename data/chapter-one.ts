@@ -123,24 +123,34 @@ export const chapterOne: Chapter = {
       nextInstruction:
         "Značka ukazuje smerom nadol po Michalskej ulici. Ďalšia stopa ťa vedie k miestu, kde sa obchod, liečivá a tajomstvá stretávali za jedným pultom.",
 
-      events: [
-        {
-          trigger: "puzzleSolved",
-          conditions: [
-            {
-              type: "flag",
-              id: "tajna_stopa_solved",
-              value: false,
-            },
-          ],
-          actions: [
-            {
-              type: "setFlag",
-              flagId: "tajna_stopa_solved",
-            },
-          ],
+events: [
+  {
+    trigger: "puzzleSolved",
+    conditions: [
+      {
+        type: "flag",
+        id: "tajna_stopa_solved",
+        value: false,
+      },
+    ],
+    actions: [
+      {
+        type: "setFlag",
+        flagId: "tajna_stopa_solved",
+      },
+      {
+        type: "addInventoryItem",
+        item: {
+          id: "golden-pressburg-key",
+          title: "Zlatý prešporský kľúč",
+          icon: "🗝️",
+          description:
+            "Drobný symbolický kľúč nájdený po vyriešení značky starého pátrača. Neotvára obyčajné dvere — otvára ďalšiu časť príbehu.",
         },
-      ],
+      },
+    ],
+  },
+],
 
       branches: [
         {

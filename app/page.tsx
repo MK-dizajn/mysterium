@@ -9,7 +9,7 @@ import { HistoryScreen } from "../components/screens/HistoryScreen";
 import { FinishScreen } from "../components/screens/FinishScreen";
 import { ArtifactScreen } from "../components/screens/ArtifactScreen";
 import { CodexBar } from "../components/ui/CodexBar";
-import type { Artifact, GameScreen } from "../types/game";
+import type { Artifact, GameScreen, InventoryItem } from "../types/game";
 import { useGameEngine } from "../hooks/useGameEngine";
 import {
   clearGameState,
@@ -99,16 +99,19 @@ export default function Home() {
       <>
         <CodexBar
           artifacts={gameState.artifacts}
+          inventory={gameState.inventory}
           score={gameState.score}
           onOpenArtifact={openArtifact}
         />
 
-        <PuzzleScreen
-          scene={currentScene}
-          onSolved={(hintsUsed) => {
-            setGameState(solvePuzzle(gameState, currentScene, hintsUsed));
-          }}
-        />
+        <div className="pt-20">
+          <PuzzleScreen
+            scene={currentScene}
+            onSolved={(hintsUsed) => {
+             setGameState(solvePuzzle(gameState, currentScene, hintsUsed));
+           }}
+         />
+        </div>
       </>
     );
   }
@@ -118,16 +121,19 @@ export default function Home() {
       <>
         <CodexBar
           artifacts={gameState.artifacts}
+          inventory={gameState.inventory}
           score={gameState.score}
           onOpenArtifact={openArtifact}
         />
 
-        <HistoryScreen
-          scene={currentScene}
-          onContinue={() => {
-            setGameState(continueAfterHistory(gameState, currentChapter));
-          }}
-        />
+        <div className="pt-20">
+          <HistoryScreen
+            scene={currentScene}
+            onContinue={() => {
+             setGameState(continueAfterHistory(gameState, currentChapter));
+           }}
+         />
+       </div>
       </>
     );
   }

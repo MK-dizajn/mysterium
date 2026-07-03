@@ -79,8 +79,10 @@ export function evaluateCondition(
     case "currentScene":
       return gameState.currentSceneIndex === condition.index;
 
-    case "flag":
-      return gameState.flags[condition.id] === (condition.value ?? true);
+    case "flag": {
+      const currentValue = gameState.flags[condition.id] ?? false;
+      return currentValue === (condition.value ?? true);
+    }
 
     default:
       return false;
