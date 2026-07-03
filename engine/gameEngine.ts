@@ -48,17 +48,23 @@ export function solvePuzzle(
   scene: Scene,
   hintsUsed: number
 ): GameState {
-  const baseState = gameState;
+  const score = calculatePuzzleScore(hintsUsed);
 
-  const eventState = runSceneEvents(
-  baseState,
-  scene,
-  "puzzleSolved",
-  hintsUsed
+  let nextState = addScore(gameState, score);
+
+  if (scene.artifact) {
+    nextState = addArtifact(nextState, scene.artifact);
+  }
+
+  nextState = runSceneEvents(
+    nextState,
+    scene,
+    "puzzleSolved",
+    hintsUsed
   );
 
   return {
-    ...eventState,
+    ...nextState,
     screen: "history",
   };
 }
