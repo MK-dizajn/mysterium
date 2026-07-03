@@ -65,12 +65,6 @@ export const chapterOne: Chapter = {
               questId: "quest-golden-key",
             },
             {
-              type: "addCalculatedPuzzleScore",
-            },
-            {
-              type: "addSceneArtifact",
-            },
-            {
               type: "setFlag",
               flagId: "michalska_brana_solved",
             },
@@ -139,14 +133,7 @@ export const chapterOne: Chapter = {
       events: [
         {
           trigger: "puzzleSolved",
-          actions: [
-            {
-              type: "addCalculatedPuzzleScore",
-            },
-            {
-              type: "addSceneArtifact",
-            },
-          ],
+          actions: [],
         },
       ],
     },
