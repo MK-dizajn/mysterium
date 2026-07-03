@@ -16,13 +16,13 @@ export const chapterOne: Chapter = {
       location: "Michalská brána",
       title: "1. Nultý bod",
       cinematicText:
-        "Pod klenbou Michalskej brány sa stretávajú cesty sveta. Starý pátrač tu zanechal prvú stopu.",
+        "Pod klenbou Michalskej brány sa dlažba leskne po daždi. Turisti prechádzajú okolo bez zastavenia, no ty vieš, že starý pátrač by prvú stopu nikdy nenechal na očiach.",
       voiceLine:
         "Začni tam, kde králi vstupovali do mesta. Pozri sa pod nohy. Nie všetko, čo je vyryté v kove, je iba ozdoba.",
       puzzle: {
         id: "puzzle-michalska-brana",
         question:
-          "Postav sa na kovový kruh nultého kilometra. Nájdi mesto s najmenšou a najväčšou vzdialenosťou. Zadaj jeho názov.",
+          "Na kovovom kruhu nultého kilometra nájdi mesto s najmenšou vzdialenosťou od Bratislavy. Zadaj jeho názov.",
         acceptedAnswers: ["vieden", "viedeň", "vienna"],
         hints: [
           "Hľadaj mesto s najmenším číslom kilometrov.",
@@ -35,7 +35,7 @@ export const chapterOne: Chapter = {
         shortText:
           "Jediná zachovaná brána stredovekého opevnenia Bratislavy.",
         fullText:
-          "Michalská brána pochádza zo stredovekého opevnenia mesta a dodnes tvorí jeden z najvýraznejších vstupov do historického jadra. Kovový nultý kilometer pod bránou ukazuje vzdialenosti viacerých svetových miest. Väčšina ľudí po ňom prejde bez povšimnutia, no práve takéto detaily budú v Mysteriách rozhodovať.",
+          "Michalská brána patrí medzi najvýraznejšie symboly historického jadra Bratislavy. Kedysi bola súčasťou mestského opevnenia a tvorila jeden z hlavných vstupov do mesta. Kovový nultý kilometer pod bránou ukazuje vzdialenosti viacerých svetových miest.",
       },
       artifact: {
         id: "artifact-michalska-brana",
@@ -44,10 +44,10 @@ export const chapterOne: Chapter = {
         shortFact:
           "Brána, kadiaľ do mesta vstupovali kupci, stráže aj králi.",
         fullText:
-          "Michalská brána je poslednou zachovanou mestskou bránou Bratislavy. Kedysi bola súčasťou obranného systému mesta a jej veža slúžila ako pozorovací bod.",
+          "Michalská brána je poslednou zachovanou mestskou bránou Bratislavy. V príbehu slúži ako symbolický vstup do sveta starého pátrača.",
       },
       nextInstruction:
-        "Pokračuj dole Michalskou ulicou smerom do mesta. Keď sa ulica zmení na Ventúrsku, hľadaj po pravej strane Lekáreň U Salvátora.",
+        "Keď vyslovíš správne mesto, v jednej z rýh kovového kruhu si všimneš drobnú značku v tvare kľúča.",
 
       events: [
         {
@@ -67,10 +67,6 @@ export const chapterOne: Chapter = {
             {
               type: "setFlag",
               flagId: "michalska_brana_solved",
-            },
-            {
-              type: "completeQuest",
-              questId: "quest-golden-key",
             },
           ],
         },
@@ -92,48 +88,131 @@ export const chapterOne: Chapter = {
     {
       id: "tajna-stopa-michalska",
       location: "Michalská ulica",
-      title: "2. Tajná stopa",
+      title: "2. Značka starého pátrača",
       cinematicText:
-        "Keď sa obzrieš späť k Michalskej bráne, všimneš si detail, ktorý predtým splýval s okolím.",
+        "Keď sa odkloníš od ruchu ulice, všimneš si na okraji kamennej steny vyrytú drobnú značku. Nie je nová. Niekto ju tu nechal dávno pred tebou.",
       voiceLine:
-        "Nie každá stopa je určená pre každého. Niektoré sa ukážu až tým, ktorí pochopili prvý odkaz.",
+        "Dobre. Prvý zámok sa otvoril. Ale kľúč ešte nemáš. Hľadaj znamenie tam, kde sa mesto mení z brány na ulicu.",
       puzzle: {
         id: "puzzle-tajna-stopa-michalska",
         question:
-          "Aká bola prvá zastávka tvojej cesty?",
-        acceptedAnswers: [
-          "michalska brana",
-          "michalská brána",
-        ],
+          "Aký symbol si našiel po vyriešení prvej stopy?",
+        acceptedAnswers: ["kluc", "kľúč", "zlty kluc", "zlaty kluc", "zlatý kľúč"],
         hints: [
-          "Je to miesto, kde sa dobrodružstvo začalo.",
-          "Je to jediná zachovaná mestská brána.",
+          "Objavil sa v ryhe kovového kruhu.",
+          "Je to predmet, ktorým sa odomyká zámok.",
         ],
       },
       history: {
         id: "history-tajna-stopa",
-        title: "Skrytá stopa",
+        title: "Skryté mestské značky",
         shortText:
-          "Mesto odhaľuje nové tajomstvá tým, ktorí si ich zaslúžia.",
+          "Niektoré detaily historického mesta si všimne iba ten, kto ich hľadá.",
         fullText:
-          "Niektoré časti príbehu sa otvoria až po splnení konkrétnych podmienok. Toto je prvý príklad vetvenia Living Adventure Engine.",
+          "Staré mestá sú plné drobných značiek, nápisov, erbov a symbolov. V hre tieto detaily slúžia ako most medzi históriou a hádankami.",
       },
       artifact: {
-        id: "artifact-tajna-stopa",
-        title: "Skrytá stopa",
+        id: "artifact-znamka-patraca",
+        title: "Značka starého pátrača",
         icon: "🗝️",
         shortFact:
-          "Prvý dôkaz, že svet reaguje na tvoje rozhodnutia.",
+          "Prvý dôkaz, že pátračova cesta bola skutočná.",
         fullText:
-          "Tento artefakt reprezentuje prvú vetvu príbehu odomknutú pomocou World State.",
+          "Vyrytá značka kľúča naznačuje, že starý pátrač pripravoval cestu pre niekoho ďalšieho. Možno pre teba.",
       },
       nextInstruction:
-        "Pokračuj ďalej po trase.",
+        "Značka ukazuje smerom nadol po Michalskej ulici. Ďalšia stopa ťa vedie k miestu, kde sa obchod, liečivá a tajomstvá stretávali za jedným pultom.",
 
       events: [
         {
           trigger: "puzzleSolved",
-          actions: [],
+          conditions: [
+            {
+              type: "flag",
+              id: "tajna_stopa_solved",
+              value: false,
+            },
+          ],
+          actions: [
+            {
+              type: "setFlag",
+              flagId: "tajna_stopa_solved",
+            },
+          ],
+        },
+      ],
+
+      branches: [
+        {
+          targetSceneId: "lekaren-u-salvatora",
+          conditions: [
+            {
+              type: "flag",
+              id: "tajna_stopa_solved",
+            },
+          ],
+        },
+      ],
+    },
+
+    {
+      id: "lekaren-u-salvatora",
+      location: "Lekáreň U Salvátora",
+      title: "3. Miesto liekov a jedov",
+      cinematicText:
+        "Pred fasádou starej lekárne sa zastavíš. Výklady mlčia, no v ich odraze na okamih zbadáš siluetu muža v dlhom kabáte. Keď sa otočíš, ulica je prázdna.",
+      voiceLine:
+        "Tu sa kedysi vážili lieky aj jedy. Pátrač vedel, že pravda býva ako liek — v malej dávke zachráni, vo veľkej zmení všetko.",
+      puzzle: {
+        id: "puzzle-lekaren-salvator",
+        question:
+          "Aké slovo najviac vystihuje miesto, kde sa miešali lieky, recepty a tajomstvá?",
+        acceptedAnswers: ["lekaren", "lekáreň", "apoteka", "apotheka"],
+        hints: [
+          "Si pred historickou budovou spojenenou s liečivami.",
+          "Staršie slovo môže byť apotéka.",
+        ],
+      },
+      history: {
+        id: "history-lekaren-salvator",
+        title: "Lekáreň U Salvátora",
+        shortText:
+          "Jedna z najznámejších historických lekární v centre Bratislavy.",
+        fullText:
+          "Lekárne v starých mestách neboli iba miestom predaja liekov. Boli aj miestom poznania, receptúr, symbolov a dôvery. V tejto kapitole predstavuje lekáreň prechod od vonkajších mestských stôp k hlbšiemu tajomstvu pátrača.",
+      },
+      artifact: {
+        id: "artifact-stary-recept",
+        title: "Starý recept",
+        icon: "📜",
+        shortFact:
+          "Útržok receptu so zvláštnym symbolom kľúča v rohu.",
+        fullText:
+          "Na útržku starého receptu je rukou dopísaná veta: 'Zlatý kľúč neotvára dvere. Otvára spomienku.'",
+      },
+      nextInstruction:
+        "Na zadnej strane útržku receptu je napísané jediné slovo: Ventúrska.",
+
+      events: [
+        {
+          trigger: "puzzleSolved",
+          conditions: [
+            {
+              type: "flag",
+              id: "lekaren_solved",
+              value: false,
+            },
+          ],
+          actions: [
+            {
+              type: "setFlag",
+              flagId: "lekaren_solved",
+            },
+            {
+              type: "completeQuest",
+              questId: "quest-golden-key",
+            },
+          ],
         },
       ],
     },
