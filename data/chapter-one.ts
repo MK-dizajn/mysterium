@@ -51,6 +51,13 @@ export const chapterOne: Chapter = {
       events: [
         {
           trigger: "puzzleSolved",
+          conditions: [
+            {
+                type: "flag",
+                id: "michalska_brana_solved",
+                value: false,
+            },
+        ],
           actions: [
             {
             type: "startQuest",
