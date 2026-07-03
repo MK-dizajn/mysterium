@@ -4,7 +4,37 @@ import type { Scene } from "../types/game";
 import { evaluateConditions } from "./conditions";
 import { calculatePuzzleScore } from "./gameScoring";
 
-export function applyGameAction(
+function setFlag(gameState: GameState, flagId: string): GameState {
+  return {
+    ...gameState,
+    flags: {
+      ...gameState.flags,
+      [flagId]: true,
+    },
+  };
+}
+
+function clearFlag(gameState: GameState, flagId: string): GameState {
+  return {
+    ...gameState,
+    flags: {
+      ...gameState.flags,
+      [flagId]: false,
+    },
+  };
+}
+
+function toggleFlag(gameState: GameState, flagId: string): GameState {
+  return {
+    ...gameState,
+    flags: {
+      ...gameState.flags,
+      [flagId]: !gameState.flags[flagId],
+    },
+  };
+}
+
+function applyGameAction(
   gameState: GameState,
   scene: Scene,
   hintsUsed: number,
@@ -22,6 +52,15 @@ export function applyGameAction(
 
     case "addSceneArtifact":
       return addArtifact(gameState, scene.artifact);
+
+    case "setFlag":
+      return setFlag(gameState, action.flagId);
+
+    case "clearFlag":
+      return clearFlag(gameState, action.flagId);
+
+    case "toggleFlag":
+      return toggleFlag(gameState, action.flagId);
 
     case "setScreen":
       return {

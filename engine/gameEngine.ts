@@ -11,6 +11,7 @@ export function createNewGameState(): GameState {
     score: 0,
     artifacts: [],
     quests: [],
+    flags: {},
   };
 }
 

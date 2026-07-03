@@ -63,6 +63,10 @@ export const chapterOne: Chapter = {
             type: "addSceneArtifact",
             },
             {
+            type: "setFlag",
+            flagId: "michalska_brana_solved",
+            },
+            {
             type: "completeQuest",
             questId: "quest-golden-key",
             },

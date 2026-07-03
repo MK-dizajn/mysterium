@@ -23,6 +23,11 @@ export type Condition =
   | {
       type: "currentScene";
       index: number;
+    }
+  | {
+      type: "flag";
+      id: string;
+      value?: boolean;
     };
 
 function compareNumbers(
@@ -73,6 +78,9 @@ export function evaluateCondition(
 
     case "currentScene":
       return gameState.currentSceneIndex === condition.index;
+
+    case "flag":
+      return gameState.flags[condition.id] === (condition.value ?? true);
 
     default:
       return false;

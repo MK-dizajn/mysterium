@@ -36,30 +36,42 @@ export type SceneBranch = {
 
 export type GameAction =
   | {
-      type: "addScore";
-      value: number;
+        type: "addScore";
+        value: number;
     }
   | {
-      type: "addArtifact";
-      artifact: Artifact;
+        type: "addArtifact";
+        artifact: Artifact;
     }
   | {
-      type: "setScreen";
-      screen: GameScreen;
+        type: "addSceneArtifact";
     }
   | {
-      type: "addSceneArtifact";
+        type: "addCalculatedPuzzleScore";
     }
   | {
-      type: "addCalculatedPuzzleScore";
-    }
-      | {
-      type: "startQuest";
-      questId: string;
+        type: "startQuest";
+        questId: string;
     }
   | {
-      type: "completeQuest";
-      questId: string;
+        type: "completeQuest";
+        questId: string;
+    }
+  | {
+        type: "setFlag";
+        flagId: string;
+    }
+  | {
+        type: "clearFlag";
+        flagId: string;
+    }  
+  | {
+        type: "toggleFlag";
+        flagId: string;
+    }
+  | {
+        type: "setScreen";
+        screen: GameScreen;
     };
 
 export type GameEventTrigger = "puzzleSolved" | "sceneEntered";
@@ -133,4 +145,5 @@ export type GameState = {
   score: number;
   artifacts: Artifact[];
   quests: QuestProgress[];
+  flags: Record<string, boolean>;
 };
