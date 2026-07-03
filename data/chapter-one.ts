@@ -165,7 +165,7 @@ events: [
       ],
     },
 
-    {
+        {
       id: "lekaren-u-salvatora",
       location: "Lekáreň U Salvátora",
       title: "3. Miesto liekov a jedov",
@@ -221,6 +221,83 @@ events: [
             {
               type: "completeQuest",
               questId: "quest-golden-key",
+            },
+          ],
+        },
+      ],
+
+      branches: [
+        {
+          targetSceneId: "venturska-brana-spomienok",
+          conditions: [
+            {
+              type: "inventoryItem",
+              itemId: "golden-pressburg-key",
+            },
+          ],
+        },
+      ],
+    },
+
+    {
+      id: "venturska-brana-spomienok",
+      location: "Ventúrska ulica",
+      title: "4. Brána spomienok",
+      cinematicText:
+        "Ventúrska ulica je tichšia než Michalská. Medzi fasádami starých domov zbadáš nenápadný reliéf v tvare zámku. Zlatý prešporský kľúč v tvojom inventári akoby na okamih zahrial dlaň.",
+      voiceLine:
+        "Nie všetky zámky sú zo železa. Niektoré sa otvoria až vtedy, keď si pripravený niesť príbeh ďalej.",
+      puzzle: {
+        id: "puzzle-venturska-brana",
+        question:
+          "Aký predmet ti umožnil nájsť Bránu spomienok?",
+        acceptedAnswers: [
+          "kluc",
+          "kľúč",
+          "zlaty kluc",
+          "zlatý kľúč",
+          "zlaty presporsky kluc",
+          "zlatý prešporský kľúč",
+        ],
+        hints: [
+          "Získal si ho po vyriešení značky starého pátrača.",
+          "Nachádza sa v inventári.",
+        ],
+      },
+      history: {
+        id: "history-venturska",
+        title: "Ventúrska ulica",
+        shortText:
+          "Jedna z historických ulíc starého mesta, spojená s meštianskym životom Bratislavy.",
+        fullText:
+          "Ventúrska ulica patrí medzi ulice historického jadra Bratislavy. V hre slúži ako prvé miesto, kde hráč použije predmet z inventára ako podmienku ďalšieho postupu.",
+      },
+      artifact: {
+        id: "artifact-brana-spomienok",
+        title: "Brána spomienok",
+        icon: "🚪",
+        shortFact:
+          "Prvá stopa, ktorá sa otvorila iba vďaka predmetu z inventára.",
+        fullText:
+          "Brána spomienok potvrdzuje, že Zlatý prešporský kľúč nie je obyčajný predmet. Je to nosič príbehu a symbol postupu hráča.",
+      },
+      nextInstruction:
+        "Za reliéfom sa ukrýva ďalšia veta pátračovho denníka. Cesta sa začína meniť na skutočné pátranie.",
+
+      events: [
+        {
+          trigger: "puzzleSolved",
+          conditions: [
+            {
+              type: "flag",
+              id: "venturska_solved",
+              value: false,
+            },
+          ],
+          actions: [
+            {
+              type: "setFlag",
+              flagId: "venturska_solved",
             },
           ],
         },
