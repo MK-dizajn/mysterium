@@ -67,6 +67,13 @@ function applyGameAction(
         ...gameState,
         screen: action.screen,
       };
+    
+    case "startDialogue":
+      return {
+        ...gameState,
+        activeDialogueId: action.dialogueId,
+        activeDialogueNodeId: action.nodeId,
+      };
 
     default:
       return gameState;

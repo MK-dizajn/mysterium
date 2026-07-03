@@ -70,6 +70,11 @@ export type GameAction =
         flagId: string;
     }
   | {
+      type: "startDialogue";
+      dialogueId: string;
+      nodeId: string;
+    }
+  | {
         type: "setScreen";
         screen: GameScreen;
     };
@@ -80,6 +85,27 @@ export type GameEvent = {
   trigger: GameEventTrigger;
   conditions?: Condition[];
   actions: GameAction[];
+};
+
+export type DialogueChoice = {
+  id: string;
+  text: string;
+  conditions?: Condition[];
+  actions?: GameAction[];
+  nextDialogueNodeId?: string;
+};
+
+export type DialogueNode = {
+  id: string;
+  speaker: string;
+  text: string;
+  choices?: DialogueChoice[];
+};
+
+export type Dialogue = {
+  id: string;
+  title: string;
+  nodes: DialogueNode[];
 };
 
 export type Scene = {
@@ -98,6 +124,8 @@ export type Scene = {
   branches?: SceneBranch[];
 
   events?: GameEvent[];
+
+  dialogues?: Dialogue[];
 };
 
 export type Chapter = {
@@ -146,4 +174,6 @@ export type GameState = {
   artifacts: Artifact[];
   quests: QuestProgress[];
   flags: Record<string, boolean>;
+  activeDialogueId?: string;
+  activeDialogueNodeId?: string;
 };
