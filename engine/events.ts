@@ -1,7 +1,6 @@
 import type { GameAction, GameEventTrigger, GameState, InventoryItem, Scene } from "../types/game";
 import { addArtifact, addScore } from "./gameEngine";
 import { evaluateConditions } from "./conditions";
-import { calculatePuzzleScore } from "./gameScoring";
 
 function setFlag(gameState: GameState, flagId: string): GameState {
   return {
@@ -73,14 +72,8 @@ function applyGameAction(
     case "addScore":
       return addScore(gameState, action.value);
 
-    case "addCalculatedPuzzleScore":
-      return addScore(gameState, calculatePuzzleScore(hintsUsed));
-
     case "addArtifact":
       return addArtifact(gameState, action.artifact);
-
-    case "addSceneArtifact":
-      return addArtifact(gameState, scene.artifact);
 
     case "setFlag":
       return setFlag(gameState, action.flagId);

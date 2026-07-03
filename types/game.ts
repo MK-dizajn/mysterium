@@ -52,12 +52,6 @@ export type GameAction =
         artifact: Artifact;
     }
   | {
-        type: "addSceneArtifact";
-    }
-  | {
-        type: "addCalculatedPuzzleScore";
-    }
-  | {
         type: "startQuest";
         questId: string;
     }
