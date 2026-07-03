@@ -13,6 +13,10 @@ export type Condition =
       id: string;
     }
   | {
+      type: "inventoryItem";
+      itemId: string;
+    }
+  | {
       type: "screen";
       value: GameState["screen"];
     }
@@ -68,6 +72,11 @@ export function evaluateCondition(
     case "artifact":
       return gameState.artifacts.some(
         (artifact) => artifact.id === condition.id
+      );
+
+    case "inventoryItem":
+      return gameState.inventory.some(
+        (item) => item.id === condition.itemId
       );
 
     case "screen":
