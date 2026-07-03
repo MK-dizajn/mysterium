@@ -161,7 +161,9 @@ export type GameScreen =
   | "puzzle"
   | "history"
   | "finish"
-  | "artifact";
+  | "artifact"
+  | "inventory"
+  | "artifacts";
 
 export type QuestStatus = "locked" | "active" | "completed";
 

@@ -4,50 +4,51 @@ type CodexBarProps = {
   artifacts: Artifact[];
   inventory: InventoryItem[];
   score: number;
-  onOpenArtifact: (artifact: Artifact) => void;
+  onOpenInventory: () => void;
+  onOpenArtifacts: () => void;
 };
 
 export function CodexBar({
   artifacts,
   inventory,
   score,
-  onOpenArtifact,
+  onOpenInventory,
+  onOpenArtifacts,
 }: CodexBarProps) {
-return (
-  <div className="fixed left-0 right-0 top-0 z-50 border-b border-amber-400/10 bg-slate-950/90 px-4 py-2 backdrop-blur">
-    <div className="mx-auto flex max-w-md items-center justify-between gap-3">
-      <div>
-        <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500">
-          Denník pátrača
-        </p>
-
-        <p className="text-xs text-amber-300">Skóre: {score}</p>
-      </div>
-
-      <div className="flex items-center gap-2">
-        {inventory.map((item) => (
-          <div
-            key={item.id}
-            title={item.description}
-            className="flex h-9 items-center gap-1 rounded-xl border border-sky-400/20 bg-sky-400/10 px-2 text-xs text-sky-100"
-          >
-            <span>{item.icon}</span>
-            <span className="max-w-24 truncate">{item.title}</span>
+  return (
+    <header className="sticky top-0 z-50 border-b border-amber-300/15 bg-slate-950/95 px-4 py-3 shadow-xl shadow-amber-950/20 backdrop-blur">
+      <div className="mx-auto flex max-w-md flex-col gap-2">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-amber-400/70">
+              Denník pátrača
+            </p>
+            <p className="text-xs text-slate-400">Mestská stopa</p>
           </div>
-        ))}
 
-        {artifacts.map((artifact) => (
+          <div className="rounded-full border border-amber-300/20 bg-amber-400/10 px-3 py-1 text-xs font-semibold text-amber-200">
+            ⭐ {score}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-2">
           <button
-            key={artifact.id}
-            title={artifact.title}
-            onClick={() => onOpenArtifact(artifact)}
-            className="flex h-9 w-9 items-center justify-center rounded-xl border border-amber-400/20 bg-amber-400/10 text-xl transition hover:bg-amber-400/20"
+            onClick={onOpenInventory}
+            className="rounded-xl border border-sky-300/15 bg-sky-400/10 px-3 py-2 text-left text-xs text-sky-100 transition hover:border-sky-300/40 hover:bg-sky-400/20"
           >
-            {artifact.icon}
+            <span className="block font-semibold">🎒 Inventár</span>
+            <span className="text-slate-400">{inventory.length}/10 predmetov</span>
           </button>
-        ))}
+
+          <button
+            onClick={onOpenArtifacts}
+            className="rounded-xl border border-amber-300/15 bg-amber-400/10 px-3 py-2 text-left text-xs text-amber-100 transition hover:border-amber-300/40 hover:bg-amber-400/20"
+          >
+            <span className="block font-semibold">🏛️ Artefakty</span>
+            <span className="text-slate-400">{artifacts.length}/12 nájdené</span>
+          </button>
+        </div>
       </div>
-    </div>
-  </div>
-);
+    </header>
+  );
 }

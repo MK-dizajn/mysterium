@@ -104,14 +104,12 @@ export default function Home() {
           onOpenArtifact={openArtifact}
         />
 
-        <div className="pt-20">
           <PuzzleScreen
             scene={currentScene}
             onSolved={(hintsUsed) => {
              setGameState(solvePuzzle(gameState, currentScene, hintsUsed));
            }}
          />
-        </div>
       </>
     );
   }
@@ -126,14 +124,12 @@ export default function Home() {
           onOpenArtifact={openArtifact}
         />
 
-        <div className="pt-20">
           <HistoryScreen
             scene={currentScene}
             onContinue={() => {
              setGameState(continueAfterHistory(gameState, currentChapter));
            }}
          />
-       </div>
       </>
     );
   }
