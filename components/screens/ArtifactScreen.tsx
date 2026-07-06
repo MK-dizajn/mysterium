@@ -21,7 +21,7 @@ export function ArtifactScreen({ artifact, onBack }: ArtifactScreenProps) {
 
         <p>{artifact.fullText}</p>
 
-        <GameButton onClick={onBack}>Späť do hry</GameButton>
+        <GameButton onClick={onBack}>Späť</GameButton>
       </StoryCard>
     </main>
   );

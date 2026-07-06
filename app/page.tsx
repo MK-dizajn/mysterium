@@ -8,7 +8,6 @@ import { PuzzleScreen } from "../components/screens/PuzzleScreen";
 import { HistoryScreen } from "../components/screens/HistoryScreen";
 import { FinishScreen } from "../components/screens/FinishScreen";
 import { ArtifactScreen } from "../components/screens/ArtifactScreen";
-import { CodexBar } from "../components/ui/CodexBar";
 import type { Artifact, GameScreen, InventoryItem } from "../types/game";
 import { useGameEngine } from "../hooks/useGameEngine";
 import {
@@ -17,6 +16,9 @@ import {
   createNewGameState,
   solvePuzzle,
 } from "../engine";
+import { InventoryScreen } from "../components/screens/InventoryScreen";
+import { ArtifactsScreen } from "../components/screens/ArtifactsScreen";
+import { GameLayout } from "../components/layout/GameLayout";
 
 const initialGameState = createNewGameState();
 
@@ -30,6 +32,8 @@ export default function Home() {
 
   const [selectedArtifact, setSelectedArtifact] = useState<Artifact | null>(null);
   const [previousScreen, setPreviousScreen] = useState<GameScreen>("puzzle");
+  const [artifactPreviousScreen, setArtifactPreviousScreen] =
+  useState<GameScreen>("artifacts");
 
   const currentChapter =
     mysteriumGame.chapters[gameState.currentChapterIndex];
@@ -71,7 +75,7 @@ export default function Home() {
   }
 
   function openArtifact(artifact: Artifact) {
-    setPreviousScreen(gameState.screen);
+    setArtifactPreviousScreen(gameState.screen);
     setSelectedArtifact(artifact);
     updateGameScreen("artifact");
   }
@@ -80,10 +84,10 @@ export default function Home() {
     return (
       <ArtifactScreen
         artifact={selectedArtifact}
-        onBack={() => updateGameScreen(previousScreen)}
+        onBack={() => updateGameScreen(artifactPreviousScreen)}
       />
     );
-  }
+    }
 
   if (gameState.screen === "intro") {
     return (
@@ -97,19 +101,25 @@ export default function Home() {
   if (gameState.screen === "puzzle") {
     return (
       <>
-        <CodexBar
-          artifacts={gameState.artifacts}
-          inventory={gameState.inventory}
-          score={gameState.score}
-          onOpenArtifact={openArtifact}
-        />
-
+          <GameLayout
+            gameState={gameState}
+            currentScreen={gameState.screen}
+            onOpenInventory={() => {
+             setPreviousScreen(gameState.screen);
+             updateGameScreen("inventory");
+             }}
+            onOpenArtifacts={() => {
+             setPreviousScreen(gameState.screen);
+             updateGameScreen("artifacts");
+            }}
+          >
           <PuzzleScreen
             scene={currentScene}
             onSolved={(hintsUsed) => {
              setGameState(solvePuzzle(gameState, currentScene, hintsUsed));
-           }}
-         />
+              }}
+            />
+          </GameLayout>
       </>
     );
   }
@@ -117,25 +127,46 @@ export default function Home() {
   if (gameState.screen === "history") {
     return (
       <>
-        <CodexBar
-          artifacts={gameState.artifacts}
-          inventory={gameState.inventory}
-          score={gameState.score}
-          onOpenArtifact={openArtifact}
-        />
-
+          <GameLayout
+           gameState={gameState}
+           currentScreen={gameState.screen}
+           onOpenInventory={() => {
+            setPreviousScreen(gameState.screen);
+            updateGameScreen("inventory");
+            }}
+          onOpenArtifacts={() => {
+           setPreviousScreen(gameState.screen);
+           updateGameScreen("artifacts");
+           }}
+          >
           <HistoryScreen
             scene={currentScene}
             onContinue={() => {
              setGameState(continueAfterHistory(gameState, currentChapter));
-           }}
-         />
+             }}
+          />
+          </GameLayout>
       </>
     );
   }
 
-  if (gameState.screen === "finish") {
-    return <FinishScreen onRestart={resetToMainMenu} />;
+  if (gameState.screen === "inventory") {
+  return (
+    <InventoryScreen
+      inventory={gameState.inventory}
+      onBack={() => updateGameScreen(previousScreen)}
+    />
+  );
+  }
+
+  if (gameState.screen === "artifacts") {
+  return (
+    <ArtifactsScreen
+      artifacts={gameState.artifacts}
+      onBack={() => updateGameScreen(previousScreen)}
+      onOpenArtifact={openArtifact}
+    />
+  );
   }
 
   return (

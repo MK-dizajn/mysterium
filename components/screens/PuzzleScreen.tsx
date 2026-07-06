@@ -48,7 +48,7 @@ export function PuzzleScreen({ scene, onSolved }: PuzzleScreenProps) {
   }
 
   return (
-    <main className="min-h-screen bg-[#05070d] px-6 pb-10 pt-28 text-white">
+    <main className="min-h-screen bg-[#05070d] px-6 pb-10 pt-10 text-white">
       <StoryCard label={scene.location} title={scene.title}>
         <p className="text-amber-200">{scene.cinematicText}</p>
 
