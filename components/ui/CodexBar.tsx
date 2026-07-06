@@ -1,48 +1,49 @@
-import type { Artifact, InventoryItem } from "../../types/game";
+import type { Artifact, InventoryItem, QuestProgress } from "../../types/game";
 
 type CodexBarProps = {
   artifacts: Artifact[];
   inventory: InventoryItem[];
+  quests: QuestProgress[];
   score: number;
   onOpenInventory: () => void;
   onOpenArtifacts: () => void;
+  onOpenQuests: () => void;
 };
 
 function getInventoryLabel(count: number) {
-  if (count === 1) {
-    return "1 predmet";
-  }
-
-  if (count > 1 && count < 5) {
-    return `${count} predmety`;
-  }
-
+  if (count === 1) return "1 predmet";
+  if (count > 1 && count < 5) return `${count} predmety`;
   return `${count} predmetov`;
 }
 
 export function CodexBar({
   artifacts,
   inventory,
+  quests,
   score,
   onOpenInventory,
   onOpenArtifacts,
-}: CodexBarProps) {
+  onOpenQuests,
+  }: CodexBarProps) {
+  const activeQuests = quests.filter((quest) => quest.status === "active").length;
+  const completedQuests = quests.filter(
+    (quest) => quest.status === "completed"
+  ).length;
+
   return (
     <header className="sticky top-0 z-50 border-b border-amber-300/15 bg-slate-950/95 px-4 py-3 shadow-xl shadow-amber-950/20 backdrop-blur">
       <div className="mx-auto flex max-w-md flex-col gap-3">
         <div className="flex items-center justify-between gap-3">
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-amber-400/80">
-              Denník pátrača
-            </p>
-          </div>
+          <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-amber-400/80">
+            Denník pátrača
+          </p>
 
           <div className="rounded-full border border-amber-300/20 bg-amber-400/10 px-3 py-1 text-xs font-semibold text-amber-200">
             ⭐ {score}
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-3 gap-2">
           <button
             type="button"
             onClick={onOpenInventory}
@@ -65,7 +66,20 @@ export function CodexBar({
               🏛️ Artefakty
             </span>
             <span className="mt-0.5 block text-xs text-slate-400">
-              {artifacts.length}/12 nájdené
+              {artifacts.length}/12
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={onOpenQuests}
+            className="rounded-xl border border-emerald-300/20 bg-emerald-400/10 px-3 py-2 text-left shadow-lg shadow-emerald-950/10 transition hover:border-emerald-300/40 hover:bg-emerald-400/20"
+          >
+            <span className="block text-sm font-bold text-emerald-100">
+              📜 Úlohy
+            </span>
+            <span className="mt-0.5 block text-xs text-slate-400">
+              {activeQuests} akt. / {completedQuests} spl.
             </span>
           </button>
         </div>

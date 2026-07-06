@@ -163,19 +163,29 @@ export type GameScreen =
   | "finish"
   | "artifact"
   | "inventory"
-  | "artifacts";
+  | "artifacts"
+  | "quests";
 
 export type QuestStatus = "locked" | "active" | "completed";
+
+export type QuestReward = {
+  score?: number;
+  artifact?: Artifact;
+  item?: InventoryItem;
+};
 
 export type Quest = {
   id: string;
   title: string;
   description: string;
+  completedText?: string;
+  reward?: QuestReward;
 };
 
 export type QuestProgress = {
   questId: string;
   status: QuestStatus;
+  completedAtSceneId?: SceneId;
 };
 
 export type GameState = {

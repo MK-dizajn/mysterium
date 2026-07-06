@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import type { Artifact, GameScreen, GameState } from "../../types/game";
+import type { GameScreen, GameState } from "../../types/game";
 import { CodexBar } from "../ui/CodexBar";
 
 type GameLayoutProps = {
@@ -8,6 +8,7 @@ type GameLayoutProps = {
   currentScreen: GameScreen;
   onOpenInventory: () => void;
   onOpenArtifacts: () => void;
+  onOpenQuests: () => void;
 };
 
 export function GameLayout({
@@ -15,15 +16,18 @@ export function GameLayout({
   gameState,
   onOpenInventory,
   onOpenArtifacts,
+  onOpenQuests,
 }: GameLayoutProps) {
   return (
     <>
       <CodexBar
         artifacts={gameState.artifacts}
         inventory={gameState.inventory}
+        quests={gameState.quests}
         score={gameState.score}
         onOpenInventory={onOpenInventory}
         onOpenArtifacts={onOpenArtifacts}
+        onOpenQuests={onOpenQuests}
       />
 
       {children}

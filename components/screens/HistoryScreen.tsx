@@ -9,7 +9,7 @@ type HistoryScreenProps = {
 
 export function HistoryScreen({ scene, onContinue }: HistoryScreenProps) {
   return (
-    <main className="min-h-screen bg-[#05070d] px-6 pb-10 pt-28 text-white">
+    <main className="min-h-screen bg-[#05070d] px-6 pb-10 pt-10 text-white">
       <StoryCard label="Zápis do Codexu" title={scene.history.title}>
         <p className="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-4 text-emerald-200">
           {scene.history.shortText}

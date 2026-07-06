@@ -48,7 +48,6 @@ export const chapterOne: Chapter = {
       },
       nextInstruction:
         "Keď vyslovíš správne mesto, v jednej z rýh kovového kruhu si všimneš drobnú značku v tvare kľúča.",
-
       events: [
         {
           trigger: "puzzleSolved",
@@ -71,7 +70,6 @@ export const chapterOne: Chapter = {
           ],
         },
       ],
-
       branches: [
         {
           targetSceneId: "tajna-stopa-michalska",
@@ -95,9 +93,14 @@ export const chapterOne: Chapter = {
         "Dobre. Prvý zámok sa otvoril. Ale kľúč ešte nemáš. Hľadaj znamenie tam, kde sa mesto mení z brány na ulicu.",
       puzzle: {
         id: "puzzle-tajna-stopa-michalska",
-        question:
-          "Aký symbol si našiel po vyriešení prvej stopy?",
-        acceptedAnswers: ["kluc", "kľúč", "zlty kluc", "zlaty kluc", "zlatý kľúč"],
+        question: "Aký symbol si našiel po vyriešení prvej stopy?",
+        acceptedAnswers: [
+          "kluc",
+          "kľúč",
+          "zlty kluc",
+          "zlaty kluc",
+          "zlatý kľúč",
+        ],
         hints: [
           "Objavil sa v ryhe kovového kruhu.",
           "Je to predmet, ktorým sa odomyká zámok.",
@@ -122,36 +125,34 @@ export const chapterOne: Chapter = {
       },
       nextInstruction:
         "Značka ukazuje smerom nadol po Michalskej ulici. Ďalšia stopa ťa vedie k miestu, kde sa obchod, liečivá a tajomstvá stretávali za jedným pultom.",
-
-events: [
-  {
-    trigger: "puzzleSolved",
-    conditions: [
-      {
-        type: "flag",
-        id: "tajna_stopa_solved",
-        value: false,
-      },
-    ],
-    actions: [
-      {
-        type: "setFlag",
-        flagId: "tajna_stopa_solved",
-      },
-      {
-        type: "addInventoryItem",
-        item: {
-          id: "golden-pressburg-key",
-          title: "Zlatý prešporský kľúč",
-          icon: "🗝️",
-          description:
-            "Drobný symbolický kľúč nájdený po vyriešení značky starého pátrača. Neotvára obyčajné dvere — otvára ďalšiu časť príbehu.",
+      events: [
+        {
+          trigger: "puzzleSolved",
+          conditions: [
+            {
+              type: "flag",
+              id: "tajna_stopa_solved",
+              value: false,
+            },
+          ],
+          actions: [
+            {
+              type: "setFlag",
+              flagId: "tajna_stopa_solved",
+            },
+            {
+              type: "addInventoryItem",
+              item: {
+                id: "golden-pressburg-key",
+                title: "Zlatý prešporský kľúč",
+                icon: "🗝️",
+                description:
+                  "Drobný symbolický kľúč nájdený po vyriešení značky starého pátrača. Neotvára obyčajné dvere — otvára ďalšiu časť príbehu.",
+              },
+            },
+          ],
         },
-      },
-    ],
-  },
-],
-
+      ],
       branches: [
         {
           targetSceneId: "lekaren-u-salvatora",
@@ -165,7 +166,7 @@ events: [
       ],
     },
 
-        {
+    {
       id: "lekaren-u-salvatora",
       location: "Lekáreň U Salvátora",
       title: "3. Miesto liekov a jedov",
@@ -202,7 +203,6 @@ events: [
       },
       nextInstruction:
         "Na zadnej strane útržku receptu je napísané jediné slovo: Ventúrska.",
-
       events: [
         {
           trigger: "puzzleSolved",
@@ -222,10 +222,13 @@ events: [
               type: "completeQuest",
               questId: "quest-golden-key",
             },
+            {
+              type: "addScore",
+              value: 10,
+            },
           ],
         },
       ],
-
       branches: [
         {
           targetSceneId: "venturska-brana-spomienok",
@@ -283,7 +286,6 @@ events: [
       },
       nextInstruction:
         "Za reliéfom sa ukrýva ďalšia veta pátračovho denníka. Cesta sa začína meniť na skutočné pátranie.",
-
       events: [
         {
           trigger: "puzzleSolved",

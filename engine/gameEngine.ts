@@ -44,6 +44,71 @@ export function addScore(
   };
 }
 
+export function startQuest(
+  gameState: GameState,
+  questId: string
+): GameState {
+  const existingQuest = gameState.quests.find(
+    (quest) => quest.questId === questId
+  );
+
+  if (existingQuest) {
+    return gameState;
+  }
+
+  return {
+    ...gameState,
+    quests: [
+      ...gameState.quests,
+      {
+        questId,
+        status: "active",
+      },
+    ],
+  };
+}
+
+export function completeQuest(
+  gameState: GameState,
+  questId: string,
+  scene?: Scene
+): GameState {
+  const existingQuest = gameState.quests.find(
+    (quest) => quest.questId === questId
+  );
+
+  if (!existingQuest) {
+    return {
+      ...gameState,
+      quests: [
+        ...gameState.quests,
+        {
+          questId,
+          status: "completed",
+          completedAtSceneId: scene?.id,
+        },
+      ],
+    };
+  }
+
+  if (existingQuest.status === "completed") {
+    return gameState;
+  }
+
+  return {
+    ...gameState,
+    quests: gameState.quests.map((quest) =>
+      quest.questId === questId
+        ? {
+            ...quest,
+            status: "completed",
+            completedAtSceneId: scene?.id,
+          }
+        : quest
+    ),
+  };
+}
+
 export function solvePuzzle(
   gameState: GameState,
   scene: Scene,

@@ -1,5 +1,5 @@
 import type { GameAction, GameEventTrigger, GameState, InventoryItem, Scene } from "../types/game";
-import { addArtifact, addScore } from "./gameEngine";
+import { addArtifact, addScore, completeQuest, startQuest } from "./gameEngine";
 import { evaluateConditions } from "./conditions";
 
 function setFlag(gameState: GameState, flagId: string): GameState {
@@ -74,6 +74,12 @@ function applyGameAction(
 
     case "addArtifact":
       return addArtifact(gameState, action.artifact);
+
+    case "startQuest":
+      return startQuest(gameState, action.questId);
+
+    case "completeQuest":
+      return completeQuest(gameState, action.questId, scene);
 
     case "setFlag":
       return setFlag(gameState, action.flagId);
