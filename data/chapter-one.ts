@@ -10,6 +10,19 @@ export const chapterOne: Chapter = {
     "Niektoré tajomstvá čakali celé stáročia.",
     "Ak toto čítaš, znamená to, že som zlyhal.",
   ],
+  quests: [
+    {
+      id: "quest-golden-key",
+      title: "Zlatý prešporský kľúč",
+      description:
+        "Sleduj stopu starého pátrača a odhaľ význam zlatého kľúča, ktorý sa ukrýva v prvej časti kapitoly.",
+      completedText:
+        "Zistil si, že Zlatý prešporský kľúč neotvára obyčajné dvere. Otvára spomienky mesta.",
+      reward: {
+        score: 10,
+      },
+    },
+  ],
   scenes: [
     {
       id: "michalska-brana",

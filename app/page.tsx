@@ -18,6 +18,7 @@ import {
 import { InventoryScreen } from "../components/screens/InventoryScreen";
 import { ArtifactsScreen } from "../components/screens/ArtifactsScreen";
 import { GameLayout } from "../components/layout/GameLayout";
+import { QuestScreen } from "../components/screens/QuestScreen";
 
 const initialGameState = createNewGameState();
 
@@ -166,43 +167,11 @@ export default function Home() {
 
   if (gameState.screen === "quests") {
     return (
-      <div className="min-h-screen bg-slate-950 px-4 py-8 text-slate-100">
-        <div className="mx-auto max-w-md">
-          <button
-            type="button"
-            onClick={() => updateGameScreen(previousScreen)}
-            className="mb-6 rounded-full border border-slate-700 px-4 py-2 text-sm text-slate-300"
-          >
-            ← Späť
-          </button>
-
-          <h1 className="mb-4 text-2xl font-bold text-emerald-100">
-            📜 Úlohy
-          </h1>
-
-          {gameState.quests.length === 0 ? (
-            <p className="text-sm text-slate-400">
-              Zatiaľ nemáš aktívne žiadne vedľajšie úlohy.
-            </p>
-          ) : (
-            <div className="space-y-3">
-              {gameState.quests.map((quest) => (
-                <div
-                  key={quest.questId}
-                  className="rounded-2xl border border-emerald-300/20 bg-emerald-400/10 p-4"
-                >
-                  <p className="font-semibold text-emerald-100">
-                    {quest.questId}
-                  </p>
-                  <p className="mt-1 text-sm text-slate-400">
-                    Stav: {quest.status}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
+      <QuestScreen
+      questProgress={gameState.quests}
+      availableQuests={currentChapter.quests ?? []}
+      onBack={() => updateGameScreen(previousScreen)}
+     />
     );
   }
 

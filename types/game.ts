@@ -144,6 +144,7 @@ export type Chapter = {
   title: string;
   subtitle: string;
   introLines: string[];
+  quests: Quest[];
   scenes: Scene[];
 };
 
