@@ -55,13 +55,6 @@ export default function Home() {
     }));
   }
 
-  function resetToMainMenu() {
-    clearGameState();
-    setSelectedArtifact(null);
-    setHasSavedProgress(false);
-    setGameState(initialGameState);
-  }
-
   function startNewGame() {
     clearGameState();
     setSelectedArtifact(null);
@@ -122,85 +115,85 @@ export default function Home() {
   }
 
   function applyDialogueChoiceActions(choice: DialogueChoice) {
-  if (!choice.actions || choice.actions.length === 0) {
-    return;
-  }
+    if (!choice.actions || choice.actions.length === 0) {
+      return;
+    }
 
-  setGameState((currentState) => {
-    let nextState = { ...currentState };
+    setGameState((currentState) => {
+      let nextState = { ...currentState };
 
-    choice.actions?.forEach((action) => {
-      if (action.type === "setFlag") {
-        nextState = {
-          ...nextState,
-          flags: {
-            ...nextState.flags,
-            [action.flagId]: true,
-          },
-        };
-      }
-
-      if (action.type === "clearFlag") {
-        nextState = {
-          ...nextState,
-          flags: {
-            ...nextState.flags,
-            [action.flagId]: false,
-          },
-        };
-      }
-
-      if (action.type === "toggleFlag") {
-        nextState = {
-          ...nextState,
-          flags: {
-            ...nextState.flags,
-            [action.flagId]: !nextState.flags[action.flagId],
-          },
-        };
-      }
-
-      if (action.type === "addScore") {
-        nextState = {
-          ...nextState,
-          score: nextState.score + action.value,
-        };
-      }
-
-      if (action.type === "addInventoryItem") {
-        const alreadyHasItem = nextState.inventory.some(
-          (item) => item.id === action.item.id
-        );
-
-        if (!alreadyHasItem) {
+      choice.actions?.forEach((action) => {
+        if (action.type === "setFlag") {
           nextState = {
             ...nextState,
-            inventory: [...nextState.inventory, action.item],
+            flags: {
+              ...nextState.flags,
+              [action.flagId]: true,
+            },
           };
         }
-      }
 
-      if (action.type === "removeInventoryItem") {
-        nextState = {
-          ...nextState,
-          inventory: nextState.inventory.filter(
-            (item) => item.id !== action.itemId
-          ),
-        };
-      }
-
-      if (action.type === "addArtifact") {
-        const alreadyHasArtifact = nextState.artifacts.some(
-          (artifact) => artifact.id === action.artifact.id
-        );
-
-        if (!alreadyHasArtifact) {
+        if (action.type === "clearFlag") {
           nextState = {
             ...nextState,
-            artifacts: [...nextState.artifacts, action.artifact],
+            flags: {
+              ...nextState.flags,
+              [action.flagId]: false,
+            },
           };
         }
-      }
+
+        if (action.type === "toggleFlag") {
+          nextState = {
+            ...nextState,
+            flags: {
+              ...nextState.flags,
+              [action.flagId]: !nextState.flags[action.flagId],
+            },
+          };
+        }
+
+        if (action.type === "addScore") {
+          nextState = {
+            ...nextState,
+            score: nextState.score + action.value,
+          };
+        }
+
+        if (action.type === "addInventoryItem") {
+          const alreadyHasItem = nextState.inventory.some(
+            (item) => item.id === action.item.id
+          );
+
+          if (!alreadyHasItem) {
+            nextState = {
+              ...nextState,
+              inventory: [...nextState.inventory, action.item],
+            };
+          }
+        }
+
+        if (action.type === "removeInventoryItem") {
+          nextState = {
+            ...nextState,
+            inventory: nextState.inventory.filter(
+              (item) => item.id !== action.itemId
+            ),
+          };
+        }
+
+        if (action.type === "addArtifact") {
+          const alreadyHasArtifact = nextState.artifacts.some(
+            (artifact) => artifact.id === action.artifact.id
+          );
+
+          if (!alreadyHasArtifact) {
+            nextState = {
+              ...nextState,
+              artifacts: [...nextState.artifacts, action.artifact],
+            };
+          }
+        }
 
         if (action.type === "setScreen") {
           nextState = {
@@ -218,47 +211,47 @@ export default function Home() {
   }
 
   if (gameState.screen === "npc") {
-  const activeNpc = currentScene.npcs?.find(
-    (npc) => npc.id === gameState.activeNpcId
-  );
-
-  const activeDialogue = currentScene.dialogues?.find(
-    (dialogue) => dialogue.id === gameState.activeDialogueId
-  );
-
-  const activeDialogueNode = activeDialogue?.nodes.find(
-  (node) => node.id === gameState.activeDialogueNodeId
-  );
-
-  const visibleChoices =
-  activeDialogueNode?.choices?.filter((choice) =>
-    evaluateConditions(choice.conditions ?? [], gameState)
-  ) ?? [];
-
-  if (!activeNpc || !activeDialogue || !gameState.activeDialogueNodeId) {
-    return (
-      <GameLayout
-        gameState={gameState}
-        currentScreen={gameState.screen}
-        onOpenInventory={openInventory}
-        onOpenArtifacts={openArtifacts}
-        onOpenQuests={openQuests}
-      >
-        <div className="rounded-2xl border border-red-400/40 bg-red-950/30 p-6 text-red-100">
-          Rozhovor sa nepodarilo načítať.
-          <button
-            type="button"
-            onClick={closeNpcDialogue}
-            className="mt-4 block rounded-xl border border-red-300/40 px-4 py-2"
-          >
-            Späť
-          </button>
-        </div>
-      </GameLayout>
+    const activeNpc = currentScene.npcs?.find(
+      (npc) => npc.id === gameState.activeNpcId
     );
-  }
 
-  return (
+    const activeDialogue = currentScene.dialogues?.find(
+      (dialogue) => dialogue.id === gameState.activeDialogueId
+    );
+
+    const activeDialogueNode = activeDialogue?.nodes.find(
+      (node) => node.id === gameState.activeDialogueNodeId
+    );
+
+    const visibleChoices =
+      activeDialogueNode?.choices?.filter((choice) =>
+        evaluateConditions(choice.conditions ?? [], gameState)
+      ) ?? [];
+
+    if (!activeNpc || !activeDialogue || !gameState.activeDialogueNodeId) {
+      return (
+        <GameLayout
+          gameState={gameState}
+          currentScreen={gameState.screen}
+          onOpenInventory={openInventory}
+          onOpenArtifacts={openArtifacts}
+          onOpenQuests={openQuests}
+        >
+          <div className="rounded-2xl border border-red-400/40 bg-red-950/30 p-6 text-red-100">
+            Rozhovor sa nepodarilo načítať.
+            <button
+              type="button"
+              onClick={closeNpcDialogue}
+              className="mt-4 block rounded-xl border border-red-300/40 px-4 py-2"
+            >
+              Späť
+            </button>
+          </div>
+        </GameLayout>
+      );
+    }
+
+    return (
       <NpcScreen
         npc={activeNpc}
         dialogue={activeDialogue}
@@ -274,27 +267,27 @@ export default function Home() {
             (item) => item.id === choiceId
           );
 
-      if (!choice) {
-        return;
-        }
+          if (!choice) {
+            return;
+          }
 
-      applyDialogueChoiceActions(choice);
+          applyDialogueChoiceActions(choice);
 
-      if (choice.nextDialogueNodeId) {
-        chooseDialogueNode(choice.nextDialogueNodeId);
-      return;
-      }
+          if (choice.nextDialogueNodeId) {
+            chooseDialogueNode(choice.nextDialogueNodeId);
+            return;
+          }
 
-      const hasSetScreenAction = choice.actions?.some(
-        (action) => action.type === "setScreen"
-      );
+          const hasSetScreenAction = choice.actions?.some(
+            (action) => action.type === "setScreen"
+          );
 
-      if (!hasSetScreenAction) {
-        closeNpcDialogue();
-      }
+          if (!hasSetScreenAction) {
+            closeNpcDialogue();
+          }
         }}
         onClose={closeNpcDialogue}
-     />
+      />
     );
   }
 
@@ -317,6 +310,10 @@ export default function Home() {
   }
 
   if (gameState.screen === "puzzle") {
+    const isMichalskaLocked =
+      currentScene.id === "michalska-brana" &&
+      !gameState.flags.talked_to_michalska_guardian;
+
     return (
       <GameLayout
         gameState={gameState}
@@ -325,47 +322,51 @@ export default function Home() {
         onOpenArtifacts={openArtifacts}
         onOpenQuests={openQuests}
       >
-        {currentScene.npcs && currentScene.npcs.length > 0 && (
-          <section className="mb-6 rounded-2xl border border-amber-400/30 bg-black/30 p-4">
-            <p className="mb-3 text-sm uppercase tracking-[0.25em] text-amber-200/70">
-              Postavy v okolí
+
+        {isMichalskaLocked ? (
+          <section className="mt-12 mx-auto max-w-2xl rounded-3xl border border-amber-300/30 bg-stone-950/80 p-6 text-stone-100 shadow-2xl">
+            <p className="mb-2 text-sm uppercase tracking-[0.3em] text-amber-200/60">
+              Stopa je zamknutá
             </p>
 
-            <div className="space-y-3">
-              {currentScene.npcs.map((npc) => (
-                <button
-                  key={npc.id}
-                  type="button"
-                  onClick={() => openNpcDialogue(npc.id)}
-                  className="w-full rounded-xl border border-amber-300/30 bg-amber-300/10 px-4 py-3 text-left transition hover:bg-amber-300/20"
-                >
-                  <div className="font-semibold text-amber-100">
-                    {npc.name}
-                  </div>
+            <h1 className="text-2xl font-bold text-amber-100">
+              Brána mlčí...
+            </h1>
 
-                  {npc.role && (
-                    <div className="text-sm text-amber-100/60">
-                      {npc.role}
-                    </div>
-                  )}
+            <p className="mt-4 leading-relaxed text-stone-300">
+              Pod klenbou Michalskej brány cítiš zvláštny nepokoj.
+              Nultý bod je priamo pred tebou, no jeho význam ti zatiaľ uniká.
+            </p>
 
-                  {npc.description && (
-                    <div className="mt-2 text-sm text-stone-300">
-                      {npc.description}
-                    </div>
-                  )}
-                </button>
-              ))}
-            </div>
+            <p className="mt-4 leading-relaxed text-stone-300">
+              V tieni brány stojí osamelá postava. Zdá sa, že čaká práve na
+              teba. Možno pozná odpoveď, ktorú ešte nehľadáš správnym spôsobom.
+            </p>
+
+            <button
+              type="button"
+              onClick={() => {
+                const npc = currentScene.npcs?.[0];
+
+                if (!npc) {
+                  return;
+                }
+
+                openNpcDialogue(npc.id);
+              }}
+              className="mt-6 w-full rounded-xl bg-amber-400 px-5 py-3 font-bold uppercase tracking-[0.15em] text-black transition hover:bg-amber-300"
+            >
+              Osloviť Strážcu
+            </button>
           </section>
+        ) : (
+          <PuzzleScreen
+            scene={currentScene}
+            onSolved={(hintsUsed) => {
+              setGameState(solvePuzzle(gameState, currentScene, hintsUsed));
+            }}
+          />
         )}
-
-        <PuzzleScreen
-          scene={currentScene}
-          onSolved={(hintsUsed) => {
-            setGameState(solvePuzzle(gameState, currentScene, hintsUsed));
-          }}
-        />
       </GameLayout>
     );
   }

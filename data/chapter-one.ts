@@ -63,56 +63,68 @@ export const chapterOne: Chapter = {
         "Keď vyslovíš správne mesto, v jednej z rýh kovového kruhu si všimneš drobnú značku v tvare kľúča.",
 
       dialogues: [
-        {
-          id: "dialogue-strazca-michalska",
-          title: "Strážca Michalskej brány",
-          nodes: [
-            {
-              id: "start",
-              speaker: "Strážca Michalskej brány",
-              text: "Zastav sa, pátrač. Nie každý, kto prejde pod touto bránou, si všimne, že mesto pod nohami stále rozpráva.",
-              choices: [
-                {
-                  id: "choice-ask-key",
-                  text: "Čo mám hľadať?",
-                  nextDialogueNodeId: "hint",
-                },
-                {
-                  id: "choice-leave",
-                  text: "Musím pokračovať.",
-                  actions: [
-                    {
-                      type: "setScreen",
-                      screen: "puzzle",
-                    },
-                  ],
-                },
-              ],
-            },
-            {
-              id: "hint",
-              speaker: "Strážca Michalskej brány",
-              text: "Začni pri nultom bode. Niekedy je najkratšia vzdialenosť zároveň najväčšou stopou.",
-              choices: [
-                {
-                  id: "choice-understood",
-                  text: "Rozumiem.",
-                  actions: [
-                    {
-                      type: "setFlag",
-                      flagId: "talked_to_michalska_guardian",
-                    },
-                    {
-                      type: "setScreen",
-                      screen: "puzzle",
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-        },
-      ],
+     {
+        id: "dialogue-strazca-michalska",
+        title: "Strážca Michalskej brány",
+       nodes: [
+         {
+            id: "start",
+            speaker: "Strážca Michalskej brány",
+            text: "Zastav sa, pátrač. Každý prejde bránou, no málokto si všimne, že prvá stopa neleží pred očami, ale pod nohami.",
+           choices: [
+              {
+               id: "choice-ask-where",
+               text: "Pod nohami?",
+               nextDialogueNodeId: "under-feet",
+              },
+             {
+                id: "choice-already-know",
+                text: "Myslím, že už viem, kde začať.",
+                actions: [
+                  {
+                    type: "setFlag",
+                   flagId: "talked_to_michalska_guardian",
+                  },
+                  {
+                    type: "startQuest",
+                    questId: "quest-golden-key",
+                  },
+                 {
+                   type: "setScreen",
+                    screen: "puzzle",
+                  },
+               ],
+             },
+           ],
+          },
+         {
+           id: "under-feet",
+           speaker: "Strážca Michalskej brány",
+           text: "Mesto má svoj nultý bod. Nie je to len ozdoba pre turistov. Je to kruh vzdialeností — a niekedy najbližšie meno ukáže prvý smer.",
+          choices: [
+             {
+               id: "choice-accept-quest",
+               text: "Prijímam stopu.",
+               actions: [
+                 {
+                   type: "setFlag",
+                   flagId: "talked_to_michalska_guardian",
+                 },
+                  {
+                    type: "startQuest",
+                    questId: "quest-golden-key",
+                  },
+                  {
+                    type: "setScreen",
+                    screen: "puzzle",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
 
       npcs: [
         {
@@ -136,10 +148,6 @@ export const chapterOne: Chapter = {
             },
           ],
           actions: [
-            {
-              type: "startQuest",
-              questId: "quest-golden-key",
-            },
             {
               type: "setFlag",
               flagId: "michalska_brana_solved",
