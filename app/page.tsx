@@ -7,7 +7,7 @@ import { LandingScreen } from "../components/screens/LandingScreen";
 import { PuzzleScreen } from "../components/screens/PuzzleScreen";
 import { HistoryScreen } from "../components/screens/HistoryScreen";
 import { ArtifactScreen } from "../components/screens/ArtifactScreen";
-import type { Artifact, GameScreen } from "../types/game";
+import type { Artifact, DialogueChoice, GameScreen } from "../types/game";
 import { useGameEngine } from "../hooks/useGameEngine";
 import {
   clearGameState,
@@ -120,6 +120,102 @@ export default function Home() {
     }));
   }
 
+  function applyDialogueChoiceActions(choice: DialogueChoice) {
+  if (!choice.actions || choice.actions.length === 0) {
+    return;
+  }
+
+  setGameState((currentState) => {
+    let nextState = { ...currentState };
+
+    choice.actions?.forEach((action) => {
+      if (action.type === "setFlag") {
+        nextState = {
+          ...nextState,
+          flags: {
+            ...nextState.flags,
+            [action.flagId]: true,
+          },
+        };
+      }
+
+      if (action.type === "clearFlag") {
+        nextState = {
+          ...nextState,
+          flags: {
+            ...nextState.flags,
+            [action.flagId]: false,
+          },
+        };
+      }
+
+      if (action.type === "toggleFlag") {
+        nextState = {
+          ...nextState,
+          flags: {
+            ...nextState.flags,
+            [action.flagId]: !nextState.flags[action.flagId],
+          },
+        };
+      }
+
+      if (action.type === "addScore") {
+        nextState = {
+          ...nextState,
+          score: nextState.score + action.value,
+        };
+      }
+
+      if (action.type === "addInventoryItem") {
+        const alreadyHasItem = nextState.inventory.some(
+          (item) => item.id === action.item.id
+        );
+
+        if (!alreadyHasItem) {
+          nextState = {
+            ...nextState,
+            inventory: [...nextState.inventory, action.item],
+          };
+        }
+      }
+
+      if (action.type === "removeInventoryItem") {
+        nextState = {
+          ...nextState,
+          inventory: nextState.inventory.filter(
+            (item) => item.id !== action.itemId
+          ),
+        };
+      }
+
+      if (action.type === "addArtifact") {
+        const alreadyHasArtifact = nextState.artifacts.some(
+          (artifact) => artifact.id === action.artifact.id
+        );
+
+        if (!alreadyHasArtifact) {
+          nextState = {
+            ...nextState,
+            artifacts: [...nextState.artifacts, action.artifact],
+          };
+        }
+      }
+
+        if (action.type === "setScreen") {
+          nextState = {
+            ...nextState,
+            screen: action.screen,
+            activeNpcId: undefined,
+            activeDialogueId: undefined,
+            activeDialogueNodeId: undefined,
+          };
+        }
+      });
+
+      return nextState;
+    });
+  }
+
   if (gameState.screen === "npc") {
   const activeNpc = currentScene.npcs?.find(
     (npc) => npc.id === gameState.activeNpcId
@@ -171,12 +267,20 @@ export default function Home() {
         return;
         }
 
+      applyDialogueChoiceActions(choice);
+
       if (choice.nextDialogueNodeId) {
         chooseDialogueNode(choice.nextDialogueNodeId);
-        return;
+      return;
       }
 
+      const hasSetScreenAction = choice.actions?.some(
+        (action) => action.type === "setScreen"
+      );
+
+      if (!hasSetScreenAction) {
         closeNpcDialogue();
+      }
         }}
         onClose={closeNpcDialogue}
      />
