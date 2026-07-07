@@ -1,4 +1,8 @@
+"use client";
+
+import { useState } from "react";
 import type { Dialogue, DialogueChoice, Npc } from "../../types/game";
+import { Typewriter } from "../ui/Typewriter";
 
 type NpcScreenProps = {
   npc: Npc;
@@ -19,9 +23,20 @@ export function NpcScreen({
   onChooseChoice,
   onClose,
 }: NpcScreenProps) {
+  const [isTextComplete, setIsTextComplete] = useState(false);
+
   const activeNode =
     dialogue.nodes.find((node) => node.id === activeNodeId) ??
     dialogue.nodes[0];
+
+  function handleTextComplete() {
+    setIsTextComplete(true);
+  }
+
+  function handleChoice(choiceId: string) {
+    setIsTextComplete(false);
+    onChooseChoice(choiceId);
+  }
 
   return (
     <main className="min-h-screen bg-stone-950 px-4 py-8 text-stone-100">
@@ -30,14 +45,10 @@ export function NpcScreen({
           Rozhovor
         </p>
 
-        <h1 className="text-3xl font-bold text-amber-100">
-          {npc.name}
-        </h1>
+        <h1 className="text-3xl font-bold text-amber-100">{npc.name}</h1>
 
         {npc.role && (
-          <p className="mt-1 text-sm text-amber-100/60">
-            {npc.role}
-          </p>
+          <p className="mt-1 text-sm text-amber-100/60">{npc.role}</p>
         )}
 
         <div className="mt-8 rounded-2xl border border-stone-700 bg-stone-900/80 p-5">
@@ -45,34 +56,37 @@ export function NpcScreen({
             {activeNode.speaker}
           </p>
 
-          <p className="text-lg leading-relaxed text-stone-100">
-            {activeNode.text}
-          </p>
+          <div className="text-lg leading-relaxed text-stone-100">
+            <Typewriter
+              key={activeNode.id}
+              text={activeNode.text}
+              onComplete={handleTextComplete}
+            />
+          </div>
         </div>
 
         <div className="mt-6 space-y-3">
-          {visibleChoices.length > 0 ? (
-            visibleChoices.map((choice) => (
+          {isTextComplete &&
+            (visibleChoices.length > 0 ? (
+              visibleChoices.map((choice) => (
+                <button
+                  key={choice.id}
+                  type="button"
+                  onClick={() => handleChoice(choice.id)}
+                  className="w-full rounded-xl border border-amber-300/30 bg-amber-300/10 px-4 py-3 text-left text-amber-50 transition hover:bg-amber-300/20"
+                >
+                  {choice.text}
+                </button>
+              ))
+            ) : (
               <button
-                key={choice.id}
                 type="button"
-                onClick={() => {
-                    onChooseChoice(choice.id);
-                }}
+                onClick={onClose}
                 className="w-full rounded-xl border border-amber-300/30 bg-amber-300/10 px-4 py-3 text-left text-amber-50 transition hover:bg-amber-300/20"
-               >
-                {choice.text}
-             </button>
-            ))
-          ) : (
-            <button
-              type="button"
-              onClick={onClose}
-              className="w-full rounded-xl border border-amber-300/30 bg-amber-300/10 px-4 py-3 text-left text-amber-50 transition hover:bg-amber-300/20"
-            >
-              Ukončiť rozhovor
-            </button>
-          )}
+              >
+                Ukončiť rozhovor
+              </button>
+            ))}
         </div>
 
         <button
