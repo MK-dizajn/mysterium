@@ -1,9 +1,10 @@
-import type { Dialogue, Npc } from "../../types/game";
+import type { Dialogue, DialogueChoice, Npc } from "../../types/game";
 
 type NpcScreenProps = {
   npc: Npc;
   dialogue: Dialogue;
   activeNodeId: string;
+  visibleChoices: DialogueChoice[];
   onChooseNode: (nodeId: string) => void;
   onChooseChoice: (choiceId: string) => void;
   onClose: () => void;
@@ -13,6 +14,7 @@ export function NpcScreen({
   npc,
   dialogue,
   activeNodeId,
+  visibleChoices,
   onChooseNode,
   onChooseChoice,
   onClose,
@@ -49,8 +51,8 @@ export function NpcScreen({
         </div>
 
         <div className="mt-6 space-y-3">
-          {activeNode.choices && activeNode.choices.length > 0 ? (
-            activeNode.choices.map((choice) => (
+          {visibleChoices.length > 0 ? (
+            visibleChoices.map((choice) => (
               <button
                 key={choice.id}
                 type="button"

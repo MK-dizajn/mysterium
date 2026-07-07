@@ -13,6 +13,7 @@ import {
   clearGameState,
   continueAfterHistory,
   createNewGameState,
+  evaluateConditions,
   solvePuzzle,
   talkToNpc,
 } from "../engine";
@@ -225,6 +226,15 @@ export default function Home() {
     (dialogue) => dialogue.id === gameState.activeDialogueId
   );
 
+  const activeDialogueNode = activeDialogue?.nodes.find(
+  (node) => node.id === gameState.activeDialogueNodeId
+  );
+
+  const visibleChoices =
+  activeDialogueNode?.choices?.filter((choice) =>
+    evaluateConditions(choice.conditions ?? [], gameState)
+  ) ?? [];
+
   if (!activeNpc || !activeDialogue || !gameState.activeDialogueNodeId) {
     return (
       <GameLayout
@@ -253,6 +263,7 @@ export default function Home() {
         npc={activeNpc}
         dialogue={activeDialogue}
         activeNodeId={gameState.activeDialogueNodeId}
+        visibleChoices={visibleChoices}
         onChooseNode={chooseDialogueNode}
         onChooseChoice={(choiceId) => {
           const activeNode = activeDialogue.nodes.find(
