@@ -1,4 +1,4 @@
-import type { Artifact, Chapter, GameState, Scene } from "../types/game";
+import type { Artifact, Chapter, GameState, Scene, Npc } from "../types/game";
 import { getNextSceneIndex, isChapterFinished } from "./gameProgress";
 import { calculatePuzzleScore } from "./gameScoring";
 import { runSceneEvents } from "./events";
@@ -41,6 +41,16 @@ export function addScore(
   return {
     ...gameState,
     score: gameState.score + points,
+  };
+}
+
+export function talkToNpc(gameState: GameState, npc: Npc): GameState {
+  return {
+    ...gameState,
+    screen: "npc",
+    activeNpcId: npc.id,
+    activeDialogueId: npc.dialogueId,
+    activeDialogueNodeId: "start",
   };
 }
 

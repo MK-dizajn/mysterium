@@ -61,6 +61,70 @@ export const chapterOne: Chapter = {
       },
       nextInstruction:
         "Keď vyslovíš správne mesto, v jednej z rýh kovového kruhu si všimneš drobnú značku v tvare kľúča.",
+
+      dialogues: [
+        {
+          id: "dialogue-strazca-michalska",
+          title: "Strážca Michalskej brány",
+          nodes: [
+            {
+              id: "start",
+              speaker: "Strážca Michalskej brány",
+              text: "Zastav sa, pátrač. Nie každý, kto prejde pod touto bránou, si všimne, že mesto pod nohami stále rozpráva.",
+              choices: [
+                {
+                  id: "choice-ask-key",
+                  text: "Čo mám hľadať?",
+                  nextDialogueNodeId: "hint",
+                },
+                {
+                  id: "choice-leave",
+                  text: "Musím pokračovať.",
+                  actions: [
+                    {
+                      type: "setScreen",
+                      screen: "puzzle",
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              id: "hint",
+              speaker: "Strážca Michalskej brány",
+              text: "Začni pri nultom bode. Niekedy je najkratšia vzdialenosť zároveň najväčšou stopou.",
+              choices: [
+                {
+                  id: "choice-understood",
+                  text: "Rozumiem.",
+                  actions: [
+                    {
+                      type: "setFlag",
+                      flagId: "talked_to_michalska_guardian",
+                    },
+                    {
+                      type: "setScreen",
+                      screen: "puzzle",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+
+      npcs: [
+        {
+          id: "npc-strazca-michalska",
+          name: "Strážca Michalskej brány",
+          role: "Tichý pozorovateľ",
+          description:
+            "Postava zahalená v tieni brány. Nepôsobí ako človek z tejto doby.",
+          dialogueId: "dialogue-strazca-michalska",
+        },
+      ],
+
       events: [
         {
           trigger: "puzzleSolved",

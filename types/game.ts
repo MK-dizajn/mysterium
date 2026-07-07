@@ -42,34 +42,69 @@ export type SceneBranch = {
   conditions?: Condition[];
 };
 
+export type GameScreen =
+  | "landing"
+  | "intro"
+  | "puzzle"
+  | "history"
+  | "finish"
+  | "artifact"
+  | "inventory"
+  | "artifacts"
+  | "quests"
+  | "questJournal"
+  | "npc";
+
+export type QuestStatus = "locked" | "active" | "completed";
+
+export type QuestReward = {
+  score?: number;
+  artifact?: Artifact;
+  item?: InventoryItem;
+};
+
+export type Quest = {
+  id: string;
+  title: string;
+  description: string;
+  completedText?: string;
+  reward?: QuestReward;
+};
+
+export type QuestProgress = {
+  questId: string;
+  status: QuestStatus;
+  completedAtSceneId?: SceneId;
+};
+
 export type GameAction =
   | {
-        type: "addScore";
-        value: number;
+      type: "addScore";
+      value: number;
     }
   | {
-        type: "addArtifact";
-        artifact: Artifact;
+      type: "addArtifact";
+      artifact: Artifact;
     }
   | {
-        type: "startQuest";
-        questId: string;
+      type: "startQuest";
+      questId: string;
     }
   | {
-        type: "completeQuest";
-        questId: string;
+      type: "completeQuest";
+      questId: string;
     }
   | {
-        type: "setFlag";
-        flagId: string;
+      type: "setFlag";
+      flagId: string;
     }
   | {
-        type: "clearFlag";
-        flagId: string;
-    }  
+      type: "clearFlag";
+      flagId: string;
+    }
   | {
-        type: "toggleFlag";
-        flagId: string;
+      type: "toggleFlag";
+      flagId: string;
     }
   | {
       type: "startDialogue";
@@ -77,8 +112,8 @@ export type GameAction =
       nodeId: string;
     }
   | {
-        type: "setScreen";
-        screen: GameScreen;
+      type: "setScreen";
+      screen: GameScreen;
     }
   | {
       type: "addInventoryItem";
@@ -118,6 +153,15 @@ export type Dialogue = {
   nodes: DialogueNode[];
 };
 
+export type Npc = {
+  id: string;
+  name: string;
+  role?: string;
+  portrait?: string;
+  description?: string;
+  dialogueId: string;
+};
+
 export type Scene = {
   id: SceneId;
   location: string;
@@ -130,12 +174,11 @@ export type Scene = {
   nextInstruction: string;
 
   conditions?: Condition[];
-
   branches?: SceneBranch[];
-
   events?: GameEvent[];
 
   dialogues?: Dialogue[];
+  npcs?: Npc[];
 };
 
 export type Chapter = {
@@ -156,39 +199,6 @@ export type Game = {
   chapters: Chapter[];
 };
 
-export type GameScreen =
-  | "landing"
-  | "intro"
-  | "puzzle"
-  | "history"
-  | "finish"
-  | "artifact"
-  | "inventory"
-  | "artifacts"
-  | "quests";
-
-export type QuestStatus = "locked" | "active" | "completed";
-
-export type QuestReward = {
-  score?: number;
-  artifact?: Artifact;
-  item?: InventoryItem;
-};
-
-export type Quest = {
-  id: string;
-  title: string;
-  description: string;
-  completedText?: string;
-  reward?: QuestReward;
-};
-
-export type QuestProgress = {
-  questId: string;
-  status: QuestStatus;
-  completedAtSceneId?: SceneId;
-};
-
 export type GameState = {
   screen: GameScreen;
   currentChapterIndex: number;
@@ -200,4 +210,5 @@ export type GameState = {
   flags: Record<string, boolean>;
   activeDialogueId?: string;
   activeDialogueNodeId?: string;
+  activeNpcId?: string;
 };
