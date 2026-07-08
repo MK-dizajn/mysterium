@@ -3,6 +3,13 @@
 import { useState } from "react";
 import type { Scene } from "../../types/game";
 import { GameButton } from "../ui/GameButton";
+import {
+  DetectiveIcon,
+  LightbulbIcon,
+  QuestionIcon,
+  SearchIcon,
+} from "../ui/MysteriumIcons";
+import { SectionCard } from "../ui/SectionCard";
 import { StoryCard } from "../ui/StoryCard";
 
 type PuzzleScreenProps = {
@@ -22,6 +29,7 @@ export function PuzzleScreen({ scene, onSolved }: PuzzleScreenProps) {
   const [answer, setAnswer] = useState("");
   const [error, setError] = useState("");
   const [hintIndex, setHintIndex] = useState(0);
+  const [successMessage, setSuccessMessage] = useState("");
 
   const visibleHints = scene.puzzle.hints.slice(0, hintIndex);
   const hasMoreHints = hintIndex < scene.puzzle.hints.length;
@@ -34,12 +42,19 @@ export function PuzzleScreen({ scene, onSolved }: PuzzleScreenProps) {
     );
 
     if (!isCorrect) {
-      setError("Zatiaľ nie. Skús sa pozrieť pozornejšie na detail pred sebou.");
+      setSuccessMessage("");
+      setError(
+        "Táto stopa zatiaľ nesedí. Vráť sa pohľadom k detailu pred sebou a skús nájsť niečo, čo si si predtým nevšimol."
+      );
       return;
     }
 
     setError("");
-    onSolved(hintIndex);
+    setSuccessMessage("Stopa potvrdená. Pátračov záznam sa otvára...");
+
+    window.setTimeout(() => {
+      onSolved(hintIndex);
+    }, 700);
   }
 
   function showHint() {
@@ -52,62 +67,102 @@ export function PuzzleScreen({ scene, onSolved }: PuzzleScreenProps) {
       <StoryCard label={scene.location} title={scene.title}>
         <p className="text-amber-200">{scene.cinematicText}</p>
 
-        <div className="rounded-2xl border border-slate-700 bg-slate-950/70 p-4 text-slate-300">
-          <p className="text-xs font-bold uppercase tracking-widest text-slate-500">
-            Hlas pátrača
+        <SectionCard
+          icon={<DetectiveIcon className="h-9 w-9" />}
+          title="Hlas pátrača"
+        >
+          <p className="italic leading-relaxed text-slate-300">
+            „{scene.voiceLine}“
           </p>
-          <p className="mt-2 italic">„{scene.voiceLine}“</p>
-        </div>
+        </SectionCard>
 
-        <p>{scene.puzzle.question}</p>
+        <SectionCard
+          icon={<SearchIcon className="h-9 w-9" />}
+          title="Vyšetrovanie miesta"
+          variant="gold"
+        >
+          <p className="text-sm leading-relaxed text-amber-100">
+            Rozhliadni sa okolo seba. Odpoveď nie je ukrytá v texte, ale v
+            detaile, ktorý máš priamo pred očami.
+          </p>
+        </SectionCard>
+
+        <SectionCard
+          icon={<QuestionIcon className="h-9 w-9" />}
+          title="Otázka"
+        >
+          <p className="mt-2 text-[15px] leading-8 text-white">
+            {scene.puzzle.question}
+          </p>
+        </SectionCard>
 
         <input
           value={answer}
           onChange={(event) => setAnswer(event.target.value)}
-          className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-4 text-center text-white outline-none focus:border-amber-400"
+          className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-4 text-center text-white outline-none transition focus:border-amber-400"
           placeholder="Tvoja odpoveď..."
         />
 
         {error && (
-          <p className="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-center text-sm text-red-300">
-            {error}
-          </p>
-        )}
-
-        <GameButton onClick={checkAnswer}>Overiť odpoveď</GameButton>
-
-        <div className="rounded-2xl border border-slate-700 bg-slate-950/60 p-4">
-          <div className="flex items-center justify-between gap-4">
-            <p className="text-xs font-bold uppercase tracking-widest text-slate-500">
-              Nápovedy
+          <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200">
+            <p className="text-xs font-bold uppercase tracking-widest text-red-300/70">
+              Nesprávna stopa
             </p>
 
-            <button
-              onClick={showHint}
-              disabled={!hasMoreHints}
-              className="rounded-xl border border-amber-400/30 px-3 py-2 text-xs font-bold text-amber-300 disabled:cursor-not-allowed disabled:opacity-40"
+            <p className="mt-2 leading-relaxed">{error}</p>
+          </div>
+        )}
+
+        {successMessage && (
+          <div className="rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-4 text-sm text-emerald-100">
+            <p className="text-xs font-bold uppercase tracking-widest text-emerald-300/70">
+              Stopa potvrdená
+            </p>
+
+            <p className="mt-2 leading-relaxed">{successMessage}</p>
+          </div>
+        )}
+
+        <SectionCard
+          icon={<LightbulbIcon className="h-9 w-9" />}
+          title="Stopy"
+        >
+          <div className="space-y-3">
+            <p className="text-sm text-slate-500">
+            {visibleHints.length === 0
+            ? "Zatiaľ si neobjavil žiadnu stopu."
+            : `Odhalené stopy: ${visibleHints.length}`}
+          </p>
+
+          <button
+            type="button"
+            onClick={showHint}
+            disabled={!hasMoreHints}
+            className="w-full rounded-xl border border-amber-400/30 px-4 py-3 text-xs font-bold uppercase tracking-[0.2em] text-amber-300 transition hover:bg-amber-400/10 disabled:cursor-not-allowed disabled:opacity-40"
             >
-              {hasMoreHints ? "Zobraziť nápovedu" : "Všetky zobrazené"}
-            </button>
+            {hasMoreHints ? "Odhaliť stopu" : "Všetky odhalené"}
+          </button>
           </div>
 
           {visibleHints.length === 0 ? (
             <p className="mt-3 text-sm text-slate-500">
-              Zatiaľ bez nápovedy. Každá použitá nápoveda neskôr zníži skóre.
+              Každá odhalená stopa zníži výsledné skóre.
             </p>
           ) : (
-            <div className="mt-3 space-y-2">
+            <div className="mt-4 space-y-2">
               {visibleHints.map((hint, index) => (
                 <p
                   key={hint}
                   className="rounded-xl border border-amber-400/10 bg-amber-400/5 p-3 text-sm text-amber-100"
                 >
-                  <strong>Nápoveda {index + 1}:</strong> {hint}
+                  <strong>Stopa {index + 1}:</strong> {hint}
                 </p>
               ))}
             </div>
           )}
-        </div>
+        </SectionCard>
+
+        <GameButton onClick={checkAnswer}>Overiť odpoveď</GameButton>
       </StoryCard>
     </main>
   );
