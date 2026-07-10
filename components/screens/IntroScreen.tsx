@@ -2,6 +2,7 @@ import type { Chapter } from "../../types/game";
 import { ActionButton } from "../ui/ActionButton";
 import { DetectiveIcon, SearchIcon } from "../ui/MysteriumIcons";
 import { ScreenContainer } from "../ui/ScreenContainer";
+import { ScreenTransition } from "../ui/ScreenTransition";
 import { SectionCard } from "../ui/SectionCard";
 import { StoryCard } from "../ui/StoryCard";
 
@@ -16,42 +17,44 @@ export function IntroScreen({
 }: IntroScreenProps) {
   return (
     <ScreenContainer>
-      <StoryCard
-        label="Úvodný prípad"
-        title={chapter.title}
-      >
-        <SectionCard
-          icon={<DetectiveIcon className="h-9 w-9" />}
-          title="Pátračov denník"
+      <ScreenTransition>
+        <StoryCard
+          label="Úvodný prípad"
+          title={chapter.title}
         >
-          <div className="space-y-5">
-            {chapter.introLines.map((line) => (
-              <p
-                key={line}
-                className="text-[15px] leading-8 text-slate-300"
-              >
-                {line}
-              </p>
-            ))}
-          </div>
-        </SectionCard>
+          <SectionCard
+            icon={<DetectiveIcon className="h-9 w-9" />}
+            title="Pátračov denník"
+          >
+            <div className="space-y-5">
+              {chapter.introLines.map((line) => (
+                <p
+                  key={line}
+                  className="text-[15px] leading-8 text-slate-300"
+                >
+                  {line}
+                </p>
+              ))}
+            </div>
+          </SectionCard>
 
-        <SectionCard
-          icon={<SearchIcon className="h-9 w-9" />}
-          title="Prvá stopa"
-          variant="gold"
-        >
-          <p className="text-sm leading-7 text-amber-100">
-            Podľa posledných svedkov ho videli tam, kadiaľ do mesta vstupovali
-            králi. Presuň sa pod <strong>Michalskú bránu</strong> a začni svoje
-            vyšetrovanie.
-          </p>
-        </SectionCard>
+          <SectionCard
+            icon={<SearchIcon className="h-9 w-9" />}
+            title="Prvá stopa"
+            variant="gold"
+          >
+            <p className="text-sm leading-7 text-amber-100">
+              Podľa posledných svedkov ho videli tam, kadiaľ do mesta vstupovali
+              králi. Presuň sa pod <strong>Michalskú bránu</strong> a začni svoje
+              vyšetrovanie.
+            </p>
+          </SectionCard>
 
-        <ActionButton onClick={onContinue}>
-          Som pri Michalskej bráne
-        </ActionButton>
-      </StoryCard>
+          <ActionButton onClick={onContinue}>
+            Som pri Michalskej bráne
+          </ActionButton>
+        </StoryCard>
+      </ScreenTransition>
     </ScreenContainer>
   );
 }

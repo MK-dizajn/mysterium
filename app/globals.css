@@ -30,6 +30,7 @@ body {
     opacity: 0;
     transform: translateY(18px) scale(0.98);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -38,4 +39,20 @@ body {
 
 .animate-fade-in {
   animation: fade-in 1.8s ease-out both;
+}
+
+@keyframes screen-enter {
+  from {
+    opacity: 0;
+    transform: translateY(45px) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.screen-transition {
+  animation: screen-enter 2.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
