@@ -1,5 +1,13 @@
 import type { Scene } from "../../types/game";
-import { GameButton } from "../ui/GameButton";
+import { ActionButton } from "../ui/ActionButton";
+import { ScreenContainer } from "../ui/ScreenContainer";
+import { MessageBox } from "../ui/MessageBox";
+import {
+  DetectiveIcon,
+  LightbulbIcon,
+  SearchIcon,
+} from "../ui/MysteriumIcons";
+import { SectionCard } from "../ui/SectionCard";
 import { StoryCard } from "../ui/StoryCard";
 
 type HistoryScreenProps = {
@@ -7,38 +15,68 @@ type HistoryScreenProps = {
   onContinue: () => void;
 };
 
-export function HistoryScreen({ scene, onContinue }: HistoryScreenProps) {
+export function HistoryScreen({
+  scene,
+  onContinue,
+}: HistoryScreenProps) {
   return (
-    <main className="min-h-screen bg-[#05070d] px-6 pb-10 pt-10 text-white">
-      <StoryCard label="Zápis do Codexu" title={scene.history.title}>
-        <p className="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-4 text-emerald-200">
+    <ScreenContainer>
+      <StoryCard
+        label="Zápis do Codexu"
+        title={scene.history.title}
+      >
+        <MessageBox
+          variant="success"
+          title="Tajomstvo odhalené"
+        >
           {scene.history.shortText}
-        </p>
+        </MessageBox>
 
-        <p>{scene.history.fullText}</p>
-
-        <div className="rounded-2xl border border-amber-400/20 bg-slate-950/70 p-4">
-          <p className="text-xs font-bold uppercase tracking-widest text-amber-400">
-            Získaný artefakt
+        <SectionCard
+          icon={<DetectiveIcon className="h-9 w-9" />}
+          title="Pátračov zápis"
+        >
+          <p className="text-[15px] leading-8 text-slate-300">
+            {scene.history.fullText}
           </p>
+        </SectionCard>
 
-          <div className="mt-3 flex items-center gap-4">
-            <div className="text-4xl">{scene.artifact.icon}</div>
-            <div>
-              <h3 className="font-bold text-white">{scene.artifact.title}</h3>
-              <p className="text-xs text-slate-400">
-                {scene.artifact.shortFact}
-              </p>
-            </div>
+        <SectionCard
+          icon={
+            <span
+              className="text-3xl"
+              aria-hidden="true"
+            >
+              {scene.artifact.icon}
+            </span>
+          }
+          title="Získaný artefakt"
+          variant="gold"
+        >
+          <div>
+            <h3 className="font-bold text-white">
+              {scene.artifact.title}
+            </h3>
+
+            <p className="mt-2 text-sm leading-relaxed text-amber-100">
+              {scene.artifact.shortFact}
+            </p>
           </div>
-        </div>
+        </SectionCard>
 
-        <p className="rounded-2xl border border-blue-400/20 bg-blue-400/10 p-4 text-blue-200">
-          {scene.nextInstruction}
-        </p>
+        <SectionCard
+          icon={<SearchIcon className="h-9 w-9" />}
+          title="Ďalšia stopa"
+        >
+          <p className="text-sm leading-relaxed text-slate-300">
+            {scene.nextInstruction}
+          </p>
+        </SectionCard>
 
-        <GameButton onClick={onContinue}>Pokračovať</GameButton>
+        <ActionButton onClick={onContinue}>
+          Pokračovať
+        </ActionButton>
       </StoryCard>
-    </main>
+    </ScreenContainer>
   );
 }

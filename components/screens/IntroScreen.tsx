@@ -1,5 +1,8 @@
 import type { Chapter } from "../../types/game";
-import { GameButton } from "../ui/GameButton";
+import { ActionButton } from "../ui/ActionButton";
+import { DetectiveIcon, SearchIcon } from "../ui/MysteriumIcons";
+import { ScreenContainer } from "../ui/ScreenContainer";
+import { SectionCard } from "../ui/SectionCard";
 import { StoryCard } from "../ui/StoryCard";
 
 type IntroScreenProps = {
@@ -7,23 +10,48 @@ type IntroScreenProps = {
   onContinue: () => void;
 };
 
-export function IntroScreen({ chapter, onContinue }: IntroScreenProps) {
+export function IntroScreen({
+  chapter,
+  onContinue,
+}: IntroScreenProps) {
   return (
-    <main className="min-h-screen bg-[#05070d] px-6 py-10 text-white">
-      <StoryCard label="Úvodný prípad" title={chapter.title}>
-        {chapter.introLines.map((line) => (
-          <p key={line}>{line}</p>
-        ))}
+    <ScreenContainer>
+      <StoryCard
+        label="Úvodný prípad"
+        title={chapter.title}
+      >
+        <SectionCard
+          icon={<DetectiveIcon className="h-9 w-9" />}
+          title="Pátračov denník"
+        >
+          <div className="space-y-5">
+            {chapter.introLines.map((line) => (
+              <p
+                key={line}
+                className="text-[15px] leading-8 text-slate-300"
+              >
+                {line}
+              </p>
+            ))}
+          </div>
+        </SectionCard>
 
-        <p className="rounded-2xl border border-amber-400/20 bg-amber-400/10 p-4 text-amber-200">
-          Podľa posledných svedkov ho videli tam, kadiaľ do mesta vstupovali
-          králi. Presuň sa pod Michalskú bránu.
-        </p>
+        <SectionCard
+          icon={<SearchIcon className="h-9 w-9" />}
+          title="Prvá stopa"
+          variant="gold"
+        >
+          <p className="text-sm leading-7 text-amber-100">
+            Podľa posledných svedkov ho videli tam, kadiaľ do mesta vstupovali
+            králi. Presuň sa pod <strong>Michalskú bránu</strong> a začni svoje
+            vyšetrovanie.
+          </p>
+        </SectionCard>
 
-        <div className="mt-8">
-          <GameButton onClick={onContinue}>Som pri Michalskej bráne</GameButton>
-        </div>
+        <ActionButton onClick={onContinue}>
+          Som pri Michalskej bráne
+        </ActionButton>
       </StoryCard>
-    </main>
+    </ScreenContainer>
   );
 }

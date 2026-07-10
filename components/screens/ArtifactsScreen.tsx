@@ -1,4 +1,9 @@
 import type { Artifact } from "../../types/game";
+import { ActionButton } from "../ui/ActionButton";
+import { DetectiveIcon } from "../ui/MysteriumIcons";
+import { ScreenContainer } from "../ui/ScreenContainer";
+import { SectionCard } from "../ui/SectionCard";
+import { StoryCard } from "../ui/StoryCard";
 
 type ArtifactsScreenProps = {
   artifacts: Artifact[];
@@ -12,41 +17,55 @@ export function ArtifactsScreen({
   onOpenArtifact,
 }: ArtifactsScreenProps) {
   return (
-    <main className="min-h-screen bg-[#05070d] px-6 py-10 text-white">
-      <div className="mx-auto max-w-md">
-        <button onClick={onBack} className="mb-6 text-sm text-amber-300">
-          ← Späť
-        </button>
-
-        <h1 className="mb-6 text-3xl font-bold text-white">
-          🏛️ Artefakty
-        </h1>
-
+    <ScreenContainer>
+      <StoryCard label="Codex pátrača" title="Artefakty">
         {artifacts.length === 0 ? (
-          <p className="text-slate-500">Zatiaľ nemáš žiadne artefakty.</p>
+          <SectionCard
+            icon={<DetectiveIcon className="h-9 w-9" />}
+            title="Codex je zatiaľ prázdny"
+          >
+            <p className="text-sm leading-relaxed text-slate-400">
+              Pokračuj v pátraní a odhaľ tajomstvá ukryté v uliciach mesta.
+              Každý získaný artefakt sa objaví na tomto mieste.
+            </p>
+          </SectionCard>
         ) : (
           <div className="space-y-3">
             {artifacts.map((artifact) => (
               <button
                 key={artifact.id}
+                type="button"
                 onClick={() => onOpenArtifact(artifact)}
-                className="w-full rounded-2xl border border-amber-300/20 bg-amber-400/10 p-4 text-left transition hover:bg-amber-400/20"
+                className="group w-full rounded-2xl border border-amber-400/20 bg-slate-950/70 p-4 text-left transition hover:border-amber-400/40 hover:bg-amber-400/10"
               >
-                <div className="mb-2 flex items-center gap-3">
-                  <span className="text-2xl">{artifact.icon}</span>
-                  <h2 className="font-bold text-amber-100">
-                    {artifact.title}
-                  </h2>
-                </div>
+                <div className="flex items-start gap-4">
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-amber-400/20 bg-amber-400/10 text-3xl transition group-hover:scale-105">
+                    <span aria-hidden="true">{artifact.icon}</span>
+                  </div>
 
-                <p className="text-sm leading-6 text-slate-300">
-                  {artifact.shortFact}
-                </p>
+                  <div className="min-w-0">
+                    <h2 className="font-bold text-amber-100">
+                      {artifact.title}
+                    </h2>
+
+                    <p className="mt-2 text-sm leading-6 text-slate-300">
+                      {artifact.shortFact}
+                    </p>
+
+                    <p className="mt-3 text-xs font-bold uppercase tracking-widest text-amber-400/70">
+                      Otvoriť záznam
+                    </p>
+                  </div>
+                </div>
               </button>
             ))}
           </div>
         )}
-      </div>
-    </main>
+
+        <ActionButton onClick={onBack} variant="secondary">
+          Späť k pátraniu
+        </ActionButton>
+      </StoryCard>
+    </ScreenContainer>
   );
 }

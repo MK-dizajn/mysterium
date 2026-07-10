@@ -1,5 +1,8 @@
 import type { Artifact } from "../../types/game";
-import { GameButton } from "../ui/GameButton";
+import { ActionButton } from "../ui/ActionButton";
+import { DetectiveIcon } from "../ui/MysteriumIcons";
+import { ScreenContainer } from "../ui/ScreenContainer";
+import { SectionCard } from "../ui/SectionCard";
 import { StoryCard } from "../ui/StoryCard";
 
 type ArtifactScreenProps = {
@@ -7,22 +10,43 @@ type ArtifactScreenProps = {
   onBack: () => void;
 };
 
-export function ArtifactScreen({ artifact, onBack }: ArtifactScreenProps) {
+export function ArtifactScreen({
+  artifact,
+  onBack,
+}: ArtifactScreenProps) {
   return (
-    <main className="min-h-screen bg-[#05070d] px-6 py-10 text-white">
-      <StoryCard label="Stránka Codexu" title={artifact.title}>
-        <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-3xl border border-amber-400/20 bg-amber-400/10 text-6xl">
-          {artifact.icon}
+    <ScreenContainer>
+      <StoryCard
+        label="Stránka Codexu"
+        title={artifact.title}
+      >
+        <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-3xl border border-amber-400/20 bg-amber-400/10 text-6xl shadow-lg shadow-amber-950/20">
+          <span aria-hidden="true">{artifact.icon}</span>
         </div>
 
-        <p className="rounded-2xl border border-amber-400/20 bg-amber-400/10 p-4 text-amber-200">
-          {artifact.shortFact}
-        </p>
+        <SectionCard
+          icon={<DetectiveIcon className="h-9 w-9" />}
+          title="Záznam artefaktu"
+          variant="gold"
+        >
+          <p className="text-sm leading-relaxed text-amber-100">
+            {artifact.shortFact}
+          </p>
+        </SectionCard>
 
-        <p>{artifact.fullText}</p>
+        <SectionCard
+          icon={<DetectiveIcon className="h-9 w-9" />}
+          title="Historický záznam"
+        >
+          <p className="text-[15px] leading-8 text-slate-300">
+            {artifact.fullText}
+          </p>
+        </SectionCard>
 
-        <GameButton onClick={onBack}>Späť</GameButton>
+        <ActionButton onClick={onBack}>
+          Späť
+        </ActionButton>
       </StoryCard>
-    </main>
+    </ScreenContainer>
   );
 }

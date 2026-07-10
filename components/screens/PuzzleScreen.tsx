@@ -2,7 +2,10 @@
 
 import { useState } from "react";
 import type { Scene } from "../../types/game";
-import { GameButton } from "../ui/GameButton";
+import { ActionButton } from "../ui/ActionButton";
+import { TextInput } from "../ui/TextInput";
+import { ScreenContainer } from "../ui/ScreenContainer";
+import { MessageBox } from "../ui/MessageBox";
 import {
   DetectiveIcon,
   LightbulbIcon,
@@ -63,7 +66,7 @@ export function PuzzleScreen({ scene, onSolved }: PuzzleScreenProps) {
   }
 
   return (
-    <main className="min-h-screen bg-[#05070d] px-6 pb-10 pt-10 text-white">
+    <ScreenContainer>
       <StoryCard label={scene.location} title={scene.title}>
         <p className="text-amber-200">{scene.cinematicText}</p>
 
@@ -96,31 +99,29 @@ export function PuzzleScreen({ scene, onSolved }: PuzzleScreenProps) {
           </p>
         </SectionCard>
 
-        <input
+        <TextInput
           value={answer}
           onChange={(event) => setAnswer(event.target.value)}
-          className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-4 text-center text-white outline-none transition focus:border-amber-400"
           placeholder="Tvoja odpoveď..."
+          aria-label="Tvoja odpoveď"
         />
 
         {error && (
-          <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200">
-            <p className="text-xs font-bold uppercase tracking-widest text-red-300/70">
-              Nesprávna stopa
-            </p>
-
-            <p className="mt-2 leading-relaxed">{error}</p>
-          </div>
+          <MessageBox
+            variant="danger"
+            title="Nesprávna stopa"
+          >
+            {error}
+          </MessageBox>
         )}
 
         {successMessage && (
-          <div className="rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-4 text-sm text-emerald-100">
-            <p className="text-xs font-bold uppercase tracking-widest text-emerald-300/70">
-              Stopa potvrdená
-            </p>
-
-            <p className="mt-2 leading-relaxed">{successMessage}</p>
-          </div>
+          <MessageBox
+            variant="success"
+            title="Stopa potvrdená"
+          >
+            {successMessage}
+          </MessageBox>
         )}
 
         <SectionCard
@@ -134,14 +135,14 @@ export function PuzzleScreen({ scene, onSolved }: PuzzleScreenProps) {
             : `Odhalené stopy: ${visibleHints.length}`}
           </p>
 
-          <button
-            type="button"
+          <ActionButton
             onClick={showHint}
             disabled={!hasMoreHints}
-            className="w-full rounded-xl border border-amber-400/30 px-4 py-3 text-xs font-bold uppercase tracking-[0.2em] text-amber-300 transition hover:bg-amber-400/10 disabled:cursor-not-allowed disabled:opacity-40"
-            >
+            variant="secondary"
+            className="py-3 text-xs"
+          >
             {hasMoreHints ? "Odhaliť stopu" : "Všetky odhalené"}
-          </button>
+          </ActionButton>
           </div>
 
           {visibleHints.length === 0 ? (
@@ -162,8 +163,10 @@ export function PuzzleScreen({ scene, onSolved }: PuzzleScreenProps) {
           )}
         </SectionCard>
 
-        <GameButton onClick={checkAnswer}>Overiť odpoveď</GameButton>
+        <ActionButton onClick={checkAnswer}>
+          Overiť odpoveď
+        </ActionButton>
       </StoryCard>
-    </main>
+    </ScreenContainer>
   );
 }

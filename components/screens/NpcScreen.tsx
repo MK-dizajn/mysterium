@@ -2,6 +2,11 @@
 
 import { useState } from "react";
 import type { Dialogue, DialogueChoice, Npc } from "../../types/game";
+import { ActionButton } from "../ui/ActionButton";
+import { DetectiveIcon } from "../ui/MysteriumIcons";
+import { ScreenContainer } from "../ui/ScreenContainer";
+import { SectionCard } from "../ui/SectionCard";
+import { StoryCard } from "../ui/StoryCard";
 import { Typewriter } from "../ui/Typewriter";
 
 type NpcScreenProps = {
@@ -39,64 +44,57 @@ export function NpcScreen({
   }
 
   return (
-    <main className="min-h-screen bg-stone-950 px-4 py-8 text-stone-100">
-      <section className="mx-auto max-w-2xl rounded-3xl border border-amber-300/30 bg-black/40 p-6 shadow-2xl">
-        <p className="mb-2 text-sm uppercase tracking-[0.3em] text-amber-200/60">
-          Rozhovor
-        </p>
-
-        <h1 className="text-3xl font-bold text-amber-100">{npc.name}</h1>
-
+    <ScreenContainer>
+      <StoryCard label="Rozhovor" title={npc.name}>
         {npc.role && (
-          <p className="mt-1 text-sm text-amber-100/60">{npc.role}</p>
+          <p className="text-sm uppercase tracking-[0.2em] text-amber-300/60">
+            {npc.role}
+          </p>
         )}
 
-        <div className="mt-8 rounded-2xl border border-stone-700 bg-stone-900/80 p-5">
-          <p className="mb-3 text-sm font-semibold text-amber-200">
-            {activeNode.speaker}
-          </p>
-
-          <div className="text-lg leading-relaxed text-stone-100">
+        <SectionCard
+          icon={<DetectiveIcon className="h-9 w-9" />}
+          title={activeNode.speaker}
+          variant="gold"
+        >
+          <div className="min-h-24 text-[17px] leading-8 text-amber-50">
             <Typewriter
               key={activeNode.id}
               text={activeNode.text}
               onComplete={handleTextComplete}
             />
           </div>
-        </div>
+        </SectionCard>
 
-        <div className="mt-6 space-y-3">
-          {isTextComplete &&
-            (visibleChoices.length > 0 ? (
+        {isTextComplete && (
+          <div className="space-y-3">
+            {visibleChoices.length > 0 ? (
               visibleChoices.map((choice) => (
-                <button
+                <ActionButton
                   key={choice.id}
-                  type="button"
                   onClick={() => handleChoice(choice.id)}
-                  className="w-full rounded-xl border border-amber-300/30 bg-amber-300/10 px-4 py-3 text-left text-amber-50 transition hover:bg-amber-300/20"
+                  variant="secondary"
+                  className="justify-start text-left"
                 >
                   {choice.text}
-                </button>
+                </ActionButton>
               ))
             ) : (
-              <button
-                type="button"
-                onClick={onClose}
-                className="w-full rounded-xl border border-amber-300/30 bg-amber-300/10 px-4 py-3 text-left text-amber-50 transition hover:bg-amber-300/20"
-              >
+              <ActionButton onClick={onClose}>
                 Ukončiť rozhovor
-              </button>
-            ))}
-        </div>
+              </ActionButton>
+            )}
+          </div>
+        )}
 
         <button
           type="button"
           onClick={onClose}
-          className="mt-6 text-sm text-stone-400 underline underline-offset-4 hover:text-stone-200"
+          className="mx-auto block text-sm text-slate-400 underline decoration-slate-600 underline-offset-4 transition hover:text-slate-200"
         >
           Späť k pátraniu
         </button>
-      </section>
-    </main>
+      </StoryCard>
+    </ScreenContainer>
   );
 }

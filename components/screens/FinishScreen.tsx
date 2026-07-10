@@ -1,4 +1,8 @@
-import { GameButton } from "../ui/GameButton";
+import { ActionButton } from "../ui/ActionButton";
+import { DetectiveIcon } from "../ui/MysteriumIcons";
+import { MessageBox } from "../ui/MessageBox";
+import { ScreenContainer } from "../ui/ScreenContainer";
+import { SectionCard } from "../ui/SectionCard";
 import { StoryCard } from "../ui/StoryCard";
 
 type FinishScreenProps = {
@@ -7,26 +11,42 @@ type FinishScreenProps = {
 
 export function FinishScreen({ onRestart }: FinishScreenProps) {
   return (
-    <main className="min-h-screen bg-[#05070d] px-6 py-10 text-white">
-      <StoryCard label="Kapitola dokončená" title="Zlatý prešporský kľúč">
-        <p className="text-amber-200">
+    <ScreenContainer>
+      <StoryCard
+        label="Kapitola dokončená"
+        title="Zlatý prešporský kľúč"
+      >
+        <MessageBox
+          variant="success"
+          title="Prípad uzavretý"
+        >
           Posledná stopa zapadla na svoje miesto. Starý pátrač mal pravdu —
           Bratislava neukrývala len príbeh, ale mapu.
-        </p>
+        </MessageBox>
 
-        <p>
-          V Codexe sa objavuje nový znak. Nie je to koniec. Je to iba prvá
-          stránka väčšieho tajomstva.
-        </p>
+        <SectionCard
+          icon={<DetectiveIcon className="h-9 w-9" />}
+          title="Záver vyšetrovania"
+        >
+          <p className="text-[15px] leading-8 text-slate-300">
+            V Codexe sa objavuje nový znak. Nie je to koniec. Je to iba prvá
+            stránka väčšieho tajomstva.
+          </p>
+        </SectionCard>
 
-        <p className="rounded-2xl border border-amber-400/20 bg-amber-400/10 p-4 text-amber-200">
+        <MessageBox
+          variant="info"
+          title="Pátračov odkaz"
+        >
           „Ak si sa dostal až sem, už vedia, že existuješ. Čierna vdova je o
           krok bližšie. A druhá kapitola sa začína pod tichými stenami
           Kapitulskej ulice...“
-        </p>
+        </MessageBox>
 
-        <GameButton onClick={onRestart}>Hrať od začiatku</GameButton>
+        <ActionButton onClick={onRestart}>
+          Hrať od začiatku
+        </ActionButton>
       </StoryCard>
-    </main>
+    </ScreenContainer>
   );
 }
