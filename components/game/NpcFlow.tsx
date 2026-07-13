@@ -49,7 +49,6 @@ export function NpcFlow({
     return (
       <GameLayout
         gameState={gameState}
-        currentScreen={gameState.screen}
         onOpenInventory={onOpenInventory}
         onOpenArtifacts={onOpenArtifacts}
         onOpenQuests={onOpenQuests}

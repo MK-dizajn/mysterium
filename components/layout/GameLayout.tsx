@@ -1,11 +1,10 @@
 import type { ReactNode } from "react";
-import type { GameScreen, GameState } from "../../types/game";
+import type { GameState } from "../../types/game";
 import { CodexBar } from "../ui/CodexBar";
 
 type GameLayoutProps = {
   children: ReactNode;
   gameState: GameState;
-  currentScreen: GameScreen;
   onOpenInventory: () => void;
   onOpenArtifacts: () => void;
   onOpenQuests: () => void;

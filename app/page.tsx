@@ -1,17 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { mysteriumGame } from "../data/mysterium-game";
+import { CityAmbient } from "../components/audio/CityAmbient";
+import { ArtifactFlow } from "../components/game/ArtifactFlow";
+import { CollectionFlow } from "../components/game/CollectionFlow";
+import { HistoryFlow } from "../components/game/HistoryFlow";
+import { NpcFlow } from "../components/game/NpcFlow";
+import { PuzzleFlow } from "../components/game/PuzzleFlow";
 import { IntroScreen } from "../components/screens/IntroScreen";
 import { LandingScreen } from "../components/screens/LandingScreen";
-import { PuzzleFlow } from "../components/game/PuzzleFlow";
-import { HistoryFlow } from "../components/game/HistoryFlow";
-import { ArtifactFlow } from "../components/game/ArtifactFlow";
-import type { Artifact, GameScreen } from "../types/game";
-import { useGameEngine } from "../hooks/useGameEngine";
-import { NpcFlow } from "../components/game/NpcFlow";
-import { GameLayout } from "../components/layout/GameLayout";
-import { CollectionFlow } from "../components/game/CollectionFlow";
+import { ArtifactUnlock } from "../components/ui/ArtifactUnlock";
+import { mysteriumGame } from "../data/mysterium-game";
 import {
   applyDialogueChoiceActions,
   clearGameState,
@@ -20,6 +19,8 @@ import {
   solvePuzzle,
   talkToNpc,
 } from "../engine";
+import { useGameEngine } from "../hooks/useGameEngine";
+import type { Artifact, GameScreen } from "../types/game";
 
 const initialGameState = createNewGameState();
 
@@ -34,6 +35,9 @@ export default function Home() {
   const [selectedArtifact, setSelectedArtifact] =
     useState<Artifact | null>(null);
 
+  const [unlockedArtifact, setUnlockedArtifact] =
+    useState<Artifact | null>(null);
+
   const [previousScreen, setPreviousScreen] =
     useState<GameScreen>("puzzle");
 
@@ -46,6 +50,10 @@ export default function Home() {
   const currentScene =
     currentChapter.scenes[gameState.currentSceneIndex];
 
+  const ambientScreen: GameScreen = unlockedArtifact
+    ? "artifact"
+    : gameState.screen;
+
   function updateGameScreen(screen: GameScreen) {
     setGameState((currentState) => ({
       ...currentState,
@@ -56,7 +64,9 @@ export default function Home() {
   function startNewGame() {
     clearGameState();
     setSelectedArtifact(null);
+    setUnlockedArtifact(null);
     setHasSavedProgress(false);
+
     setGameState({
       ...initialGameState,
       screen: "intro",
@@ -85,14 +95,19 @@ export default function Home() {
   }
 
   function openNpcDialogue(npcId: string) {
-    const npc = currentScene.npcs?.find((item) => item.id === npcId);
+    const npc = currentScene.npcs?.find(
+      (item) => item.id === npcId
+    );
 
     if (!npc) {
       return;
     }
 
     setPreviousScreen(gameState.screen);
-    setGameState((currentState) => talkToNpc(currentState, npc));
+
+    setGameState((currentState) =>
+      talkToNpc(currentState, npc)
+    );
   }
 
   function closeNpcDialogue() {
@@ -112,110 +127,168 @@ export default function Home() {
     }));
   }
 
-  if (gameState.screen === "npc") {
+  function renderCurrentScreen() {
+    if (unlockedArtifact) {
+      return (
+        <ArtifactUnlock
+          artifact={unlockedArtifact}
+          onComplete={() => setUnlockedArtifact(null)}
+        />
+      );
+    }
+
+    if (gameState.screen === "npc") {
+      return (
+        <NpcFlow
+          gameState={gameState}
+          scene={currentScene}
+          onOpenInventory={openInventory}
+          onOpenArtifacts={openArtifacts}
+          onOpenQuests={openQuests}
+          onChooseNode={chooseDialogueNode}
+          onApplyChoiceActions={(choice) => {
+            setGameState((currentState) =>
+              applyDialogueChoiceActions(
+                currentState,
+                choice
+              )
+            );
+          }}
+          onClose={closeNpcDialogue}
+        />
+      );
+    }
+
+    if (
+      gameState.screen === "artifact" &&
+      selectedArtifact
+    ) {
+      return (
+        <ArtifactFlow
+          artifact={selectedArtifact}
+          onBack={() =>
+            updateGameScreen(artifactPreviousScreen)
+          }
+        />
+      );
+    }
+
+    if (
+      gameState.screen === "artifact" &&
+      !selectedArtifact
+    ) {
+      return (
+        <CollectionFlow
+          gameState={{
+            ...gameState,
+            screen: "artifacts",
+          }}
+          chapter={currentChapter}
+          onBack={() => updateGameScreen(previousScreen)}
+          onOpenArtifact={openArtifact}
+        />
+      );
+    }
+
+    if (gameState.screen === "intro") {
+      return (
+        <IntroScreen
+          chapter={currentChapter}
+          onContinue={() => updateGameScreen("puzzle")}
+        />
+      );
+    }
+
+    if (gameState.screen === "puzzle") {
+      return (
+        <PuzzleFlow
+          gameState={gameState}
+          scene={currentScene}
+          onOpenInventory={openInventory}
+          onOpenArtifacts={openArtifacts}
+          onOpenQuests={openQuests}
+          onOpenNpcDialogue={openNpcDialogue}
+          onSolved={(hintsUsed) => {
+            setGameState((currentState) => {
+              const nextState = solvePuzzle(
+                currentState,
+                currentScene,
+                hintsUsed
+              );
+
+              const newlyUnlockedArtifact =
+                nextState.artifacts.find(
+                  (artifact) =>
+                    !currentState.artifacts.some(
+                      (currentArtifact) =>
+                        currentArtifact.id === artifact.id
+                    )
+                );
+
+              if (newlyUnlockedArtifact) {
+                setUnlockedArtifact(
+                  newlyUnlockedArtifact
+                );
+              }
+
+              return nextState;
+            });
+          }}
+        />
+      );
+    }
+
+    if (gameState.screen === "history") {
+      return (
+        <HistoryFlow
+          gameState={gameState}
+          scene={currentScene}
+          onOpenInventory={openInventory}
+          onOpenArtifacts={openArtifacts}
+          onOpenQuests={openQuests}
+          onContinue={() => {
+            setGameState(
+              continueAfterHistory(
+                gameState,
+                currentChapter
+              )
+            );
+          }}
+        />
+      );
+    }
+
+    if (
+      gameState.screen === "inventory" ||
+      gameState.screen === "artifacts" ||
+      gameState.screen === "quests"
+    ) {
+      return (
+        <CollectionFlow
+          gameState={gameState}
+          chapter={currentChapter}
+          onBack={() => updateGameScreen(previousScreen)}
+          onOpenArtifact={openArtifact}
+        />
+      );
+    }
+
+    return (
+      <LandingScreen
+        hasSavedProgress={hasSavedProgress}
+        onContinueGame={() =>
+          updateGameScreen(gameState.screen)
+        }
+        onStartNewGame={startNewGame}
+      />
+    );
+  }
+
   return (
-    <NpcFlow
-      gameState={gameState}
-      scene={currentScene}
-      onOpenInventory={openInventory}
-      onOpenArtifacts={openArtifacts}
-      onOpenQuests={openQuests}
-      onChooseNode={chooseDialogueNode}
-      onApplyChoiceActions={(choice) => {
-        setGameState((currentState) =>
-        applyDialogueChoiceActions(currentState, choice)
-        );
-      }}
-      onClose={closeNpcDialogue}
-    />
-  );
-  }
+    <>
+      <CityAmbient currentScreen={ambientScreen} />
 
-  if (gameState.screen === "artifact" && selectedArtifact) {
-    return (
-      <ArtifactFlow
-        artifact={selectedArtifact}
-        onBack={() => updateGameScreen(artifactPreviousScreen)}
-      />
-    );
-  }
-  
-  if (gameState.screen === "artifact" && !selectedArtifact) {
-    return (
-      <CollectionFlow
-        gameState={{
-         ...gameState,
-         screen: "artifacts",
-        }}
-        chapter={currentChapter}
-        onBack={() => updateGameScreen(previousScreen)}
-        onOpenArtifact={openArtifact}
-      />
-    );
-  }
-
-  if (gameState.screen === "intro") {
-    return (
-      <IntroScreen
-        chapter={currentChapter}
-        onContinue={() => updateGameScreen("puzzle")}
-      />
-    );
-  }
-
-  if (gameState.screen === "puzzle") {
-  return (
-    <PuzzleFlow
-      gameState={gameState}
-      scene={currentScene}
-      onOpenInventory={openInventory}
-      onOpenArtifacts={openArtifacts}
-      onOpenQuests={openQuests}
-      onOpenNpcDialogue={openNpcDialogue}
-      onSolved={(hintsUsed) => {
-        setGameState(solvePuzzle(gameState, currentScene, hintsUsed));
-      }}
-    />
-  );
-  }
-
-  if (gameState.screen === "history") {
-    return (
-      <HistoryFlow
-        gameState={gameState}
-        scene={currentScene}
-        onOpenInventory={openInventory}
-        onOpenArtifacts={openArtifacts}
-        onOpenQuests={openQuests}
-        onContinue={() => {
-          setGameState(
-            continueAfterHistory(gameState, currentChapter)
-          );
-        }}
-      />
-    );
-  }
-
-  if (
-    gameState.screen === "inventory" ||
-    gameState.screen === "artifacts" ||
-    gameState.screen === "quests"
-  ) {
-    return (
-      <CollectionFlow
-        gameState={gameState}
-        chapter={currentChapter}
-        onBack={() => updateGameScreen(previousScreen)}
-        onOpenArtifact={openArtifact}
-      />
-    );
-  }
-
-  return (
-    <LandingScreen
-      hasSavedProgress={hasSavedProgress}
-      onContinueGame={() => updateGameScreen(gameState.screen)}
-      onStartNewGame={startNewGame}
-    />
+      {renderCurrentScreen()}
+    </>
   );
 }

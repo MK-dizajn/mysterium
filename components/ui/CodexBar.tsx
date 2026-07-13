@@ -1,4 +1,12 @@
-import type { Artifact, InventoryItem, QuestProgress } from "../../types/game";
+"use client";
+
+import { useEffect, useState } from "react";
+import type {
+  Artifact,
+  InventoryItem,
+  QuestProgress,
+} from "../../types/game";
+import { soundManager } from "../../lib/soundManager";
 
 type CodexBarProps = {
   artifacts: Artifact[];
@@ -24,11 +32,27 @@ export function CodexBar({
   onOpenInventory,
   onOpenArtifacts,
   onOpenQuests,
-  }: CodexBarProps) {
-  const activeQuests = quests.filter((quest) => quest.status === "active").length;
+}: CodexBarProps) {
+  const [isMuted, setIsMuted] = useState(false);
+
+  const activeQuests = quests.filter(
+    (quest) => quest.status === "active"
+  ).length;
+
   const completedQuests = quests.filter(
     (quest) => quest.status === "completed"
   ).length;
+
+  useEffect(() => {
+    setIsMuted(soundManager.isMuted());
+  }, []);
+
+  function toggleSound() {
+    const nextMutedState = !isMuted;
+
+    soundManager.setMuted(nextMutedState);
+    setIsMuted(nextMutedState);
+  }
 
   return (
     <header className="sticky top-0 z-50 border-b border-amber-300/15 bg-slate-950/95 px-4 py-3 shadow-xl shadow-amber-950/20 backdrop-blur">
@@ -38,8 +62,30 @@ export function CodexBar({
             Denník pátrača
           </p>
 
-          <div className="rounded-full border border-amber-300/20 bg-amber-400/10 px-3 py-1 text-xs font-semibold text-amber-200">
-            ⭐ {score}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={toggleSound}
+              aria-label={
+                isMuted
+                  ? "Zapnúť zvuk"
+                  : "Vypnúť zvuk"
+              }
+              title={
+                isMuted
+                  ? "Zapnúť zvuk"
+                  : "Vypnúť zvuk"
+              }
+              className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-600/50 bg-slate-800/70 text-sm transition hover:border-amber-300/40 hover:bg-slate-700"
+            >
+              <span aria-hidden="true">
+                {isMuted ? "🔇" : "🔊"}
+              </span>
+            </button>
+
+            <div className="rounded-full border border-amber-300/20 bg-amber-400/10 px-3 py-1 text-xs font-semibold text-amber-200">
+              ⭐ {score}
+            </div>
           </div>
         </div>
 
@@ -52,6 +98,7 @@ export function CodexBar({
             <span className="block text-sm font-bold text-sky-100">
               🎒 Inventár
             </span>
+
             <span className="mt-0.5 block text-xs text-slate-400">
               {getInventoryLabel(inventory.length)}
             </span>
@@ -65,6 +112,7 @@ export function CodexBar({
             <span className="block text-sm font-bold text-amber-100">
               🏛️ Artefakty
             </span>
+
             <span className="mt-0.5 block text-xs text-slate-400">
               {artifacts.length}/12
             </span>
@@ -78,6 +126,7 @@ export function CodexBar({
             <span className="block text-sm font-bold text-emerald-100">
               📜 Úlohy
             </span>
+
             <span className="mt-0.5 block text-xs text-slate-400">
               {activeQuests} akt. / {completedQuests} spl.
             </span>
