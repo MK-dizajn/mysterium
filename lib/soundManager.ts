@@ -11,7 +11,14 @@ type SoundConfig = {
   loop?: boolean;
 };
 
+type FadeState = {
+  frameId: number;
+};
+
 const SOUND_STORAGE_KEY = "mysterium-sound-muted";
+
+export const SOUND_SETTING_EVENT =
+  "mysterium-sound-setting-change";
 
 const sounds: Record<SoundId, SoundConfig> = {
   "artifact-unlock": {
@@ -39,6 +46,7 @@ const sounds: Record<SoundId, SoundConfig> = {
 
 class SoundManager {
   private activeSounds = new Map<SoundId, HTMLAudioElement>();
+  private activeFades = new Map<SoundId, FadeState>();
   private muted = false;
 
   constructor() {
@@ -48,18 +56,19 @@ class SoundManager {
     }
   }
 
-  play(soundId: SoundId) {
-    if (typeof window === "undefined" || this.muted) {
+  private cancelFade(soundId: SoundId) {
+    const fade = this.activeFades.get(soundId);
+
+    if (!fade || typeof window === "undefined") {
       return;
     }
 
+    window.cancelAnimationFrame(fade.frameId);
+    this.activeFades.delete(soundId);
+  }
+
+  private createAudio(soundId: SoundId) {
     const config = sounds[soundId];
-
-    if (!config) {
-      return;
-    }
-
-    this.stop(soundId);
 
     const audio = new Audio(config.src);
 
@@ -71,20 +80,136 @@ class SoundManager {
       () => {
         if (!audio.loop) {
           this.activeSounds.delete(soundId);
+          this.cancelFade(soundId);
         }
       },
       { once: true }
     );
 
+    this.activeSounds.set(soundId, audio);
+
+    return audio;
+  }
+
+  play(soundId: SoundId) {
+    if (typeof window === "undefined" || this.muted) {
+      return;
+    }
+
+    this.cancelFade(soundId);
+    this.stop(soundId);
+
+    const audio = this.createAudio(soundId);
+
     audio.play().catch(() => {
       this.activeSounds.delete(soundId);
     });
+  }
 
-    this.activeSounds.set(soundId, audio);
+  fadeIn(soundId: SoundId, duration = 1500) {
+    if (typeof window === "undefined" || this.muted) {
+      return;
+    }
+
+    this.cancelFade(soundId);
+
+    const config = sounds[soundId];
+    const targetVolume = config.volume ?? 1;
+
+    let audio = this.activeSounds.get(soundId);
+
+    if (!audio) {
+      audio = this.createAudio(soundId);
+      audio.volume = 0;
+
+      audio.play().catch(() => {
+        this.activeSounds.delete(soundId);
+      });
+    } else if (audio.paused) {
+      audio.play().catch(() => {
+        this.activeSounds.delete(soundId);
+      });
+    }
+
+    const startVolume = audio.volume;
+    const startedAt = performance.now();
+
+    const updateVolume = (currentTime: number) => {
+      const progress = Math.min(
+        (currentTime - startedAt) / duration,
+        1
+      );
+
+      audio.volume =
+        startVolume +
+        (targetVolume - startVolume) * progress;
+
+      if (progress < 1) {
+        const frameId =
+          window.requestAnimationFrame(updateVolume);
+
+        this.activeFades.set(soundId, { frameId });
+      } else {
+        audio.volume = targetVolume;
+        this.activeFades.delete(soundId);
+      }
+    };
+
+    const frameId =
+      window.requestAnimationFrame(updateVolume);
+
+    this.activeFades.set(soundId, { frameId });
+  }
+
+  fadeOut(soundId: SoundId, duration = 1000) {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const audio = this.activeSounds.get(soundId);
+
+    if (!audio) {
+      return;
+    }
+
+    this.cancelFade(soundId);
+
+    const startVolume = audio.volume;
+    const startedAt = performance.now();
+
+    const updateVolume = (currentTime: number) => {
+      const progress = Math.min(
+        (currentTime - startedAt) / duration,
+        1
+      );
+
+      audio.volume = startVolume * (1 - progress);
+
+      if (progress < 1) {
+        const frameId =
+          window.requestAnimationFrame(updateVolume);
+
+        this.activeFades.set(soundId, { frameId });
+      } else {
+        audio.pause();
+        audio.currentTime = 0;
+        audio.volume = sounds[soundId].volume ?? 1;
+
+        this.activeSounds.delete(soundId);
+        this.activeFades.delete(soundId);
+      }
+    };
+
+    const frameId =
+      window.requestAnimationFrame(updateVolume);
+
+    this.activeFades.set(soundId, { frameId });
   }
 
   stop(soundId: SoundId) {
     const audio = this.activeSounds.get(soundId);
+
+    this.cancelFade(soundId);
 
     if (!audio) {
       return;
@@ -92,10 +217,20 @@ class SoundManager {
 
     audio.pause();
     audio.currentTime = 0;
+    audio.volume = sounds[soundId].volume ?? 1;
+
     this.activeSounds.delete(soundId);
   }
 
   stopAll() {
+    this.activeFades.forEach(({ frameId }) => {
+      if (typeof window !== "undefined") {
+        window.cancelAnimationFrame(frameId);
+      }
+    });
+
+    this.activeFades.clear();
+
     this.activeSounds.forEach((audio) => {
       audio.pause();
       audio.currentTime = 0;
@@ -111,6 +246,12 @@ class SoundManager {
       window.localStorage.setItem(
         SOUND_STORAGE_KEY,
         String(muted)
+      );
+
+      window.dispatchEvent(
+        new CustomEvent(SOUND_SETTING_EVENT, {
+          detail: { muted },
+        })
       );
     }
 
