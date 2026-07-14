@@ -23,7 +23,7 @@ export function IntroScreen({
        label="Úvodný prípad"
        title={chapter.title}
      >
-       <Reveal delay={500}>
+       <Reveal delay={300}>
           <SectionCard
             icon={<DetectiveIcon className="h-9 w-9" />}
             title="Pátračov denník"
@@ -41,7 +41,7 @@ export function IntroScreen({
          </SectionCard>
         </Reveal>
 
-       <Reveal delay={1000}>
+       <Reveal delay={500}>
          <SectionCard
            icon={<SearchIcon className="h-9 w-9" />}
            title="Prvá stopa"
@@ -55,7 +55,7 @@ export function IntroScreen({
           </SectionCard>
        </Reveal>
 
-        <Reveal delay={1500}>
+        <Reveal delay={700}>
           <ActionButton onClick={onContinue}>
             Som pri Michalskej bráne
           </ActionButton>

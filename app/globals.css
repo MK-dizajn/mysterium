@@ -162,21 +162,6 @@ body {
   animation: artifact-overlay-enter 700ms ease-out both;
 }
 
-.artifact-unlock-content {
-  width: 100%;
-  max-width: 360px;
-  text-align: center;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.artifact-unlock-content-visible {
-  opacity: 1;
-  pointer-events: auto;
-  animation: artifact-unlock-enter 1.8s
-    cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
 .artifact-unlock-label {
   margin-bottom: 24px;
   font-size: 12px;
@@ -219,4 +204,366 @@ body {
   font-size: 13px;
   letter-spacing: 0.08em;
   color: rgb(148, 163, 184);
+}
+
+@keyframes artifact-cinematic-title {
+  0% {
+    opacity: 0;
+    transform: scale(0.92);
+    letter-spacing: 0.55em;
+    filter: blur(8px);
+  }
+
+  25% {
+    opacity: 1;
+    transform: scale(1);
+    letter-spacing: 0.34em;
+    filter: blur(0);
+  }
+
+  55% {
+    opacity: 1;
+    transform: scale(1.04);
+    letter-spacing: 0.34em;
+    filter: blur(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.18);
+    letter-spacing: 0.5em;
+    filter: blur(10px);
+  }
+}
+
+@keyframes artifact-approach {
+  0% {
+    opacity: 0;
+    transform: translateY(35px) scale(0.35);
+    filter: blur(18px);
+  }
+
+  35% {
+    opacity: 0.25;
+    transform: translateY(24px) scale(0.5);
+    filter: blur(12px);
+  }
+
+  72% {
+    opacity: 1;
+    transform: translateY(-6px) scale(1.08);
+    filter: blur(0);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes artifact-details-enter {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.artifact-unlock-stage {
+  position: relative;
+  display: grid;
+  min-height: 430px;
+  width: 100%;
+  max-width: 380px;
+  place-items: center;
+}
+
+.artifact-unlock-cinematic-title {
+  position: absolute;
+  z-index: 20;
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 0 16px;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.artifact-unlock-cinematic-title p {
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1.8;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: rgb(253, 230, 138);
+  text-shadow:
+    0 0 16px rgba(251, 191, 36, 0.6),
+    0 0 40px rgba(245, 158, 11, 0.3);
+}
+
+.artifact-unlock-title-line {
+  display: block;
+  height: 1px;
+  width: 90px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(251, 191, 36, 0.9),
+    transparent
+  );
+}
+
+.artifact-unlock-content {
+  position: absolute;
+  z-index: 10;
+  width: 100%;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.artifact-unlock-stage-active
+  .artifact-unlock-cinematic-title {
+  animation: artifact-cinematic-title 2s ease-in-out both;
+}
+
+.artifact-unlock-stage-active
+  .artifact-unlock-content {
+  animation: artifact-approach 2.1s
+    cubic-bezier(0.16, 1, 0.3, 1) 300ms both;
+}
+
+.artifact-unlock-stage-active
+  .artifact-unlock-label {
+  animation: artifact-details-enter 700ms ease-out 1650ms both;
+}
+
+.artifact-unlock-stage-active
+  .artifact-unlock-title {
+  animation: artifact-details-enter 700ms ease-out 1800ms both;
+}
+
+.artifact-unlock-label,
+.artifact-unlock-title {
+  opacity: 0;
+}
+
+.artifact-unlock-hint {
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 600ms ease-out,
+    transform 600ms ease-out;
+}
+
+.artifact-unlock-hint-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.artifact-unlock-stage-active
+  .artifact-unlock-content {
+  pointer-events: auto;
+}
+
+@keyframes artifact-particle-float {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 25px, 0) scale(0.5);
+  }
+
+  20% {
+    opacity: 0.8;
+  }
+
+  70% {
+    opacity: 0.55;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate3d(0, -110px, 0) scale(1.15);
+  }
+}
+
+.artifact-particles {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.artifact-particles-visible {
+  opacity: 1;
+}
+
+.artifact-particle {
+  position: absolute;
+  bottom: 22%;
+  left: 50%;
+  height: 5px;
+  width: 5px;
+  border-radius: 9999px;
+  background: rgba(251, 191, 36, 0.9);
+  box-shadow:
+    0 0 10px rgba(251, 191, 36, 0.8),
+    0 0 24px rgba(245, 158, 11, 0.4);
+  opacity: 0;
+  animation: artifact-particle-float 3.8s ease-in-out infinite;
+}
+
+.artifact-particle-1 {
+  margin-left: -135px;
+  animation-delay: 0.1s;
+}
+
+.artifact-particle-2 {
+  margin-left: -105px;
+  animation-delay: 0.7s;
+}
+
+.artifact-particle-3 {
+  margin-left: -75px;
+  animation-delay: 1.4s;
+}
+
+.artifact-particle-4 {
+  margin-left: -45px;
+  animation-delay: 0.4s;
+}
+
+.artifact-particle-5 {
+  margin-left: -15px;
+  animation-delay: 1.9s;
+}
+
+.artifact-particle-6 {
+  margin-left: 15px;
+  animation-delay: 1.1s;
+}
+
+.artifact-particle-7 {
+  margin-left: 45px;
+  animation-delay: 0.2s;
+}
+
+.artifact-particle-8 {
+  margin-left: 75px;
+  animation-delay: 1.6s;
+}
+
+.artifact-particle-9 {
+  margin-left: 105px;
+  animation-delay: 0.9s;
+}
+
+.artifact-particle-10 {
+  margin-left: 135px;
+  animation-delay: 2.2s;
+}
+
+.artifact-particle-11 {
+  margin-left: -90px;
+  animation-delay: 2.6s;
+}
+
+.artifact-particle-12 {
+  margin-left: 90px;
+  animation-delay: 2.9s;
+}
+
+.artifact-particle-3,
+.artifact-particle-8,
+.artifact-particle-11 {
+  height: 3px;
+  width: 3px;
+}
+
+.artifact-particle-5,
+.artifact-particle-10 {
+  height: 7px;
+  width: 7px;
+}
+
+@keyframes codex-page-open {
+  0% {
+    opacity: 0;
+    transform:
+      perspective(1000px)
+      rotateX(7deg)
+      translateY(28px)
+      scale(0.94);
+    filter: blur(6px);
+  }
+
+  60% {
+    opacity: 1;
+    transform:
+      perspective(1000px)
+      rotateX(-1deg)
+      translateY(-3px)
+      scale(1.01);
+    filter: blur(0);
+  }
+
+  100% {
+    opacity: 1;
+    transform:
+      perspective(1000px)
+      rotateX(0)
+      translateY(0)
+      scale(1);
+    filter: blur(0);
+  }
+}
+
+.codex-page-perspective {
+  width: 100%;
+  perspective: 1000px;
+}
+
+.codex-page-transition {
+  width: 100%;
+  transform-origin: center top;
+  animation: codex-page-open 1.15s
+    cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .screen-transition,
+  .reveal,
+  .artifact-reveal,
+  .codex-page-transition,
+  .artifact-unlock-overlay-visible,
+  .artifact-unlock-stage-active
+    .artifact-unlock-cinematic-title,
+  .artifact-unlock-stage-active
+    .artifact-unlock-content,
+  .artifact-unlock-stage-active
+    .artifact-unlock-label,
+  .artifact-unlock-stage-active
+    .artifact-unlock-title,
+  .artifact-particle {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+  }
+
+  .artifact-unlock-hint {
+    transition-duration: 1ms !important;
+  }
+
+  .artifact-particles {
+    display: none;
+  }
 }
