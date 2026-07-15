@@ -37,6 +37,10 @@ export function PuzzleScreen({ scene, onSolved }: PuzzleScreenProps) {
   const visibleHints = scene.puzzle.hints.slice(0, hintIndex);
   const hasMoreHints = hintIndex < scene.puzzle.hints.length;
 
+  const investigationObjective =
+    scene.investigation?.objective ??
+    "Rozhliadni sa okolo seba. Odpoveď nie je ukrytá v texte, ale v detaile, ktorý máš priamo pred očami.";
+
   function checkAnswer() {
     const userAnswer = normalizeAnswer(answer);
 
@@ -61,8 +65,11 @@ export function PuzzleScreen({ scene, onSolved }: PuzzleScreenProps) {
   }
 
   function showHint() {
-    if (!hasMoreHints) return;
-    setHintIndex(hintIndex + 1);
+    if (!hasMoreHints) {
+      return;
+    }
+
+    setHintIndex((currentIndex) => currentIndex + 1);
   }
 
   return (
@@ -84,10 +91,23 @@ export function PuzzleScreen({ scene, onSolved }: PuzzleScreenProps) {
           title="Vyšetrovanie miesta"
           variant="gold"
         >
-          <p className="text-sm leading-relaxed text-amber-100">
-            Rozhliadni sa okolo seba. Odpoveď nie je ukrytá v texte, ale v
-            detaile, ktorý máš priamo pred očami.
-          </p>
+          <div className="space-y-4">
+            <p className="text-sm leading-relaxed text-amber-100">
+              {investigationObjective}
+            </p>
+
+            {scene.investigation?.detectiveHint && (
+              <div className="rounded-2xl border border-amber-300/15 bg-black/15 p-4">
+                <p className="text-xs font-bold uppercase tracking-[0.22em] text-amber-400">
+                  Pátračova rada
+                </p>
+
+                <p className="mt-2 text-sm italic leading-relaxed text-slate-300">
+                  „{scene.investigation.detectiveHint}“
+                </p>
+              </div>
+            )}
+          </div>
         </SectionCard>
 
         <SectionCard
@@ -101,25 +121,25 @@ export function PuzzleScreen({ scene, onSolved }: PuzzleScreenProps) {
 
         <TextInput
           value={answer}
-          onChange={(event) => setAnswer(event.target.value)}
+          onChange={(event) => {
+            setAnswer(event.target.value);
+
+            if (error) {
+              setError("");
+            }
+          }}
           placeholder="Tvoja odpoveď..."
           aria-label="Tvoja odpoveď"
         />
 
         {error && (
-          <MessageBox
-            variant="danger"
-            title="Nesprávna stopa"
-          >
+          <MessageBox variant="danger" title="Nesprávna stopa">
             {error}
           </MessageBox>
         )}
 
         {successMessage && (
-          <MessageBox
-            variant="success"
-            title="Stopa potvrdená"
-          >
+          <MessageBox variant="success" title="Stopa potvrdená">
             {successMessage}
           </MessageBox>
         )}
@@ -130,19 +150,19 @@ export function PuzzleScreen({ scene, onSolved }: PuzzleScreenProps) {
         >
           <div className="space-y-3">
             <p className="text-sm text-slate-500">
-            {visibleHints.length === 0
-            ? "Zatiaľ si neobjavil žiadnu stopu."
-            : `Odhalené stopy: ${visibleHints.length}`}
-          </p>
+              {visibleHints.length === 0
+                ? "Zatiaľ si neobjavil žiadnu stopu."
+                : `Odhalené stopy: ${visibleHints.length}`}
+            </p>
 
-          <ActionButton
-            onClick={showHint}
-            disabled={!hasMoreHints}
-            variant="secondary"
-            className="py-3 text-xs"
-          >
-            {hasMoreHints ? "Odhaliť stopu" : "Všetky odhalené"}
-          </ActionButton>
+            <ActionButton
+              onClick={showHint}
+              disabled={!hasMoreHints}
+              variant="secondary"
+              className="py-3 text-xs"
+            >
+              {hasMoreHints ? "Odhaliť stopu" : "Všetky odhalené"}
+            </ActionButton>
           </div>
 
           {visibleHints.length === 0 ? (
@@ -153,7 +173,7 @@ export function PuzzleScreen({ scene, onSolved }: PuzzleScreenProps) {
             <div className="mt-4 space-y-2">
               {visibleHints.map((hint, index) => (
                 <p
-                  key={hint}
+                  key={`${scene.puzzle.id}-hint-${index}`}
                   className="rounded-xl border border-amber-400/10 bg-amber-400/5 p-3 text-sm text-amber-100"
                 >
                   <strong>Stopa {index + 1}:</strong> {hint}
@@ -163,8 +183,11 @@ export function PuzzleScreen({ scene, onSolved }: PuzzleScreenProps) {
           )}
         </SectionCard>
 
-        <ActionButton onClick={checkAnswer}>
-          Overiť odpoveď
+        <ActionButton
+          onClick={checkAnswer}
+          disabled={!answer.trim() || Boolean(successMessage)}
+        >
+          {successMessage ? "Stopa potvrdená" : "Overiť odpoveď"}
         </ActionButton>
       </StoryCard>
     </ScreenContainer>

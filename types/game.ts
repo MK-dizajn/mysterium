@@ -30,6 +30,22 @@ export type CodexEntry = {
   fullText: string;
 };
 
+export type InvestigationType =
+  | "observation"
+  | "inscription"
+  | "architecture"
+  | "symbol"
+  | "counting"
+  | "comparison"
+  | "inventory"
+  | "deduction";
+
+export type Investigation = {
+  objective: string;
+  detectiveHint?: string;
+  observationType?: InvestigationType;
+};
+
 export type Puzzle = {
   id: PuzzleId;
   question: string;
@@ -168,6 +184,9 @@ export type Scene = {
   title: string;
   cinematicText: string;
   voiceLine: string;
+
+  investigation?: Investigation;
+
   puzzle: Puzzle;
   history: CodexEntry;
   artifact: Artifact;
