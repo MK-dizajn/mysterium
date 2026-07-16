@@ -6,8 +6,8 @@ export const lekarenUSalvatoraScene: Scene = {
   title: "3. Mysli na koniec",
 
   cinematicText:
-    "Pátračova stopa ťa privedie na Panskú ulicu. Pred tebou stojí historická lekáreň, ktorej fasáda ukrýva viac než iba meno a výzdobu. Niekde na tomto mieste zostal odkaz starší než samotná budova, v ktorej sa dnes nachádza.",
-
+  "Po Michalskej a Ventúrskej ulici prichádzaš na Panskú ulicu k historickej Lekárni U Salvátora. Si na správnom mieste. Jej fasáda však ukrýva viac než názov a výzdobu — zostal na nej odkaz starší než samotná budova.",
+  
   voiceLine:
     "Liečiteľ musí poznať nielen začiatok svojho rozhodnutia, ale aj jeho následky. Pátrač si preto zapísal jedinú radu: Čokoľvek robíš, mysli na koniec. Nájdi miesto, odkiaľ tieto slová pochádzajú.",
 
@@ -56,7 +56,7 @@ export const lekarenUSalvatoraScene: Scene = {
   },
 
   nextInstruction:
-    "Keď zadáš správny rok, v denníku sa odkryje ďalšia veta: „Prvý údaj označil dom. Druhý patrí odkazu, ktorý prežil stáročia. Čísla však nie sú kľúčom samy osebe. Na Ventúrskej hľadaj miesto, kde sa uchovávali príbehy ľudí, ktorí mesto navštívili.“",
+  "Rok 1658 bol druhou časťou skladačky. Pátrač tým pripomenul, že každé rozhodnutie má svoj dôsledok.\n\nPokračuj po Panskej ulici späť na Ventúrsku. Zastav sa pri budove Academie Istropolitany na Ventúrskej 3.",
 
   events: [
     {
@@ -76,11 +76,15 @@ export const lekarenUSalvatoraScene: Scene = {
         {
           type: "addInventoryItem",
           item: {
-            id: "salvator-1658-clue",
-            title: "Odkaz z roku 1658",
-            icon: "📜",
+            id: "evidence-apothecary-seal",
+            title: "Lekárnická pečať",
+            icon: "🧪",
             description:
-              "Druhá časť pátračovej šifry. Latinský odkaz pripomína: „Čokoľvek robíš, rob rozvážne a mysli na koniec.“",
+              "Tmavá vosková pečať s jemným odtlačkom historickej lekárne. Na spodnej hrane je vyrytá druhá dvojica číslic tajnej kombinácie.",
+            evidenceKind: "object",
+            secretCode: "58",
+            evidenceOrder: 3,
+            actId: "act-1",
           },
         },
       ],
@@ -93,11 +97,11 @@ export const lekarenUSalvatoraScene: Scene = {
       conditions: [
         {
           type: "inventoryItem",
-          itemId: "golden-pressburg-key",
+          itemId: "evidence-brass-house-token",
         },
         {
           type: "inventoryItem",
-          itemId: "salvator-1658-clue",
+          itemId: "evidence-apothecary-seal",
         },
       ],
     },

@@ -8,6 +8,7 @@ export function createNewGameState(): GameState {
     screen: "landing",
     currentChapterIndex: 0,
     currentSceneIndex: 0,
+    currentActId: "act-1",
     score: 0,
     artifacts: [],
     quests: [],
@@ -155,6 +156,26 @@ export function continueAfterHistory(
     return {
       ...gameState,
       screen: "finish",
+    };
+  }
+
+  const completedSceneIndex = gameState.currentSceneIndex;
+
+  if (completedSceneIndex === 2) {
+    return {
+      ...gameState,
+      currentSceneIndex: nextIndex,
+      currentActId: "act-1",
+      screen: "actTransition",
+    };
+  }
+
+  if (completedSceneIndex === 5) {
+    return {
+      ...gameState,
+      currentSceneIndex: nextIndex,
+      currentActId: "act-2",
+      screen: "actTransition",
     };
   }
 

@@ -6,7 +6,7 @@ export const maximilianovaFontanaScene: Scene = {
   title: "7. Strážca nad vodou",
 
   cinematicText:
-    "Od radničnej veže ťa delí od ďalšej stopy iba niekoľko krokov. V strede Hlavného námestia stojí fontána, ktorá po stáročia sledovala trhy, oslavy aj nepokoje. Nad vodou sa dvíha postava muža, no mesto si dodnes nie je celkom isté, koho vlastne predstavuje.",
+  "Od Starej radnice prejdeš iba niekoľko krokov do stredu Hlavného námestia. Si na správnom mieste. Pred tebou stojí fontána, ktorá po stáročia sledovala trhy, oslavy aj nepokoje mesta.",
 
   voiceLine:
     "Meno môže klamať. Legenda môže prežiť pravdu. Preto sa nespoliehaj na názov fontány. Pozri sa na postavu nad vodou a urči, čím bola pripravená chrániť mesto.",
@@ -57,7 +57,7 @@ export const maximilianovaFontanaScene: Scene = {
   },
 
   nextInstruction:
-    "Keď potvrdíš rytierovu zbroj, v denníku sa objaví ďalší zápis: „Múr niesol ranu. Voda dostala strážcu. Teraz hľadaj palác, nad ktorého bránou spočíva váha cirkevnej moci.“ Pokračuj z Hlavného námestia na Primaciálne námestie.",
+  "Rytier nad vodou pripomenul, že ochranca mesta nemusí mať iba jedno meno.\n\nZ Hlavného námestia pokračuj cez krátky priechod na Primaciálne námestie. Zastav sa pred hlavným priečelím Primaciálneho paláca.",
 
   events: [
     {
@@ -77,11 +77,15 @@ export const maximilianovaFontanaScene: Scene = {
         {
           type: "addInventoryItem",
           item: {
-            id: "armoured-guardian-clue",
-            title: "Zbroj mestského strážcu",
+            id: "evidence-guardian-buckle",
+            title: "Rytierska spona strážcu",
             icon: "⚔️",
             description:
-              "Šiesta časť pátračovej šifry. Postava nad fontánou pripomína, že ochranca mesta nemusí mať iba jedno meno.",
+              "Kovová spona zdobená motívom rytiera z fontány. Na vnútornej strane je vyrytá šiesta dvojica číslic tajnej kombinácie.",
+            evidenceKind: "object",
+            secretCode: "72",
+            evidenceOrder: 7,
+            actId: "act-3",
           },
         },
       ],

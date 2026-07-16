@@ -18,15 +18,19 @@ export function ArtifactsScreen({
 }: ArtifactsScreenProps) {
   return (
     <ScreenContainer>
-      <StoryCard label="Codex pátrača" title="Artefakty">
+      <StoryCard
+        label="Objavené miesta a príbehy"
+        title="História"
+      >
         {artifacts.length === 0 ? (
           <SectionCard
             icon={<DetectiveIcon className="h-9 w-9" />}
-            title="Codex je zatiaľ prázdny"
+            title="Zatiaľ si nič neobjavil"
           >
             <p className="text-sm leading-relaxed text-slate-400">
-              Pokračuj v pátraní a odhaľ tajomstvá ukryté v uliciach mesta.
-              Každý získaný artefakt sa objaví na tomto mieste.
+              Pokračuj v pátraní a odhaľuj historické miesta, príbehy a
+              detaily ukryté v uliciach mesta. Každý nový objav sa zobrazí
+              práve tu.
             </p>
           </SectionCard>
         ) : (
@@ -40,7 +44,9 @@ export function ArtifactsScreen({
               >
                 <div className="flex items-start gap-4">
                   <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-amber-400/20 bg-amber-400/10 text-3xl transition group-hover:scale-105">
-                    <span aria-hidden="true">{artifact.icon}</span>
+                    <span aria-hidden="true">
+                      {artifact.icon}
+                    </span>
                   </div>
 
                   <div className="min-w-0">
@@ -53,7 +59,7 @@ export function ArtifactsScreen({
                     </p>
 
                     <p className="mt-3 text-xs font-bold uppercase tracking-widest text-amber-400/70">
-                      Otvoriť záznam
+                      Otvoriť historický záznam
                     </p>
                   </div>
                 </div>
@@ -62,7 +68,10 @@ export function ArtifactsScreen({
           </div>
         )}
 
-        <ActionButton onClick={onBack} variant="secondary">
+        <ActionButton
+          onClick={onBack}
+          variant="secondary"
+        >
           Späť k pátraniu
         </ActionButton>
       </StoryCard>

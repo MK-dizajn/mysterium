@@ -3,6 +3,7 @@ import type { Condition } from "../engine/conditions";
 export type GameId = string;
 export type ChapterId = string;
 export type SceneId = string;
+export type ActId = "act-1" | "act-2" | "act-3";
 export type PuzzleId = string;
 export type ArtifactId = string;
 export type CodexEntryId = string;
@@ -15,12 +16,23 @@ export type Artifact = {
   fullText: string;
 };
 
+export type EvidenceKind =
+  | "object"
+  | "document"
+  | "symbol"
+  | "fragment";
+
 export type InventoryItem = {
   id: string;
   title: string;
   icon: string;
   description: string;
   consumable?: boolean;
+
+  evidenceKind?: EvidenceKind;
+  secretCode?: string;
+  evidenceOrder?: number;
+  actId?: string;
 };
 
 export type CodexEntry = {
@@ -63,6 +75,8 @@ export type GameScreen =
   | "intro"
   | "puzzle"
   | "history"
+  | "actTransition"
+  | "actChest"
   | "finish"
   | "artifact"
   | "inventory"
@@ -222,6 +236,7 @@ export type GameState = {
   screen: GameScreen;
   currentChapterIndex: number;
   currentSceneIndex: number;
+  currentActId: ActId;
   score: number;
   artifacts: Artifact[];
   inventory: InventoryItem[];

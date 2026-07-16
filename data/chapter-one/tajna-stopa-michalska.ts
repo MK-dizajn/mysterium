@@ -6,7 +6,7 @@ export const tajnaStopaMichalskaScene: Scene = {
   title: "2. Dom, ktorý sa zmestil do medzery",
 
   cinematicText:
-    "Pátračova veta ťa nenechá zájsť ďaleko. Hneď pri Michalskej bráne stojí dom taký úzky, že sa medzi okolité stavby takmer stráca. Väčšina ľudí okolo neho prejde bez toho, aby si uvedomila, že sa pozerá na jednu z najnezvyčajnejších stavieb starého mesta.",
+  "Od Michalskej brány stačí urobiť len niekoľko krokov. Medzi okolitými budovami stojí nenápadný dom, ktorý väčšina návštevníkov ani nezaregistruje. Si na správnom mieste. Práve tu sa ukrýva jedna z najnezvyčajnejších stavieb starého Prešporka.",
 
   voiceLine:
     "Mesto niekedy ukryje tajomstvo tak, že ho nestavia do tieňa. Nechá ho priamo pred očami — iba mu vezme priestor. Nájdi dom, ktorý sa medzi svojich susedov takmer nezmestil.",
@@ -49,8 +49,8 @@ export const tajnaStopaMichalskaScene: Scene = {
       "Nenápadná stavba pri Michalskej bráne pripomína, že najzaujímavejšie mestské objavy nemusia byť najväčšie. Dom sa tiesni v úzkej medzere medzi okolitými stavbami a mnoho návštevníkov si ho napriek jeho výnimočnosti vôbec nevšimne.",
   },
 
-  nextInstruction:
-    "Po zadaní čísla domu sa na okraji pátračovho denníka objaví ďalší zápis: „Číslo si zapamätaj. Nie je to odpoveď, ale prvý údaj zámku. Pokračuj ulicou k miestu, nad ktorým bdie Spasiteľ.“",
+    nextInstruction:
+  "Číslo bolo iba prvou časťou skladačky. Samo osebe ešte nič neotvára.\n\nPokračuj Michalskou ulicou smerom na Ventúrsku a následne na Panskú ulicu. Tvojou ďalšou zastávkou je historická Lekáreň U Salvátora.",
 
   events: [
     {
@@ -70,11 +70,15 @@ export const tajnaStopaMichalskaScene: Scene = {
         {
           type: "addInventoryItem",
           item: {
-            id: "golden-pressburg-key",
-            title: "Prvý údaj zlatého kľúča",
-            icon: "🔢",
+            id: "evidence-brass-house-token",
+            title: "Mosadzný domový štítok",
+            icon: "🏷️",
             description:
-              "Číslo 15 zapísané v denníku starého pátrača. Je označené ako prvý údaj zámku, ktorý má viesť k Zlatému prešporskému kľúču.",
+              "Malý mosadzný štítok s obrysom úzkeho domu. Na zadnej strane je vyrytá prvá dvojica číslic tajnej kombinácie.",
+            evidenceKind: "object",
+            secretCode: "15",
+            evidenceOrder: 2,
+            actId: "act-1",
           },
         },
       ],

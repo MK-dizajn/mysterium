@@ -6,7 +6,7 @@ export const staraRadnicaScene: Scene = {
   title: "6. Stopa, ktorú mesto neodstránilo",
 
   cinematicText:
-    "Z Františkánskeho námestia pokračuješ niekoľko krokov k miestu, odkiaľ sa po stáročia spravovalo mesto. Radničná veža pôsobí pokojne, no jej stena dodnes nesie stopu chvíle, keď sa Bratislava ocitla pod paľbou.",
+  "Po niekoľkých krokoch prichádzaš na Hlavné námestie pred vežu Starej radnice. Si na správnom mieste. Budova pôsobí pokojne, no jej múr dodnes nesie stopu chvíle, keď sa mesto ocitlo pod paľbou.",
 
   voiceLine:
     "Niektoré rany mesto opraví. Iné ponechá na očiach, aby ľudia nezabudli. Hľadaj stopu útoku, ktorá sa nestala súčasťou múzea. Zostala priamo v múre.",
@@ -59,7 +59,7 @@ export const staraRadnicaScene: Scene = {
   },
 
   nextInstruction:
-    "Po potvrdení stopy sa v denníku objaví veta: „Múr uchoval zásah. Voda však uchováva meno panovníka, ktorý mal chrániť mesto pred nešťastím.“ Otoč sa smerom do stredu Hlavného námestia.",
+  "Stopa v múre dokázala, že mesto uchováva aj udalosti, na ktoré by možno najradšej zabudlo.\n\nZostaň na Hlavnom námestí a prejdi niekoľko krokov do jeho stredu k Maximiliánovej fontáne.",
 
   events: [
     {
@@ -79,11 +79,15 @@ export const staraRadnicaScene: Scene = {
         {
           type: "addInventoryItem",
           item: {
-            id: "cannonball-memory-clue",
-            title: "Stopa bombardovania",
+            id: "evidence-cannonball-fragment",
+            title: "Úlomok delovej gule",
             icon: "⚫",
             description:
-              "Piata časť pátračovej šifry. Delová guľa zostala v múre ako dôkaz udalosti, na ktorú mesto nemalo zabudnúť.",
+              "Ťažký kovový úlomok so stopami poškodenia. Na jeho povrchu je vyrazená piata dvojica číslic tajnej kombinácie.",
+            evidenceKind: "fragment",
+            secretCode: "09",
+            evidenceOrder: 6,
+            actId: "act-2",
           },
         },
       ],

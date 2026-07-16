@@ -7,6 +7,8 @@ import { CollectionFlow } from "../components/game/CollectionFlow";
 import { HistoryFlow } from "../components/game/HistoryFlow";
 import { NpcFlow } from "../components/game/NpcFlow";
 import { PuzzleFlow } from "../components/game/PuzzleFlow";
+import { ActTransitionScreen } from "../components/screens/ActTransitionScreen";
+import { FinishScreen } from "../components/screens/FinishScreen";
 import { IntroScreen } from "../components/screens/IntroScreen";
 import { LandingScreen } from "../components/screens/LandingScreen";
 import { ArtifactUnlock } from "../components/ui/ArtifactUnlock";
@@ -20,9 +22,11 @@ import {
   talkToNpc,
 } from "../engine";
 import { useGameEngine } from "../hooks/useGameEngine";
-import type { Artifact, GameScreen } from "../types/game";
-
-const initialGameState = createNewGameState();
+import type {
+  ActId,
+  Artifact,
+  GameScreen,
+} from "../types/game";
 
 export default function Home() {
   const {
@@ -65,10 +69,12 @@ export default function Home() {
     clearGameState();
     setSelectedArtifact(null);
     setUnlockedArtifact(null);
+    setPreviousScreen("puzzle");
+    setArtifactPreviousScreen("artifacts");
     setHasSavedProgress(false);
 
     setGameState({
-      ...initialGameState,
+      ...createNewGameState(),
       screen: "intro",
     });
   }
@@ -127,6 +133,14 @@ export default function Home() {
     }));
   }
 
+  function continueToNextAct(nextActId: ActId) {
+    setGameState((currentState) => ({
+      ...currentState,
+      currentActId: nextActId,
+      screen: "puzzle",
+    }));
+  }
+
   function renderCurrentScreen() {
     if (unlockedArtifact) {
       return (
@@ -166,9 +180,10 @@ export default function Home() {
       return (
         <ArtifactFlow
           artifact={selectedArtifact}
-          onBack={() =>
-            updateGameScreen(artifactPreviousScreen)
-          }
+          onBack={() => {
+            setSelectedArtifact(null);
+            updateGameScreen(artifactPreviousScreen);
+          }}
         />
       );
     }
@@ -247,15 +262,55 @@ export default function Home() {
           onOpenArtifacts={openArtifacts}
           onOpenQuests={openQuests}
           onContinue={() => {
-            setGameState(
+            setGameState((currentState) =>
               continueAfterHistory(
-                gameState,
+                currentState,
                 currentChapter
               )
             );
           }}
         />
       );
+    }
+
+    if (gameState.screen === "actTransition") {
+      const isFirstTransition =
+        gameState.currentSceneIndex === 3;
+
+      const completedActId: ActId = isFirstTransition
+        ? "act-1"
+        : "act-2";
+
+      const nextActId: ActId = isFirstTransition
+        ? "act-2"
+        : "act-3";
+
+      const evidenceCount = gameState.inventory.filter(
+        (item) => item.actId === completedActId
+      ).length;
+
+      return (
+        <ActTransitionScreen
+          completedActTitle={
+            isFirstTransition
+              ? "Akt I – Prvé stopy"
+              : "Akt II – Moc a pamäť"
+          }
+          nextActTitle={
+            isFirstTransition
+              ? "Akt II – Moc a poznanie"
+              : "Akt III – Posledné tajomstvo"
+          }
+          evidenceCount={evidenceCount}
+          onContinue={() =>
+            continueToNextAct(nextActId)
+          }
+        />
+      );
+    }
+
+    if (gameState.screen === "finish") {
+      return <FinishScreen onRestart={startNewGame} />;
     }
 
     if (
@@ -287,7 +342,6 @@ export default function Home() {
   return (
     <>
       <CityAmbient currentScreen={ambientScreen} />
-
       {renderCurrentScreen()}
     </>
   );

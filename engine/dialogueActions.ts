@@ -81,9 +81,71 @@ export function applyDialogueChoiceActions(
       if (!alreadyHasArtifact) {
         nextState = {
           ...nextState,
-          artifacts: [...nextState.artifacts, action.artifact],
+          artifacts: [
+            ...nextState.artifacts,
+            action.artifact,
+          ],
         };
       }
+    }
+
+    if (action.type === "startQuest") {
+      const existingQuest = nextState.quests.find(
+        (quest) => quest.questId === action.questId
+      );
+
+      if (!existingQuest) {
+        nextState = {
+          ...nextState,
+          quests: [
+            ...nextState.quests,
+            {
+              questId: action.questId,
+              status: "active",
+            },
+          ],
+        };
+      }
+    }
+
+    if (action.type === "completeQuest") {
+      const existingQuest = nextState.quests.find(
+        (quest) => quest.questId === action.questId
+      );
+
+      if (!existingQuest) {
+        nextState = {
+          ...nextState,
+          quests: [
+            ...nextState.quests,
+            {
+              questId: action.questId,
+              status: "completed",
+            },
+          ],
+        };
+      } else if (existingQuest.status !== "completed") {
+        nextState = {
+          ...nextState,
+          quests: nextState.quests.map((quest) =>
+            quest.questId === action.questId
+              ? {
+                  ...quest,
+                  status: "completed",
+                }
+              : quest
+          ),
+        };
+      }
+    }
+
+    if (action.type === "startDialogue") {
+      nextState = {
+        ...nextState,
+        screen: "npc",
+        activeDialogueId: action.dialogueId,
+        activeDialogueNodeId: action.nodeId,
+      };
     }
 
     if (action.type === "setScreen") {

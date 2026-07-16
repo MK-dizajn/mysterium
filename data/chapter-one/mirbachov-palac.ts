@@ -6,7 +6,7 @@ export const mirbachovPalacScene: Scene = {
   title: "5. Znak posledných pánov",
 
   cinematicText:
-    "Z Ventúrskej sa pátračova stopa stáča na Františkánske námestie. Oproti starému kostolu stojí honosný palác, ktorého fasáda je plná ornamentov. Pátrač však nehľadal najkrajšiu ozdobu. Hľadal znak človeka, ktorý chcel, aby po ňom zostala stopa aj po odchode.",
+  "Z Ventúrskej prichádzaš na Františkánske námestie. Oproti kostolu stojí bohato zdobený Mirbachov palác. Si na správnom mieste. Pátrač však nehľadá jeho najvýraznejšiu ozdobu, ale znak človeka, ktorého rod tu zanechal svoju stopu.",
 
   voiceLine:
     "Majitelia prichádzajú a odchádzajú. Ich mená vyblednú, no znaky zostávajú nad hlavami tých, ktorí sa nikdy nepozrú nahor. Nájdi symbol ukrytý pod korunou.",
@@ -59,7 +59,7 @@ export const mirbachovPalacScene: Scene = {
   },
 
   nextInstruction:
-    "Po potvrdení erbu sa v denníku objaví nová veta: „Kráľ otvoril školu. Šľachtic označil dom. No mesto si svojich vládcov pamätá na mieste, kde sa po stáročia rozhodovalo o jeho osude.“ Stopa smeruje k Starej radnici.",
+  "Rodový erb pripomenul, že mená majiteľov sa môžu stratiť, no ich znaky zostávajú.\n\nZ Františkánskeho námestia pokračuj krátkou cestou na Hlavné námestie. Zastav sa pred vežou Starej radnice.",
 
   events: [
     {
@@ -79,11 +79,15 @@ export const mirbachovPalacScene: Scene = {
         {
           type: "addInventoryItem",
           item: {
-            id: "nyary-crest-clue",
-            title: "Znak rodu Nyáry",
+            id: "evidence-nyary-crest-seal",
+            title: "Pečať rodu Nyáry",
             icon: "🛡️",
             description:
-              "Štvrtá časť pátračovej šifry. Rodový erb zostal na fasáde aj po tom, ako jeho majitelia palác opustili.",
+              "Tmavá vosková pečať s odtlačkom rodového erbu. Na zadnej strane je vyrytá štvrtá dvojica číslic tajnej kombinácie.",
+            evidenceKind: "symbol",
+            secretCode: "70",
+            evidenceOrder: 5,
+            actId: "act-2",
           },
         },
       ],

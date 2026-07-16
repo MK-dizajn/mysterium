@@ -6,7 +6,7 @@ export const venturskaBranaSpomienokScene: Scene = {
   title: "4. Dom, v ktorom sa začalo vzdelanie",
 
   cinematicText:
-    "Ventúrska ulica pokračuje medzi palácmi a starými meštianskymi domami. Pátračov denník ťa však nevedie k najhonosnejšej fasáde. Zastaví ťa pred kamennou budovou, ktorá na prvý pohľad pôsobí nenápadne. Práve tu sa však kedysi stretávali učenci, astronómovia a ľudia, ktorí sa snažili porozumieť svetu.",
+  "Z Panskej ulice sa vraciaš na Ventúrsku a po krátkej chôdzi prichádzaš k domu číslo 3. Si na správnom mieste. Za nenápadnou fasádou sa kedysi stretávali učenci, astronómovia a ľudia, ktorí sa snažili porozumieť svetu.",
 
   voiceLine:
     "Prvý údaj si našiel na dome. Druhý v odkaze lekárnika. Teraz hľadaj miesto, kde sa otázky nepovažovali za slabosť, ale za začiatok poznania. Meno muža, ktorý ho založil, otvorí ďalšiu časť denníka.",
@@ -58,7 +58,7 @@ export const venturskaBranaSpomienokScene: Scene = {
   },
 
   nextInstruction:
-    "Keď vyslovíš meno zakladateľa, tri zápisy v denníku sa spoja: „Pätnásť označilo miesto. Rok pripomenul rozvahu. Kráľ otvoril cestu poznaniu.“ Medzi stránkami sa objaví obrys kľúča. Ešte však nie je celý — chýba mu posledný zub.",
+  "Meno zakladateľa pridalo do skladačky ďalšiu vrstvu. Pátrač teraz vedie tvoju pozornosť od vzdelania k moci a rodovým znakom.\n\nPokračuj po Ventúrskej smerom na Františkánske námestie. Zastav sa pred Mirbachovým palácom.",
 
   events: [
     {
@@ -78,11 +78,15 @@ export const venturskaBranaSpomienokScene: Scene = {
         {
           type: "addInventoryItem",
           item: {
-            id: "corvin-founder-clue",
-            title: "Meno kráľa zakladateľa",
-            icon: "👑",
+            id: "evidence-academia-seal",
+            title: "Pečať Academie Istropolitany",
+            icon: "🎓",
             description:
-              "Tretia časť pátračovej šifry. Matej Korvín založil Academiu Istropolitanu a otvoril v meste cestu vzdelaniu.",
+              "Kovová pečať s obrysom otvorenej knihy a kráľovskej koruny. Na jej hrane je vyrazená tretia dvojica číslic tajnej kombinácie.",
+            evidenceKind: "object",
+            secretCode: "65",
+            evidenceOrder: 4,
+            actId: "act-2",
           },
         },
       ],

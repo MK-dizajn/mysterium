@@ -144,6 +144,20 @@ export const michalskaBranaScene: Scene = {
           type: "setFlag",
           flagId: "michalska_brana_solved",
         },
+        {
+          type: "addInventoryItem",
+          item: {
+            id: "evidence-zero-kilometre-token",
+            title: "Žetón nultého kilometra",
+            icon: "🧭",
+            description:
+             "Mosadzný žetón s vyrytými smermi svetových miest. Na jeho zadnej strane sa nachádza prvá dvojica číslic tajnej kombinácie.",
+            evidenceKind: "object",
+            secretCode: "00",
+            evidenceOrder: 1,
+            actId: "act-1",
+          },
+        },
       ],
     },
   ],

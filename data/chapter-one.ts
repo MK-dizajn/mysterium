@@ -7,6 +7,9 @@ import { venturskaBranaSpomienokScene } from "./chapter-one/venturska-brana-spom
 import { mirbachovPalacScene } from "./chapter-one/mirbachov-palac";
 import { staraRadnicaScene } from "./chapter-one/stara-radnica";
 import { maximilianovaFontanaScene } from "./chapter-one/maximilianova-fontana";
+import { primacialnyPalacScene } from "./chapter-one/primacialny-palac";
+import { bratislavskyMierScene } from "./chapter-one/bratislavsky-mier";
+import { zlatyPresporskyKlucScene } from "./chapter-one/zlaty-presporsky-kluc";
 
 export const chapterOne: Chapter = {
   id: "bratislava-chapter-1",
@@ -29,5 +32,8 @@ export const chapterOne: Chapter = {
     mirbachovPalacScene,
     staraRadnicaScene,
     maximilianovaFontanaScene,
+    primacialnyPalacScene,
+    bratislavskyMierScene,
+    zlatyPresporskyKlucScene,
   ],
 };
