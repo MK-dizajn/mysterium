@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ChestDial } from "./ChestDial";
+import { soundManager } from "../../../lib/soundManager";
 
 type ChestProps = {
   codes: string[];
@@ -42,35 +43,42 @@ export function Chest({
   const [areFragmentsVisible, setAreFragmentsVisible] =
     useState(false);
 
-  useEffect(() => {
+  useEffect(() => { 
     if (!isUnlocked) {
-      setIsLockReleased(false);
+     setIsLockReleased(false);
       setIsLidOpen(false);
-      setIsLightVisible(false);
-      setAreFragmentsVisible(false);
-      return;
+     setIsLightVisible(false);
+     setAreFragmentsVisible(false);
+
+     return;
     }
 
-    const lockTimer = window.setTimeout(() => {
-      setIsLockReleased(true);
+   const lockTimer = window.setTimeout(() => {
+     setIsLockReleased(true);
+
+     // Jemné cvaknutie pri odomknutí
+     soundManager.play("chest-unlock");
     }, 250);
 
-    const lidTimer = window.setTimeout(() => {
-      setIsLidOpen(true);
-    }, 700);
+   const lidTimer = window.setTimeout(() => {
+     setIsLidOpen(true);
+
+      // Hlavný zvuk otvorenia truhlice
+      soundManager.play("artifact-unlock");
+   }, 700);
 
     const lightTimer = window.setTimeout(() => {
-      setIsLightVisible(true);
+     setIsLightVisible(true);
     }, 1050);
 
     const fragmentsTimer = window.setTimeout(() => {
-      setAreFragmentsVisible(true);
-    }, 1450);
+     setAreFragmentsVisible(true);
+   }, 1450);
 
-    return () => {
+   return () => {
       window.clearTimeout(lockTimer);
       window.clearTimeout(lidTimer);
-      window.clearTimeout(lightTimer);
+     window.clearTimeout(lightTimer);
       window.clearTimeout(fragmentsTimer);
     };
   }, [isUnlocked]);
@@ -91,24 +99,36 @@ export function Chest({
   }
 
   return (
-    <div className="relative mx-auto w-full max-w-md pt-10">
-      {/* Jemná žiara za truhlicou */}
       <div
-        className={`pointer-events-none absolute left-1/2 top-16 h-[26rem] w-[90%] -translate-x-1/2 rounded-full blur-3xl transition-all duration-1000 ${
-          isLightVisible
-            ? "scale-110 bg-amber-300/25 opacity-100"
-            : "bg-amber-950/20 opacity-70"
-        }`}
-      />
+        className="relative mx-auto w-full max-w-md"
+        style={{
+          perspective: "1200px",
+          transformStyle: "preserve-3d",
+          animation: isUnlocked
+            ? "chest-cinematic-camera 3200ms cubic-bezier(0.22, 1, 0.36, 1) forwards"
+            : "none",
+        }}
+      >
 
-      <div className="relative">
+      <div
+        className="relative"
+        style={{
+          perspective: "1200px",
+          transformStyle: "preserve-3d",
+        }}
+      >
         {/* Veko truhlice */}
         <div
-          className={`pointer-events-none relative z-30 mx-4 origin-bottom transition-all duration-1000 ease-out ${
-            isLidOpen
-              ? "-translate-y-24 scale-y-75 opacity-95"
-              : "translate-y-0 scale-y-100 opacity-100"
+          className={`pointer-events-none relative z-30 mx-4 origin-bottom transition-opacity duration-700 ${
+            isLidOpen ? "opacity-95" : "opacity-100"
           }`}
+          style={{
+            transform: "translateY(0) rotateX(0deg)",
+            transformStyle: "preserve-3d",
+            animation: isLidOpen
+              ? "chest-lid-cinematic-open 1400ms cubic-bezier(0.22, 1, 0.36, 1) forwards"
+              : "none",
+            }}
         >
           <div className="relative h-36 overflow-hidden rounded-t-[4rem] border border-amber-500/35 shadow-[0_24px_40px_rgba(0,0,0,0.7)] sm:h-40">
             {/* Drevo */}
@@ -147,16 +167,67 @@ export function Chest({
               </span>
             </div>
           </div>
+          {/* Vnútorná strana otvoreného veka */}
+          <div
+            className={`pointer-events-none absolute inset-3 rounded-t-[2.75rem] rounded-b-xl border border-amber-950/80 bg-gradient-to-b from-[#25140c] via-[#160c08] to-[#090504] shadow-[inset_0_14px_28px_rgba(0,0,0,0.85),inset_0_-4px_10px_rgba(180,110,45,0.12)] transition-opacity duration-700 ${
+              isLidOpen ? "opacity-100" : "opacity-0"
+            }`}
+            style={{
+              transform: "translateZ(-10px) rotateX(180deg)",
+              backfaceVisibility: "hidden",
+            }}
+          >
+            <div className="absolute inset-x-7 top-7 h-px bg-amber-300/10" />
+            <div className="absolute inset-x-10 bottom-6 h-px bg-black/70" />
+          </div>
+
+          {/* Spodná hrana veka – vytvára 3D hrúbku */}
+          <div
+            className={`pointer-events-none absolute inset-x-2 bottom-0 h-5 origin-top rounded-b-xl border-x border-b border-black/70 bg-gradient-to-b from-[#3b1f11] via-[#241208] to-[#0c0603] shadow-[0_8px_14px_rgba(0,0,0,0.65)] transition-opacity duration-500 ${
+              isLidOpen ? "opacity-100" : "opacity-70"
+            }`}
+            style={{
+              transform: "translateY(12px) rotateX(-78deg)",
+              transformOrigin: "top",
+            }}
+          />
         </div>
 
         {/* Svetlo zvnútra */}
-        <div
-          className={`pointer-events-none absolute left-1/2 top-24 z-10 h-64 w-[90%] -translate-x-1/2 rounded-full bg-amber-200/45 blur-3xl transition-all delay-300 duration-1000 ${
-            isLightVisible
-              ? "scale-125 opacity-100"
-              : "scale-50 opacity-0"
+        <div className="pointer-events-none absolute inset-x-0 top-16 z-20 h-72 overflow-visible">
+          {/* Široká žiara */}
+          <div
+            className={`absolute left-1/2 top-10 h-64 w-[92%] -translate-x-1/2 rounded-full bg-amber-200/35 blur-3xl transition-all delay-200 duration-[1400ms] ease-out ${
+              isLightVisible
+                ? "scale-125 opacity-100"
+                : "scale-50 opacity-0"
           }`}
         />
+
+          {/* Jasné jadro svetla */}
+          <div
+            className={`absolute left-1/2 top-20 h-32 w-[62%] rounded-full bg-amber-100/70 blur-2xl transition-opacity delay-300 duration-1000 ease-out ${
+              isLightVisible
+                ? "opacity-100"
+                : "opacity-0"
+            }`}
+            style={{
+              transform: "translateX(-50%)",
+              animation: isLightVisible
+              ? "chest-light-pulse 2200ms ease-in-out 1200ms infinite"
+              : "none",
+            }}
+          />
+
+          {/* Svetelný lúč smerom nahor */}
+          <div
+            className={`absolute left-1/2 top-0 h-56 w-40 -translate-x-1/2 origin-bottom bg-gradient-to-t from-amber-100/50 via-amber-200/20 to-transparent blur-2xl transition-all delay-300 duration-[1300ms] ease-out ${
+              isLightVisible
+                ? "-translate-y-24 scale-x-125 scale-y-125 opacity-90"
+                : "translate-y-10 scale-x-50 scale-y-50 opacity-0"
+            }`}
+          />
+        </div>
 
         {/* Svetelné lúče */}
         <div
@@ -166,6 +237,118 @@ export function Chest({
               : "scale-75 opacity-0"
           }`}
         />
+
+        {/* Krátky svetelný záblesk pri otvorení */}
+        <div
+          className="pointer-events-none absolute left-1/2 top-[42%] z-20 h-72 w-72 rounded-full bg-amber-100/50 blur-3xl"
+          style={{
+            opacity: 0,
+            animation: isLightVisible
+              ? "chest-light-burst 1300ms ease-out forwards"
+              : "none",
+          }}
+        />
+
+        {/* Pomalé častice nad otvorenou truhlicou */}
+              <div
+                className={`pointer-events-none absolute inset-x-10 top-14 z-30 h-64 overflow-visible transition-opacity duration-1000 ${
+                  isLightVisible ? "opacity-100" : "opacity-0"
+                }`}
+              >
+                {[
+                  {
+                    left: "12%",
+                    delay: "0ms",
+                    duration: "3600ms",
+                    size: 2,
+                    drift: "-18px",
+                  },
+                  {
+                    left: "26%",
+                    delay: "900ms",
+                    duration: "4200ms",
+                    size: 3,
+                    drift: "14px",
+                  },
+                  {
+                    left: "41%",
+                    delay: "1700ms",
+                    duration: "3900ms",
+                    size: 2,
+                    drift: "-10px",
+                  },
+                  {
+                    left: "57%",
+                    delay: "500ms",
+                    duration: "4500ms",
+                    size: 3,
+                    drift: "20px",
+                  },
+                  {
+                    left: "73%",
+                    delay: "2200ms",
+                    duration: "4100ms",
+                    size: 2,
+                    drift: "-16px",
+                  },
+                  {
+                    left: "88%",
+                    delay: "1300ms",
+                    duration: "3700ms",
+                    size: 2,
+                    drift: "12px",
+                  },
+                ].map((particle, index) => (
+                  <span
+      key={`chest-ambient-particle-${index}`}
+                    className="absolute bottom-0 rounded-full bg-amber-100 shadow-[0_0_8px_rgba(253,230,138,0.75)]"
+      style={{
+        left: particle.left,
+        width: `${particle.size}px`,
+        height: `${particle.size}px`,
+                      opacity: 0,
+        animation: isLightVisible
+                        ? `chest-ambient-particle ${particle.duration} ease-in-out ${particle.delay} infinite`
+                        : "none",
+                      ["--ambient-drift" as string]: particle.drift,
+                    }}
+                  />
+                ))}
+              </div>
+
+              {/* Zlaté prachové častice */}
+              <div
+                className={`pointer-events-none absolute inset-x-8 top-20 z-30 h-52 overflow-visible transition-opacity duration-500 ${
+                  isLightVisible ? "opacity-100" : "opacity-0"
+                }`}
+              >
+                {[
+                  { left: "8%", delay: "0ms", duration: "1500ms", size: 4, drift: "-28px" },
+                  { left: "17%", delay: "160ms", duration: "1800ms", size: 3, drift: "18px" },
+                  { left: "28%", delay: "80ms", duration: "1650ms", size: 5, drift: "-12px" },
+                  { left: "39%", delay: "280ms", duration: "1900ms", size: 3, drift: "30px" },
+                  { left: "50%", delay: "120ms", duration: "1700ms", size: 4, drift: "-20px" },
+                  { left: "61%", delay: "340ms", duration: "1850ms", size: 5, drift: "22px" },
+                  { left: "72%", delay: "220ms", duration: "1600ms", size: 3, drift: "-24px" },
+                  { left: "82%", delay: "420ms", duration: "1950ms", size: 4, drift: "16px" },
+                  { left: "90%", delay: "260ms", duration: "1750ms", size: 3, drift: "-14px" },
+                ].map((particle, index) => (
+                  <span
+                    key={`chest-dust-${index}`}
+                    className="absolute bottom-0 rounded-full bg-amber-100 shadow-[0_0_10px_rgba(253,230,138,0.85)]"
+                    style={{
+                      left: particle.left,
+                      width: `${particle.size}px`,
+                      height: `${particle.size}px`,
+                      opacity: 0,
+                      animation: isLightVisible
+                        ? `chest-dust-rise ${particle.duration} ease-out ${particle.delay} forwards`
+                        : "none",
+              ["--dust-x" as string]: particle.drift,
+            }}
+          />
+          ))}
+        </div>
 
         {/* Štyri útržky fotografie */}
         <div
@@ -180,13 +363,49 @@ export function Chest({
               key={`photo-fragment-${index}`}
               type="button"
               onClick={onRewardClick}
-              className={`absolute w-20 rounded-sm border border-amber-100/50 bg-[#d8c39d] p-1.5 shadow-2xl shadow-black/70 transition-all duration-1000 ease-out hover:z-50 hover:scale-110 sm:w-28 ${position} ${
+              className={`absolute w-20 rounded-sm border border-amber-100/50 bg-[#d8c39d] p-1.5 shadow-2xl shadow-black/70 hover:z-50 hover:scale-110 sm:w-28 ${position} ${
                 areFragmentsVisible
-                  ? "pointer-events-auto translate-y-0 scale-100 opacity-100"
-                  : "pointer-events-none translate-y-40 scale-75 opacity-0"
+                  ? "pointer-events-auto"
+                  : "pointer-events-none opacity-0"
               }`}
               style={{
-                transitionDelay: `${650 + index * 180}ms`,
+                animation: areFragmentsVisible
+                  ? `chest-fragment-reveal 1100ms cubic-bezier(0.22, 1, 0.36, 1) ${
+                      180 + index * 170
+                    }ms forwards`
+                  : "none",
+                ["--fragment-start-x" as string]:
+                  index === 0
+                    ? "-42px"
+                    : index === 1
+                      ? "-16px"
+                      : index === 2
+                        ? "18px"
+                        : "44px",
+                ["--fragment-start-rotate" as string]:
+                  index === 0
+                    ? "-22deg"
+                    : index === 1
+                      ? "-8deg"
+                      : index === 2
+                        ? "10deg"
+                        : "24deg",
+                ["--fragment-overshoot-rotate" as string]:
+                  index === 0
+                    ? "-7deg"
+                    : index === 1
+                      ? "3deg"
+                      : index === 2
+                        ? "-2deg"
+                        : "8deg",
+                ["--fragment-end-rotate" as string]:
+                  index === 0
+                    ? "-5deg"
+                    : index === 1
+                      ? "2deg"
+                      : index === 2
+                        ? "-1deg"
+                        : "5deg",
               }}
               aria-label={`Preskúmať útržok fotografie ${
                 index + 1
@@ -215,6 +434,38 @@ export function Chest({
         </div>
 
         {/* Spodná časť truhlice */}
+        {/* Vnútorná dutina truhlice */}
+        <div
+          className={`pointer-events-none absolute inset-x-8 top-28 z-10 h-28 overflow-hidden rounded-b-3xl transition-all duration-700 ${
+            isLidOpen
+            ? "opacity-100"
+            : "opacity-0"
+          }`}
+        >
+        {/* Zadná stena */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0b0503] via-[#120804] to-black" />
+
+        {/* Ľavá stena */}
+        <div
+          className="absolute left-0 top-0 h-full w-10 bg-gradient-to-r from-black via-[#1a0d06] to-transparent"
+          style={{
+            transform: "skewY(-14deg)",
+            transformOrigin: "left",
+          }}
+        />
+
+        {/* Pravá stena */}
+        <div
+          className="absolute right-0 top-0 h-full w-10 bg-gradient-to-l from-black via-[#1a0d06] to-transparent"
+          style={{
+            transform: "skewY(14deg)",
+            transformOrigin: "right",
+          }}
+        />
+
+        {/* Dno */}
+        <div className="absolute inset-x-4 bottom-0 h-10 rounded-t-xl bg-gradient-to-b from-[#2a140a] to-black" />
+        </div>
         <div
           className={`relative z-20 -mt-1 overflow-hidden rounded-b-[2.5rem] border border-amber-500/30 shadow-[0_30px_55px_rgba(0,0,0,0.75)] transition duration-700 ${
             isLightVisible
