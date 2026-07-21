@@ -181,6 +181,36 @@ export function Chest({
             <div className="absolute inset-x-10 bottom-6 h-px bg-black/70" />
           </div>
 
+                    {/* 3D hrúbka veka – ľavý bok */}
+          <div
+            className="pointer-events-none absolute bottom-2 left-0 top-12 w-4 rounded-l-2xl border-l border-amber-700/30 bg-gradient-to-r from-[#090402] via-[#241108] to-[#3b1d0d] shadow-[-8px_8px_14px_rgba(0,0,0,0.55)]"
+            style={{
+              transform: "translateX(-5px) translateZ(-6px) rotateY(-58deg)",
+              transformOrigin: "right center",
+            }}
+          />
+
+          {/* 3D hrúbka veka – pravý bok */}
+          <div
+            className="pointer-events-none absolute bottom-2 right-0 top-12 w-4 rounded-r-2xl border-r border-amber-700/30 bg-gradient-to-l from-[#090402] via-[#241108] to-[#3b1d0d] shadow-[8px_8px_14px_rgba(0,0,0,0.55)]"
+            style={{
+              transform: "translateX(5px) translateZ(-6px) rotateY(58deg)",
+              transformOrigin: "left center",
+            }}
+          />
+
+          {/* Horná zaoblená hrana veka */}
+          <div
+            className="pointer-events-none absolute inset-x-8 top-0 h-5 rounded-[50%] border-t border-amber-300/25 bg-gradient-to-b from-amber-700/35 via-[#35190c]/80 to-transparent blur-[0.3px]"
+            style={{
+              transform: "translateY(-3px) translateZ(5px) rotateX(58deg)",
+              transformOrigin: "bottom center",
+            }}
+          />
+
+          {/* Jemný plastický odlesk na oblúku */}
+          <div className="pointer-events-none absolute inset-x-14 top-4 h-10 rounded-[50%] bg-gradient-to-b from-amber-200/10 via-amber-500/5 to-transparent blur-md" />
+
           {/* Spodná hrana veka – vytvára 3D hrúbku */}
           <div
             className={`pointer-events-none absolute inset-x-2 bottom-0 h-5 origin-top rounded-b-xl border-x border-b border-black/70 bg-gradient-to-b from-[#3b1f11] via-[#241208] to-[#0c0603] shadow-[0_8px_14px_rgba(0,0,0,0.65)] transition-opacity duration-500 ${
@@ -195,6 +225,41 @@ export function Chest({
 
         {/* Svetlo zvnútra */}
         <div className="pointer-events-none absolute inset-x-0 top-16 z-20 h-72 overflow-visible">
+
+        {/* Jemná hmla unikajúca z otvorenej truhlice */}
+        <div
+          className={`pointer-events-none absolute inset-x-10 top-24 z-20 h-48 overflow-visible transition-opacity delay-500 duration-1000 ${
+          isLightVisible ? "opacity-100" : "opacity-0"
+         }`}
+       >
+         <span
+           className="absolute left-[8%] top-16 h-16 w-[58%] rounded-full bg-amber-100/10 blur-2xl"
+           style={{
+             animation: isLightVisible
+               ? "chest-mist-left 5200ms ease-in-out 400ms infinite"
+               : "none",
+           }}
+         />
+
+         <span
+           className="absolute right-[5%] top-10 h-20 w-[62%] rounded-full bg-amber-50/10 blur-3xl"
+           style={{
+             animation: isLightVisible
+               ? "chest-mist-right 6100ms ease-in-out 900ms infinite"
+               : "none",
+           }}
+         />
+
+         <span
+           className="absolute left-1/2 top-24 h-14 w-[75%] -translate-x-1/2 rounded-full bg-amber-200/10 blur-2xl"
+           style={{
+             animation: isLightVisible
+               ? "chest-mist-center 4600ms ease-in-out 1400ms infinite"
+               : "none",
+           }}
+         />
+       </div>
+
           {/* Široká žiara */}
           <div
             className={`absolute left-1/2 top-10 h-64 w-[92%] -translate-x-1/2 rounded-full bg-amber-200/35 blur-3xl transition-all delay-200 duration-[1400ms] ease-out ${
@@ -478,26 +543,99 @@ export function Chest({
 
           <div className="absolute inset-0 bg-gradient-to-b from-amber-950/20 via-black/10 to-slate-950/85" />
 
-          {/* Bočné stĺpiky */}
-          <div className="absolute inset-y-0 left-0 w-7 border-r border-amber-400/15 bg-gradient-to-r from-black/70 via-amber-950/50 to-transparent sm:w-8" />
+          {/* Horná 3D hrana tela truhlice */}
+          <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-5 border-b border-amber-200/15 bg-gradient-to-b from-[#4a2813] via-[#261208] to-[#0b0503] shadow-[inset_0_2px_2px_rgba(251,191,36,0.12),0_5px_10px_rgba(0,0,0,0.75)]" />
 
-          <div className="absolute inset-y-0 right-0 w-7 border-l border-amber-400/15 bg-gradient-to-l from-black/70 via-amber-950/50 to-transparent sm:w-8" />
+          <div className="pointer-events-none absolute inset-x-8 top-1 z-10 h-3 rounded-[50%] bg-gradient-to-b from-amber-200/10 to-transparent blur-sm" />
 
-          {/* Rohové kovanie */}
-          <div className="absolute bottom-0 left-0 h-10 w-10 rounded-tr-xl border-r border-t border-amber-300/25 bg-gradient-to-br from-amber-700/40 to-black sm:h-12 sm:w-12" />
+          {/* Ľavý masívny bočný stĺpik */}
+          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-8 border-r border-amber-300/15 bg-gradient-to-r from-[#050302] via-[#32190c] to-[#160b06] shadow-[inset_-5px_0_8px_rgba(0,0,0,0.65),5px_0_10px_rgba(0,0,0,0.35)] sm:w-10">
+            <div className="absolute inset-y-3 left-1 w-px bg-amber-200/10" />
+            <div className="absolute inset-y-0 right-1 w-px bg-black/70" />
+          </div>
 
-          <div className="absolute bottom-0 right-0 h-10 w-10 rounded-tl-xl border-l border-t border-amber-300/25 bg-gradient-to-bl from-amber-700/40 to-black sm:h-12 sm:w-12" />
+          {/* Pravý masívny bočný stĺpik */}
+          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-8 border-l border-amber-300/15 bg-gradient-to-l from-[#050302] via-[#32190c] to-[#160b06] shadow-[inset_5px_0_8px_rgba(0,0,0,0.65),-5px_0_10px_rgba(0,0,0,0.35)] sm:w-10">
+            <div className="absolute inset-y-3 right-1 w-px bg-amber-200/10" />
+            <div className="absolute inset-y-0 left-1 w-px bg-black/70" />
+          </div>
+
+          {/* Vnútorné perspektívne tiene */}
+          <div className="pointer-events-none absolute bottom-0 left-8 top-5 z-[5] w-8 bg-gradient-to-r from-black/45 to-transparent sm:left-10" />
+
+          <div className="pointer-events-none absolute bottom-0 right-8 top-5 z-[5] w-8 bg-gradient-to-l from-black/45 to-transparent sm:right-10" />
+
+          {/* Ľavé rohové kovanie */}
+          <div className="pointer-events-none absolute bottom-0 left-0 z-20 h-12 w-12 rounded-tr-2xl border-r border-t border-amber-200/25 bg-gradient-to-br from-[#7a4a18] via-[#3d240d] to-[#090504] shadow-[inset_-4px_-4px_8px_rgba(0,0,0,0.65),4px_-3px_10px_rgba(0,0,0,0.45)] sm:h-14 sm:w-14">
+            <div className="absolute left-2 top-2 h-2.5 w-2.5 rounded-full border border-amber-100/25 bg-amber-700 shadow-[inset_0_1px_2px_rgba(255,255,255,0.12),0_2px_4px_rgba(0,0,0,0.8)]" />
+
+            <div className="absolute bottom-2 left-2 h-2.5 w-2.5 rounded-full border border-amber-100/20 bg-amber-800 shadow-[0_2px_4px_rgba(0,0,0,0.8)]" />
+
+            <div className="absolute inset-y-2 right-1 w-px bg-amber-200/10" />
+          </div>
+
+          {/* Pravé rohové kovanie */}
+          <div className="pointer-events-none absolute bottom-0 right-0 z-20 h-12 w-12 rounded-tl-2xl border-l border-t border-amber-200/25 bg-gradient-to-bl from-[#7a4a18] via-[#3d240d] to-[#090504] shadow-[inset_4px_-4px_8px_rgba(0,0,0,0.65),-4px_-3px_10px_rgba(0,0,0,0.45)] sm:h-14 sm:w-14">
+            <div className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full border border-amber-100/25 bg-amber-700 shadow-[inset_0_1px_2px_rgba(255,255,255,0.12),0_2px_4px_rgba(0,0,0,0.8)]" />
+
+            <div className="absolute bottom-2 right-2 h-2.5 w-2.5 rounded-full border border-amber-100/20 bg-amber-800 shadow-[0_2px_4px_rgba(0,0,0,0.8)]" />
+
+            <div className="absolute inset-y-2 left-1 w-px bg-amber-200/10" />
+          </div>
+
+          {/* Spodná masívna základňa truhlice */}
+          <div className="pointer-events-none absolute inset-x-5 bottom-0 z-10 h-5 rounded-t-lg border-t border-amber-200/15 bg-gradient-to-b from-[#4a2813] via-[#211108] to-[#080402] shadow-[0_8px_14px_rgba(0,0,0,0.7),inset_0_2px_2px_rgba(251,191,36,0.08)]" />
+
+          {/* Ľavá nožička */}
+          <div
+            className="pointer-events-none absolute -bottom-3 left-8 z-0 h-5 w-12 rounded-b-xl border-x border-b border-black/80 bg-gradient-to-b from-[#2e170b] to-[#080402] shadow-[0_8px_12px_rgba(0,0,0,0.65)]"
+            style={{
+              transform: "skewX(-8deg)",
+            }}
+          />
+
+          {/* Pravá nožička */}
+          <div
+            className="pointer-events-none absolute -bottom-3 right-8 z-0 h-5 w-12 rounded-b-xl border-x border-b border-black/80 bg-gradient-to-b from-[#2e170b] to-[#080402] shadow-[0_8px_12px_rgba(0,0,0,0.65)]"
+            style={{
+              transform: "skewX(8deg)",
+            }}
+          />
+
+          {/* Tieň pod truhlicou */}
+          <div className="pointer-events-none absolute -bottom-6 left-1/2 z-[-1] h-6 w-[82%] -translate-x-1/2 rounded-full bg-black/75 blur-xl" />
 
           <div className="relative px-4 pb-5 pt-8 sm:px-6 sm:pb-6 sm:pt-9">
+            
             {/* Mosadzný panel */}
             <div
-              className={`relative overflow-hidden rounded-3xl border px-2 py-3 shadow-[inset_0_0_30px_rgba(0,0,0,0.8),0_12px_28px_rgba(0,0,0,0.5)] transition duration-700 ${
+              className={`relative overflow-hidden rounded-3xl border px-2 py-3 shadow-[inset_0_0_30px_rgba(0,0,0,0.8),0_18px_34px_rgba(0,0,0,0.72),0_0_0_3px_rgba(75,45,14,0.55)] transition duration-700 ${
                 isLockReleased
                   ? "border-emerald-300/40"
                   : "border-amber-400/35"
               }`}
+              style={{
+                transform: "translateZ(18px)",
+                transformStyle: "preserve-3d",
+              }}
             >
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-[#49300f] via-[#211406] to-[#080604]" />
+
+              {/* Horná plastická hrana panelu */}
+              <div className="pointer-events-none absolute inset-x-3 top-0 h-3 rounded-b-xl bg-gradient-to-b from-amber-200/20 via-amber-700/10 to-transparent" />
+
+              {/* Spodná hrúbka panelu */}
+              <div
+                className="pointer-events-none absolute inset-x-3 bottom-0 h-4 rounded-t-xl bg-gradient-to-b from-transparent via-[#2b1908] to-black/80"
+                style={{
+                  transform: "translateY(2px)",
+                }}
+              />
+
+              {/* Bočné tiene panelu */}
+              <div className="pointer-events-none absolute inset-y-3 left-0 w-4 bg-gradient-to-r from-black/65 to-transparent" />
+
+              <div className="pointer-events-none absolute inset-y-3 right-0 w-4 bg-gradient-to-l from-black/65 to-transparent" />
 
               <div className="pointer-events-none absolute inset-1 rounded-[1.25rem] border border-amber-100/10" />
 
