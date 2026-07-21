@@ -32,7 +32,7 @@ export type InventoryItem = {
   evidenceKind?: EvidenceKind;
   secretCode?: string;
   evidenceOrder?: number;
-  actId?: string;
+  actId?: ActId;
 };
 
 export type CodexEntry = {

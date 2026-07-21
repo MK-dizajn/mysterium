@@ -1,38 +1,82 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import type {
+  ActId,
+  InventoryItem,
+} from "../../types/game";
 import { ActionButton } from "../ui/ActionButton";
+import { Chest } from "../ui/chest/Chest";
+import {
+  ChestEvidencePanel,
+  type ChestEvidence,
+} from "../ui/chest/ChestEvidencePanel";
 import { MessageBox } from "../ui/MessageBox";
+import { RewardReveal } from "../ui/reward/RewardReveal";
 import { ScreenContainer } from "../ui/ScreenContainer";
-import { StoryCard } from "../ui/StoryCard";
 
 type ActChestScreenProps = {
   title: string;
   expectedCodes: string[];
+  inventory: InventoryItem[];
+  currentActId: ActId;
   onUnlocked: () => void;
 };
 
 export function ActChestScreen({
   title,
   expectedCodes,
+  inventory,
+  currentActId,
   onUnlocked,
 }: ActChestScreenProps) {
   const [codes, setCodes] = useState(
     expectedCodes.map(() => "00")
   );
-  const [error, setError] = useState("");
-  const [isUnlocked, setIsUnlocked] = useState(false);
 
-  function updateCode(index: number, value: string) {
-    const normalizedValue = value
-      .replace(/\D/g, "")
-      .slice(0, 2);
+  const [error, setError] = useState("");
+  const [isUnlocked, setIsUnlocked] =
+    useState(false);
+  const [isEvidenceOpen, setIsEvidenceOpen] =
+    useState(false);
+  const [isRewardOpen, setIsRewardOpen] =
+    useState(false);
+
+  const actEvidence = useMemo<ChestEvidence[]>(
+    () =>
+      inventory
+        .filter(
+          (item) =>
+            item.actId === currentActId &&
+            item.evidenceKind &&
+            item.secretCode
+        )
+        .sort(
+          (firstItem, secondItem) =>
+            (firstItem.evidenceOrder ?? 0) -
+            (secondItem.evidenceOrder ?? 0)
+        )
+        .map((item) => ({
+          id: item.id,
+          title: item.title,
+          description: item.description,
+          secretCode: item.secretCode,
+          order: item.evidenceOrder,
+        })),
+    [inventory, currentActId]
+  );
+
+  function updateCode(
+    index: number,
+    value: string
+  ) {
+    if (isUnlocked) {
+      return;
+    }
 
     setCodes((currentCodes) =>
       currentCodes.map((code, codeIndex) =>
-        codeIndex === index
-          ? normalizedValue.padStart(2, "0")
-          : code
+        codeIndex === index ? value : code
       )
     );
 
@@ -40,121 +84,145 @@ export function ActChestScreen({
   }
 
   function checkCode() {
-    const isCorrect = expectedCodes.every(
-      (expectedCode, index) =>
-        codes[index] === expectedCode
-    );
+    const isCorrect =
+      codes.length === expectedCodes.length &&
+      expectedCodes.every(
+        (expectedCode, index) =>
+          codes[index] === expectedCode
+      );
 
     if (!isCorrect) {
       setError(
-        "Mechanizmus sa nepohol. Niektorá dvojica nesedí. Skontroluj dôkazy z aktuálnej etapy."
+        "Mechanizmus sa nepohol. Niektorá dvojica nesedí. Prezri si dôkazy aktu a skontroluj ich poradie."
       );
+
       return;
     }
 
     setError("");
     setIsUnlocked(true);
+  }
 
-    window.setTimeout(() => {
-      onUnlocked();
-    }, 1500);
+  function openReward() {
+    if (!isUnlocked) {
+      return;
+    }
+
+    setIsRewardOpen(true);
+  }
+
+  function continueFromReward() {
+    setIsRewardOpen(false);
+    onUnlocked();
   }
 
   return (
-    <ScreenContainer>
-      <StoryCard
-        label="Zámok aktu"
-        title={title}
-      >
-        <p className="text-sm leading-7 text-slate-300">
-          Na veku truhlice sú tri mosadzné číselníky. Každý dôkaz z tejto
-          etapy ukrýva jednu dvojicu číslic. Zadaj ich v poradí, v akom si
-          dôkazy získal.
-        </p>
-
-        <div
-          className={`mt-6 rounded-3xl border p-5 transition ${
-            isUnlocked
-              ? "border-emerald-300/30 bg-emerald-400/10"
-              : "border-amber-300/20 bg-amber-950/20"
-          }`}
-        >
-          <div className="mx-auto max-w-sm rounded-3xl border border-amber-300/20 bg-gradient-to-b from-amber-950 to-slate-950 p-5 shadow-2xl">
-            <div className="rounded-2xl border border-amber-300/20 bg-black/25 px-4 py-3 text-center">
-              <p className="text-xs font-bold uppercase tracking-[0.3em] text-amber-400/80">
-                Mechanická truhlica
-              </p>
-            </div>
-
-            <div className="mt-6 grid grid-cols-3 gap-3">
-              {codes.map((code, index) => (
-                <label
-                  key={`chest-code-${index}`}
-                  className="block"
-                >
-                  <span className="sr-only">
-                    Číselník {index + 1}
-                  </span>
-
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    value={code}
-                    disabled={isUnlocked}
-                    onChange={(event) =>
-                      updateCode(index, event.target.value)
-                    }
-                    className="w-full rounded-2xl border border-amber-300/30 bg-slate-950 px-2 py-4 text-center font-mono text-3xl font-black tracking-[0.18em] text-amber-100 outline-none transition focus:border-amber-300 disabled:opacity-60"
-                    aria-label={`Číselník ${index + 1}`}
-                  />
-                </label>
-              ))}
-            </div>
-
-            <div
-              className={`mx-auto mt-6 h-3 w-24 rounded-full transition ${
-                isUnlocked
-                  ? "bg-emerald-300 shadow-lg shadow-emerald-300/40"
-                  : "bg-amber-950"
-              }`}
-            />
-
-            <p className="mt-4 text-center text-xs uppercase tracking-[0.2em] text-slate-500">
-              {isUnlocked
-                ? "Západka uvoľnená"
-                : "Zámok čaká na kombináciu"}
+    <>
+      <ScreenContainer>
+        <div className="mx-auto w-full max-w-md py-6">
+          <header className="px-2 text-center">
+            <p className="text-[0.65rem] font-bold uppercase tracking-[0.35em] text-amber-400">
+              Zámok aktu
             </p>
+
+            <h1 className="mt-3 text-3xl font-black text-white">
+              {title}
+            </h1>
+
+            <div className="mx-auto mt-5 flex max-w-xs items-center gap-3">
+              <div className="h-px flex-1 bg-gradient-to-r from-transparent to-amber-400/40" />
+
+              <span
+                className="text-xs text-amber-400"
+                aria-hidden="true"
+              >
+                ◇
+              </span>
+
+              <div className="h-px flex-1 bg-gradient-to-l from-transparent to-amber-400/40" />
+            </div>
+
+            <p className="mx-auto mt-5 max-w-sm text-sm leading-7 text-slate-300">
+              Spoj tri dvojice ukryté v dôkazoch
+              aktu a nastav správnu kombináciu.
+            </p>
+          </header>
+
+          <button
+            type="button"
+            onClick={() => setIsEvidenceOpen(true)}
+            className="mx-auto mt-6 flex w-[calc(100%-1rem)] max-w-sm items-center justify-between rounded-2xl border border-amber-300/25 bg-slate-950/70 px-4 py-3 text-left shadow-lg shadow-black/20 backdrop-blur transition hover:border-amber-300/45 hover:bg-amber-950/20 active:translate-y-0.5"
+          >
+            <span>
+              <span className="block text-[0.65rem] font-bold uppercase tracking-[0.24em] text-amber-400/70">
+                Denník vyšetrovania
+              </span>
+
+              <span className="mt-1 block text-sm font-bold text-amber-100">
+                Prezrieť dôkazy aktu
+              </span>
+            </span>
+
+            <span
+              className="text-xl text-amber-300"
+              aria-hidden="true"
+            >
+              📖
+            </span>
+          </button>
+
+          <div className="mt-2">
+            <Chest
+              codes={codes}
+              isUnlocked={isUnlocked}
+              onCodeChange={updateCode}
+              onRewardClick={openReward}
+            />
+          </div>
+
+          <div className="mx-auto mt-5 w-[calc(100%-1rem)] max-w-sm">
+            {error && (
+              <MessageBox
+                variant="danger"
+                title="Nesprávna kombinácia"
+              >
+                {error}
+              </MessageBox>
+            )}
+
+            {isUnlocked && (
+              <MessageBox
+                variant="success"
+                title="Truhlica je otvorená"
+              >
+                Medzi prachom a starým drevom sa
+                objavila roztrhaná fotografia. Dotkni
+                sa jej a preskúmaj ďalšiu stopu.
+              </MessageBox>
+            )}
+
+            {!isUnlocked && (
+              <ActionButton onClick={checkCode}>
+                Odomknúť truhlicu
+              </ActionButton>
+            )}
           </div>
         </div>
+      </ScreenContainer>
 
-        {error && (
-          <MessageBox
-            variant="danger"
-            title="Nesprávna kombinácia"
-          >
-            {error}
-          </MessageBox>
-        )}
+      <ChestEvidencePanel
+        evidence={actEvidence}
+        isOpen={isEvidenceOpen}
+        onClose={() => setIsEvidenceOpen(false)}
+      />
 
-        {isUnlocked && (
-          <MessageBox
-            variant="success"
-            title="Truhlica sa otvára"
-          >
-            Západka odskočila. Pod vekom sa ukrýva roztrhaný obraz ďalšej
-            lokality.
-          </MessageBox>
-        )}
-
-        <ActionButton
-          onClick={checkCode}
-          disabled={isUnlocked}
-        >
-          {isUnlocked
-            ? "Truhlica odomknutá"
-            : "Odomknúť truhlicu"}
-        </ActionButton>
-      </StoryCard>
-    </ScreenContainer>
+      <RewardReveal
+        isOpen={isRewardOpen}
+        title="Roztrhaná fotografia"
+        description="Na zadnej strane fotografie je rukou dopísaná ďalšia stopa. Obraz je poškodený a rozdelený na časti. Budeš ho musieť zložiť, aby si odhalil nasledujúce miesto."
+        imageLabel="Fotografia"
+        onContinue={continueFromReward}
+      />
+    </>
   );
 }

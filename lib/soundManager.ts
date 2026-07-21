@@ -44,6 +44,10 @@ const sounds: Record<SoundId, SoundConfig> = {
   },
 };
 
+function clampVolume(volume: number) {
+  return Math.max(0, Math.min(1, volume));
+}
+
 class SoundManager {
   private activeSounds = new Map<SoundId, HTMLAudioElement>();
   private activeFades = new Map<SoundId, FadeState>();
@@ -69,10 +73,9 @@ class SoundManager {
 
   private createAudio(soundId: SoundId) {
     const config = sounds[soundId];
-
     const audio = new Audio(config.src);
 
-    audio.volume = config.volume ?? 1;
+    audio.volume = clampVolume(config.volume ?? 1);
     audio.loop = config.loop ?? false;
 
     audio.addEventListener(
@@ -114,7 +117,7 @@ class SoundManager {
     this.cancelFade(soundId);
 
     const config = sounds[soundId];
-    const targetVolume = config.volume ?? 1;
+    const targetVolume = clampVolume(config.volume ?? 1);
 
     let audio = this.activeSounds.get(soundId);
 
@@ -131,18 +134,20 @@ class SoundManager {
       });
     }
 
-    const startVolume = audio.volume;
+    const startVolume = clampVolume(audio.volume);
     const startedAt = performance.now();
 
     const updateVolume = (currentTime: number) => {
       const progress = Math.min(
-        (currentTime - startedAt) / duration,
+        Math.max((currentTime - startedAt) / duration, 0),
         1
       );
 
-      audio.volume =
+      const nextVolume =
         startVolume +
         (targetVolume - startVolume) * progress;
+
+      audio.volume = clampVolume(nextVolume);
 
       if (progress < 1) {
         const frameId =
@@ -174,16 +179,19 @@ class SoundManager {
 
     this.cancelFade(soundId);
 
-    const startVolume = audio.volume;
+    const startVolume = clampVolume(audio.volume);
     const startedAt = performance.now();
 
     const updateVolume = (currentTime: number) => {
       const progress = Math.min(
-        (currentTime - startedAt) / duration,
+        Math.max((currentTime - startedAt) / duration, 0),
         1
       );
 
-      audio.volume = startVolume * (1 - progress);
+      const nextVolume =
+        startVolume * (1 - progress);
+
+      audio.volume = clampVolume(nextVolume);
 
       if (progress < 1) {
         const frameId =
@@ -193,7 +201,9 @@ class SoundManager {
       } else {
         audio.pause();
         audio.currentTime = 0;
-        audio.volume = sounds[soundId].volume ?? 1;
+        audio.volume = clampVolume(
+          sounds[soundId].volume ?? 1
+        );
 
         this.activeSounds.delete(soundId);
         this.activeFades.delete(soundId);
@@ -217,7 +227,9 @@ class SoundManager {
 
     audio.pause();
     audio.currentTime = 0;
-    audio.volume = sounds[soundId].volume ?? 1;
+    audio.volume = clampVolume(
+      sounds[soundId].volume ?? 1
+    );
 
     this.activeSounds.delete(soundId);
   }

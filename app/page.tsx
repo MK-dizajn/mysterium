@@ -7,6 +7,7 @@ import { CollectionFlow } from "../components/game/CollectionFlow";
 import { HistoryFlow } from "../components/game/HistoryFlow";
 import { NpcFlow } from "../components/game/NpcFlow";
 import { PuzzleFlow } from "../components/game/PuzzleFlow";
+import { ActChestScreen } from "../components/screens/ActChestScreen";
 import { ActTransitionScreen } from "../components/screens/ActTransitionScreen";
 import { FinishScreen } from "../components/screens/FinishScreen";
 import { IntroScreen } from "../components/screens/IntroScreen";
@@ -131,6 +132,10 @@ export default function Home() {
       ...currentState,
       activeDialogueNodeId: nodeId,
     }));
+  }
+
+  function openActChest() {
+    updateGameScreen("actChest");
   }
 
   function continueToNextAct(nextActId: ActId) {
@@ -281,10 +286,6 @@ export default function Home() {
         ? "act-1"
         : "act-2";
 
-      const nextActId: ActId = isFirstTransition
-        ? "act-2"
-        : "act-3";
-
       const evidenceCount = gameState.inventory.filter(
         (item) => item.actId === completedActId
       ).length;
@@ -302,9 +303,49 @@ export default function Home() {
               : "Akt III – Posledné tajomstvo"
           }
           evidenceCount={evidenceCount}
-          onContinue={() =>
-            continueToNextAct(nextActId)
-          }
+          onContinue={openActChest}
+        />
+      );
+    }
+
+    if (gameState.screen === "actChest") {
+      const isFirstChest =
+        gameState.currentSceneIndex === 3;
+
+      const completedActId: ActId = isFirstChest
+        ? "act-1"
+        : "act-2";
+
+      const nextActId: ActId = isFirstChest
+        ? "act-2"
+        : "act-3";
+
+      const expectedCodes = gameState.inventory
+        .filter(
+          (item) =>
+            item.actId === completedActId &&
+            item.secretCode
+        )
+        .sort(
+          (firstItem, secondItem) =>
+            (firstItem.evidenceOrder ?? 0) -
+            (secondItem.evidenceOrder ?? 0)
+        )
+        .map((item) => item.secretCode as string);
+
+      return (
+         <ActChestScreen
+          title={
+              isFirstChest
+                ? "Truhlica prvého aktu"
+                : "Truhlica druhého aktu"
+           }
+           expectedCodes={expectedCodes}
+           inventory={gameState.inventory}
+           currentActId={completedActId}
+           onUnlocked={() =>
+             continueToNextAct(nextActId)
+           }
         />
       );
     }
