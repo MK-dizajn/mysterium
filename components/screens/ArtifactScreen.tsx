@@ -22,7 +22,7 @@ export function ArtifactScreen({
       <ScreenTransition>
         <CodexPageTransition>
           <StoryCard
-            label="Stránka Codexu"
+            label="História"
             title={artifact.title}
           >
             <Reveal delay={300}>
@@ -36,7 +36,7 @@ export function ArtifactScreen({
             <Reveal delay={700}>
               <SectionCard
                 icon={<DetectiveIcon className="h-9 w-9" />}
-                title="Záznam artefaktu"
+                title="Zaujímavosť"
                 variant="gold"
               >
                 <p className="text-sm leading-relaxed text-amber-100">
@@ -48,7 +48,7 @@ export function ArtifactScreen({
             <Reveal delay={1100}>
               <SectionCard
                 icon={<DetectiveIcon className="h-9 w-9" />}
-                title="Historický záznam"
+                title="Historický príbeh"
               >
                 <p className="text-[15px] leading-8 text-slate-300">
                   {artifact.fullText}

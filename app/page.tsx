@@ -95,55 +95,92 @@ export default function Home() {
     updateGameScreen("quests");
   }
 
-  function openArtifact(artifact: Artifact) {
-    setArtifactPreviousScreen(gameState.screen);
-    setSelectedArtifact(artifact);
-    updateGameScreen("artifact");
-  }
-
-  function openNpcDialogue(npcId: string) {
-    const npc = currentScene.npcs?.find(
-      (item) => item.id === npcId
-    );
-
-    if (!npc) {
-      return;
+    function openArtifact(artifact: Artifact) {
+      setArtifactPreviousScreen(gameState.screen);
+     setSelectedArtifact(artifact);
+     updateGameScreen("artifact");
     }
 
-    setPreviousScreen(gameState.screen);
+    function openNpcDialogue(npcId: string) {
+      const npc = currentScene.npcs?.find(
+        (item) => item.id === npcId
+     );
 
-    setGameState((currentState) =>
-      talkToNpc(currentState, npc)
-    );
-  }
+      if (!npc) {
+       return;
+     }
 
-  function closeNpcDialogue() {
-    setGameState((currentState) => ({
-      ...currentState,
-      screen: previousScreen,
-      activeNpcId: undefined,
-      activeDialogueId: undefined,
-      activeDialogueNodeId: undefined,
-    }));
-  }
+     setPreviousScreen(gameState.screen);
 
-  function chooseDialogueNode(nodeId: string) {
-    setGameState((currentState) => ({
-      ...currentState,
-      activeDialogueNodeId: nodeId,
-    }));
-  }
+     setGameState((currentState) =>
+        talkToNpc(currentState, npc)
+     );
+    }
 
-  function openActChest() {
-    updateGameScreen("actChest");
-  }
+    function closeNpcDialogue() {
+     setGameState((currentState) => ({
+        ...currentState,
+       screen: previousScreen,
+       activeNpcId: undefined,
+       activeDialogueId: undefined,
+       activeDialogueNodeId: undefined,
+     }));
+    }
 
-  function continueToNextAct(nextActId: ActId) {
-    setGameState((currentState) => ({
-      ...currentState,
-      currentActId: nextActId,
-      screen: "puzzle",
-    }));
+    function chooseDialogueNode(nodeId: string) {
+     setGameState((currentState) => ({
+       ...currentState,
+       activeDialogueNodeId: nodeId,
+     }));
+   }
+
+    function openActChest() {
+      updateGameScreen("actChest");
+    }
+
+    function continueToNextAct(
+    completedActId: ActId,
+    nextActId: ActId
+  ) {
+    setGameState((currentState) => {
+     const rewardId =
+        completedActId === "act-1"
+          ? "torn-photo-fragment-act-1"
+          : "torn-photo-fragment-act-2";
+
+      const alreadyCollected =
+        currentState.inventory.some(
+          (item) => item.id === rewardId
+        );
+
+      const rewardItem =
+        completedActId === "act-1"
+         ? {
+              id: rewardId,
+              title: "Prvý útržok fotografie",
+              icon: "🖼️",
+             description:
+               "Útržok starej fotografie nájdený v truhlici prvého aktu. Na zadnej strane je časť ručne napísanej správy, ktorá vedie k ďalším miestam vyšetrovania.",
+             actId: "act-2" as ActId,
+            }
+         : {
+              id: rewardId,
+             title: "Druhý útržok fotografie",
+             icon: "🖼️",
+              description:
+               "Druhý útržok starej fotografie. Po spojení s prvou časťou odhaľuje, že všetky doterajšie stopy smerujú k poslednému tajomstvu pátračovho denníka.",
+             actId: "act-3" as ActId,
+           };
+
+     return {
+       ...currentState,
+       currentActId: nextActId,
+       screen: "puzzle",
+       inventory: alreadyCollected
+         ? currentState.inventory
+          : [...currentState.inventory, rewardItem],
+      };
+    });
   }
 
   function renderCurrentScreen() {
@@ -344,8 +381,8 @@ export default function Home() {
            inventory={gameState.inventory}
            currentActId={completedActId}
            onUnlocked={() =>
-             continueToNextAct(nextActId)
-           }
+            continueToNextAct(completedActId, nextActId)
+          }
         />
       );
     }

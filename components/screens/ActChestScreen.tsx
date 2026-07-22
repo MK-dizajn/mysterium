@@ -66,6 +66,25 @@ export function ActChestScreen({
     [inventory, currentActId]
   );
 
+  const rewardContent =
+    currentActId === "act-1"
+      ? {
+          title: "Prvý útržok fotografie",
+          description:
+            "V truhlici leží prvá časť starej fotografie. Na zadnej strane je rukou dopísaná neúplná správa. Viditeľné slová naznačujú, že ďalšie stopy čakajú medzi miestami moci a poznania.",
+          imageLabel: "Prvý útržok fotografie",
+          successText:
+            "Medzi prachom a starým drevom sa objavil prvý útržok fotografie. Dotkni sa ho a preskúmaj stopu, ktorá otvorí ďalší akt.",
+        }
+      : {
+          title: "Druhý útržok fotografie",
+          description:
+            "Druhá časť fotografie dopĺňa prvý útržok. Obraz stále nie je úplný, no rukou napísaná poznámka už prezrádza, že všetky získané stopy smerujú k poslednému tajomstvu pátračovho denníka.",
+          imageLabel: "Druhý útržok fotografie",
+          successText:
+            "Vo vnútri truhlice sa odhalil druhý útržok fotografie. Preskúmaj ho a pokračuj k poslednému aktu vyšetrovania.",
+        };
+
   function updateCode(
     index: number,
     value: string
@@ -195,9 +214,7 @@ export function ActChestScreen({
                 variant="success"
                 title="Truhlica je otvorená"
               >
-                Medzi prachom a starým drevom sa
-                objavila roztrhaná fotografia. Dotkni
-                sa jej a preskúmaj ďalšiu stopu.
+                {rewardContent.successText}
               </MessageBox>
             )}
 
@@ -218,9 +235,9 @@ export function ActChestScreen({
 
       <RewardReveal
         isOpen={isRewardOpen}
-        title="Roztrhaná fotografia"
-        description="Na zadnej strane fotografie je rukou dopísaná ďalšia stopa. Obraz je poškodený a rozdelený na časti. Budeš ho musieť zložiť, aby si odhalil nasledujúce miesto."
-        imageLabel="Fotografia"
+        title={rewardContent.title}
+        description={rewardContent.description}
+        imageLabel={rewardContent.imageLabel}
         onContinue={continueFromReward}
       />
     </>

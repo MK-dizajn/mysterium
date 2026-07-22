@@ -9,7 +9,9 @@ type FinishScreenProps = {
   onRestart: () => void;
 };
 
-export function FinishScreen({ onRestart }: FinishScreenProps) {
+export function FinishScreen({
+  onRestart,
+}: FinishScreenProps) {
   return (
     <ScreenContainer>
       <StoryCard
@@ -20,31 +22,61 @@ export function FinishScreen({ onRestart }: FinishScreenProps) {
           variant="success"
           title="Prípad uzavretý"
         >
-          Posledná stopa zapadla na svoje miesto. Starý pátrač mal pravdu —
-          Bratislava neukrývala len príbeh, ale mapu.
+          Posledná stopa zapadla na svoje miesto.
+          Starý pátrač mal pravdu — Bratislava
+          neukrývala len príbeh, ale mapu.
         </MessageBox>
 
         <SectionCard
           icon={<DetectiveIcon className="h-9 w-9" />}
           title="Záver vyšetrovania"
         >
-          <p className="text-[15px] leading-8 text-slate-300">
-            V Codexe sa objavuje nový znak. Nie je to koniec. Je to iba prvá
-            stránka väčšieho tajomstva.
-          </p>
+          <div className="space-y-4 text-[15px] leading-8 text-slate-300">
+            <p>
+              Zlatý prešporský kľúč nebol predmetom,
+              ktorý by otváral obyčajné dvere. Tvorili
+              ho spomienky ukryté vo fasádach, nápisoch,
+              erboch a ranách, ktoré na meste zanechali
+              stáročia.
+            </p>
+
+            <p>
+              V časti História zostáva zaznamenaná
+              pamäť starého Prešporka. Do inventára si
+              získal dokončený kľúč aj poškodený útržok
+              mapy ďalšieho prípadu.
+            </p>
+          </div>
         </SectionCard>
 
         <MessageBox
           variant="info"
-          title="Pátračov odkaz"
+          title="Posledná strana denníka"
         >
-          „Ak si sa dostal až sem, už vedia, že existuješ. Čierna vdova je o
-          krok bližšie. A druhá kapitola sa začína pod tichými stenami
-          Kapitulskej ulice...“
+          „Prešporok neukrýval jeden kľúč. Toto bol iba
+          prvý.“
         </MessageBox>
 
+        <SectionCard
+          icon={
+            <span
+              className="text-3xl"
+              aria-hidden="true"
+            >
+              🗺️
+            </span>
+          }
+          title="Pátranie pokračuje"
+        >
+          <p className="text-[15px] leading-8 text-slate-300">
+            Prvý prípad sa skončil, no útržok mapy
+            odhaľuje začiatok väčšieho tajomstva.
+            Príbeh bude pokračovať v druhej kapitole.
+          </p>
+        </SectionCard>
+
         <ActionButton onClick={onRestart}>
-          Hrať od začiatku
+          Hrať kapitolu od začiatku
         </ActionButton>
       </StoryCard>
     </ScreenContainer>
