@@ -35,23 +35,33 @@ export function useChestUnlockSequence(
       return;
     }
 
+    /*
+      Filmová sekvencia
+
+      0 ms      - správny kód
+      320 ms    - mechanické odomknutie
+      780 ms    - začiatok pohybu veka
+      1080 ms   - prvé svetlo z vnútra
+      1680 ms   - fotografia
+    */
+
     const lockTimer = window.setTimeout(() => {
       setIsLockReleased(true);
       soundManager.play("chest-unlock");
-    }, 250);
+    }, 320);
 
     const lidTimer = window.setTimeout(() => {
       setIsLidOpen(true);
       soundManager.play("artifact-unlock");
-    }, 700);
+    }, 780);
 
     const lightTimer = window.setTimeout(() => {
       setIsLightVisible(true);
-    }, 1050);
+    }, 1080);
 
     const fragmentsTimer = window.setTimeout(() => {
       setAreFragmentsVisible(true);
-    }, 1450);
+    }, 1680);
 
     return () => {
       window.clearTimeout(lockTimer);

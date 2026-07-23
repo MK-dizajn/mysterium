@@ -9,7 +9,7 @@ type ChestVisualProps = {
   isLidOpen: boolean;
   isLightVisible: boolean;
   areFragmentsVisible: boolean;
-  fragmentClasses: string[];
+  fragmentClasses: readonly string[];
   onRewardClick?: () => void;
 };
 
@@ -22,19 +22,25 @@ export function ChestVisual({
 }: ChestVisualProps) {
   return (
     <>
+      {/* Konštrukcia a pohyb veka */}
       <ChestLid isLidOpen={isLidOpen} />
 
+      {/* Atmosféra vystupujúca z otvorenej truhlice */}
       <ChestMist isLightVisible={isLightVisible} />
 
+      {/* Hlavný zdroj svetla vo vnútri truhlice */}
       <ChestInnerLight isLightVisible={isLightVisible} />
 
+      {/* Filmové lúče, odlesky a svetelné pulzy */}
       <ChestLightEffects isLightVisible={isLightVisible} />
 
+      {/* Jemné prachové a žiarivé častice */}
       <ChestParticles isLightVisible={isLightVisible} />
 
+      {/* Interaktívna odmena musí zostať ako najvyššia vrstva */}
       <ChestPhotoFragments
         areFragmentsVisible={areFragmentsVisible}
-        fragmentClasses={fragmentClasses}
+        fragmentClasses={[...fragmentClasses]}
         onRewardClick={onRewardClick}
       />
     </>

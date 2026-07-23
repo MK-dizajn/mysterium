@@ -11,22 +11,18 @@ export function ChestStage({
 }: ChestStageProps) {
   return (
     <div
-      className="relative mx-auto w-full max-w-md"
-      style={{
-        perspective: "1200px",
-        transformStyle: "preserve-3d",
-        animation: isUnlocked
-          ? "chest-cinematic-camera 3200ms cubic-bezier(0.22, 1, 0.36, 1) forwards"
-          : "none",
-      }}
+      className={`chest-stage relative isolate mx-auto w-full max-w-md ${
+        isUnlocked ? "chest-stage-unlocked" : ""
+      }`}
     >
       <div
-        className="relative"
-        style={{
-          perspective: "1200px",
-          transformStyle: "preserve-3d",
-        }}
-      >
+        className={`chest-stage-glow ${
+          isUnlocked ? "chest-stage-glow-visible" : ""
+        }`}
+        aria-hidden="true"
+      />
+
+      <div className="chest-stage-content">
         {children}
       </div>
     </div>
