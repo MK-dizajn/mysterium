@@ -12,21 +12,22 @@ export const tajnaStopaMichalskaScene: Scene = {
     "Mesto niekedy ukryje tajomstvo tak, že ho nestavia do tieňa. Nechá ho priamo pred očami — iba mu vezme priestor. Nájdi dom, ktorý sa medzi svojich susedov takmer nezmestil.",
 
   investigation: {
-    objective:
-        "Zostaň pri Michalskej bráne a prezri si domy v jej bezprostrednej blízkosti. Hľadaj fasádu, ktorá je nápadne užšia než všetky ostatné.",
+    objective: `Zostaň pri Michalskej bráne a prezri si domy v jej bezprostrednej blízkosti.
+
+Nájdi fasádu, ktorá je nápadne užšia než všetky ostatné. Keď dom objavíš, prezri si jeho označenie.`,
     detectiveHint:
-        "Nehľadaj veľkosťou. Hľadaj miesto, ktoré akoby vzniklo iba preto, že medzi dvoma stavbami zostala úzka medzera.",
+      "Nehľadaj veľkosťou. Hľadaj miesto, ktoré akoby vzniklo iba preto, že medzi dvoma stavbami zostala úzka medzera.",
     observationType: "architecture",
-   },
+  },
 
   puzzle: {
     id: "puzzle-tajna-stopa-michalska",
-    question:
-      "Nájdi mimoriadne úzky dom stojaci hneď vedľa Michalskej brány. Aké číslo má tento dom?",
+    answerLabel: "Zapíš orientačné číslo najužšieho domu.",
     acceptedAnswers: ["15", "cislo 15", "číslo 15", "dom 15"],
     hints: [
-      "Zostaň v bezprostrednej blízkosti Michalskej brány.",
-      "Hľadaj úzky dom na pravej strane pri pohľade na bránu z Michalskej ulice.",
+      "Od brány sa nevzďaľuj. Hľadaný dom stojí v jej bezprostrednej blízkosti.",
+      "Pri pohľade na bránu z Michalskej ulice hľadaj mimoriadne úzky dom na pravej strane.",
+      "Správna odpoveď je 15.",
     ],
   },
 

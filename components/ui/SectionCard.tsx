@@ -42,22 +42,22 @@ export function SectionCard({
     <section
       className={`rounded-3xl border ${styles[variant]} p-5 shadow-xl transition duration-300 hover:-translate-y-0.5 hover:border-amber-300/40`}
     >
-      <div className="flex items-start gap-4">
+      <div className="flex items-center gap-4">
         <div
-          className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-white/5 ${iconStyles[variant]}`}
+          className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-white/5 ${iconStyles[variant]}`}
         >
           {icon}
         </div>
 
-        <div className="min-w-0 flex-1">
-          <p
-            className={`text-xs font-bold uppercase tracking-[0.25em] ${titleStyles[variant]}`}
-          >
-            {title}
-          </p>
+        <p
+          className={`text-sm font-bold uppercase tracking-[0.25em] ${titleStyles[variant]}`}
+        >
+          {title}
+        </p>
+      </div>
 
-          <div className="mt-3 leading-relaxed">{children}</div>
-        </div>
+      <div className="mt-4 px-1 text-left leading-7">
+        {children}
       </div>
     </section>
   );

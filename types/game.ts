@@ -60,9 +60,40 @@ export type Investigation = {
 
 export type Puzzle = {
   id: PuzzleId;
-  question: string;
+
+  /**
+   * Starší formát zadania. Zostáva voliteľný, aby sa nerozbili
+   * existujúce scény, ktoré ešte neprešli na nový investigation flow.
+   */
+  question?: string;
+
+  /**
+   * Krátky pokyn nad vstupom, napríklad:
+   * "Zapíš názov mesta" alebo "Zapíš číslo domu".
+   */
+  answerLabel?: string;
+
   acceptedAnswers: string[];
   hints: string[];
+};
+
+export type DetectiveNote = {
+  number: number | string;
+  title: string;
+  imageSrc: string;
+  imageAlt?: string;
+  introText?: string;
+  continueLabel?: string;
+  unlockFlagId?: string;
+  readFlagId: string;
+};
+
+export type NpcGate = {
+  requiredFlagId: string;
+  eyebrow: string;
+  title: string;
+  paragraphs: string[];
+  buttonLabel: string;
 };
 
 export type SceneBranch = {
@@ -200,6 +231,8 @@ export type Scene = {
   voiceLine: string;
 
   investigation?: Investigation;
+  detectiveNote?: DetectiveNote;
+  npcGate?: NpcGate;
 
   puzzle: Puzzle;
   history: CodexEntry;

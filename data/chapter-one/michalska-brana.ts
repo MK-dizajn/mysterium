@@ -12,21 +12,48 @@ export const michalskaBranaScene: Scene = {
     "Nehľadaj značku, ktorú som tu zanechal ja. Hľadaj tú, ktorú tu zanechalo mesto. Mená sú roztrúsené po celom svete, no prvé z nich leží bližšie, než si myslíš.",
 
   investigation: {
-    objective:
-        "Postav sa priamo pod Michalskú bránu a prezri kovový kruh v dlažbe. Porovnaj mestá a vzdialenosti, ktoré sú na ňom uvedené.",
+    objective: `Postav sa priamo pod Michalskú bránu.
+
+Nájdi kovový kruh v dlažbe s názvami miest a prezri si vzdialenosti, ktoré sú pri nich uvedené.
+
+Pátračovo pravidlo znie: „Prvá stopa patrí mestu, ku ktorému vedie najkratšia cesta.“`,
     detectiveHint:
-        "Pátrač nezačínal najvzdialenejšou stopou. Zaujímala ho tá, ku ktorej vedie najkratšia cesta.",
+      "Pátrač nezačínal najvzdialenejšou stopou. Zaujímala ho tá, ku ktorej vedie najkratšia cesta.",
     observationType: "comparison",
-   },
+  },
+
+  npcGate: {
+    requiredFlagId: "talked_to_michalska_guardian",
+    eyebrow: "Stopa je zamknutá",
+    title: "Brána mlčí...",
+    paragraphs: [
+      "Pod klenbou Michalskej brány cítiš zvláštny nepokoj. Nultý bod je priamo pred tebou, no jeho význam ti zatiaľ uniká.",
+      "V tieni brány stojí osamelá postava. Zdá sa, že čaká práve na teba. Možno pozná spôsob, akým starý pátrač čítal stopy mesta.",
+    ],
+    buttonLabel: "Osloviť Strážcu",
+  },
+
+  detectiveNote: {
+    number: 1,
+    title: "Nultý bod",
+    imageSrc: "/images/journal/detective-note-entry-1.png",
+    imageAlt:
+      "Odtrhnutý list zo starého pátračovho denníka s prvým zápisom.",
+    introText:
+      "Strážca ti podáva zažltnutý list. Papier neukrýva hotovú odpoveď — iba pravidlo, podľa ktorého starý pátrač začínal svoje vyšetrovania.",
+    continueLabel: "Preskúmať nultý bod",
+    unlockFlagId: "talked_to_michalska_guardian",
+    readFlagId: "read_detective_note_nulty_bod",
+  },
 
   puzzle: {
     id: "puzzle-michalska-brana",
-    question:
-      "Nájdi pod bránou kovový kruh so svetovými mestami. Pátračovo pravidlo znie: „Prvá stopa patrí mestu, ku ktorému vedie najkratšia cesta.“ Ktoré mesto spomedzi uvedených názvov hľadáš?",
+    answerLabel: "Zapíš názov mesta, ku ktorému vedie najkratšia cesta.",
     acceptedAnswers: ["vieden", "viedeň", "vienna", "wien"],
     hints: [
-      "Porovnaj vzdialenosti uvedené pri jednotlivých mestách.",
+      "Nepozeraj iba na názvy miest. Porovnaj čísla, ktoré označujú ich vzdialenosť.",
       "Hľadané mesto je hlavným mestom susedného Rakúska.",
+      "Správna odpoveď je Viedeň.",
     ],
   },
 
@@ -69,22 +96,9 @@ export const michalskaBranaScene: Scene = {
               nextDialogueNodeId: "under-gate",
             },
             {
-              id: "choice-start-investigation",
-              text: "Pozriem sa po mieste sám.",
-              actions: [
-                {
-                  type: "setFlag",
-                  flagId: "talked_to_michalska_guardian",
-                },
-                {
-                  type: "startQuest",
-                  questId: "quest-golden-key",
-                },
-                {
-                  type: "setScreen",
-                  screen: "puzzle",
-                },
-              ],
+              id: "choice-ask-patrac",
+              text: "Čo ti tu pátrač zanechal?",
+              nextDialogueNodeId: "handover-note",
             },
           ],
         },
@@ -92,15 +106,40 @@ export const michalskaBranaScene: Scene = {
           id: "under-gate",
           speaker: "Strážca Michalskej brány",
           text:
-            "Je to bod, ktorý spája Bratislavu so svetom. Pátrač z množstva vzdialených miest vybral jediné. To, ktoré je k nám najbližšie.",
+            "Je tam bod, ktorý spája Bratislavu so svetom. Pátrač však nechcel, aby som ti prezradil mesto. Zanechal iba pravidlo, podľa ktorého ho dokážeš nájsť sám.",
           choices: [
             {
-              id: "choice-accept-quest",
-              text: "Nájdem ho.",
+              id: "choice-see-note",
+              text: "Ukáž mi jeho pravidlo.",
+              nextDialogueNodeId: "handover-note",
+            },
+          ],
+        },
+        {
+          id: "handover-note",
+          speaker: "Strážca Michalskej brány",
+          text:
+            "Strážca sa na chvíľu odmlčí. Zo svojho kabáta vytiahne starý zažltnutý papier, opatrne ho rozloží a podá ti ho. „Pátrač mi povedal, že ak sa raz objaví niekto, kto bude pokračovať v jeho práci, mám mu odovzdať toto. Odpoveď v ňom nehľadaj. Naučí ťa iba to, ako rozmýšľal.“",
+          choices: [
+            {
+              id: "choice-accept-note",
+              text: "Prijať Pátračov zápis",
               actions: [
                 {
                   type: "setFlag",
                   flagId: "talked_to_michalska_guardian",
+                },
+                {
+                  type: "addInventoryItem",
+                  item: {
+                    id: "detective-note-nulty-bod",
+                    title: "Pátračov zápis č. 1 – Nultý bod",
+                    icon: "📜",
+                    description:
+                      "Zažltnutá strana zo strateného denníka. Neobsahuje hotovú odpoveď, ale pravidlo: z množstva ciest vybrať tú najkratšiu.",
+                    evidenceKind: "document",
+                    actId: "act-1",
+                  },
                 },
                 {
                   type: "startQuest",
@@ -151,7 +190,7 @@ export const michalskaBranaScene: Scene = {
             title: "Žetón nultého kilometra",
             icon: "🧭",
             description:
-             "Mosadzný žetón s vyrytými smermi svetových miest. Na jeho zadnej strane sa nachádza prvá dvojica číslic tajnej kombinácie.",
+              "Mosadzný žetón s vyrytými smermi svetových miest. Na jeho zadnej strane sa nachádza prvá dvojica číslic tajnej kombinácie.",
             evidenceKind: "object",
             secretCode: "00",
             evidenceOrder: 1,

@@ -941,3 +941,392 @@ body {
     transition: none;
   }
 }
+/* -------------------------------------------------------------------------- */
+/* Journal Reveal                                                             */
+/* -------------------------------------------------------------------------- */
+
+.journal-reveal {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  overflow: hidden;
+  background: #050403;
+  opacity: 0;
+  transition: opacity 700ms ease-out;
+}
+
+.journal-reveal-visible {
+  opacity: 1;
+}
+
+.journal-reveal-leaving {
+  opacity: 0;
+  transition-duration: 620ms;
+  pointer-events: none;
+}
+
+.journal-reveal-desk {
+  position: absolute;
+  inset: -8%;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(17, 9, 4, 0.95),
+      rgba(66, 35, 17, 0.72) 22%,
+      rgba(91, 50, 25, 0.7) 48%,
+      rgba(55, 28, 13, 0.78) 76%,
+      rgba(13, 7, 3, 0.96)
+    ),
+    repeating-linear-gradient(
+      92deg,
+      transparent 0,
+      transparent 52px,
+      rgba(8, 3, 1, 0.28) 54px,
+      rgba(128, 73, 35, 0.08) 58px,
+      transparent 64px
+    ),
+    linear-gradient(180deg, #2f180c, #160b06);
+  filter: blur(2px) saturate(0.78);
+  transform: scale(1.08);
+  animation: journal-desk-camera 13s ease-in-out infinite alternate;
+}
+
+.journal-reveal-light {
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(
+      ellipse at 50% 42%,
+      rgba(255, 195, 104, 0.2),
+      rgba(145, 74, 27, 0.08) 35%,
+      transparent 67%
+    );
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.journal-reveal-vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      ellipse at center,
+      transparent 30%,
+      rgba(2, 1, 1, 0.26) 63%,
+      rgba(2, 1, 1, 0.88) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.45),
+      transparent 22%,
+      transparent 72%,
+      rgba(0, 0, 0, 0.68)
+    );
+  pointer-events: none;
+}
+
+.journal-reveal-stage {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  min-height: 100svh;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding:
+    max(24px, env(safe-area-inset-top))
+    16px
+    max(24px, env(safe-area-inset-bottom));
+  perspective: 1300px;
+}
+
+.journal-reveal-intro {
+  position: relative;
+  z-index: 4;
+  margin-bottom: 12px;
+  max-width: 34rem;
+  padding: 0 20px;
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.7;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(254, 243, 199, 0.72);
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.95);
+  opacity: 0;
+  transform: translateY(-12px);
+}
+
+.journal-reveal-intro-visible {
+  animation: journal-intro-enter 900ms ease-out 240ms both;
+}
+
+.journal-reveal-paper {
+  position: relative;
+  z-index: 5;
+  width: min(94vw, 470px);
+  max-height: min(71svh, 720px);
+  margin: 0;
+  opacity: 0;
+  transform:
+    translate3d(0, -42svh, 120px)
+    rotateX(8deg)
+    rotateZ(-2.2deg)
+    scale(0.91);
+  transform-origin: center 12%;
+  will-change: transform, opacity, filter;
+}
+
+.journal-reveal-paper-visible {
+  animation: journal-paper-drop 1650ms
+    cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.journal-reveal-paper-shadow {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: -3%;
+  height: 12%;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.72);
+  filter: blur(22px);
+  opacity: 0;
+}
+
+.journal-reveal-paper-visible .journal-reveal-paper-shadow {
+  animation: journal-paper-shadow 1650ms ease-out both;
+}
+
+.journal-reveal-paper-image {
+  display: block;
+  max-height: min(71svh, 720px);
+  width: 100%;
+  object-fit: contain;
+  user-select: none;
+  filter:
+    drop-shadow(0 34px 42px rgba(0, 0, 0, 0.74))
+    sepia(0.05)
+    saturate(0.94);
+}
+
+.journal-reveal-controls {
+  position: relative;
+  z-index: 8;
+  width: min(92vw, 430px);
+  margin-top: 12px;
+  opacity: 0;
+  transform: translateY(18px);
+  pointer-events: none;
+}
+
+.journal-reveal-controls-visible {
+  animation: journal-controls-enter 700ms ease-out both;
+  pointer-events: auto;
+}
+
+.journal-reveal-dust {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.journal-reveal-dust-particle {
+  position: absolute;
+  display: block;
+  height: 3px;
+  width: 3px;
+  border-radius: 9999px;
+  background: rgba(255, 225, 174, 0.7);
+  box-shadow: 0 0 9px rgba(255, 190, 90, 0.45);
+  opacity: 0;
+  animation-name: journal-dust-float;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.journal-reveal-dust-particle:nth-child(3n) {
+  height: 2px;
+  width: 2px;
+}
+
+.journal-reveal-dust-particle:nth-child(4n) {
+  height: 4px;
+  width: 4px;
+}
+
+@keyframes journal-desk-camera {
+  from {
+    transform: scale(1.08) translate3d(-0.6%, 0.3%, 0);
+  }
+
+  to {
+    transform: scale(1.12) translate3d(0.8%, -0.5%, 0);
+  }
+}
+
+@keyframes journal-intro-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+    filter: blur(5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes journal-paper-drop {
+  0% {
+    opacity: 0;
+    transform:
+      translate3d(0, -42svh, 120px)
+      rotateX(8deg)
+      rotateZ(-2.2deg)
+      scale(0.91);
+    filter: blur(6px);
+  }
+
+  58% {
+    opacity: 1;
+    transform:
+      translate3d(0, 10px, 0)
+      rotateX(-1deg)
+      rotateZ(0.7deg)
+      scale(1.015);
+    filter: blur(0);
+  }
+
+  76% {
+    transform:
+      translate3d(0, -4px, 0)
+      rotateX(0.4deg)
+      rotateZ(-0.35deg)
+      scale(0.995);
+  }
+
+  90% {
+    transform:
+      translate3d(0, 2px, 0)
+      rotateX(0)
+      rotateZ(0.12deg)
+      scale(1.002);
+  }
+
+  100% {
+    opacity: 1;
+    transform:
+      translate3d(0, 0, 0)
+      rotateX(0)
+      rotateZ(0)
+      scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes journal-paper-shadow {
+  0%,
+  42% {
+    opacity: 0;
+    transform: scaleX(0.58) translateY(-18px);
+  }
+
+  66% {
+    opacity: 0.82;
+    transform: scaleX(1.06) translateY(3px);
+  }
+
+  100% {
+    opacity: 0.56;
+    transform: scaleX(1) translateY(0);
+  }
+}
+
+@keyframes journal-controls-enter {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+    filter: blur(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes journal-dust-float {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0) scale(0.7);
+  }
+
+  18% {
+    opacity: 0.55;
+  }
+
+  62% {
+    opacity: 0.34;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate3d(18px, -72px, 0) scale(1.15);
+  }
+}
+
+@media (max-height: 720px) {
+  .journal-reveal-intro {
+    display: none;
+  }
+
+  .journal-reveal-paper,
+  .journal-reveal-paper-image {
+    max-height: 74svh;
+  }
+
+  .journal-reveal-controls {
+    margin-top: 6px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .journal-reveal,
+  .journal-reveal-desk,
+  .journal-reveal-intro-visible,
+  .journal-reveal-paper-visible,
+  .journal-reveal-paper-visible .journal-reveal-paper-shadow,
+  .journal-reveal-controls-visible,
+  .journal-reveal-dust-particle {
+    animation: none !important;
+    transition-duration: 1ms !important;
+  }
+
+  .journal-reveal {
+    opacity: 1;
+  }
+
+  .journal-reveal-intro,
+  .journal-reveal-paper,
+  .journal-reveal-controls {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+
+  .journal-reveal-controls {
+    pointer-events: auto;
+  }
+
+  .journal-reveal-dust {
+    display: none;
+  }
+}

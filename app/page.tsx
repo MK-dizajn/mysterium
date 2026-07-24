@@ -265,6 +265,15 @@ export default function Home() {
           onOpenArtifacts={openArtifacts}
           onOpenQuests={openQuests}
           onOpenNpcDialogue={openNpcDialogue}
+          onReadDetectiveNote={(flagId) => {
+            setGameState((currentState) => ({
+              ...currentState,
+              flags: {
+                ...currentState.flags,
+                [flagId]: true,
+              },
+            }));
+          }}
           onSolved={(hintsUsed) => {
             setGameState((currentState) => {
               const nextState = solvePuzzle(

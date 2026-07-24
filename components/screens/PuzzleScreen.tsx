@@ -9,7 +9,6 @@ import { MessageBox } from "../ui/MessageBox";
 import {
   DetectiveIcon,
   LightbulbIcon,
-  QuestionIcon,
   SearchIcon,
 } from "../ui/MysteriumIcons";
 import { SectionCard } from "../ui/SectionCard";
@@ -39,7 +38,11 @@ export function PuzzleScreen({ scene, onSolved }: PuzzleScreenProps) {
 
   const investigationObjective =
     scene.investigation?.objective ??
+    scene.puzzle.question ??
     "Rozhliadni sa okolo seba. Odpoveď nie je ukrytá v texte, ale v detaile, ktorý máš priamo pred očami.";
+
+  const answerLabel =
+    scene.puzzle.answerLabel ?? "Zapíš výsledok svojho pátrania.";
 
   function checkAnswer() {
     const userAnswer = normalizeAnswer(answer);
@@ -57,7 +60,7 @@ export function PuzzleScreen({ scene, onSolved }: PuzzleScreenProps) {
     }
 
     setError("");
-    setSuccessMessage("Stopa potvrdená. Pátračov záznam sa otvára...");
+    setSuccessMessage("Stopa potvrdená. Pátračov záznam sa otvára.");
 
     window.setTimeout(() => {
       onSolved(hintIndex);
@@ -88,49 +91,49 @@ export function PuzzleScreen({ scene, onSolved }: PuzzleScreenProps) {
 
         <SectionCard
           icon={<SearchIcon className="h-9 w-9" />}
-          title="Vyšetrovanie miesta"
+          title="Tvoja úloha"
           variant="gold"
         >
-          <div className="space-y-4">
-            <p className="text-sm leading-relaxed text-amber-100">
+          <div className="space-y-5">
+            <p className="whitespace-pre-line text-left text-sm leading-relaxed text-amber-100">
               {investigationObjective}
             </p>
 
-            {scene.investigation?.detectiveHint && (
-              <div className="rounded-2xl border border-amber-300/15 bg-black/15 p-4">
-                <p className="text-xs font-bold uppercase tracking-[0.22em] text-amber-400">
-                  Pátračova rada
-                </p>
+            <div className="border-t border-amber-300/15 pt-5">
+              <p className="text-center text-xs font-bold uppercase tracking-[0.22em] text-amber-400">
+                Výsledok pátrania
+              </p>
 
-                <p className="mt-2 text-sm italic leading-relaxed text-slate-300">
-                  „{scene.investigation.detectiveHint}“
-                </p>
+              <p className="mx-auto mt-2 max-w-sm text-center text-sm leading-relaxed text-slate-300">
+                {answerLabel}
+              </p>
+
+              <div className="mt-5">
+                <TextInput
+                  value={answer}
+                  onChange={(event) => {
+                    setAnswer(event.target.value);
+
+                    if (error) {
+                      setError("");
+                    }
+                  }}
+                  placeholder="Tvoja odpoveď"
+                  aria-label={answerLabel}
+                />
               </div>
-            )}
+
+              <div className="mt-4">
+                <ActionButton
+                  onClick={checkAnswer}
+                  disabled={!answer.trim() || Boolean(successMessage)}
+                >
+                  {successMessage ? "Stopa potvrdená" : "Overiť odpoveď"}
+                </ActionButton>
+              </div>
+            </div>
           </div>
         </SectionCard>
-
-        <SectionCard
-          icon={<QuestionIcon className="h-9 w-9" />}
-          title="Otázka"
-        >
-          <p className="mt-2 text-[15px] leading-8 text-white">
-            {scene.puzzle.question}
-          </p>
-        </SectionCard>
-
-        <TextInput
-          value={answer}
-          onChange={(event) => {
-            setAnswer(event.target.value);
-
-            if (error) {
-              setError("");
-            }
-          }}
-          placeholder="Tvoja odpoveď..."
-          aria-label="Tvoja odpoveď"
-        />
 
         {error && (
           <MessageBox variant="danger" title="Nesprávna stopa">
@@ -146,49 +149,48 @@ export function PuzzleScreen({ scene, onSolved }: PuzzleScreenProps) {
 
         <SectionCard
           icon={<LightbulbIcon className="h-9 w-9" />}
-          title="Stopy"
+          title="Pátračove poznámky"
         >
           <div className="space-y-3">
-            <p className="text-sm text-slate-500">
+            <p className="text-center text-sm text-slate-500">
               {visibleHints.length === 0
-                ? "Zatiaľ si neobjavil žiadnu stopu."
-                : `Odhalené stopy: ${visibleHints.length}`}
+                ? "Zatiaľ si neprečítal žiadnu poznámku."
+                : `Prečítané poznámky: ${visibleHints.length}`}
             </p>
 
-            <ActionButton
-              onClick={showHint}
-              disabled={!hasMoreHints}
-              variant="secondary"
-              className="py-3 text-xs"
-            >
-              {hasMoreHints ? "Odhaliť stopu" : "Všetky odhalené"}
-            </ActionButton>
-          </div>
+            <div className="mx-auto w-full max-w-sm">
+              <ActionButton
+                onClick={showHint}
+                disabled={!hasMoreHints}
+                variant="secondary"
+                className="w-full py-3 text-xs"
+              >
+                {hasMoreHints
+                  ? "Prečítať ďalšiu poznámku"
+                  : "Všetky poznámky prečítané"}
+              </ActionButton>
 
-          {visibleHints.length === 0 ? (
-            <p className="mt-3 text-sm text-slate-500">
-              Každá odhalená stopa zníži výsledné skóre.
-            </p>
-          ) : (
-            <div className="mt-4 space-y-2">
-              {visibleHints.map((hint, index) => (
-                <p
-                  key={`${scene.puzzle.id}-hint-${index}`}
-                  className="rounded-xl border border-amber-400/10 bg-amber-400/5 p-3 text-sm text-amber-100"
-                >
-                  <strong>Stopa {index + 1}:</strong> {hint}
+              {visibleHints.length === 0 && (
+                <p className="mt-3 text-center text-sm leading-relaxed text-slate-500">
+                  Každá prečítaná poznámka zníži výsledné skóre.
                 </p>
-              ))}
+              )}
             </div>
-          )}
-        </SectionCard>
 
-        <ActionButton
-          onClick={checkAnswer}
-          disabled={!answer.trim() || Boolean(successMessage)}
-        >
-          {successMessage ? "Stopa potvrdená" : "Overiť odpoveď"}
-        </ActionButton>
+            {visibleHints.length > 0 && (
+              <div className="space-y-2">
+                {visibleHints.map((hint, index) => (
+                  <p
+                    key={`${scene.puzzle.id}-hint-${index}`}
+                    className="rounded-xl border border-amber-400/10 bg-amber-400/5 p-3 text-left text-sm leading-relaxed text-amber-100"
+                  >
+                    <strong>Poznámka {index + 1}:</strong> {hint}
+                  </p>
+                ))}
+              </div>
+            )}
+          </div>
+        </SectionCard>
       </StoryCard>
     </ScreenContainer>
   );
