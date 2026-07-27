@@ -16,7 +16,10 @@ import { useChestUnlockSequence } from "./useChestUnlockSequence";
 type ChestProps = {
   codes: string[];
   isUnlocked?: boolean;
-  onCodeChange: (index: number, value: string) => void;
+  onCodeChange: (
+    index: number,
+    value: string
+  ) => void;
   onRewardClick?: () => void;
 };
 
@@ -33,18 +36,23 @@ export function Chest({
     areFragmentsVisible,
   } = useChestUnlockSequence(isUnlocked);
 
-  const { updateDigit } = useChestCodeControls({
-    codes,
-    onCodeChange,
-  });
+  const { updateDigit } =
+    useChestCodeControls({
+      codes,
+      onCodeChange,
+    });
 
   return (
     <ChestStage isUnlocked={isUnlocked}>
       <ChestVisual
         isLidOpen={isLidOpen}
         isLightVisible={isLightVisible}
-        areFragmentsVisible={areFragmentsVisible}
-        fragmentClasses={CHEST_FRAGMENT_CLASSES}
+        areFragmentsVisible={
+          areFragmentsVisible
+        }
+        fragmentClasses={
+          CHEST_FRAGMENT_CLASSES
+        }
         onRewardClick={onRewardClick}
       />
 

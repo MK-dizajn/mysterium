@@ -12,12 +12,16 @@ export function ChestStage({
   return (
     <div
       className={`chest-stage relative isolate mx-auto w-full max-w-md ${
-        isUnlocked ? "chest-stage-unlocked" : ""
+        isUnlocked
+          ? "chest-stage-unlocked"
+          : ""
       }`}
     >
       <div
         className={`chest-stage-glow ${
-          isUnlocked ? "chest-stage-glow-visible" : ""
+          isUnlocked
+            ? "chest-stage-glow-visible"
+            : ""
         }`}
         aria-hidden="true"
       />

@@ -25,15 +25,18 @@ type Chest3DProps = {
   isUnlocked?: boolean;
   onSelect?: () => void;
   onRewardClick?: () => void;
+  presentation?: "default" | "cinematic";
 };
 
 type CameraRigProps = {
   isFocused: boolean;
+  isCinematic: boolean;
 };
 
 type ChestPrototypeProps = {
   isFocused: boolean;
   isUnlocked: boolean;
+  isCinematic: boolean;
   onSelect?: () => void;
   onRewardClick?: () => void;
 };
@@ -228,12 +231,16 @@ function useChest3DUnlockSequence(
 
 function CameraRig({
   isFocused,
+  isCinematic,
 }: CameraRigProps) {
   const { camera } = useThree();
 
   const explorePosition = useMemo(
-    () => new Vector3(4.8, 3.15, 6.5),
-    []
+    () =>
+      isCinematic
+        ? new Vector3(0, 1.55, 6.35)
+        : new Vector3(4.8, 3.15, 6.5),
+    [isCinematic]
   );
 
   const focusedPosition = useMemo(
@@ -242,8 +249,11 @@ function CameraRig({
   );
 
   const exploreLookTarget = useMemo(
-    () => new Vector3(0, -0.05, 0),
-    []
+    () =>
+      isCinematic
+        ? new Vector3(0, -0.08, 0)
+        : new Vector3(0, -0.05, 0),
+    [isCinematic]
   );
 
   const focusedLookTarget = useMemo(
@@ -254,6 +264,23 @@ function CameraRig({
   const currentLookTarget = useRef(
     new Vector3(0, -0.05, 0)
   );
+
+  useEffect(() => {
+    if (!isCinematic) {
+      return;
+    }
+
+    camera.position.copy(explorePosition);
+    currentLookTarget.current.copy(
+      exploreLookTarget
+    );
+    camera.lookAt(exploreLookTarget);
+  }, [
+    camera,
+    exploreLookTarget,
+    explorePosition,
+    isCinematic,
+  ]);
 
   useFrame((_, delta) => {
     const positionTarget = isFocused
@@ -1281,6 +1308,7 @@ function CombinationLockPlate({
 function ChestPrototype({
   isFocused,
   isUnlocked,
+  isCinematic,
   onSelect,
   onRewardClick,
 }: ChestPrototypeProps) {
@@ -1457,7 +1485,16 @@ function ChestPrototype({
     <>
       <group
         ref={chestRef}
-        rotation={[0, -0.35, 0]}
+        position={
+          isCinematic
+            ? [0, -0.04, 0]
+            : [0, 0, 0]
+        }
+        rotation={[
+          0,
+          isCinematic ? 0 : -0.35,
+          0,
+        ]}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
@@ -2269,24 +2306,42 @@ export function Chest3D({
   isUnlocked = false,
   onSelect,
   onRewardClick,
+  presentation = "default",
 }: Chest3DProps) {
+  const isCinematic =
+    presentation === "cinematic";
+
   return (
-    <div className="relative mx-auto h-[440px] w-full max-w-md overflow-hidden rounded-[2rem] border border-amber-300/15 bg-gradient-to-b from-slate-950 via-[#07080d] to-black shadow-2xl shadow-black/60">
+    <div
+      className={
+        isCinematic
+          ? "relative left-1/2 h-[390px] w-screen max-w-none -translate-x-1/2 overflow-visible bg-transparent"
+          : "relative mx-auto h-[440px] w-full max-w-md overflow-hidden rounded-[2rem] border border-amber-300/15 bg-gradient-to-b from-slate-950 via-[#07080d] to-black shadow-2xl shadow-black/60"
+      }
+    >
       <Canvas
         shadows
         dpr={[1, 1.5]}
+        gl={{ alpha: true }}
+        style={{
+          background: "transparent",
+        }}
         camera={{
-          position: [4.8, 3.15, 6.5],
-          fov: 38,
+          position: isCinematic
+            ? [0, 1.55, 6.35]
+            : [4.8, 3.15, 6.5],
+          fov: isCinematic ? 36 : 38,
           near: 0.1,
           far: 100,
         }}
       >
         <Suspense fallback={null}>
-          <color
-            attach="background"
-            args={["#080a0f"]}
-          />
+          {!isCinematic && (
+            <color
+              attach="background"
+              args={["#080a0f"]}
+            />
+          )}
 
           <fog
             attach="fog"
@@ -2295,6 +2350,7 @@ export function Chest3D({
 
           <CameraRig
             isFocused={isFocused}
+            isCinematic={isCinematic}
           />
 
           <ambientLight
@@ -2347,6 +2403,7 @@ export function Chest3D({
           <ChestPrototype
             isFocused={isFocused}
             isUnlocked={isUnlocked}
+            isCinematic={isCinematic}
             onSelect={onSelect}
             onRewardClick={
               onRewardClick
@@ -2363,7 +2420,8 @@ export function Chest3D({
         </Suspense>
       </Canvas>
 
-      {!isFocused &&
+      {!isCinematic &&
+        !isFocused &&
         !isUnlocked && (
           <div className="pointer-events-none absolute inset-x-0 bottom-5 text-center">
             <p className="text-[0.6rem] font-bold uppercase tracking-[0.28em] text-amber-400/70">
@@ -2377,7 +2435,8 @@ export function Chest3D({
           </div>
         )}
 
-      {isFocused &&
+      {!isCinematic &&
+        isFocused &&
         !isUnlocked && (
           <div className="pointer-events-none absolute inset-x-0 bottom-5 text-center">
             <p className="text-[0.6rem] font-bold uppercase tracking-[0.28em] text-amber-300">
@@ -2386,7 +2445,8 @@ export function Chest3D({
           </div>
         )}
 
-      {isUnlocked && (
+      {!isCinematic &&
+        isUnlocked && (
         <div className="pointer-events-none absolute inset-x-0 bottom-5 text-center">
           <p className="text-[0.6rem] font-bold uppercase tracking-[0.28em] text-amber-300">
             Tajomstvo odhalené
