@@ -33,6 +33,8 @@ type ActChestScreenProps = {
   onUnlocked: () => void;
 };
 
+const MECHANISM_REVEAL_DELAY_MS = 950;
+
 export function ActChestScreen({
   title,
   expectedCodes,
@@ -76,7 +78,7 @@ export function ActChestScreen({
 
     const mechanismTimer = window.setTimeout(() => {
       setIsMechanismVisible(true);
-    }, 420);
+    }, MECHANISM_REVEAL_DELAY_MS);
 
     return () => {
       window.clearTimeout(mechanismTimer);
@@ -169,11 +171,12 @@ export function ActChestScreen({
   }
 
   function focusMechanism() {
-    if (isUnlocked) {
+    if (isUnlocked || isChestFocused) {
       return;
     }
 
     setError("");
+    setIsMechanismVisible(false);
     setIsChestFocused(true);
   }
 
@@ -250,12 +253,14 @@ export function ActChestScreen({
 
             <div className="mx-auto mt-5 flex max-w-xs items-center gap-3">
               <div className="h-px flex-1 bg-gradient-to-r from-transparent to-amber-400/40" />
+
               <span
                 className="text-xs text-amber-400"
                 aria-hidden="true"
               >
                 ◇
               </span>
+
               <div className="h-px flex-1 bg-gradient-to-l from-transparent to-amber-400/40" />
             </div>
 
@@ -268,6 +273,7 @@ export function ActChestScreen({
 
           <div className="relative mt-6">
             <Chest3D
+              presentation="explore"
               isFocused={isChestFocused}
               isUnlocked={isUnlocked}
               onSelect={focusMechanism}
@@ -276,10 +282,10 @@ export function ActChestScreen({
 
             {!isUnlocked && (
               <div
-                className={`absolute left-1/2 top-[54%] z-20 w-[86%] max-w-[340px] -translate-x-1/2 -translate-y-1/2 transition-all duration-700 ease-out ${
+                className={`absolute left-1/2 top-[54%] z-20 w-[86%] max-w-[340px] -translate-x-1/2 -translate-y-1/2 transition-[opacity,transform,filter] duration-[560ms] ease-out ${
                   isMechanismVisible
                     ? "pointer-events-auto scale-100 opacity-100 blur-0"
-                    : "pointer-events-none scale-[0.74] opacity-0 blur-md"
+                    : "pointer-events-none scale-[0.9] opacity-0 blur-sm"
                 }`}
                 aria-hidden={!isMechanismVisible}
               >
@@ -331,6 +337,7 @@ export function ActChestScreen({
                 <span className="block text-[0.65rem] font-bold uppercase tracking-[0.24em] text-amber-400/70">
                   Denník vyšetrovania
                 </span>
+
                 <span className="mt-1 block text-sm font-bold text-amber-100">
                   Prezrieť dôkazy aktu
                 </span>
