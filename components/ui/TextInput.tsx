@@ -20,7 +20,7 @@ export function TextInput({
       <input
         className={[
           "w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-4",
-          "text-center text-white outline-none transition duration-200",
+          "text-center text-base text-white outline-none transition duration-200",
           "placeholder:text-slate-600",
           "focus:border-amber-400 focus:ring-2 focus:ring-amber-400/10",
           "disabled:cursor-not-allowed disabled:opacity-50",

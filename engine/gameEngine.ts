@@ -125,6 +125,15 @@ export function solvePuzzle(
   scene: Scene,
   hintsUsed: number
 ): GameState {
+  const solvedFlagId = `puzzle-solved-${scene.id}`;
+
+  if (gameState.flags[solvedFlagId]) {
+    return {
+      ...gameState,
+      screen: "history",
+    };
+  }
+
   const score = calculatePuzzleScore(hintsUsed);
 
   let nextState = addScore(gameState, score);
@@ -143,6 +152,10 @@ export function solvePuzzle(
   return {
     ...nextState,
     screen: "history",
+    flags: {
+      ...nextState.flags,
+      [solvedFlagId]: true,
+    },
   };
 }
 

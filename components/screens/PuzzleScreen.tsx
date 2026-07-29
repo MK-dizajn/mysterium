@@ -45,6 +45,11 @@ export function PuzzleScreen({ scene, onSolved }: PuzzleScreenProps) {
     scene.puzzle.answerLabel ?? "Zapíš výsledok svojho pátrania.";
 
   function checkAnswer() {
+    if (
+      document.activeElement instanceof HTMLElement
+    ) {
+      document.activeElement.blur();
+    }
     const userAnswer = normalizeAnswer(answer);
 
     const isCorrect = scene.puzzle.acceptedAnswers.some(
@@ -118,8 +123,26 @@ export function PuzzleScreen({ scene, onSolved }: PuzzleScreenProps) {
                       setError("");
                     }
                   }}
+                  onKeyDown={(event) => {
+                    if (
+                      event.key !== "Enter" ||
+                      event.nativeEvent.isComposing ||
+                      !answer.trim() ||
+                      successMessage
+                    ) {
+                      return;
+                    }
+
+                    event.preventDefault();
+                    checkAnswer();
+                  }}
                   placeholder="Tvoja odpoveď"
                   aria-label={answerLabel}
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  enterKeyHint="done"
                 />
               </div>
 

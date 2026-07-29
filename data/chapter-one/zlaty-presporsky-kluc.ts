@@ -88,6 +88,10 @@ export const zlatyPresporskyKlucScene: Scene = {
           questId: "quest-golden-key",
         },
         {
+          type: "addScore",
+          value: 10,
+        },
+        {
           type: "addInventoryItem",
           item: {
             id: "golden-pressburg-key-complete",

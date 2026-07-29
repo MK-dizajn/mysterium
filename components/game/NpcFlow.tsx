@@ -45,7 +45,12 @@ export function NpcFlow({
       evaluateConditions(choice.conditions ?? [], gameState)
     ) ?? [];
 
-  if (!activeNpc || !activeDialogue || !gameState.activeDialogueNodeId) {
+  if (
+    !activeNpc ||
+    !activeDialogue ||
+    !gameState.activeDialogueNodeId ||
+    !activeDialogueNode
+  ) {
     return (
       <GameLayout
         gameState={gameState}

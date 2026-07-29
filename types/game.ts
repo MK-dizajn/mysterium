@@ -278,4 +278,5 @@ export type GameState = {
   activeDialogueId?: string;
   activeDialogueNodeId?: string;
   activeNpcId?: string;
+  returnScreen?: GameScreen;
 };

@@ -191,26 +191,36 @@ export function ActChestScreen({
   }
 
   function checkCode() {
-    const isCorrect =
-      codes.length === expectedCodes.length &&
-      expectedCodes.every(
-        (expectedCode, index) =>
-          normalizeChestCode(codes[index]) ===
-          normalizeChestCode(expectedCode)
-      );
+  const hasAllEvidence =
+    expectedCodes.length === CHEST_PAIR_LABELS.length;
 
-    if (!isCorrect) {
-      setError(
-        "Mechanizmus sa nepohol. Niektorá dvojica nesedí. Prezri si dôkazy aktu a skontroluj ich poradie."
-      );
-      return;
-    }
-
-    setError("");
-    setIsMechanismVisible(false);
-    setIsUnlocked(true);
-    setIsChestFocused(true);
+  if (!hasAllEvidence) {
+    setError(
+      "Chýba ti niektorý z dôkazov potrebných na otvorenie truhlice. Vráť sa k pátraniu a skontroluj získané stopy."
+    );
+    return;
   }
+
+  const isCorrect =
+    codes.length === expectedCodes.length &&
+    expectedCodes.every(
+      (expectedCode, index) =>
+        normalizeChestCode(codes[index]) ===
+        normalizeChestCode(expectedCode)
+    );
+
+  if (!isCorrect) {
+    setError(
+      "Mechanizmus sa nepohol. Niektorá dvojica nesedí. Prezri si dôkazy aktu a skontroluj ich poradie."
+    );
+    return;
+  }
+
+  setError("");
+  setIsMechanismVisible(false);
+  setIsUnlocked(true);
+  setIsChestFocused(true);
+}
 
   function openReward() {
     if (!isUnlocked) {
