@@ -664,3 +664,63 @@ Skóre vo finále je pred zmenou aj po nej rovnaké: 10 hádaniek × 100 + odmen
 **Build:** netýka sa tohto kroku.
 
 **Ďalší krok:** podľa akčného plánu, po potvrdení používateľa.
+
+---
+
+## Krok 27 (akčný plán 0.4a): Jednotné názvy a opravy textov
+
+**Rozhodnutia používateľa:**
+- Možnosť A: v lište „Úlohy“, „Inventár“, „Artefakty“; „Denník pátrača“ zostáva nadpisom lišty.
+- Štítok „Zápis do denníka pátrača“.
+- Dvojice kódov číslované 1 až 9.
+
+**Čo sa urobilo:**
+- **Horná lišta** (`components/ui/CodexBar.tsx`):
+  - 🕵️ Prípad → **🕵️ Úlohy**, 🔎 Dôkazy → **🔎 Inventár**, 📖 História → **📖 Artefakty**.
+  - Popis pod Úlohami: „1 aktívny / Dokončený / Nezačatý“ → **„1 aktívna“ (2–4 aktívne, 5+ aktívnych) / „Splnené“ / „Žiadne“**.
+  - Popis pod Inventárom: „1 dôkaz…“ → **„1 predmet / 2–4 predmety / 0 alebo 5+ predmetov“**.
+- **Obrazovka Úloh** (`components/screens/QuestScreen.tsx`):
+  - nadpis „🕵️ Úlohy“,
+  - stavy „Aktívna / Splnená / Zamknutá“,
+  - sekcie „Aktívne úlohy“ a „Splnené úlohy“,
+  - „Odmena za splnenie úlohy“,
+  - nový úvodný text a text pri žiadnej úlohe.
+- **Inventár** (`components/screens/InventoryScreen.tsx`):
+  - nadpis „Inventár“,
+  - „Zatiaľ nemáš žiadne predmety“,
+  - štítok „Fragment“ → **„Útržok“**.
+- **Artefakty:** nadpis zoznamu „Artefakty“ (`ArtifactsScreen.tsx`), štítok v detaile „Artefakt“ (`ArtifactScreen.tsx`).
+- **Záver kapitoly** (`FinishScreen.tsx`): „V časti História zostáva…“ → „V Artefaktoch zostáva…“.
+- **Obrazovka histórie** (`HistoryScreen.tsx`): „Zápis do Codexu“ → **„Zápis do denníka pátrača“**.
+- **Jazyk stránky** (`app/layout.tsx`): `lang="en"` → **`lang="sk"`**.
+- **Poradie dvojíc kódov** v popisoch dôkazov 2 až 9 opravené na „druhá“ až „deviata“ (dôkaz 1 „prvá“ bol správne). Kódy ani poradie dôkazov sa nezmenili.
+
+**Kontrola tvarov slov (pre počty 0, 1, 2, 3, 4, 5, 6, 10, 11, 12, 21, 22):**
+- predmety: 0 predmetov, 1 predmet, 2–4 predmety, 5+ predmetov (aj 21 a 22 predmetov), všetko správne.
+- aktívne úlohy: 1 aktívna, 2–4 aktívne, 5+ aktívnych, všetko správne. Pri 0 sa nezobrazuje, vtedy sa ukáže „Splnené“ alebo „Žiadne“.
+
+**Kontrola poradia dvojíc:** všetkých 9 dôkazov má slovo, ktoré sedí s ich číslom (`evidenceOrder`).
+
+**Zmenené súbory (zmeny kódu a textov v commite `20c2987`):**
+- `components/ui/CodexBar.tsx`
+- `components/screens/QuestScreen.tsx`
+- `components/screens/InventoryScreen.tsx`
+- `components/screens/ArtifactsScreen.tsx`
+- `components/screens/ArtifactScreen.tsx`
+- `components/screens/FinishScreen.tsx`
+- `components/screens/HistoryScreen.tsx`
+- `app/layout.tsx`
+- `data/chapter-one/` – 8 súborov: `tajna-stopa-michalska.ts`, `lekaren-u-salvatora.ts`, `venturska-brana-spomienok.ts`, `mirbachov-palac.ts`, `stara-radnica.ts`, `maximilianova-fontana.ts`, `primacialny-palac.ts`, `bratislavsky-mier.ts`
+- `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** 1 chyba a 1 upozornenie, **obe existovali už pred touto zmenou** (overené na verzii pred zmenou):
+- `CodexBar.tsx`, riadok 53 (predtým 47; posunul sa, lebo som vyššie pridal funkciu): `react-hooks/set-state-in-effect`, načítanie stavu zvuku.
+- `HistoryScreen.tsx`, riadok 7: nepoužitý `LightbulbIcon` (iba upozornenie).
+
+**Chyba pri zápise:** zápis do denníka najprv zlyhal (miesto v denníku sa nedalo jednoznačne nájsť), ale commit zmien sa už vykonal. Zmeny kódu sú preto v jednom commite a tento záznam v samostatnom commite hneď za ním.
+
+**V prehliadači:** zatiaľ neoverené používateľom.
+
+**Ďalší krok:** používateľ overí v prehliadači (aj šírku 360 px), potom časť 0.4b (počet artefaktov z dát namiesto „/10“), až po potvrdení.
