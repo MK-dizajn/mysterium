@@ -236,3 +236,74 @@ Poznámka: opravu z tohto kroku používateľ presunul do kroku 1.3.
 - prečítať 2 poznámky, otvoriť inventár a vrátiť sa;
 - stlačiť F5 a kliknúť „Pokračovať“;
 - po vyriešení hádanky musí skóre stúpnuť o 60.
+
+---
+
+## 22. 10. 2026 – Krok 12: Analýza – hráč pri scénach 3 až 10 nevie, čo má zadať
+
+**Zistenie (iba z čítania kódu):**
+- Potvrdené. `components/screens/PuzzleScreen.tsx` zobrazí ako úlohu `investigation.objective`. Otázku `puzzle.question` zobrazí iba vtedy, keď scéna `investigation` nemá.
+- Všetkých 10 scén má `investigation`, takže sa `puzzle.question` nezobrazí nikde.
+- `answerLabel` (text nad políčkom na odpoveď) majú iba scény 1 a 2. Scény 3 až 10 ukazujú iba všeobecné „Zapíš výsledok svojho pátrania.“
+- Najhoršie je to pri scéne 3 (Lekáreň U Salvátora): hráč sa nedozvie, že má zapísať rok.
+
+**Navrhovaná oprava (zatiaľ neurobená):** doplniť `answerLabel` do 8 súborov v `data/chapter-one/`: `lekaren-u-salvatora.ts`, `venturska-brana-spomienok.ts`, `mirbachov-palac.ts`, `stara-radnica.ts`, `maximilianova-fontana.ts`, `primacialny-palac.ts`, `bratislavsky-mier.ts`, `zlaty-presporsky-kluc.ts`.
+
+**Zmenené súbory:** žiadne v kóde (iba tento denník).
+
+**Build:** netýka sa tohto kroku.
+
+**Ďalší krok:** používateľ dodá 8 textov pre `answerLabel`.
+
+---
+
+## 22. 10. 2026 – Krok 13: Hľadanie starších funkcií truhlice v histórii Gitu
+
+**Čo sa urobilo:**
+- Prešiel som celú históriu Gitu (všetky vetvy) pre súbory truhlice: `components/ui/chest`, `components/ui/chest-3d`, `components/screens/ActChestScreen.tsx`, `components/screens/ChestIntroScreen.tsx`, `components/ui/reward`.
+- Podľa kľúčových slov som prehľadal aj ostatný kód (`app`, `data`, `engine`, `types`, `hooks`, `lib`).
+- Prvá verzia truhlice je `3069aa4` (16. 7. 2026), posledná `2cc2c7b` (29. 7. 2026). Spolu 11 verzií.
+
+**Výsledok:**
+1. **Video s NPC, ktorý prinesie truhlicu – nikdy neexistovalo.** V žiadnej verzii nie je video (žiadny `<video>`, `.mp4` ani `.webm`). `ChestIntroScreen.tsx` bol vždy iba textový úvod s animáciou, v ktorej sa truhlica objaví. Žiadna postava v ňom nie je.
+2. **Automatické skladanie útržkov do jednej fotografie – nikdy neexistovalo.** Od verzie `682869e` (21. 7. 2026) z otvorenej truhlice vyletí niekoľko samostatných útržkov (`ChestPhotoFragments.tsx`). Kliknutím na útržok sa otvorí odmena. Skladanie sa spomína iba v texte verzie `64dbb8f`: „Obraz je poškodený a rozdelený na časti. Budeš ho musieť zložiť…“. Ako funkcia však nikdy neexistovalo.
+3. **Otočenie fotografie s adresou na zadnej strane – nikdy neexistovalo.** Žiadna verzia neotáča fotografiu (otočenie o 180° sa v histórii nenachádza). Odmena (`RewardReveal.tsx`) ukazuje fotografiu mierne naklonenú s popisom „Nájdené v uzamknutej truhlici“. „Zadná strana fotografie“ sa spomína iba v textoch popisov. Nápis „Potiahni pre otočenie“ znamená otáčanie 3D truhlice, nie fotografie.
+4. **Zadanie adresy ďalšieho miesta ako podmienka na pokračovanie – nikdy neexistovalo.** Jediné políčka v truhlici boli na zadanie číselného kódu: vo verzii `3069aa4` číselné políčka, neskôr kolieska s tlačidlami + a −. Po otvorení truhlice hra pokračuje rovno na ďalšiu scénu a ďalšie miesto sa hráč dozvie iba z textu.
+
+**Obmedzenie:** vidím iba to, čo bolo uložené do Gitu. Ak tieto funkcie vznikli na starom počítači alebo na USB a nikdy sa necommitli, v histórii ich nenájdem.
+
+**Zmenené súbory:** žiadne v kóde (iba tento denník).
+
+**Build:** netýka sa tohto kroku.
+
+**Ďalší krok:** rozhodnutie používateľa, či sa tieto štyri prvky majú navrhnúť ako nové funkcie. Stále čaká aj 8 textov pre `answerLabel` (krok 12).
+
+---
+
+## 22. 10. 2026 – Krok 14: Koncept zážitku
+
+**Čo sa urobilo:**
+- Vytvoril som `docs/KONCEPT-ZAZITKU.md` podľa zadania. Obsahuje:
+  - (A) úvodné video s bránou (spustí sa až po kliknutí, s tlačidlom „Preskočiť“ a náhradnou verziou),
+  - (B) predmet s vodidlom po každej úlohe,
+  - (C) jednu truhlicu s tromi zámkami ako finále kapitoly,
+  - (D) automaticky zloženú fotografiu s adresou na zadnej strane,
+  - (E) odomknutie ďalšej kapitoly ručným zadaním miesta, bez GPS,
+  - (F) ľahké konce aktov bez truhlice,
+  - (G) úlohy typu „všimni si a urob s tým niečo“,
+  - (H) otvorené rozhodnutia: brána, NPC, formát adresy.
+- Pri každej časti je poznámka, čo z toho už v hre existuje.
+- Nič sa nenaprogramovalo.
+
+**Zistený rozpor:** `docs/KONCEPT-KAPITOL.md` má pravidlo „truhlica po každom akte“. Nový koncept chce jednu truhlicu na konci kapitoly. `KONCEPT-KAPITOL.md` som nemenil, treba ho zosúladiť neskôr.
+
+**Zmenené súbory:**
+- `docs/KONCEPT-ZAZITKU.md` (nový, commitnutý)
+- `docs/PRACOVNY-DENNIK.md` (záznamy krokov 12, 13 a 14, commitnuté)
+
+**Build:** netýka sa tohto kroku (iba dokumentácia).
+
+**Ďalší krok:**
+- doplniť otvorené rozhodnutia (časť H),
+- zosúladiť `KONCEPT-KAPITOL.md`,
+- stále čaká 8 textov pre `answerLabel` (krok 12).
