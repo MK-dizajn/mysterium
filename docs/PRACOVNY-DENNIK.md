@@ -333,3 +333,29 @@ Poznámka: opravu z tohto kroku používateľ presunul do kroku 1.3.
 **Build:** netýka sa tohto kroku (iba dokumentácia).
 
 **Ďalší krok:** push všetkých lokálnych commitov na vetvu `sprint-4-first-playable-chapter`.
+
+---
+
+## 22. 10. 2026 – Krok 16: Push na GitHub – ZLYHAL
+
+**Čo sa urobilo:**
+- Pred pushom som overil GitHub (`git fetch`): vetva `sprint-4-first-playable-chapter` sa medzitým nezmenila. Lokálne sme 7 verzií napred a 0 pozadu, takže push nepotreboval force.
+- Spustil som `git push origin sprint-4-first-playable-chapter` (iba táto vetva, nie `main`, bez force).
+
+**Chyba:**
+```
+fatal: Cannot prompt because user interactivity has been disabled.
+fatal: could not read Username for 'https://github.com': terminal prompts disabled
+```
+- Jednoducho: Git nemá uložené prihlásenie ku GitHubu. Pýtal by si meno a heslo, ale v tomto prostredí sa nemôže opýtať.
+- Git z GitHub Desktop má nastaveného správcu prihlásenia (`credential.helper = manager`), ale prihlásenie v ňom nie je uložené pre tento spôsob spúšťania.
+
+**Výsledok:** na GitHub sa **nič neposlalo**. GitHub má stále poslednú verziu `2cc2c7b`. Všetkých 7 verzií je bezpečne uložených iba v tomto počítači:
+- `0619ef6`, `888ccf5`, `744e0d0`, `73f6f77`, `d194d72`, `cc9bfe3`, `ff8bc61`
+
+**Zmenené súbory:**
+- `docs/PRACOVNY-DENNIK.md` (tento záznam, zatiaľ necommitnutý)
+
+**Build:** netýka sa tohto kroku.
+
+**Ďalší krok:** pushnúť cez aplikáciu GitHub Desktop (v nej je používateľ prihlásený), alebo nastaviť prihlásenie pre Git v termináli.
