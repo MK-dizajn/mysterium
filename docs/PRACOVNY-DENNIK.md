@@ -521,3 +521,21 @@ fatal: could not read Username for 'https://github.com': terminal prompts disabl
 **Ďalší krok:**
 - používateľ overí okienko v prehliadači,
 - potom krok 0.2 (odmena za quest), až po potvrdení.
+
+---
+
+## Krok 23: Overenie potvrdzovacieho okienka v prehliadači
+
+**Čo sa urobilo:**
+- Používateľ otestoval krok 22 (akčný plán 0.3a) v prehliadači. Všetko funguje:
+  - „Zrušiť“, Esc aj kliknutie mimo okienka nič nezmažú,
+  - „Áno, začať odznova“ hru vymaže a začne odznova,
+  - okienko sa zobrazuje správne.
+- Krok 0.3a je **overený a dokončený**.
+
+**Zmenené súbory:**
+- `docs/PRACOVNY-DENNIK.md` (tento záznam)
+
+**Build:** netýka sa tohto kroku.
+
+**Ďalší krok:** krok 0.2 (odmena za quest iba z dát), až po potvrdení používateľa.
