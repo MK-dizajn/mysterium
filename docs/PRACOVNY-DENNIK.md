@@ -112,3 +112,58 @@ Sem sa po každom dokončenom kroku zapíše krátky záznam: čo sa urobilo, kt
 **Build:** netýka sa tohto kroku.
 
 **Ďalší krok:** uložiť do Gitu (commitnúť) pracovný denník `docs/PRACOVNY-DENNIK.md`.
+
+---
+
+## 22. 10. 2026 – Krok 7: Commit pracovného denníka
+
+**Čo sa urobilo:**
+- Do Gitu som uložil iba súbor `docs/PRACOVNY-DENNIK.md` (verzia `888ccf5`, záznamy krokov 1 až 6).
+- Nič sa neposlalo na GitHub. Verzia je zatiaľ iba v tomto počítači.
+
+**Zmenené súbory:**
+- `docs/PRACOVNY-DENNIK.md` (commitnutý)
+
+**Build:** netýka sa tohto kroku (iba dokumentácia).
+
+**Ďalší krok:** vytvoriť `docs/KONCEPT-KAPITOL.md` a `docs/MEDIA-LICENCIE.md` a commitnúť ich.
+
+---
+
+## 22. 10. 2026 – Krok 8: Koncept kapitol a evidencia médií
+
+**Čo sa urobilo:**
+- Vytvoril som `docs/KONCEPT-KAPITOL.md` s pravidlami pre každú kapitolu:
+  - 90–120 minút, 10–12 úloh,
+  - truhlica s kódom po každom akte,
+  - úloha spojená s miestom,
+  - ďalšie kapitoly v iných častiach Bratislavy, predaj jednotlivo aj v balíku,
+  - neskôr videá, zvuky, hlasy a ďalšie NPC.
+- V koncepte je aj porovnanie s kapitolou I. Zistené nezhody: v akte III chýba truhlica a odhadovaná dĺžka (60–75 min) je kratšia než cieľ.
+- Vytvoril som `docs/MEDIA-LICENCIE.md` s tabuľkou (súbor, nástroj, plán, dátum, zadanie) a zapísal doň všetky súčasné médiá. Pôvod obrázka `detective-note-entry-1.png` je neznámy, treba ho doplniť. Všetky zvuky sú prázdne alebo chýbajú.
+- Oba súbory som commitol (verzia `744e0d0`). Nič sa neposlalo na GitHub.
+
+**Zmenené súbory:**
+- `docs/KONCEPT-KAPITOL.md` (nový, commitnutý)
+- `docs/MEDIA-LICENCIE.md` (nový, commitnutý)
+- `docs/PRACOVNY-DENNIK.md` (záznamy krokov 7 a 8, zatiaľ necommitnuté)
+
+**Build:** netýka sa tohto kroku (iba dokumentácia).
+
+**Ďalší krok:** overiť v prehliadači, že stránka po F5 už nebliká (krok 3), a doplniť pôvod obrázka do `docs/MEDIA-LICENCIE.md`.
+
+---
+
+## 22. 10. 2026 – Krok 9: Overenie opravy blikania a commit denníka
+
+**Čo sa urobilo:**
+- Používateľ potvrdil: stránka po F5 už nebliká a hra je hrateľná. Oprava z kroku 3 je overená.
+- Pôvod obrázka `detective-note-entry-1.png` zostáva v `docs/MEDIA-LICENCIE.md` ako „neznáme – doplniť“.
+- Do Gitu som uložil iba `docs/PRACOVNY-DENNIK.md` (záznamy krokov 7, 8 a 9). Nič sa neposlalo na GitHub.
+
+**Zmenené súbory:**
+- `docs/PRACOVNY-DENNIK.md` (commitnutý)
+
+**Build:** netýka sa tohto kroku (iba dokumentácia).
+
+**Ďalší krok:** podľa akčného plánu, po potvrdení používateľa.
