@@ -7,6 +7,7 @@ import type {
   Scene,
 } from "../types/game";
 import {
+  getActForScene,
   getNextSceneIndex,
   getPuzzleSolvedFlagId,
   isChapterFinished,
@@ -238,22 +239,19 @@ export function continueAfterHistory(
     };
   }
 
-  const completedSceneIndex = gameState.currentSceneIndex;
+  const completedScene = chapter.scenes[gameState.currentSceneIndex];
+  const nextScene = chapter.scenes[nextIndex];
 
-  if (completedSceneIndex === 2) {
+  const completedAct = completedScene
+    ? getActForScene(chapter, completedScene.id)
+    : undefined;
+  const nextAct = getActForScene(chapter, nextScene.id);
+
+  if (completedAct && nextAct && completedAct.id !== nextAct.id) {
     return {
       ...gameState,
       currentSceneIndex: nextIndex,
-      currentActId: "act-1",
-      screen: "actTransition",
-    };
-  }
-
-  if (completedSceneIndex === 5) {
-    return {
-      ...gameState,
-      currentSceneIndex: nextIndex,
-      currentActId: "act-2",
+      currentActId: completedAct.id,
       screen: "actTransition",
     };
   }
@@ -263,8 +261,6 @@ export function continueAfterHistory(
     currentSceneIndex: nextIndex,
     screen: "puzzle",
   };
-
-  const nextScene = chapter.scenes[nextIndex];
 
   return runSceneEvents(
     nextState,

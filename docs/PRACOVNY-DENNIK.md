@@ -835,3 +835,54 @@ Skóre vo finále je pred zmenou aj po nej rovnaké: 10 hádaniek × 100 + odmen
 - `components/screens/QuestScreen.tsx` – „…po odhalení Zlatého prešporského kľúča“, „Začni vyšetrovanie pri Michalskej bráne. Po rozhovore so strážcom…“.
 
 **Ďalší krok:** krok A2 (engine a `page.tsx` berú hranice aktov a kódy truhlíc z dát namiesto čísel scén 2, 3 a 5), až po potvrdení používateľa.
+
+---
+
+## Krok 31 (časť A, krok A2): Hranice aktov, názvy aktov a kódy truhlíc z dát
+
+**Čo sa urobilo:**
+- `engine/gameEngine.ts`: prechod aktu sa už nespúšťa po scénach s indexom **2** a **5**. Spustí sa vtedy, keď ďalšia scéna patrí do iného aktu podľa `data/chapter-one/acts.ts`. `currentActId` sa nastaví na dokončený akt z dát.
+- `app/page.tsx`:
+  - prechod aktu a truhlica sa už nerozhodujú podľa scény s indexom **3**,
+  - názvy aktov sú z dát,
+  - dokončený a nasledujúci akt, počet dôkazov a kódy truhlice dáva nová funkcia `getActTransition`.
+- `engine/gameProgress.ts`: nové funkcie:
+  - `getActForScene` (v ktorom akte je scéna),
+  - `getActLockEvidence` (dôkazy aktu z dát),
+  - `getActTransition` (údaje pre prechod aktu a truhlicu).
+  - `getActLockCodes` z kroku A1 teraz používa `getActLockEvidence`.
+- Kódy truhlice majú poradie z dát aktu, ale **iba za dôkazy, ktoré hráč naozaj má**. Tak zostala zachovaná dnešná kontrola „Chýba ti niektorý z dôkazov…“: chýbajúci dôkaz = menej kódov, rovnako ako predtým.
+- Názov aktu II sa všade zobrazuje ako **„Akt II – Moc a poznanie“** (predtým na konci aktu II „Moc a pamäť“).
+- **Nezmenené (krok A3):**
+  - odmeny z truhlíc (útržky fotografie) a ich texty v `page.tsx` a `ActChestScreen.tsx`,
+  - nadpisy „Truhlica prvého/druhého aktu“; tie sa teraz vyberajú podľa poradia aktu, nie podľa čísla scény.
+- Zostáva aj predvolený akt novej hry `"act-1"` v `createNewGameState`. Pri prechode aktu ho engine prepíše hodnotou z dát, takže o ničom nerozhoduje.
+
+**Test (mimo projektu, necommitnutý):** zachytil priebeh celej kapitoly (každá obrazovka, akt, skóre, `currentActId`, kódy), 6 uložených hier a truhlicu s chýbajúcim dôkazom. Výsledok pred zmenou a po nej sa porovnal riadok po riadku.
+- **48 riadkov, líšia sa iba 4.** Vo všetkých 4 je jediný rozdiel „Akt II – Moc a pamäť“ → „Akt II – Moc a poznanie“, čo je zámer.
+- **Rovnaké pred aj po:**
+  - poradie obrazoviek,
+  - kódy 00-15-58 a 65-70-09,
+  - skóre (100 až 1010),
+  - `currentActId` po každej scéne (act-1, pri prechode act-1, po truhlici act-2 atď.).
+- **Uložené hry** (všetky rovnaké pred aj po; žiadna sa pri načítaní neopravovala):
+  - úplný začiatok (úvod),
+  - uprostred prechodu aktu I a aktu II,
+  - pred truhlicou aktu I a aktu II (po otvorení pokračuje scénou 4, resp. 7, so správnym aktom),
+  - koniec kapitoly.
+- **Chýbajúci dôkaz** (bez štítku domu): 2 dôkazy, kódy 00-58, rovnako ako predtým.
+- **Test skóre z kroku 24:** stále 1010, s 2 nápovedami 970.
+
+**Zmenené súbory:**
+- `engine/gameProgress.ts`
+- `engine/gameEngine.ts`
+- `app/page.tsx`
+- `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** zmenené súbory sú bez chýb.
+
+**V prehliadači:** zatiaľ neoverené používateľom. Prechod aktu II má ukazovať „Akt II – Moc a poznanie“.
+
+**Ďalší krok:** krok A3 (odmeny a texty truhlíc z `page.tsx` a `ActChestScreen.tsx` do dát), až po potvrdení používateľa.

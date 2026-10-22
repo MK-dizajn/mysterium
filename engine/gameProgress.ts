@@ -16,12 +16,22 @@ export function countChapterArtifacts(chapter: Chapter) {
   return chapter.scenes.filter((scene) => Boolean(scene.artifact)).length;
 }
 
+export function getActForScene(
+  chapter: Chapter,
+  sceneId: string
+): Act | undefined {
+  return chapter.acts.find((act) => act.sceneIds.includes(sceneId));
+}
+
 /**
- * Kódy zámku aktu odvodené z dôkazov (secretCode), ktoré hráč získa
- * v scénach aktu, v poradí podľa evidenceOrder. Počet dvojíc nie je pevný.
+ * Dôkazy (so secretCode), ktoré hráč získa v scénach aktu,
+ * v poradí podľa evidenceOrder. Počet nie je pevný.
  */
-export function getActLockCodes(chapter: Chapter, act: Act): string[] {
-  const evidence: InventoryItem[] = act.sceneIds
+export function getActLockEvidence(
+  chapter: Chapter,
+  act: Act
+): InventoryItem[] {
+  return act.sceneIds
     .map((sceneId) => chapter.scenes.find((scene) => scene.id === sceneId))
     .flatMap((scene) => scene?.events ?? [])
     .flatMap((event) => event.actions)
@@ -29,14 +39,57 @@ export function getActLockCodes(chapter: Chapter, act: Act): string[] {
       action.type === "addInventoryItem" && action.item.secretCode
         ? [action.item]
         : []
-    );
-
-  return evidence
+    )
     .sort(
       (firstItem, secondItem) =>
         (firstItem.evidenceOrder ?? 0) - (secondItem.evidenceOrder ?? 0)
-    )
-    .map((item) => item.secretCode as string);
+    );
+}
+
+/** Kódy zámku aktu odvodené z dôkazov jeho scén. */
+export function getActLockCodes(chapter: Chapter, act: Act): string[] {
+  return getActLockEvidence(chapter, act).map(
+    (item) => item.secretCode as string
+  );
+}
+
+export type ActTransition = {
+  completedAct: Act;
+  nextAct?: Act;
+  /** Kódy iba za dôkazy, ktoré hráč naozaj má (chýbajúci dôkaz = menej kódov). */
+  expectedCodes: string[];
+  evidenceCount: number;
+};
+
+/**
+ * Údaje pre prechod aktu a truhlicu. Dokončený akt je currentActId,
+ * ktorý engine nastaví pri prechode aktu podľa dát kapitoly.
+ */
+export function getActTransition(
+  chapter: Chapter,
+  gameState: GameState
+): ActTransition | null {
+  const previousScene = chapter.scenes[gameState.currentSceneIndex - 1];
+
+  const completedAct =
+    chapter.acts.find((act) => act.id === gameState.currentActId) ??
+    (previousScene ? getActForScene(chapter, previousScene.id) : undefined);
+
+  if (!completedAct) {
+    return null;
+  }
+
+  const ownedEvidence = getActLockEvidence(chapter, completedAct).filter(
+    (evidenceItem) =>
+      gameState.inventory.some((item) => item.id === evidenceItem.id)
+  );
+
+  return {
+    completedAct,
+    nextAct: chapter.acts[chapter.acts.indexOf(completedAct) + 1],
+    expectedCodes: ownedEvidence.map((item) => item.secretCode as string),
+    evidenceCount: ownedEvidence.length,
+  };
 }
 
 function isValidIndex(index: number, length: number) {

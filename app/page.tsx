@@ -20,6 +20,7 @@ import {
   continueAfterHistory,
   countChapterArtifacts,
   createNewGameState,
+  getActTransition,
   revealHint,
   solvePuzzle,
   talkToNpc,
@@ -374,63 +375,29 @@ export default function Home() {
       );
     }
 
-    if (gameState.screen === "actTransition") {
-      const isFirstTransition =
-        gameState.currentSceneIndex === 3;
+    const actTransition =
+      gameState.screen === "actTransition" ||
+      gameState.screen === "actChest"
+        ? getActTransition(currentChapter, gameState)
+        : null;
 
-      const completedActId: ActId = isFirstTransition
-        ? "act-1"
-        : "act-2";
-
-      const evidenceCount = gameState.inventory.filter(
-        (item) =>
-          item.actId === completedActId &&
-          item.evidenceKind &&
-          item.secretCode
-      ).length;
-
+    if (gameState.screen === "actTransition" && actTransition) {
       return (
         <ActTransitionScreen
-          completedActTitle={
-            isFirstTransition
-              ? "Akt I – Prvé stopy"
-              : "Akt II – Moc a pamäť"
-          }
-          nextActTitle={
-            isFirstTransition
-              ? "Akt II – Moc a poznanie"
-              : "Akt III – Posledné tajomstvo"
-          }
-          evidenceCount={evidenceCount}
+          completedActTitle={actTransition.completedAct.title}
+          nextActTitle={actTransition.nextAct?.title ?? ""}
+          evidenceCount={actTransition.evidenceCount}
           onContinue={openActChest}
         />
       );
     }
 
-    if (gameState.screen === "actChest") {
+    if (gameState.screen === "actChest" && actTransition) {
+      const { completedAct, nextAct } = actTransition;
+
+      // Texty truhlíc a odmeny presunie do dát krok A3.
       const isFirstChest =
-        gameState.currentSceneIndex === 3;
-
-      const completedActId: ActId = isFirstChest
-        ? "act-1"
-        : "act-2";
-
-      const nextActId: ActId = isFirstChest
-        ? "act-2"
-        : "act-3";
-
-      const expectedCodes = gameState.inventory
-        .filter(
-          (item) =>
-            item.actId === completedActId &&
-            item.secretCode
-        )
-        .sort(
-          (firstItem, secondItem) =>
-            (firstItem.evidenceOrder ?? 0) -
-            (secondItem.evidenceOrder ?? 0)
-        )
-        .map((item) => item.secretCode as string);
+        currentChapter.acts.indexOf(completedAct) === 0;
 
       return (
         <ActChestScreen
@@ -439,11 +406,14 @@ export default function Home() {
               ? "Truhlica prvého aktu"
               : "Truhlica druhého aktu"
           }
-          expectedCodes={expectedCodes}
+          expectedCodes={actTransition.expectedCodes}
           inventory={gameState.inventory}
-          currentActId={completedActId}
+          currentActId={completedAct.id}
           onUnlocked={() =>
-            continueToNextAct(completedActId, nextActId)
+            continueToNextAct(
+              completedAct.id,
+              nextAct?.id ?? completedAct.id
+            )
           }
         />
       );
