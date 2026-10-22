@@ -724,3 +724,24 @@ Skóre vo finále je pred zmenou aj po nej rovnaké: 10 hádaniek × 100 + odmen
 **V prehliadači:** zatiaľ neoverené používateľom.
 
 **Ďalší krok:** používateľ overí v prehliadači (aj šírku 360 px), potom časť 0.4b (počet artefaktov z dát namiesto „/10“), až po potvrdení.
+
+---
+
+## Krok 28: Overenie názvov v prehliadači pri šírke 360 px
+
+**Čo sa urobilo:**
+- Používateľ overil krok 27 (akčný plán 0.4a) v prehliadači pri šírke 360 px a poslal snímku obrazovky. Podľa neho je všetko v poriadku:
+  - lišta „🕵️ Úlohy / 1 aktívna“, „🔎 Inventár / 2 predmety“, „📖 Artefakty / 1/10 objavených“,
+  - tlačidlá sa zmestia vedľa seba, nič nie je orezané a stránka sa vodorovne neposúva.
+- **Drobný vizuálny rozdiel na snímke:**
+  - pri tlačidle Artefakty je ikona 📖 na samostatnom riadku nad textom a „1/10 objavených“ sa zalomí na dva riadky,
+  - pri Úlohách a Inventári sú ikona aj text v jednom riadku.
+  - Je to čitateľné, nič sa neprekrýva, iba tlačidlá nevyzerajú rovnako. Zatiaľ sa nerieši.
+- Krok 0.4a je **overený a dokončený**.
+
+**Zmenené súbory:**
+- `docs/PRACOVNY-DENNIK.md` (tento záznam)
+
+**Build:** netýka sa tohto kroku.
+
+**Ďalší krok:** časť 0.4b (počet artefaktov z dát kapitoly namiesto „/10“), až po potvrdení používateľa.
