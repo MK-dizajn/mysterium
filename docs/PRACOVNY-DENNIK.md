@@ -307,3 +307,29 @@ Poznámka: opravu z tohto kroku používateľ presunul do kroku 1.3.
 - doplniť otvorené rozhodnutia (časť H),
 - zosúladiť `KONCEPT-KAPITOL.md`,
 - stále čaká 8 textov pre `answerLabel` (krok 12).
+
+---
+
+## 22. 10. 2026 – Krok 15: Nová verzia konceptu zážitku
+
+**Čo sa urobilo:**
+- Prepísal som `docs/KONCEPT-ZAZITKU.md` novou verziou zadania. Zmeny oproti kroku 14:
+  - (A) Video končí pri zatvorenej **Michalskej bráne**, pátranie sa začína pod ňou.
+  - (C) Truhlicu vo videu prinesie **Strážca**. Kódy troch zámkov: `00-15-58`, `65-70-09`, `72-81-05`.
+  - (D) Na zadnej strane fotografie je **miesto** ďalšej kapitoly.
+  - (E) Zadáva sa **názov miesta**. Hra odpustí diakritiku, veľké a malé písmená a drobné preklepy. Potom vždy ukáže kartu „Ďalšie miesto“ (názov, úplná adresa, „Otvoriť v mapách“, popis cesty).
+  - (H) Namiesto otvorených rozhodnutí sú pravidlá **trasy**: plynulá slučka, 3–5 minút medzi miestami, koniec pri štarte alebo pri kaviarni, overenie na mape vo Fáze 2.
+- Poznámky „Dnes v hre“ zostali pri každej časti.
+- Nič sa nenaprogramovalo.
+
+**Zistené:**
+- Rozpor s `docs/KONCEPT-KAPITOL.md` („truhlica po každom akte“) trvá. Ten súbor som nemenil.
+- Dnešná trasa má krátky návrat (Panská → Ventúrska) a končí pri Primaciálnom paláci. Overí sa vo Fáze 2.
+
+**Zmenené súbory:**
+- `docs/KONCEPT-ZAZITKU.md` (prepísaný, commitnutý)
+- `docs/PRACOVNY-DENNIK.md` (commitnutý)
+
+**Build:** netýka sa tohto kroku (iba dokumentácia).
+
+**Ďalší krok:** push všetkých lokálnych commitov na vetvu `sprint-4-first-playable-chapter`.
