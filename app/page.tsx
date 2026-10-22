@@ -273,7 +273,8 @@ export default function Home() {
             setGameState((currentState) =>
               applyDialogueChoiceActions(
                 currentState,
-                choice
+                choice,
+                currentChapter.quests
               )
             );
           }}
@@ -350,7 +351,8 @@ export default function Home() {
             setGameState((currentState) => {
               const nextState = solvePuzzle(
                 currentState,
-                currentScene
+                currentScene,
+                currentChapter.quests
               );
 
               const newlyUnlockedArtifact =

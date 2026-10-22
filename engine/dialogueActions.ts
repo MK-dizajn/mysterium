@@ -1,11 +1,14 @@
 import type {
   DialogueChoice,
   GameState,
+  Quest,
 } from "../types/game";
+import { completeQuest } from "./gameEngine";
 
 export function applyDialogueChoiceActions(
   gameState: GameState,
-  choice: DialogueChoice
+  choice: DialogueChoice,
+  questDefinitions: Quest[]
 ): GameState {
   if (!choice.actions || choice.actions.length === 0) {
     return gameState;
@@ -109,34 +112,11 @@ export function applyDialogueChoiceActions(
     }
 
     if (action.type === "completeQuest") {
-      const existingQuest = nextState.quests.find(
-        (quest) => quest.questId === action.questId
+      nextState = completeQuest(
+        nextState,
+        action.questId,
+        questDefinitions
       );
-
-      if (!existingQuest) {
-        nextState = {
-          ...nextState,
-          quests: [
-            ...nextState.quests,
-            {
-              questId: action.questId,
-              status: "completed",
-            },
-          ],
-        };
-      } else if (existingQuest.status !== "completed") {
-        nextState = {
-          ...nextState,
-          quests: nextState.quests.map((quest) =>
-            quest.questId === action.questId
-              ? {
-                  ...quest,
-                  status: "completed",
-                }
-              : quest
-          ),
-        };
-      }
     }
 
     if (action.type === "startDialogue") {

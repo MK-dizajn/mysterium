@@ -539,3 +539,50 @@ fatal: could not read Username for 'https://github.com': terminal prompts disabl
 **Build:** netýka sa tohto kroku.
 
 **Ďalší krok:** krok 0.2 (odmena za quest iba z dát), až po potvrdení používateľa.
+
+---
+
+## Krok 24 (akčný plán 0.2): Odmena za úlohu iba z dát
+
+Poznámka: používateľ tento krok nazval „krok 23“. Číslo 23 už patrí overeniu okienka, preto je zapísaný ako krok 24.
+
+**Čo sa urobilo:**
+- Odmena za úlohu sa berie **iba** z `reward.score` v `data/chapter-one/quests.ts` (+10 bodov za „Zlatý prešporský kľúč“).
+- Pripíše ju funkcia `completeQuest` v `engine/gameEngine.ts`, a to **iba pri prvom splnení** úlohy. Už splnená úloha sa nemení, takže odmena sa nedá získať dvakrát.
+- Z poslednej scény (`data/chapter-one/zlaty-presporsky-kluc.ts`) som vymazal samostatnú akciu `addScore 10`.
+- `engine/dialogueActions.ts` už nemá vlastnú kópiu dokončenia úlohy. Volá tú istú funkciu `completeQuest`, takže aj úloha dokončená rozhovorom dá odmenu, a iba raz. Predtým odmenu nedávala vôbec.
+- `engine/events.ts` a `app/page.tsx` iba odovzdávajú zoznam úloh kapitoly ďalej.
+
+**Test (mimo projektu, necommitnutý):** test prejde všetkých 10 scén so skutočnými dátami kapitoly.
+
+| Kontrola | Pred zmenou | Po zmene |
+|---|---|---|
+| Skóre na konci kapitoly, 0 nápoved | **1010** | **1010** |
+| Skóre na konci, 2 nápovedy pri Salvátorovi | 970 | 970 |
+| Úloha „Zlatý prešporský kľúč“ | splnená | splnená |
+| Druhé vyriešenie finále | 1010 (nič nepridá) | 1010 (nič nepridá) |
+| Opakované `completeQuest` | 1010 | 1010 |
+| Po uložení a načítaní (F5) | 1010, úloha splnená | 1010, úloha splnená |
+| Po F5 a znova finále | 1010 | 1010 |
+| Úloha dokončená rozhovorom | 0 bodov (odmena chýbala) | **+10, druhýkrát už nič** |
+
+Skóre vo finále je pred zmenou aj po nej rovnaké: 10 hádaniek × 100 + odmena 10 = 1010.
+
+**Zmenené súbory:**
+- `engine/gameEngine.ts`
+- `engine/events.ts`
+- `engine/dialogueActions.ts`
+- `app/page.tsx`
+- `data/chapter-one/zlaty-presporsky-kluc.ts`
+- `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint (`eslint` zmenených súborov):** 1 chyba v `app/page.tsx`, riadok 101 (`react-hooks/set-state-in-effect`).
+- Chyba **existovala už pred touto zmenou** (overené na verzii pred zmenou) a netýka sa riadkov, ktoré som menil.
+- Ide o efekt pre neexistujúcu scénu, ktorý prepíše krok 0.3b.
+- Ostatné zmenené súbory sú bez chýb.
+
+**V prehliadači:** zatiaľ neoverené používateľom.
+
+**Ďalší krok:** používateľ overí v prehliadači, potom krok 0.3b, až po potvrdení.

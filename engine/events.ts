@@ -1,4 +1,4 @@
-import type { GameAction, GameEventTrigger, GameState, InventoryItem, Scene } from "../types/game";
+import type { GameAction, GameEventTrigger, GameState, InventoryItem, Quest, Scene } from "../types/game";
 import { addArtifact, addScore, completeQuest, startQuest } from "./gameEngine";
 import { evaluateConditions } from "./conditions";
 
@@ -65,6 +65,7 @@ function removeInventoryItem(
 function applyGameAction(
   gameState: GameState,
   scene: Scene,
+  questDefinitions: Quest[],
   hintsUsed: number,
   action: GameAction
 ): GameState {
@@ -79,7 +80,12 @@ function applyGameAction(
       return startQuest(gameState, action.questId);
 
     case "completeQuest":
-      return completeQuest(gameState, action.questId, scene);
+      return completeQuest(
+        gameState,
+        action.questId,
+        questDefinitions,
+        scene
+      );
 
     case "setFlag":
       return setFlag(gameState, action.flagId);
@@ -118,6 +124,7 @@ export function runSceneEvents(
   gameState: GameState,
   scene: Scene,
   trigger: GameEventTrigger,
+  questDefinitions: Quest[],
   hintsUsed = 0
 ): GameState {
   const matchingEvents = scene.events?.filter(
@@ -133,7 +140,13 @@ export function runSceneEvents(
   return matchingEvents.reduce((currentState, event) => {
     return event.actions.reduce(
       (stateAfterAction, action) =>
-        applyGameAction(stateAfterAction, scene, hintsUsed, action),
+        applyGameAction(
+          stateAfterAction,
+          scene,
+          questDefinitions,
+          hintsUsed,
+          action
+        ),
       currentState
     );
   }, gameState);

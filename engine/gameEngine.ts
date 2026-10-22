@@ -1,4 +1,11 @@
-import type { Artifact, Chapter, GameState, Scene, Npc } from "../types/game";
+import type {
+  Artifact,
+  Chapter,
+  GameState,
+  Npc,
+  Quest,
+  Scene,
+} from "../types/game";
 import { getNextSceneIndex, isChapterFinished } from "./gameProgress";
 import { calculatePuzzleScore } from "./gameScoring";
 import { runSceneEvents } from "./events";
@@ -107,9 +114,30 @@ export function startQuest(
   };
 }
 
+function applyQuestReward(
+  gameState: GameState,
+  questId: string,
+  questDefinitions: Quest[]
+): GameState {
+  const rewardScore = questDefinitions.find(
+    (quest) => quest.id === questId
+  )?.reward?.score;
+
+  if (!rewardScore) {
+    return gameState;
+  }
+
+  return addScore(gameState, rewardScore);
+}
+
+/**
+ * Odmena z dát úlohy (reward) sa pripíše iba pri prvom splnení.
+ * Už splnená úloha sa nemení, takže odmena sa nedá získať dvakrát.
+ */
 export function completeQuest(
   gameState: GameState,
   questId: string,
+  questDefinitions: Quest[],
   scene?: Scene
 ): GameState {
   const existingQuest = gameState.quests.find(
@@ -117,40 +145,49 @@ export function completeQuest(
   );
 
   if (!existingQuest) {
-    return {
-      ...gameState,
-      quests: [
-        ...gameState.quests,
-        {
-          questId,
-          status: "completed",
-          completedAtSceneId: scene?.id,
-        },
-      ],
-    };
+    return applyQuestReward(
+      {
+        ...gameState,
+        quests: [
+          ...gameState.quests,
+          {
+            questId,
+            status: "completed",
+            completedAtSceneId: scene?.id,
+          },
+        ],
+      },
+      questId,
+      questDefinitions
+    );
   }
 
   if (existingQuest.status === "completed") {
     return gameState;
   }
 
-  return {
-    ...gameState,
-    quests: gameState.quests.map((quest) =>
-      quest.questId === questId
-        ? {
-            ...quest,
-            status: "completed",
-            completedAtSceneId: scene?.id,
-          }
-        : quest
-    ),
-  };
+  return applyQuestReward(
+    {
+      ...gameState,
+      quests: gameState.quests.map((quest) =>
+        quest.questId === questId
+          ? {
+              ...quest,
+              status: "completed",
+              completedAtSceneId: scene?.id,
+            }
+          : quest
+      ),
+    },
+    questId,
+    questDefinitions
+  );
 }
 
 export function solvePuzzle(
   gameState: GameState,
-  scene: Scene
+  scene: Scene,
+  questDefinitions: Quest[]
 ): GameState {
   const solvedFlagId = getPuzzleSolvedFlagId(scene);
 
@@ -174,6 +211,7 @@ export function solvePuzzle(
     nextState,
     scene,
     "puzzleSolved",
+    questDefinitions,
     hintsUsed
   );
 
@@ -228,5 +266,10 @@ export function continueAfterHistory(
 
   const nextScene = chapter.scenes[nextIndex];
 
-  return runSceneEvents(nextState, nextScene, "sceneEntered");
+  return runSceneEvents(
+    nextState,
+    nextScene,
+    "sceneEntered",
+    chapter.quests
+  );
 }
