@@ -82,9 +82,9 @@ export const primacialnyPalacScene: Scene = {
             title: "Emblém C · I",
             icon: "⚖️",
             description:
-              "Medený emblém s písmenami C a I, symbolmi láskavosti a spravodlivosti. Na zadnej strane je vyrytá ôsma dvojica číslic tajnej kombinácie.",
+              "Medený emblém s písmenami C a I, symbolmi láskavosti a spravodlivosti. Na zadnej strane je vyrytá jedna číslica tajného kódu.",
             evidenceKind: "symbol",
-            secretCode: "81",
+            secretCode: "2",
             evidenceOrder: 8,
             actId: "act-3",
           },

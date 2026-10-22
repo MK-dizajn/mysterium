@@ -84,9 +84,9 @@ export const staraRadnicaScene: Scene = {
             title: "Úlomok delovej gule",
             icon: "⚫",
             description:
-              "Ťažký kovový úlomok so stopami poškodenia. Na jeho povrchu je vyrazená šiesta dvojica číslic tajnej kombinácie.",
+              "Ťažký kovový úlomok so stopami poškodenia. Na jeho povrchu je vyrazená jedna číslica tajného kódu.",
             evidenceKind: "fragment",
-            secretCode: "09",
+            secretCode: "4",
             evidenceOrder: 6,
             actId: "act-2",
           },

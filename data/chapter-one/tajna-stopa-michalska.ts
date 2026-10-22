@@ -75,9 +75,9 @@ Nájdi fasádu, ktorá je nápadne užšia než všetky ostatné. Keď dom objav
             title: "Mosadzný domový štítok",
             icon: "🏷️",
             description:
-              "Malý mosadzný štítok s obrysom úzkeho domu. Na zadnej strane je vyrytá druhá dvojica číslic tajnej kombinácie.",
+              "Malý mosadzný štítok s obrysom úzkeho domu. Na zadnej strane je vyrytá jedna číslica tajného kódu.",
             evidenceKind: "object",
-            secretCode: "15",
+            secretCode: "8",
             evidenceOrder: 2,
             actId: "act-1",
           },

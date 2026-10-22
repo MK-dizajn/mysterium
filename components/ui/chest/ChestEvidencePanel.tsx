@@ -271,7 +271,7 @@ export function ChestEvidencePanel({
                           <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-amber-200/60 to-transparent" />
 
                           <p className="text-[0.6rem] font-bold uppercase tracking-[0.25em] text-amber-500/70">
-                            Objavená dvojica
+                            Objavená číslica
                           </p>
 
                           <p className="mt-2 font-mono text-3xl font-black tracking-[0.2em] text-amber-100 drop-shadow-[0_0_12px_rgba(251,191,36,0.3)]">

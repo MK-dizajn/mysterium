@@ -83,9 +83,9 @@ export const venturskaBranaSpomienokScene: Scene = {
             title: "Pečať Academie Istropolitany",
             icon: "🎓",
             description:
-              "Kovová pečať s obrysom otvorenej knihy a kráľovskej koruny. Na jej hrane je vyrazená štvrtá dvojica číslic tajnej kombinácie.",
+              "Kovová pečať s obrysom otvorenej knihy a kráľovskej koruny. Na jej hrane je vyrazená jedna číslica tajného kódu.",
             evidenceKind: "object",
-            secretCode: "65",
+            secretCode: "6",
             evidenceOrder: 4,
             actId: "act-2",
           },

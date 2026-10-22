@@ -14,6 +14,8 @@ import { Chest3D } from "../ui/chest-3d/Chest3D";
 import { ChestCodePanel } from "../ui/chest/ChestCodePanel";
 import {
   CHEST_PAIR_LABELS,
+  checkChestCode,
+  createEmptyChestCode,
   normalizeChestCode,
 } from "../ui/chest/chestUtils";
 import {
@@ -43,7 +45,7 @@ export function ActChestScreen({
   onUnlocked,
 }: ActChestScreenProps) {
   const [codes, setCodes] = useState<string[]>(
-    () => expectedCodes.map(() => "00")
+    () => expectedCodes.map(() => createEmptyChestCode())
   );
   const [error, setError] = useState("");
   const [isUnlocked, setIsUnlocked] =
@@ -60,7 +62,7 @@ export function ActChestScreen({
     useState(false);
 
   useEffect(() => {
-    setCodes(expectedCodes.map(() => "00"));
+    setCodes(expectedCodes.map(() => createEmptyChestCode()));
     setError("");
     setIsUnlocked(false);
     setIsEvidenceOpen(false);
@@ -191,36 +193,31 @@ export function ActChestScreen({
   }
 
   function checkCode() {
-  const hasAllEvidence =
-    expectedCodes.length === CHEST_PAIR_LABELS.length;
-
-  if (!hasAllEvidence) {
-    setError(
-      "Chýba ti niektorý z dôkazov potrebných na otvorenie truhlice. Vráť sa k pátraniu a skontroluj získané stopy."
+    const result = checkChestCode(
+      codes,
+      expectedCodes,
+      CHEST_PAIR_LABELS.length
     );
-    return;
+
+    if (result === "missingEvidence") {
+      setError(
+        "Chýba ti niektorý z dôkazov potrebných na otvorenie truhlice. Vráť sa k pátraniu a skontroluj získané stopy."
+      );
+      return;
+    }
+
+    if (result === "wrong") {
+      setError(
+        "Mechanizmus sa nepohol. Niektorá číslica nesedí. Prezri si dôkazy aktu a skontroluj ich poradie."
+      );
+      return;
+    }
+
+    setError("");
+    setIsMechanismVisible(false);
+    setIsUnlocked(true);
+    setIsChestFocused(true);
   }
-
-  const isCorrect =
-    codes.length === expectedCodes.length &&
-    expectedCodes.every(
-      (expectedCode, index) =>
-        normalizeChestCode(codes[index]) ===
-        normalizeChestCode(expectedCode)
-    );
-
-  if (!isCorrect) {
-    setError(
-      "Mechanizmus sa nepohol. Niektorá dvojica nesedí. Prezri si dôkazy aktu a skontroluj ich poradie."
-    );
-    return;
-  }
-
-  setError("");
-  setIsMechanismVisible(false);
-  setIsUnlocked(true);
-  setIsChestFocused(true);
-}
 
   function openReward() {
     if (!isUnlocked) {

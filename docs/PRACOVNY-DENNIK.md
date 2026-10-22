@@ -948,3 +948,58 @@ Skóre vo finále je pred zmenou aj po nej rovnaké: 10 hádaniek × 100 + odmen
 **Build:** netýka sa tohto kroku (iba dokumentácia).
 
 **Ďalší krok:** rozhodnutie používateľa o kroku A3 (vynechať, keďže truhlice po aktoch zaniknú?), potom návrh kroku B1a, až po potvrdení.
+
+---
+
+## Krok 34 (krok B1a): Jednociferné kódy v dátach
+
+**Rozhodnutie používateľa:** krok **A3 sa vynecháva**, lebo truhlice po aktoch podľa `docs/KARTY-USLOH.md` zaniknú. Robí sa B1a.
+
+**Čo sa urobilo:**
+- `secretCode` pri 9 dôkazoch je teraz **jedna číslica** podľa kariet úloh:
+  - scéna 1: 3, scéna 2: 8, scéna 3: 1,
+  - scéna 4: 6, scéna 5: 0, scéna 6: 4,
+  - scéna 7: 9, scéna 8: 2, scéna 9: 7.
+- Kódy zámkov sa odvodia z dát (`getActLockCodes`): **I = 3-8-1**, **II = 6-0-4**, **III = 9-2-7**.
+- Popisy všetkých 9 dôkazov: „…je vyrytá *n*-tá dvojica číslic tajnej kombinácie“ → „…je vyrytá **jedna číslica tajného kódu**“. Číslica sa v texte neprezrádza.
+- Truhlica:
+  - `components/ui/chest/chestUtils.ts`: šírka kódu jedného miesta je na jednom mieste (`CHEST_CODE_LENGTH = 1`, predtým natvrdo 2 znaky v `normalizeChestCode`); nová funkcia `createEmptyChestCode` (predtým natvrdo `"00"`); overenie kódu presunuté do funkcie `checkChestCode`, aby sa dalo otestovať.
+  - `components/screens/ActChestScreen.tsx`: začiatočný kód cez `createEmptyChestCode` (predtým `"00"` na 2 miestach), overenie cez `checkChestCode`; hláška „Niektorá **dvojica** nesedí“ → „Niektorá **číslica** nesedí“.
+  - `components/ui/chest/ChestEvidencePanel.tsx`: „Objavená dvojica“ → „Objavená číslica“.
+  - Každý zámok má stále **3 miesta**, každé teraz s **jedným kolieskom** (predtým dve).
+- **Nezmenené (zámerne):**
+  - 3D model truhlice (`components/ui/chest-3d/ChestModel.tsx`) má na prednej strane ozdobné, nepohyblivé okienka, **dve na každý zámok**. Na zadávanie kódu nemajú vplyv (kód sa zadáva v 2D paneli `ChestCodePanel.tsx`). Úprava 3D modelu presahuje tento krok; truhlicu prestavia kroky B3/B4.
+  - Nepoužívaný súbor `components/ui/chest/ChestCode.tsx` má vlastnú šírku 2 znaky; nikde sa neimportuje, preto som ho nemenil.
+  - Texty „Potvrdiť kombináciu“ a „Tri dôkazy. Jedna kombinácia.“ v truhlici platia aj pre tri číslice.
+  - Názvy predmetov (žetón, štítok, pečate…) zatiaľ zostávajú. Predmety podľa kariet úloh (mapa, strana z denníka, zuby kľúča…) prídu v ďalších krokoch.
+
+**Test (mimo projektu, necommitnutý):**
+| Kontrola | Pred zmenou | Po zmene |
+|---|---|---|
+| prázdny kód jedného miesta | „00“ (2 znaky) | „0“ (1 znak) |
+| kódy zámkov z dát | 00-15-58, 65-70-09, 72-81-05 | **3-8-1, 6-0-4, 9-2-7** |
+| správny kód zadaný kolieskami (všetky 3 zámky) | správny | správny |
+| zlý kód (jedna číslica inak) | zlý | zlý |
+| chýbajúci dôkaz | „chýba dôkaz“ | „chýba dôkaz“ |
+| popisy dôkazov so slovom „dvojica“ alebo „kombinácia“ | 9 z 9 | 0 z 9 |
+| priebeh celej kapitoly (48 riadkov) | – | líši sa iba 9 riadkov, a to **iba kódmi**; poradie obrazoviek, akty, skóre (1010) a uložené hry sú rovnaké |
+
+**Zistený problém so starými uloženiami (zatiaľ neriešený, čaká na rozhodnutie):**
+- Uložená hra má v inventári **kópie** predmetov so starými kódmi.
+- Truhlica už čaká nový kód (**3-8-1**), ale inventár a panel dôkazov pri starom uložení ukazujú **00-15-58**. Overené testom.
+- Návrh riešenia je v odpovedi používateľovi; zapracuje sa až po potvrdení.
+
+**Zmenené súbory:**
+- `components/ui/chest/chestUtils.ts`
+- `components/screens/ActChestScreen.tsx`
+- `components/ui/chest/ChestEvidencePanel.tsx`
+- `data/chapter-one/` – 9 súborov scén 1 až 9
+- `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** v `ActChestScreen.tsx` 2 staré chyby `react-hooks/set-state-in-effect` (riadky 65 a 77, predtým 63 a 75; posunuli sa o 2 riadky importu). **Existovali už pred touto zmenou.** Ostatné zmenené súbory sú bez chýb.
+
+**V prehliadači:** zatiaľ neoverené používateľom.
+
+**Ďalší krok:** rozhodnutie používateľa o starých uloženiach, potom B1b, až po potvrdení.

@@ -190,9 +190,9 @@ Pátračovo pravidlo znie: „Prvá stopa patrí mestu, ku ktorému vedie najkra
             title: "Žetón nultého kilometra",
             icon: "🧭",
             description:
-              "Mosadzný žetón s vyrytými smermi svetových miest. Na jeho zadnej strane sa nachádza prvá dvojica číslic tajnej kombinácie.",
+              "Mosadzný žetón s vyrytými smermi svetových miest. Na jeho zadnej strane sa nachádza jedna číslica tajného kódu.",
             evidenceKind: "object",
-            secretCode: "00",
+            secretCode: "3",
             evidenceOrder: 1,
             actId: "act-1",
           },

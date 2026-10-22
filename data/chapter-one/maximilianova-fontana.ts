@@ -82,9 +82,9 @@ export const maximilianovaFontanaScene: Scene = {
             title: "Rytierska spona strážcu",
             icon: "⚔️",
             description:
-              "Kovová spona zdobená motívom rytiera z fontány. Na vnútornej strane je vyrytá siedma dvojica číslic tajnej kombinácie.",
+              "Kovová spona zdobená motívom rytiera z fontány. Na vnútornej strane je vyrytá jedna číslica tajného kódu.",
             evidenceKind: "object",
-            secretCode: "72",
+            secretCode: "9",
             evidenceOrder: 7,
             actId: "act-3",
           },

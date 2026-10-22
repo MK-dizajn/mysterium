@@ -84,9 +84,9 @@ export const mirbachovPalacScene: Scene = {
             title: "Pečať rodu Nyáry",
             icon: "🛡️",
             description:
-              "Tmavá vosková pečať s odtlačkom rodového erbu. Na zadnej strane je vyrytá piata dvojica číslic tajnej kombinácie.",
+              "Tmavá vosková pečať s odtlačkom rodového erbu. Na zadnej strane je vyrytá jedna číslica tajného kódu.",
             evidenceKind: "symbol",
-            secretCode: "70",
+            secretCode: "0",
             evidenceOrder: 5,
             actId: "act-2",
           },
