@@ -95,7 +95,7 @@ export default function Home() {
       return;
     }
 
-    clearGameState();
+    // Uložený postup nemažeme — prepíše sa až zámerným začatím novej hry.
     setHasSavedProgress(false);
     setSelectedArtifact(null);
     setUnlockedArtifact(null);
