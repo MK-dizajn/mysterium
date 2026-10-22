@@ -33,7 +33,7 @@ export default function Home() {
     hasSavedProgress,
     setHasSavedProgress,
     continueSavedGame,
-  } = useGameEngine();
+  } = useGameEngine(mysteriumGame);
 
   const [selectedArtifact, setSelectedArtifact] =
     useState<Artifact | null>(null);
@@ -80,35 +80,8 @@ export default function Home() {
     gameState.currentActId,
   ]);
 
-  useEffect(() => {
-    const chapterExists = Boolean(
-      mysteriumGame.chapters[gameState.currentChapterIndex]
-    );
-
-    const sceneExists = Boolean(
-      chapterExists &&
-        mysteriumGame.chapters[gameState.currentChapterIndex]?.scenes[
-          gameState.currentSceneIndex
-        ]
-    );
-
-    if (chapterExists && sceneExists) {
-      return;
-    }
-
-    // Uložený postup nemažeme — prepíše sa až zámerným začatím novej hry.
-    setHasSavedProgress(false);
-    setSelectedArtifact(null);
-    setUnlockedArtifact(null);
-    setPreviousScreen("puzzle");
-    setArtifactPreviousScreen("artifacts");
-    setGameState(createNewGameState());
-  }, [
-    gameState.currentChapterIndex,
-    gameState.currentSceneIndex,
-    setGameState,
-    setHasSavedProgress,
-  ]);
+  // Uloženú hru s neexistujúcou scénou opraví už načítanie
+  // (loadRepairedGameState v useGameEngine), preto tu netreba kontrolu.
 
   function updateGameScreen(screen: GameScreen) {
     setGameState((currentState) => ({

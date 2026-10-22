@@ -1,8 +1,14 @@
-import type { GameState } from "../types/game";
+import type { Game, GameState } from "../types/game";
 import { SAVE_KEY } from "./constants";
 import { createNewGameState } from "./gameEngine";
+import { repairGameProgress } from "./gameProgress";
 
 const CORRUPTED_SAVE_KEY = `${SAVE_KEY}-corrupted`;
+const REPAIR_BACKUP_KEY = `${SAVE_KEY}-backup-before-repair`;
+
+// Neplatné číslo kapitoly alebo scény nenahrádzame nulou, ale označíme ho,
+// aby ho repairGameProgress rozpoznal a hráča poslal na správne miesto.
+const INVALID_INDEX = -1;
 
 function isNonNegativeInteger(value: unknown): value is number {
   return typeof value === "number" && Number.isInteger(value) && value >= 0;
@@ -25,10 +31,10 @@ function normalizeGameState(value: unknown): GameState | null {
     ...saved,
     currentChapterIndex: isNonNegativeInteger(saved.currentChapterIndex)
       ? saved.currentChapterIndex
-      : defaults.currentChapterIndex,
+      : INVALID_INDEX,
     currentSceneIndex: isNonNegativeInteger(saved.currentSceneIndex)
       ? saved.currentSceneIndex
-      : defaults.currentSceneIndex,
+      : INVALID_INDEX,
     score:
       typeof saved.score === "number" && Number.isFinite(saved.score)
         ? saved.score
@@ -84,6 +90,38 @@ export function loadGameState(): GameState | null {
   }
 
   return gameState;
+}
+
+/**
+ * Načíta uloženú hru a ak ukazuje na neexistujúcu kapitolu alebo scénu,
+ * opraví ju. Pôvodné uloženie sa pred opravou odloží pod samostatný kľúč.
+ */
+export function loadRepairedGameState(game: Game): GameState | null {
+  const gameState = loadGameState();
+
+  if (!gameState) {
+    return null;
+  }
+
+  const repairedState = repairGameProgress(game, gameState);
+
+  if (repairedState === gameState) {
+    return gameState;
+  }
+
+  try {
+    const originalProgress = localStorage.getItem(SAVE_KEY);
+
+    if (originalProgress) {
+      localStorage.setItem(REPAIR_BACKUP_KEY, originalProgress);
+    }
+  } catch {
+    // Úložisko nie je dostupné, oprava aj tak pokračuje.
+  }
+
+  saveGameState(repairedState);
+
+  return repairedState;
 }
 
 export function saveGameState(gameState: GameState) {

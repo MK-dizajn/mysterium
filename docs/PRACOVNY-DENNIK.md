@@ -586,3 +586,61 @@ Skóre vo finále je pred zmenou aj po nej rovnaké: 10 hádaniek × 100 + odmen
 **V prehliadači:** zatiaľ neoverené používateľom.
 
 **Ďalší krok:** používateľ overí v prehliadači, potom krok 0.3b, až po potvrdení.
+
+---
+
+## Krok 25 (akčný plán 0.3b): Oprava uloženej hry s neexistujúcou scénou
+
+**Čo sa urobilo:**
+- Pri načítaní hry sa skontroluje, či uložená kapitola a scéna existujú. **Iba ak nie** (číslo mimo rozsahu alebo neplatné), hra uloženie opraví:
+  - body, dôkazy, artefakty, úlohy aj nápovedy zostanú,
+  - hráč pokračuje **prvou nevyriešenou scénou** podľa značiek `puzzle-solved-<id>`,
+  - ak nie je žiadna značka, začne prvou scénou,
+  - ak sú vyriešené všetky scény, zobrazí sa záver kapitoly.
+- **Platné uloženie sa nikdy nemení.**
+- Pôvodné uloženie sa pred opravou odloží pod samostatný kľúč `mysterium-progress-v2-backup-before-repair`.
+- Hráč sa už nezacyklí: opravené uloženie sa hneď uloží, takže „Pokračovať v pátraní“ funguje aj po F5.
+- Neplatné číslo scény (−1, text) sa pri načítaní už potichu nenahrádza nulou. Označí sa ako neplatné, aby ho oprava rozpoznala. Predtým by takéto uloženie poslalo hráča na už vyriešenú prvú scénu.
+- Z `app/page.tsx` som odstránil starý efekt, ktorý pri neexistujúcej scéne vracal hráča na úvod.
+- Pomocnú funkciu `getPuzzleSolvedFlagId` (názov značky vyriešenej hádanky) som presunul z `engine/gameEngine.ts` do `engine/gameProgress.ts`, aby ju oba súbory zdieľali a nevznikla kópia.
+
+**Test (mimo projektu, necommitnutý):** uloženie so 4 vyriešenými scénami, 400 bodmi, 4 dôkazmi, 4 artefaktmi, aktívnou úlohou a 1 nápovedou.
+
+| Uloženie | Pred zmenou | Po zmene |
+|---|---|---|
+| Číslo scény 99 | úvodná obrazovka, **skóre 0**, body stratené, hráč v kruhu | scéna 5 (prvá nevyriešená), skóre 400, všetko zostalo, záloha vytvorená |
+| Číslo scény −1 | scéna 1 (už vyriešená), skóre 400 | scéna 5, skóre 400, všetko zostalo, záloha vytvorená |
+| Text namiesto čísla | scéna 1 (už vyriešená), skóre 400 | scéna 5, skóre 400, všetko zostalo, záloha vytvorená |
+| Všetky scény vyriešené (99) | úvodná obrazovka, skóre 0 | záver kapitoly, skóre 400, všetko zostalo, záloha vytvorená |
+| Žiadna značka vyriešenia (99) | úvodná obrazovka, skóre 0 | scéna 1, skóre 400, všetko zostalo, záloha vytvorená |
+| Bežné platné uloženie (scéna 5) | scéna 5, nezmenené | scéna 5, **nezmenené**, žiadna záloha |
+
+- Pri všetkých prípadoch po zmene sa po opätovnom načítaní (F5) nič ďalej nezmenilo.
+- Záloha sa vo všetkých opravených prípadoch zhodovala s pôvodným uložením.
+- Poznámka: test čísluje scény od 0, v tabuľke sú od 1 (scéna 5 = Mirbachov palác).
+
+**Zmenené súbory:**
+- `engine/gameProgress.ts` (nová funkcia `repairGameProgress`, presunutá `getPuzzleSolvedFlagId`)
+- `engine/gameStorage.ts` (nová funkcia `loadRepairedGameState`, záloha pred opravou, neplatné číslo sa nenahrádza nulou)
+- `engine/gameEngine.ts` (iba používa presunutú `getPuzzleSolvedFlagId`)
+- `hooks/useGameEngine.ts` (pri načítaní volá `loadRepairedGameState`)
+- `app/page.tsx` (odstránený starý efekt, riadky 83–111)
+- `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:**
+- Chyba v `app/page.tsx`, riadok 101 **zmizla**. `app/page.tsx` je teraz bez chýb.
+- V `hooks/useGameEngine.ts` zostávajú 2 chyby (riadky 26 a 41, `react-hooks/set-state-in-effect`). **Boli tam už pred touto zmenou**, na tých istých riadkoch (overené na verzii pred zmenou).
+  - Ich oprava by znamenala prepísať spôsob načítania v hooku. Navrhujem ju ako samostatný krok.
+- Ostatné zmenené súbory sú bez chýb.
+
+**Zostávajúce riziko:**
+- Ak oprava posunie hráča za koniec aktu, ktorého truhlicu ešte neotvoril, truhlicu preskočí. Stane sa to iba pri poškodenom alebo veľmi starom uložení.
+- Počas vývoja (zmena dát kapitoly bez obnovenia stránky) by sa oprava spustila až po F5.
+
+**V prehliadači:** zatiaľ neoverené používateľom.
+
+**Ďalší krok:**
+- používateľ overí v prehliadači,
+- rozhodne, či opraviť 2 staré lint chyby v `hooks/useGameEngine.ts`.

@@ -6,7 +6,11 @@ import type {
   Quest,
   Scene,
 } from "../types/game";
-import { getNextSceneIndex, isChapterFinished } from "./gameProgress";
+import {
+  getNextSceneIndex,
+  getPuzzleSolvedFlagId,
+  isChapterFinished,
+} from "./gameProgress";
 import { calculatePuzzleScore } from "./gameScoring";
 import { runSceneEvents } from "./events";
 
@@ -23,10 +27,6 @@ export function createNewGameState(): GameState {
     inventory: [],
     hintsUsed: {},
   };
-}
-
-function getPuzzleSolvedFlagId(scene: Scene) {
-  return `puzzle-solved-${scene.id}`;
 }
 
 export function getHintsUsed(gameState: GameState, scene: Scene): number {

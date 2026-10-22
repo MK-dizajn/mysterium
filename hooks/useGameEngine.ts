@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { GameState } from "../types/game";
+import type { Game, GameState } from "../types/game";
 import {
   createNewGameState,
-  loadGameState,
+  loadRepairedGameState,
   saveGameState,
 } from "../engine";
 
-export function useGameEngine() {
+export function useGameEngine(game: Game) {
   const [gameState, setGameState] = useState<GameState>(
     createNewGameState()
   );
@@ -20,7 +20,7 @@ export function useGameEngine() {
     useState(false);
 
   useEffect(() => {
-    const savedProgress = loadGameState();
+    const savedProgress = loadRepairedGameState(game);
 
     if (!savedProgress) {
       setSavedGameState(null);
@@ -30,7 +30,7 @@ export function useGameEngine() {
 
     setSavedGameState(savedProgress);
     setHasSavedProgress(true);
-  }, []);
+  }, [game]);
 
   useEffect(() => {
     if (gameState.screen === "landing") {
