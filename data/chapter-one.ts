@@ -1,4 +1,5 @@
 import type { Chapter } from "../types/game";
+import { chapterOneActs } from "./chapter-one/acts";
 import { chapterOneQuests } from "./chapter-one/quests";
 import { michalskaBranaScene } from "./chapter-one/michalska-brana";
 import { tajnaStopaMichalskaScene } from "./chapter-one/tajna-stopa-michalska";
@@ -23,6 +24,8 @@ export const chapterOne: Chapter = {
   ],
 
   quests: chapterOneQuests,
+
+  acts: chapterOneActs,
 
   scenes: [
     michalskaBranaScene,     

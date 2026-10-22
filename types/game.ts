@@ -3,7 +3,7 @@ import type { Condition } from "../engine/conditions";
 export type GameId = string;
 export type ChapterId = string;
 export type SceneId = string;
-export type ActId = "act-1" | "act-2" | "act-3";
+export type ActId = string;
 export type PuzzleId = string;
 export type ArtifactId = string;
 export type CodexEntryId = string;
@@ -247,6 +247,15 @@ export type Scene = {
   npcs?: Npc[];
 };
 
+export type Act = {
+  id: ActId;
+  title: string;
+  /** Scény aktu v poradí, v akom ich hráč prechádza. */
+  sceneIds: SceneId[];
+  /** Označenie zámku truhlice pre tento akt (napríklad „I“). */
+  lockLabel: string;
+};
+
 export type Chapter = {
   id: ChapterId;
   city: string;
@@ -254,6 +263,7 @@ export type Chapter = {
   subtitle: string;
   introLines: string[];
   quests: Quest[];
+  acts: Act[];
   scenes: Scene[];
 };
 

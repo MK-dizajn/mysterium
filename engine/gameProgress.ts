@@ -1,4 +1,11 @@
-import type { Chapter, Game, GameState, Scene } from "../types/game";
+import type {
+  Act,
+  Chapter,
+  Game,
+  GameState,
+  InventoryItem,
+  Scene,
+} from "../types/game";
 import { evaluateConditions } from "./conditions";
 
 export function getPuzzleSolvedFlagId(scene: Scene) {
@@ -7,6 +14,29 @@ export function getPuzzleSolvedFlagId(scene: Scene) {
 
 export function countChapterArtifacts(chapter: Chapter) {
   return chapter.scenes.filter((scene) => Boolean(scene.artifact)).length;
+}
+
+/**
+ * Kódy zámku aktu odvodené z dôkazov (secretCode), ktoré hráč získa
+ * v scénach aktu, v poradí podľa evidenceOrder. Počet dvojíc nie je pevný.
+ */
+export function getActLockCodes(chapter: Chapter, act: Act): string[] {
+  const evidence: InventoryItem[] = act.sceneIds
+    .map((sceneId) => chapter.scenes.find((scene) => scene.id === sceneId))
+    .flatMap((scene) => scene?.events ?? [])
+    .flatMap((event) => event.actions)
+    .flatMap((action) =>
+      action.type === "addInventoryItem" && action.item.secretCode
+        ? [action.item]
+        : []
+    );
+
+  return evidence
+    .sort(
+      (firstItem, secondItem) =>
+        (firstItem.evidenceOrder ?? 0) - (secondItem.evidenceOrder ?? 0)
+    )
+    .map((item) => item.secretCode as string);
 }
 
 function isValidIndex(index: number, length: number) {

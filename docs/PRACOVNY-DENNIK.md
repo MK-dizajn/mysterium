@@ -780,3 +780,58 @@ Skóre vo finále je pred zmenou aj po nej rovnaké: 10 hádaniek × 100 + odmen
 **V prehliadači:** zatiaľ neoverené používateľom.
 
 **Ďalší krok:** používateľ overí, že lišta ukazuje rovnaké „x/10“ ako predtým. Potom ďalší krok akčného plánu, až po potvrdení.
+
+---
+
+## Krok 30 (časť A, krok A1): Akty kapitoly v dátach
+
+**Cieľ časti A:** logika aktov a odmien sa presunie z kódu (čísla scén 2, 3 a 5 v `gameEngine.ts` a `page.tsx`, odmeny z truhlíc) do dát kapitoly. Nové kapitoly sa tak budú pridávať bez zásahu do enginu. Kroky A1 až A3 **nemenia správanie hry**.
+
+**Rozhodnutia používateľa:**
+- Názov aktu II: **„Akt II – Moc a poznanie“**.
+- `ActId` je všeobecný text, nie pevné tri hodnoty.
+- Počet dvojíc kódov zámku sa odvodí z dôkazov so `secretCode` v scénach aktu, nie natvrdo tri.
+
+**Čo sa urobilo:**
+- `types/game.ts`:
+  - `ActId` je teraz `string` (predtým iba `"act-1" | "act-2" | "act-3"`),
+  - nový typ `Act` (id, názov, zoznam scén, označenie zámku),
+  - `Chapter` má nové pole `acts`.
+- Nový súbor `data/chapter-one/acts.ts` s tromi aktmi kapitoly 1:
+  - akt I „Akt I – Prvé stopy“: Michalská brána, najužší dom, Lekáreň U Salvátora; zámok I,
+  - akt II „Akt II – Moc a poznanie“: Academia Istropolitana, Mirbachov palác, Stará radnica; zámok II,
+  - akt III „Akt III – Posledné tajomstvo“: Maximiliánova fontána, Primaciálny palác, Bratislavský mier, Zlatý prešporský kľúč; zámok III.
+- `data/chapter-one.ts`: kapitola používa `acts`.
+- `engine/gameProgress.ts`: nová funkcia `getActLockCodes`. Odvodí kódy zámku aktu z dôkazov jeho scén v poradí podľa `evidenceOrder`; počet dvojíc nie je pevný. Hra ju zatiaľ nepoužíva, použije ju krok A2.
+- Engine ani obrazovky akty zatiaľ nepoužívajú. Hra sa správa presne ako predtým.
+
+**Nezhody v názvoch aktov:**
+- Akt II mal v `app/page.tsx` dva názvy: „Akt II – **Moc a pamäť**“ (riadok 397, koniec aktu II) a „Akt II – **Moc a poznanie**“ (riadok 401, začiatok aktu II). Používateľ vybral „Moc a poznanie“. V dátach je už správne, ale **v hre sa „Moc a pamäť“ zobrazuje ďalej, kým ho krok A2 nenahradí názvom z dát**.
+- Akt I („Prvé stopy“) a akt III („Posledné tajomstvo“) sú v kóde zapísané každý iba raz, nezhoda nie je.
+
+**Test dát (mimo projektu, necommitnutý):**
+- **Pred zmenou:** zlyhal podľa očakávania („kapitola nemá zoznam aktov“).
+- **Po zmene:** všetkých 26 kontrol prešlo:
+  - každá z 10 scén je práve v jednom akte, akty neobsahujú neexistujúce scény, id aktov sú jedinečné,
+  - poradie scén v aktoch je rovnaké ako poradie scén v kapitole,
+  - odvodené kódy: akt I **00-15-58**, akt II **65-70-09**, akt III **72-81-05**, každý so 3 dvojicami,
+  - všetkých 9 dôkazov má v dátach `actId` zhodné s aktom svojej scény.
+- **Test celej kapitoly** (z kroku 24) dáva po zmene rovnaké výsledky: skóre 1010, s 2 nápovedami 970, úloha splnená, po F5 bez zmeny.
+
+**Zmenené súbory:**
+- `types/game.ts`
+- `engine/gameProgress.ts`
+- `data/chapter-one.ts`
+- `data/chapter-one/acts.ts` (nový)
+- `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** zmenené súbory sú bez chýb.
+
+**Na neskôr – texty kapitoly natvrdo v obrazovkách:** presunú sa do dát kapitoly v kroku B7 alebo skôr:
+- `components/screens/FinishScreen.tsx` – celý záver kapitoly (Zlatý prešporský kľúč, útržok mapy, „Prešporok neukrýval jeden kľúč…“),
+- `components/screens/IntroScreen.tsx` – „Presuň sa pod Michalskú bránu…“, tlačidlo „Som pri Michalskej bráne“,
+- `components/screens/QuestScreen.tsx` – „…po odhalení Zlatého prešporského kľúča“, „Začni vyšetrovanie pri Michalskej bráne. Po rozhovore so strážcom…“.
+
+**Ďalší krok:** krok A2 (engine a `page.tsx` berú hranice aktov a kódy truhlíc z dát namiesto čísel scén 2, 3 a 5), až po potvrdení používateľa.
