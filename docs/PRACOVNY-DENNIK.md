@@ -1156,3 +1156,29 @@ Skóre vo finále je pred zmenou aj po nej rovnaké: 10 hádaniek × 100 + odmen
 **V prehliadači:** zatiaľ neoverené používateľom (aj šírka 360 px).
 
 **Ďalší krok:** používateľ overí zápisník v prehliadači, potom B1b-2 (prototyp „Prezrieť“ na žetóne), až po potvrdení.
+
+---
+
+## Krok 39: Oprava vzhľadu Zápisníka kódov
+
+**Problém (od používateľa):** popisy „ZÁMOK I / II / III“ sa zalamovali na dva riadky a políčka s číslicami neboli v riadkoch pod sebou.
+
+**Príčina:** stĺpec popisu mal 64 px, ale „ZÁMOK III“ (veľké písmená, riedke písmo) má asi 84 px. Pri šírke 360 px by sa popis vedľa troch políčok nezmestil ani na jednom riadku (k dispozícii asi 232 px).
+
+**Čo sa urobilo** (iba vzhľad, `components/ui/CodeNotebook.tsx`):
+- popis je vždy na jednom riadku (`whitespace-nowrap`),
+- na úzkych obrazovkách (pod 640 px, teda aj pri 360 px) je popis **nad políčkami**, vo všetkých troch riadkoch rovnako, takže políčka začínajú pod sebou,
+- na širších obrazovkách je popis **vedľa políčok** v stĺpci s pevnou šírkou 96 px,
+- texty, logika a popisy pre čítačku sa nezmenili.
+
+**Zmenené súbory:**
+- `components/ui/CodeNotebook.tsx`
+- `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** bez chýb.
+
+**V prehliadači:** zatiaľ neoverené používateľom.
+
+**Ďalší krok:** používateľ overí zápisník pri 360 px a na počítači, potom B1b-2, až po potvrdení.

@@ -27,10 +27,10 @@ export function CodeNotebook({ locks }: CodeNotebookProps) {
             key={lock.actId}
             role="group"
             aria-label={`Zámok ${lock.lockLabel}`}
-            className="flex items-center gap-2"
+            className="flex flex-col items-start gap-1.5 sm:flex-row sm:items-center sm:gap-2"
           >
             <p
-              className="w-16 shrink-0 text-xs font-bold uppercase tracking-[0.15em] text-amber-300/80"
+              className="whitespace-nowrap text-xs font-bold uppercase tracking-[0.15em] text-amber-300/80 sm:w-24 sm:shrink-0"
               aria-hidden="true"
             >
               Zámok {lock.lockLabel}
