@@ -1243,3 +1243,74 @@ Skóre vo finále je pred zmenou aj po nej rovnaké: 10 hádaniek × 100 + odmen
 **V prehliadači:** zatiaľ neoverené používateľom (myš, klávesnica, 360 px, vypnutý zvuk, vypnuté animácie).
 
 **Ďalší krok:** používateľ overí obrazovku „Prezrieť“ v prehliadači, potom B1b-3 (zvyšné predmety), až po potvrdení.
+
+---
+
+## Krok 41: Návrh B1b-2b – otáčanie žetónu prstom alebo myšou
+
+**Čo sa urobilo:** iba čítanie kódu a návrh (v odpovedi používateľovi). Kód sa nemenil. B1b-3 sa nezačína, kým používateľ nepotvrdí B1b-2b.
+
+**Zistenia z kódu:**
+- three.js 0.185.1, @react-three/fiber 9.6.1 a @react-three/drei 10.7.7 sú v projekte.
+- 3D truhlica (`components/ui/chest-3d/`) už má vlastné otáčanie ťahaním. Plátno (`Canvas`) sa nastavuje v `ChestScene.tsx`.
+- Po kroku B2 hra 3D truhlicu nenačítava, takže three.js dnes nie je v balíku hry. Nová 3D časť by sa mala načítať až pri otvorení „Prezrieť“.
+
+**Zmenené súbory:**
+- `docs/PRACOVNY-DENNIK.md` (tento záznam)
+
+**Build:** netýka sa tohto kroku.
+
+**Ďalší krok:** rozhodnutie používateľa medzi možnosťou A (CSS 3D) a B (three.js), až potom realizácia.
+
+---
+
+## Krok 42: Záver pracovného dňa
+
+**Stav Gitu:** všetky commity až po krok 40 (B1b-2) sú na GitHube (vetva `sprint-4-first-playable-chapter`). Na odoslanie čaká iba commit s týmto záznamom a záznamom kroku 41.
+
+**Hotové (kód, build prešiel, otestované):**
+- **0.1** – jasné zadanie úloh v scénach 3 až 10 (`answerLabel`), Salvátor zvonku.
+- **0.2** – odmena za úlohu iba z dát (`quests.ts`), pripíše sa raz.
+- **0.3a** – potvrdzovacie okienko pred zmazaním postupu (overené v prehliadači).
+- **0.3b** – oprava uloženej hry s neexistujúcou scénou so zálohou (overené v prehliadači).
+- **0.4a** – jednotné názvy Úlohy, Inventár, Artefakty, `lang="sk"`, poradie dvojíc (overené pri 360 px).
+- **0.4b** – počet artefaktov z dát kapitoly namiesto „/10“.
+- **1.1** – počet prečítaných nápoved sa ukladá do hry.
+- **A1** – akty kapitoly v dátach (`acts.ts`), `ActId` ako text.
+- **A2** – hranice aktov, názvy aktov a kódy z dát namiesto čísel scén.
+- **A3** – vynechaný (truhlice po aktoch zanikli).
+- **B1a** – jednociferné kódy 3-8-1, 6-0-4, 9-2-7.
+- **B2** – ľahký koniec aktu (Hlas Strážcu, Pečať) s útržkami fotografie namiesto truhlíc po akte I a II.
+- **B1b-1** – stav nájdených číslic a Zápisník kódov v Inventári.
+- **B1b-2** – obrazovka „Prezrieť“, prototyp so žetónom (2D, tlačidlo „Otočiť na hranu“).
+- **Dokumenty:** `KONCEPT-KAPITOL.md`, `KONCEPT-ZAZITKU.md`, `KARTY-USLOH.md`, `MEDIA-LICENCIE.md`.
+
+**Rozpracované:**
+- **B1b-2b** – otáčanie žetónu prstom alebo myšou podľa návrhu (možnosť B, three.js), rozdelené na kroky:
+  - **2b-1** – kresba žetónu ako jeden SVG zdroj pre 2D aj 3D – **zatiaľ sa nezačal**,
+  - **2b-2** – 3D žetón (ťahanie so zotrvačnosťou, šípky, natočenie hrany a tlačidlo pri číslici, 2D záloha, načítanie až pri „Prezrieť“),
+  - **2b-3** – výkon a dokončenie.
+- **B1b-3** (ostatné predmety) sa začne až po B1b-2b.
+
+**Otvorené veci:**
+1. **Zarovnanie Zápisníka kódov** – oprava je urobená (krok 39), ale používateľ ju zatiaľ neoveril v prehliadači (360 px aj počítač). Snímka sa k správe nepripojila.
+2. **Overenie v prehliadači** – B2 (koniec aktu bez truhlice), B1b-1 (zápisník) a B1b-2 (obrazovka „Prezrieť“: myš, klávesnica, 360 px, vypnutý zvuk, vypnuté animácie).
+3. **Terén:**
+   - Salvátor – presné miesto latinského nápisu na vonkajšku,
+   - Primaciálny palác – poradie písmen C, I zľava doprava,
+   - Mirbachov palác – príliš ľahká odpoveď „znak“,
+   - vodidlá na ďalšie miesta, dĺžka trasy.
+4. **Verzia uloženia** – pred prvým externým testerom zvýšiť `mysterium-progress-v2` na `v3`.
+5. **Ďalšie otvorené** (z predchádzajúcich krokov):
+   - zvukové súbory sú prázdne alebo chýbajú (aj nový `digit-found.mp3`),
+   - zosúladiť `KONCEPT-KAPITOL.md` a `KONCEPT-ZAZITKU.md` s kartami úloh (jedna truhlica, nové kódy),
+   - texty kapitoly natvrdo v `FinishScreen.tsx`, `IntroScreen.tsx` a `QuestScreen.tsx` presunúť do dát (B7),
+   - staré lint chyby `set-state-in-effect` (`useGameEngine.ts`, `CodexBar.tsx`, `ActChestScreen.tsx`),
+   - 3D model truhlice má ozdobné okienka pre 2 číslice (rieši B3/B4).
+
+**Zmenené súbory:**
+- `docs/PRACOVNY-DENNIK.md`
+
+**Build:** netýka sa tohto kroku.
+
+**Ďalší krok:** používateľ potvrdí odpovede k návrhu B1b-2b (A alebo B, spôsob otáčania, prepínač `?bez3d`), potom krok 2b-1.
