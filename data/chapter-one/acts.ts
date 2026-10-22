@@ -10,6 +10,21 @@ export const chapterOneActs: Act[] = [
       "lekaren-u-salvatora",
     ],
     lockLabel: "I",
+    ending: {
+      kind: "guardianVoice",
+      label: "Hlas Strážcu",
+      text:
+        "Tri stopy máš za sebou. Pátrač mi povedal, že kto dôjde až sem, nezačal náhodou. Ešte nie je čas na otázky. Prijmi prvý útržok fotografie a pokračuj.",
+      reward: {
+        id: "torn-photo-fragment-act-1",
+        title: "Prvý útržok fotografie",
+        icon: "🖼️",
+        description:
+          "Útržok starej fotografie, ktorý ti odovzdal Strážca. Na zadnej strane je časť ručne napísanej správy, ktorá vedie k ďalším miestam vyšetrovania.",
+        actId: "act-2",
+      },
+      continueLabel: "Prijať útržok a pokračovať",
+    },
   },
   {
     id: "act-2",
@@ -20,6 +35,21 @@ export const chapterOneActs: Act[] = [
       "stara-radnica",
     ],
     lockLabel: "II",
+    ending: {
+      kind: "seal",
+      label: "Pečať",
+      text:
+        "Vzdelanie, znak aj stopa vojny. Mesto si pamätá všetko, aj to, na čo by najradšej zabudlo. Druhý útržok fotografie je tvoj.",
+      reward: {
+        id: "torn-photo-fragment-act-2",
+        title: "Druhý útržok fotografie",
+        icon: "🖼️",
+        description:
+          "Druhý útržok starej fotografie, ktorý ti pripadol po pečati. Po spojení s prvou časťou odhaľuje, že všetky doterajšie stopy smerujú k poslednému tajomstvu pátračovho denníka.",
+        actId: "act-3",
+      },
+      continueLabel: "Prijať útržok a pokračovať",
+    },
   },
   {
     id: "act-3",

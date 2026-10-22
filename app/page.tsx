@@ -7,7 +7,6 @@ import { CollectionFlow } from "../components/game/CollectionFlow";
 import { HistoryFlow } from "../components/game/HistoryFlow";
 import { NpcFlow } from "../components/game/NpcFlow";
 import { PuzzleFlow } from "../components/game/PuzzleFlow";
-import { ActChestScreen } from "../components/screens/ActChestScreen";
 import { ActTransitionScreen } from "../components/screens/ActTransitionScreen";
 import { FinishScreen } from "../components/screens/FinishScreen";
 import { IntroScreen } from "../components/screens/IntroScreen";
@@ -17,6 +16,7 @@ import { mysteriumGame } from "../data/mysterium-game";
 import {
   applyDialogueChoiceActions,
   clearGameState,
+  completeActEnding,
   continueAfterHistory,
   countChapterArtifacts,
   createNewGameState,
@@ -26,7 +26,7 @@ import {
   talkToNpc,
 } from "../engine";
 import { useGameEngine } from "../hooks/useGameEngine";
-import type { ActId, Artifact, GameScreen } from "../types/game";
+import type { Artifact, GameScreen } from "../types/game";
 
 export default function Home() {
   const {
@@ -179,52 +179,10 @@ export default function Home() {
     }));
   }
 
-  function openActChest() {
-    updateGameScreen("actChest");
-  }
-
-  function continueToNextAct(
-    completedActId: ActId,
-    nextActId: ActId
-  ) {
-    setGameState((currentState) => {
-      const rewardId =
-        completedActId === "act-1"
-          ? "torn-photo-fragment-act-1"
-          : "torn-photo-fragment-act-2";
-
-      const alreadyCollected = currentState.inventory.some(
-        (item) => item.id === rewardId
-      );
-
-      const rewardItem =
-        completedActId === "act-1"
-          ? {
-              id: rewardId,
-              title: "Prvý útržok fotografie",
-              icon: "🖼️",
-              description:
-                "Útržok starej fotografie nájdený v truhlici prvého aktu. Na zadnej strane je časť ručne napísanej správy, ktorá vedie k ďalším miestam vyšetrovania.",
-              actId: "act-2" as ActId,
-            }
-          : {
-              id: rewardId,
-              title: "Druhý útržok fotografie",
-              icon: "🖼️",
-              description:
-                "Druhý útržok starej fotografie. Po spojení s prvou časťou odhaľuje, že všetky doterajšie stopy smerujú k poslednému tajomstvu pátračovho denníka.",
-              actId: "act-3" as ActId,
-            };
-
-      return {
-        ...currentState,
-        currentActId: nextActId,
-        screen: "puzzle",
-        inventory: alreadyCollected
-          ? currentState.inventory
-          : [...currentState.inventory, rewardItem],
-      };
-    });
+  function finishActEnding() {
+    setGameState((currentState) =>
+      completeActEnding(currentChapter, currentState)
+    );
   }
 
   function renderCurrentScreen() {
@@ -376,8 +334,7 @@ export default function Home() {
     }
 
     const actTransition =
-      gameState.screen === "actTransition" ||
-      gameState.screen === "actChest"
+      gameState.screen === "actTransition"
         ? getActTransition(currentChapter, gameState)
         : null;
 
@@ -387,34 +344,8 @@ export default function Home() {
           completedActTitle={actTransition.completedAct.title}
           nextActTitle={actTransition.nextAct?.title ?? ""}
           evidenceCount={actTransition.evidenceCount}
-          onContinue={openActChest}
-        />
-      );
-    }
-
-    if (gameState.screen === "actChest" && actTransition) {
-      const { completedAct, nextAct } = actTransition;
-
-      // Texty truhlíc a odmeny presunie do dát krok A3.
-      const isFirstChest =
-        currentChapter.acts.indexOf(completedAct) === 0;
-
-      return (
-        <ActChestScreen
-          title={
-            isFirstChest
-              ? "Truhlica prvého aktu"
-              : "Truhlica druhého aktu"
-          }
-          expectedCodes={actTransition.expectedCodes}
-          inventory={gameState.inventory}
-          currentActId={completedAct.id}
-          onUnlocked={() =>
-            continueToNextAct(
-              completedAct.id,
-              nextAct?.id ?? completedAct.id
-            )
-          }
+          ending={actTransition.completedAct.ending}
+          onContinue={finishActEnding}
         />
       );
     }

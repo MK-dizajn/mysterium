@@ -1003,3 +1003,101 @@ Skóre vo finále je pred zmenou aj po nej rovnaké: 10 hádaniek × 100 + odmen
 **V prehliadači:** zatiaľ neoverené používateľom.
 
 **Ďalší krok:** rozhodnutie používateľa o starých uloženiach, potom B1b, až po potvrdení.
+
+---
+
+## Krok 35: Rozhodnutie o starých uloženiach a návrh B1b
+
+**Rozhodnutie používateľa o starých uloženiach:**
+- **Teraz sa starým uloženiam nič nerobí.** Uloženie spred kroku B1a môže v inventári ukazovať staré dvojciferné kódy (00, 15, 58…), kým truhlica čaká nové (3-8-1…).
+- **Tester začína hru odznova** („Začať odznova“).
+- **Pred prvým externým testerom treba zvýšiť verziu uloženia** z `mysterium-progress-v2` na `mysterium-progress-v3`, aby nikto nehral so starým, nezhodným uložením.
+
+**Čo sa urobilo:**
+- Iba čítanie kódu a návrh kroku B1b podľa `docs/KARTY-USLOH.md` (stav nájdených číslic, Zápisník kódov, obrazovka „Prezrieť“, kreslenie predmetov v SVG, dostupnosť, rozdelenie na kroky). Návrh je v odpovedi používateľovi.
+
+**Zmenené súbory:**
+- `docs/PRACOVNY-DENNIK.md` (tento záznam)
+
+**Build:** netýka sa tohto kroku.
+
+**Ďalší krok:** potvrdenie návrhu B1b používateľom.
+
+---
+
+## Krok 36: Rozhodnutia k B1b, zmena poradia a návrh B2
+
+**Rozhodnutia používateľa k B1b** (B1b sa zatiaľ nerobí):
+- názvy predmetov sa premenujú v **B1b-3** spolu s kreslením,
+- „Ukáž číslicu“ **body nestojí**, ale zapamätá sa,
+- žiara po **20 s**, „Ukáž číslicu“ po ďalších **20 s**,
+- Zápisník kódov je **v Inventári**, nie v lište a nie pri dnešnej truhlici po akte.
+
+**Zmena poradia:** pred B1b sa robí **B2**: odstránenie truhlíc po akte I a II a ich nahradenie ľahkým koncom aktu.
+
+**Čo sa urobilo:** iba čítanie kódu a návrh B2 (v odpovedi používateľovi). Kód sa nemenil.
+
+**Zmenené súbory:**
+- `docs/PRACOVNY-DENNIK.md` (tento záznam)
+
+**Build:** netýka sa tohto kroku.
+
+**Ďalší krok:** potvrdenie návrhu B2 používateľom.
+
+---
+
+## Krok 37 (krok B2): Koniec aktu bez truhlice
+
+**Čo sa urobilo:**
+- Po akte I a akte II už **nie je truhlica**. Ostala iba obrazovka konca aktu (`ActTransitionScreen`), ktorá teraz ukáže moment z dát `data/chapter-one/acts.ts`:
+  - **akt I – 🔊 Hlas Strážcu:** „Tri stopy máš za sebou. Pátrač mi povedal, že kto dôjde až sem, nezačal náhodou. Ešte nie je čas na otázky. Prijmi prvý útržok fotografie a pokračuj.“
+  - **akt II – 🛡️ Pečať:** „Vzdelanie, znak aj stopa vojny. Mesto si pamätá všetko, aj to, na čo by najradšej zabudlo. Druhý útržok fotografie je tvoj.“
+  - pod textom karta útržku fotografie a tlačidlo **„Prijať útržok a pokračovať“**,
+  - zostali „Dôkazy zhromaždené“, „Vyhodnotenie prípadu“ a „Nasleduje“; odstránila sa iba veta „Pred pokračovaním musíš odhaliť miesto…“, ktorá patrila k truhlici.
+- **Útržky fotografie** udeľuje nová funkcia `completeActEnding` v `engine/gameEngine.ts` z dát (`ending.reward`):
+  - **iba raz**,
+  - mimo obrazovky konca aktu nerobí nič, takže opakované kliknutie ani F5 nič nezdvoja.
+  - Natvrdo zapísané odmeny a `continueToNextAct` z `app/page.tsx` zmizli.
+- **Útržky:** id (`torn-photo-fragment-act-1`, `-act-2`), názvy a `actId` sú rovnaké. Popisy sa upravili, aby nespomínali truhlicu:
+  - prvý: „Útržok starej fotografie, **ktorý ti odovzdal Strážca**. …“
+  - druhý: „Druhý útržok starej fotografie, **ktorý ti pripadol po pečati**. …“
+- **Staré uloženia:** uloženie na obrazovke truhlice (`actChest`) sa pri načítaní prevedie na koniec aktu (`actTransition`). Pôvodné uloženie sa pred prevodom zálohuje pod `mysterium-progress-v2-backup-before-repair`, ako pri kroku 0.3b. Uloženia na konci aktu sa nemenia.
+- **Po scéne 10** nasleduje ako doteraz záverečná obrazovka (`FinishScreen`). Akt III zatiaľ nemá vlastný koniec.
+- **Nič sa nezmazalo.** V projekte ostali nepoužité súbory truhlice pre kroky B3 a B4:
+  - `components/screens/ActChestScreen.tsx`, `components/screens/ChestIntroScreen.tsx`,
+  - celé priečinky `components/ui/chest/` a `components/ui/chest-3d/` (spolu 29 súborov),
+  - `components/ui/reward/RewardReveal.tsx`,
+  - zvuk `chest-unlock`.
+  - Obrazovka `"actChest"` zostala v type `GameScreen`, aby ju prevod starých uložení rozpoznal.
+
+**Test (mimo projektu, necommitnutý):**
+| Kontrola | Pred zmenou | Po zmene |
+|---|---|---|
+| poradie obrazoviek celej kapitoly | … prechod aktu → **truhlica** → scéna 4 … | … prechod aktu → scéna 4 … (truhlica 2× zmizla, nič iné) |
+| kedy pribudne útržok | po truhlici aktu I / II | po konci aktu I / II (rovnaký okamih pred scénou 4 / 7) |
+| id a `actId` útržkov | act-1 → actId act-2, act-2 → actId act-3 | rovnaké |
+| popisy útržkov | „…nájdený v truhlici prvého aktu…“ | „…ktorý ti odovzdal Strážca…“, „…ktorý ti pripadol po pečati…“ |
+| skóre | 1010 | **1010** |
+| uložené hry: začiatok, uprostred prechodu aktu I a II, koniec kapitoly | – | rovnaké ako pred zmenou, bez zálohy |
+| uložené hry pred truhlicou aktu I a II | ostali na truhlici | prevedené na koniec aktu, **záloha = pôvodné uloženie**, po pokračovaní scéna 4 / 7 so správnym útržkom |
+| opakované kliknutie (4×) na konci aktu I | (dnešná funkcia by posunula akt aj na act-3) | 1 útržok, akt act-2, scéna 4 |
+| F5 na konci aktu a po prijatí + ďalšie kliknutie | – | 1 útržok, akt act-2, scéna 4 |
+
+**Zmenené súbory:**
+- `types/game.ts` (typy `ActEnding`, `ActEndingKind`, pole `ending` pri akte)
+- `data/chapter-one/acts.ts` (koniec aktu I a II s textami a útržkami)
+- `engine/gameEngine.ts` (`completeActEnding`)
+- `engine/gameStorage.ts` (prevod `actChest` → `actTransition` so zálohou)
+- `components/screens/ActTransitionScreen.tsx`
+- `app/page.tsx`
+- `docs/PRACOVNY-DENNIK.md` (aj záznamy krokov 35 a 36)
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** zmenené súbory sú bez chýb.
+
+**Riziko:** do kroku B3 hra nemá žiadnu truhlicu. Zbierané číslice (3-8-1…) sa ukazujú v Inventári, ale zatiaľ nič neodomykajú.
+
+**V prehliadači:** zatiaľ neoverené používateľom.
+
+**Ďalší krok:** používateľ overí koniec aktu I a II v prehliadači, potom ďalší krok podľa plánu (B1b alebo B3), až po potvrdení.

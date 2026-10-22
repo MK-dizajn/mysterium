@@ -1,3 +1,4 @@
+import type { ActEnding } from "../../types/game";
 import { ActionButton } from "../ui/ActionButton";
 import { DetectiveIcon } from "../ui/MysteriumIcons";
 import { MessageBox } from "../ui/MessageBox";
@@ -9,13 +10,21 @@ type ActTransitionScreenProps = {
   completedActTitle: string;
   nextActTitle: string;
   evidenceCount: number;
+  ending?: ActEnding;
   onContinue: () => void;
+};
+
+const ENDING_ICONS: Record<ActEnding["kind"], string> = {
+  guardianVoice: "🔊",
+  seal: "🛡️",
+  mysteryReveal: "🔍",
 };
 
 export function ActTransitionScreen({
   completedActTitle,
   nextActTitle,
   evidenceCount,
+  ending,
   onContinue,
 }: ActTransitionScreenProps) {
   return (
@@ -32,32 +41,58 @@ export function ActTransitionScreen({
           vytvárať spoločný obraz.
         </MessageBox>
 
+        {ending && (
+          <SectionCard
+            icon={
+              <span className="text-3xl" aria-hidden="true">
+                {ENDING_ICONS[ending.kind]}
+              </span>
+            }
+            title={ending.label}
+            variant="gold"
+          >
+            <p className="italic leading-relaxed text-amber-100">
+              „{ending.text}“
+            </p>
+          </SectionCard>
+        )}
+
+        {ending?.reward && (
+          <SectionCard
+            icon={
+              <span className="text-3xl" aria-hidden="true">
+                {ending.reward.icon}
+              </span>
+            }
+            title={ending.reward.title}
+          >
+            <p className="text-sm leading-relaxed text-slate-300">
+              {ending.reward.description}
+            </p>
+          </SectionCard>
+        )}
+
         <SectionCard
           icon={<DetectiveIcon className="h-9 w-9" />}
           title="Vyhodnotenie prípadu"
         >
-          <div className="space-y-3">
-            <p className="text-[15px] leading-8 text-slate-300">
-              V tejto etape si získal {evidenceCount} dôkazy. Každý z nich
-              ukrýva časť tajnej kombinácie.
-            </p>
-
-            <p className="text-sm leading-6 text-amber-100">
-              Pred pokračovaním musíš odhaliť miesto, ku ktorému vedie ďalšia
-              stopa starého pátrača.
-            </p>
-          </div>
+          <p className="text-[15px] leading-8 text-slate-300">
+            V tejto etape si získal {evidenceCount} dôkazy. Každý z nich
+            ukrýva časť tajnej kombinácie.
+          </p>
         </SectionCard>
 
-        <MessageBox
-          variant="info"
-          title="Nasleduje"
-        >
-          {nextActTitle}
-        </MessageBox>
+        {nextActTitle && (
+          <MessageBox
+            variant="info"
+            title="Nasleduje"
+          >
+            {nextActTitle}
+          </MessageBox>
+        )}
 
         <ActionButton onClick={onContinue}>
-          Preskúmať novú stopu
+          {ending?.continueLabel ?? "Pokračovať"}
         </ActionButton>
       </StoryCard>
     </ScreenContainer>

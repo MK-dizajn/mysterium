@@ -247,6 +247,19 @@ export type Scene = {
   npcs?: Npc[];
 };
 
+export type ActEndingKind = "guardianVoice" | "seal" | "mysteryReveal";
+
+/** Ľahký moment na konci aktu (bez truhlice). */
+export type ActEnding = {
+  kind: ActEndingKind;
+  /** Nadpis momentu, napríklad „Hlas Strážcu“ alebo „Pečať“. */
+  label: string;
+  text: string;
+  /** Predmet, ktorý hráč na konci aktu dostane (iba raz). */
+  reward?: InventoryItem;
+  continueLabel: string;
+};
+
 export type Act = {
   id: ActId;
   title: string;
@@ -254,6 +267,7 @@ export type Act = {
   sceneIds: SceneId[];
   /** Označenie zámku truhlice pre tento akt (napríklad „I“). */
   lockLabel: string;
+  ending?: ActEnding;
 };
 
 export type Chapter = {

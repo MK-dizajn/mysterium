@@ -8,6 +8,7 @@ import type {
 } from "../types/game";
 import {
   getActForScene,
+  getActTransition,
   getNextSceneIndex,
   getPuzzleSolvedFlagId,
   isChapterFinished,
@@ -268,4 +269,42 @@ export function continueAfterHistory(
     "sceneEntered",
     chapter.quests
   );
+}
+
+/**
+ * Ukončí koniec aktu: udelí odmenu z dát (iba raz), prepne na ďalší akt
+ * a pokračuje ďalšou scénou. Mimo obrazovky konca aktu nerobí nič,
+ * takže opakované kliknutie nič nezdvojí.
+ */
+export function completeActEnding(
+  chapter: Chapter,
+  gameState: GameState
+): GameState {
+  if (gameState.screen !== "actTransition") {
+    return gameState;
+  }
+
+  const transition = getActTransition(chapter, gameState);
+
+  if (!transition) {
+    return {
+      ...gameState,
+      screen: "puzzle",
+    };
+  }
+
+  const reward = transition.completedAct.ending?.reward;
+
+  const shouldAddReward =
+    reward !== undefined &&
+    !gameState.inventory.some((item) => item.id === reward.id);
+
+  return {
+    ...gameState,
+    currentActId: transition.nextAct?.id ?? transition.completedAct.id,
+    screen: "puzzle",
+    inventory: shouldAddReward
+      ? [...gameState.inventory, reward]
+      : gameState.inventory,
+  };
 }

@@ -93,8 +93,24 @@ export function loadGameState(): GameState | null {
 }
 
 /**
- * Načíta uloženú hru a ak ukazuje na neexistujúcu kapitolu alebo scénu,
- * opraví ju. Pôvodné uloženie sa pred opravou odloží pod samostatný kľúč.
+ * Obrazovku truhlice po akte hra už nepoužíva (krok B2). Uloženie
+ * pred truhlicou pokračuje koncom aktu, číslo scény aj akt už sedia.
+ */
+function migrateRemovedScreens(gameState: GameState): GameState {
+  if (gameState.screen !== "actChest") {
+    return gameState;
+  }
+
+  return {
+    ...gameState,
+    screen: "actTransition",
+  };
+}
+
+/**
+ * Načíta uloženú hru a ak ukazuje na neexistujúcu kapitolu alebo scénu
+ * alebo na obrazovku, ktorá už neexistuje, opraví ju. Pôvodné uloženie
+ * sa pred opravou odloží pod samostatný kľúč.
  */
 export function loadRepairedGameState(game: Game): GameState | null {
   const gameState = loadGameState();
@@ -103,7 +119,9 @@ export function loadRepairedGameState(game: Game): GameState | null {
     return null;
   }
 
-  const repairedState = repairGameProgress(game, gameState);
+  const repairedState = migrateRemovedScreens(
+    repairGameProgress(game, gameState)
+  );
 
   if (repairedState === gameState) {
     return gameState;
