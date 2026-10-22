@@ -6,14 +6,14 @@ export const lekarenUSalvatoraScene: Scene = {
   title: "3. Mysli na koniec",
 
   cinematicText:
-  "Po Michalskej a Ventúrskej ulici prichádzaš na Panskú ulicu k historickej Lekárni U Salvátora. Si na správnom mieste. Jej fasáda zaujme na prvý pohľad, no skutočný odkaz, starší než samotná budova, sa ukrýva vo vnútri.",
+  "Po Michalskej a Ventúrskej ulici prichádzaš na Panskú ulicu k historickej Lekárni U Salvátora. Si na správnom mieste. Jej fasáda však ukrýva viac než názov a výzdobu — zostal na nej odkaz starší než samotná budova.",
   
   voiceLine:
     "Liečiteľ musí poznať nielen začiatok svojho rozhodnutia, ale aj jeho následky. Pátrač si preto zapísal jedinú radu: Čokoľvek robíš, mysli na koniec. Nájdi miesto, odkiaľ tieto slová pochádzajú.",
 
   investigation: {
     objective:
-        "Vojdi dovnútra Lekárne U Salvátora a prezri si jej historické zariadenie. Pátrač nehľadá názov lekárne ani súčasné nápisy. Hľadá starý latinský odkaz a rok, ktorým sa končí.",
+        "Postav sa pred Lekáreň U Salvátora a pozorne si prezri jej vonkajšie priečelie. Pátrač nehľadá názov lekárne ani súčasné nápisy. Hľadá starý latinský odkaz a rok, ktorým sa končí.",
     detectiveHint:
         "Keď nájdeš latinský text, nečítaj iba jeho začiatok. Skutočná stopa sa ukrýva na jeho úplnom konci.",
     observationType: "inscription",

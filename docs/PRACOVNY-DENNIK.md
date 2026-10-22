@@ -393,8 +393,9 @@ fatal: could not read Username for 'https://github.com': terminal prompts disabl
   - 9\. Bratislavský mier: „Zadaj názov sály, v ktorej bol podpísaný mier.“
   - 10\. Zlatý prešporský kľúč: „Zadaj dvoma slovami, čo všetky stopy spoločne uchovávajú.“
 - Salvátor (scéna 3):
-  - nový `objective`: hráč má vojsť **dovnútra** lekárne a hľadať latinský odkaz a **rok**,
-  - nový `cinematicText`: už nehovorí, že odkaz je na fasáde, ale že sa ukrýva vo vnútri.
+  - nový `objective`, aby hráč hľadal latinský odkaz a **rok**,
+  - pôvodne aj vstup dovnútra lekárne a nový `cinematicText`.
+  - **Opravené v kroku 19:** hráč dnu nevchádza, všetko je zvonku. `cinematicText` je opäť pôvodný.
 - Bratislavský mier (scéna 9): nový `objective` začína vetou „V tomto paláci bol 26. decembra 1805 podpísaný Bratislavský mier.“ Nahradil nejasné „Použi pátračov historický záznam“.
 - Prijímané odpovede, nápovedy ani kód obrazoviek a enginu sa nezmenili.
 
@@ -413,13 +414,33 @@ fatal: could not read Username for 'https://github.com': terminal prompts disabl
 **V prehliadači:** zatiaľ neoverené používateľom.
 
 **Otvorené veci na overenie v teréne:**
-1. **Lekáreň U Salvátora:**
-   - či je latinský nápis naozaj v interiéri,
-   - či sa tam dá vojsť a v akých hodinách.
-   - Ak nie, texty scény 3 sa prepíšu.
+1. **Salvátor:** overiť v teréne presné miesto latinského nápisu na vonkajšku. Vstup dnu sa nevyžaduje.
 2. **Primaciálny palác:** či sú písmená na fasáde naozaj v poradí C, I zľava doprava.
 3. **Mirbachov palác:** odpoveď „znak“ (a „rodový znak“) je príliš ľahká, lebo slovo „znak“ je priamo v pátračovej poznámke. Zvážiť jej vyradenie vo Fáze 2.
 
 **Ďalší krok:**
 - používateľ overí nové texty v prehliadači (aspoň scénu 3),
+- stále čaká overenie nápoved z kroku 11 (akčný plán 1.1).
+
+---
+
+## 22. 10. 2026 – Krok 19: Oprava Salvátora – všetko sa hľadá zvonku
+
+**Čo sa urobilo:**
+- Oprava kroku 18: pri Lekárni U Salvátora hráč **nevchádza dnu**. Všetko hľadané je dostupné zvonku.
+- `investigation.objective` má nové, vonkajšie znenie: „Postav sa pred Lekáreň U Salvátora a pozorne si prezri jej vonkajšie priečelie. Pátrač nehľadá názov lekárne ani súčasné nápisy. Hľadá starý latinský odkaz a rok, ktorým sa končí.“
+- `cinematicText` je vrátený do pôvodnej podoby o fasáde: „…Jej fasáda však ukrýva viac než názov a výzdobu — zostal na nej odkaz starší než samotná budova.“ Overené porovnaním s verziou pred krokom 18 (`2742611`).
+- `answerLabel` („Zadaj rok, ktorým sa končí latinský nápis.“) zostal. Nič iné sa nezmenilo.
+- V kroku 18 som opravil otvorenú vec č. 1 a vyradil zápis o otváracích hodinách.
+
+**Zmenené súbory:**
+- `data/chapter-one/lekaren-u-salvatora.ts`
+- `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**V prehliadači:** zatiaľ neoverené používateľom.
+
+**Ďalší krok:**
+- používateľ overí scénu 3 v prehliadači,
 - stále čaká overenie nápoved z kroku 11 (akčný plán 1.1).
