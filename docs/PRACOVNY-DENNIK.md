@@ -886,3 +886,34 @@ Skóre vo finále je pred zmenou aj po nej rovnaké: 10 hádaniek × 100 + odmen
 **V prehliadači:** zatiaľ neoverené používateľom. Prechod aktu II má ukazovať „Akt II – Moc a poznanie“.
 
 **Ďalší krok:** krok A3 (odmeny a texty truhlíc z `page.tsx` a `ActChestScreen.tsx` do dát), až po potvrdení používateľa.
+
+---
+
+## Krok 32: Karty úloh – odmeny, jednociferné kódy a truhlica
+
+**Čo sa urobilo:**
+- Vytvoril som `docs/KARTY-USLOH.md` s návrhom odmien po úlohách pre kapitolu I. Nič sa nenaprogramovalo.
+- **Rozhodnutia používateľa zapísané v dokumente:**
+  - kódy zámkov sú **jednociferné**, každý predmet nesie jednu číslicu: zámok I = **3-8-1** (scény 1–3), II = **6-0-4** (scény 4–6), III = **9-2-7** (scény 7–9),
+  - starý dvojciferný systém (00-15-58, 65-70-09, 72-81-05) sa nahrádza,
+  - odmeny po scénach: žetón nultého kilometra, kus mapy s domom č. 15, strana z denníka, pečať vzdelanosti, druhý kus mapy, hlasová nahrávka Strážcu (zatiaľ text), tri zuby Zlatého kľúča, vo finále zložený kľúč,
+  - pri každej odmene tlačidlo „Ukáž cestu“ s dnešným textom trasy (`nextInstruction`), bez straty bodov,
+  - konce aktov bez truhlice: hlas Strážcu, pečať, zloženie kľúča, a vždy útržok fotografie,
+  - jedna truhlica na konci kapitoly s tromi zámkami (kolieska 0–9, 3 číslice), potom Zlatý kľúč do stredného zámku a otvorenie veka; v truhlici štvrtý útržok s adresou,
+  - staré uložené hry sa po zmene **resetujú**.
+- Sekcia „Otvorené veci“: presné vodidlá po terénnom overení, texty koncov aktov, adresa a názov ďalšieho miesta.
+- Pri každej časti je poznámka „Dnes v hre“.
+
+**Na zosúladenie (zapísané aj v dokumente):**
+- `docs/KONCEPT-ZAZITKU.md` (časť C) uvádza staré kódy,
+- `docs/KONCEPT-KAPITOL.md` uvádza „truhlica po každom akte“,
+- test dát z krokov A1 a A2 overoval staré kódy a pri zmene sa upraví,
+- reset uložených hier je zámerná výnimka z pravidla „uložený postup sa nemaže“; pred realizáciou treba rozhodnúť, ako sa spraví a ako sa o ňom hráč dozvie.
+
+**Zmenené súbory:**
+- `docs/KARTY-USLOH.md` (nový)
+- `docs/PRACOVNY-DENNIK.md`
+
+**Build:** netýka sa tohto kroku (iba dokumentácia).
+
+**Ďalší krok:** krok A3, až po potvrdení používateľa. Treba zvážiť, či A3 (presun dnešných dvoch truhlíc do dát) má ešte zmysel, keď sa truhlice po aktoch nahradia jednou truhlicou na konci kapitoly.
