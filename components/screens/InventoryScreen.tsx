@@ -20,7 +20,7 @@ function getEvidenceKindLabel(item: InventoryItem) {
   }
 
   if (item.evidenceKind === "fragment") {
-    return "Fragment";
+    return "Útržok";
   }
 
   if (item.evidenceKind === "object") {
@@ -43,11 +43,11 @@ export function InventoryScreen({
 
   return (
     <ScreenContainer>
-      <StoryCard label="Zhromaždené stopy" title="Dôkazy">
+      <StoryCard label="Zhromaždené stopy" title="Inventár">
         {sortedInventory.length === 0 ? (
           <SectionCard
             icon={<DetectiveIcon className="h-9 w-9" />}
-            title="Zatiaľ nemáš žiadne dôkazy"
+            title="Zatiaľ nemáš žiadne predmety"
           >
             <p className="text-sm leading-relaxed text-slate-400">
               Počas vyšetrovania budeš nachádzať predmety, dokumenty a

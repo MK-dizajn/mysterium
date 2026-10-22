@@ -22,7 +22,7 @@ export function ArtifactScreen({
       <ScreenTransition>
         <CodexPageTransition>
           <StoryCard
-            label="História"
+            label="Artefakt"
             title={artifact.title}
           >
             <Reveal delay={300}>

@@ -20,7 +20,7 @@ export function ArtifactsScreen({
     <ScreenContainer>
       <StoryCard
         label="Objavené miesta a príbehy"
-        title="História"
+        title="Artefakty"
       >
         {artifacts.length === 0 ? (
           <SectionCard

@@ -22,7 +22,7 @@ export function HistoryScreen({
   return (
     <ScreenContainer>
       <StoryCard
-        label="Zápis do Codexu"
+        label="Zápis do denníka pátrača"
         title={scene.history.title}
       >
         <MessageBox

@@ -18,10 +18,16 @@ type CodexBarProps = {
   onOpenQuests: () => void;
 };
 
-function getEvidenceLabel(count: number) {
-  if (count === 1) return "1 dôkaz";
-  if (count > 1 && count < 5) return `${count} dôkazy`;
-  return `${count} dôkazov`;
+function getInventoryLabel(count: number) {
+  if (count === 1) return "1 predmet";
+  if (count > 1 && count < 5) return `${count} predmety`;
+  return `${count} predmetov`;
+}
+
+function getActiveQuestsLabel(count: number) {
+  if (count === 1) return "1 aktívna";
+  if (count > 1 && count < 5) return `${count} aktívne`;
+  return `${count} aktívnych`;
 }
 
 export function CodexBar({
@@ -96,15 +102,15 @@ export function CodexBar({
             className="rounded-xl border border-emerald-300/20 bg-emerald-400/10 px-3 py-2 text-left shadow-lg shadow-emerald-950/10 transition hover:border-emerald-300/40 hover:bg-emerald-400/20"
           >
             <span className="block text-sm font-bold text-emerald-100">
-              🕵️ Prípad
+              🕵️ Úlohy
             </span>
 
             <span className="mt-0.5 block text-xs text-slate-400">
               {activeQuests > 0
-                ? `${activeQuests} aktívny`
+                ? getActiveQuestsLabel(activeQuests)
                 : completedQuests > 0
-                  ? "Dokončený"
-                  : "Nezačatý"}
+                  ? "Splnené"
+                  : "Žiadne"}
             </span>
           </button>
 
@@ -114,11 +120,11 @@ export function CodexBar({
             className="rounded-xl border border-sky-300/20 bg-sky-400/10 px-3 py-2 text-left shadow-lg shadow-sky-950/10 transition hover:border-sky-300/40 hover:bg-sky-400/20"
           >
             <span className="block text-sm font-bold text-sky-100">
-              🔎 Dôkazy
+              🔎 Inventár
             </span>
 
             <span className="mt-0.5 block text-xs text-slate-400">
-              {getEvidenceLabel(inventory.length)}
+              {getInventoryLabel(inventory.length)}
             </span>
           </button>
 
@@ -128,7 +134,7 @@ export function CodexBar({
             className="rounded-xl border border-amber-300/20 bg-amber-400/10 px-3 py-2 text-left shadow-lg shadow-amber-950/10 transition hover:border-amber-300/40 hover:bg-amber-400/20"
           >
             <span className="block text-sm font-bold text-amber-100">
-              📖 História
+              📖 Artefakty
             </span>
 
             <span className="mt-0.5 block text-xs text-slate-400">

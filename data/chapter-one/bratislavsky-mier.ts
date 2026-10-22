@@ -83,7 +83,7 @@ export const bratislavskyMierScene: Scene = {
             title: "Pečať Bratislavského mieru",
             icon: "🕊️",
             description:
-              "Laková pečať z mierového dokumentu uzavretého v Primaciálnom paláci. Na jej okraji je vyrytá ôsma dvojica číslic tajnej kombinácie.",
+              "Laková pečať z mierového dokumentu uzavretého v Primaciálnom paláci. Na jej okraji je vyrytá deviata dvojica číslic tajnej kombinácie.",
             evidenceKind: "document",
             secretCode: "05",
             evidenceOrder: 9,

@@ -7,9 +7,9 @@ type QuestScreenProps = {
 };
 
 function getQuestStatusLabel(status: QuestProgress["status"]) {
-  if (status === "active") return "Aktívny";
-  if (status === "completed") return "Uzavretý";
-  return "Zamknutý";
+  if (status === "active") return "Aktívna";
+  if (status === "completed") return "Splnená";
+  return "Zamknutá";
 }
 
 function findQuestDefinition(
@@ -47,7 +47,7 @@ export function QuestScreen({
       variant === "completed" && questDefinition?.completedText
         ? questDefinition.completedText
         : questDefinition?.description ??
-          "Neznámy prípad zo spisu starého pátrača.";
+          "Neznáma úloha zo spisu starého pátrača.";
 
     const rewardScore = questDefinition?.reward?.score;
 
@@ -82,7 +82,7 @@ export function QuestScreen({
 
         {variant === "completed" && rewardScore ? (
           <p className="mt-4 rounded-2xl border border-emerald-300/15 bg-slate-950/40 px-4 py-3 text-sm text-emerald-100">
-            ⭐ Odmena za uzavretie prípadu: +{rewardScore} bodov
+            ⭐ Odmena za splnenie úlohy: +{rewardScore} bodov
           </p>
         ) : null}
       </article>
@@ -105,24 +105,24 @@ export function QuestScreen({
         </p>
 
         <h1 className="mt-2 text-3xl font-bold text-emerald-100">
-          🕵️ Prípad
+          🕵️ Úlohy
         </h1>
 
         <p className="mt-3 text-sm leading-6 text-slate-400">
-          Tu nájdeš hlavný cieľ vyšetrovania a stav prípadu. Dôkazy zbieraš
-          počas jednotlivých zastávok, no celý prípad sa uzavrie až po
-          odhalení Zlatého prešporského kľúča.
+          Tu nájdeš úlohy vyšetrovania a ich stav. Predmety zbieraš počas
+          jednotlivých zastávok, no hlavná úloha sa splní až po odhalení
+          Zlatého prešporského kľúča.
         </p>
 
         {questProgress.length === 0 ? (
           <div className="mt-8 rounded-3xl border border-slate-700/80 bg-slate-900/80 p-5">
             <p className="font-semibold text-slate-100">
-              Prípad ešte nebol otvorený.
+              Zatiaľ nemáš žiadnu úlohu.
             </p>
 
             <p className="mt-2 text-sm leading-6 text-slate-400">
               Začni vyšetrovanie pri Michalskej bráne. Po rozhovore so
-              strážcom sa tu zobrazí hlavný prípad kapitoly.
+              strážcom sa tu zobrazí hlavná úloha kapitoly.
             </p>
           </div>
         ) : (
@@ -130,7 +130,7 @@ export function QuestScreen({
             {activeQuests.length > 0 && (
               <section>
                 <h2 className="mb-3 text-sm font-bold uppercase tracking-[0.25em] text-amber-300/80">
-                  Aktuálny prípad
+                  Aktívne úlohy
                 </h2>
 
                 <div className="space-y-3">
@@ -144,7 +144,7 @@ export function QuestScreen({
             {completedQuests.length > 0 && (
               <section>
                 <h2 className="mb-3 text-sm font-bold uppercase tracking-[0.25em] text-emerald-300/80">
-                  Uzavreté prípady
+                  Splnené úlohy
                 </h2>
 
                 <div className="space-y-3">

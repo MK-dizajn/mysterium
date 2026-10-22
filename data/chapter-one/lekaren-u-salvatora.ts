@@ -81,7 +81,7 @@ export const lekarenUSalvatoraScene: Scene = {
             title: "Lekárnická pečať",
             icon: "🧪",
             description:
-              "Tmavá vosková pečať s jemným odtlačkom historickej lekárne. Na spodnej hrane je vyrytá druhá dvojica číslic tajnej kombinácie.",
+              "Tmavá vosková pečať s jemným odtlačkom historickej lekárne. Na spodnej hrane je vyrytá tretia dvojica číslic tajnej kombinácie.",
             evidenceKind: "object",
             secretCode: "58",
             evidenceOrder: 3,

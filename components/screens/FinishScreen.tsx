@@ -47,7 +47,7 @@ export function FinishScreen({
             </p>
 
             <p>
-              V časti História zostáva zaznamenaná
+              V Artefaktoch zostáva zaznamenaná
               pamäť starého Prešporka. Do inventára si
               získal dokončený kľúč aj poškodený útržok
               mapy ďalšieho prípadu.
