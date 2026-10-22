@@ -444,3 +444,30 @@ fatal: could not read Username for 'https://github.com': terminal prompts disabl
 **Ďalší krok:**
 - používateľ overí scénu 3 v prehliadači,
 - stále čaká overenie nápoved z kroku 11 (akčný plán 1.1).
+
+---
+
+## 22. 10. 2026 – Krok 20: Koniec pracovného dňa
+
+**Čo sa urobilo:**
+- Vývojový server (`npm run dev`) je vypnutý.
+- Všetky zmeny sú uložené v Gite a aj na GitHube: verzia `b534ecf` je na vetve `sprint-4-first-playable-chapter`.
+
+**Zmenené súbory:**
+- `docs/PRACOVNY-DENNIK.md` (tento záznam)
+
+**Build:** posledný build (krok 19) prešiel.
+
+**Na zajtra – čaká na overenie alebo rozhodnutie:**
+1. V prehliadači overiť:
+   - scénu 3 (nové texty Salvátora),
+   - nápovedy z kroku 11: po F5 a po otvorení inventára zostanú, skóre +60 pri 2 nápovedách.
+2. V teréne overiť:
+   - Salvátor – presné miesto nápisu na vonkajšku,
+   - Primaciálny palác – poradie písmen,
+   - Mirbachov palác – odpoveď „znak“.
+3. Krok 1.3: uložená hra so scénou mimo rozsah (návrh v kroku 10).
+4. Zosúladiť `docs/KONCEPT-KAPITOL.md` s `docs/KONCEPT-ZAZITKU.md` (jedna truhlica na konci kapitoly).
+5. Zvukové súbory sú prázdne – treba ich nájsť alebo vytvoriť.
+
+**Ako zajtra spustiť hru:** v termináli v priečinku projektu `npm run dev`, potom otvoriť http://localhost:3000.
