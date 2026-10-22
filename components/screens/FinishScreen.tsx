@@ -1,4 +1,8 @@
+"use client";
+
+import { useState } from "react";
 import { ActionButton } from "../ui/ActionButton";
+import { ConfirmDialog } from "../ui/ConfirmDialog";
 import { DetectiveIcon } from "../ui/MysteriumIcons";
 import { MessageBox } from "../ui/MessageBox";
 import { ScreenContainer } from "../ui/ScreenContainer";
@@ -12,6 +16,8 @@ type FinishScreenProps = {
 export function FinishScreen({
   onRestart,
 }: FinishScreenProps) {
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+
   return (
     <ScreenContainer>
       <StoryCard
@@ -75,10 +81,23 @@ export function FinishScreen({
           </p>
         </SectionCard>
 
-        <ActionButton onClick={onRestart}>
+        <ActionButton onClick={() => setIsConfirmOpen(true)}>
           Hrať kapitolu od začiatku
         </ActionButton>
       </StoryCard>
+
+      {isConfirmOpen && (
+        <ConfirmDialog
+          title="Začať odznova?"
+          message="Dokončenú kapitolu aj získané body vymažeš a začneš od prvej zastávky. Túto akciu nemožno vrátiť."
+          confirmLabel="Áno, začať odznova"
+          onConfirm={() => {
+            setIsConfirmOpen(false);
+            onRestart();
+          }}
+          onCancel={() => setIsConfirmOpen(false)}
+        />
+      )}
     </ScreenContainer>
   );
 }

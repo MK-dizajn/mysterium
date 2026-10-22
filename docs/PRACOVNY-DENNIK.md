@@ -471,3 +471,53 @@ fatal: could not read Username for 'https://github.com': terminal prompts disabl
 5. Zvukové súbory sú prázdne – treba ich nájsť alebo vytvoriť.
 
 **Ako zajtra spustiť hru:** v termináli v priečinku projektu `npm run dev`, potom otvoriť http://localhost:3000.
+
+---
+
+## Krok 21: Overenie Salvátora a návrh krokov 0.2 a 0.3
+
+**Čo sa urobilo (iba čítanie):**
+- Overil som `data/chapter-one/lekaren-u-salvatora.ts`. Hráč **nevchádza dnu**:
+  - riadok 9, `cinematicText`: pôvodný text o fasáde,
+  - riadok 16, `objective`: „Postav sa pred Lekáreň U Salvátora a pozorne si prezri jej vonkajšie priečelie…“,
+  - riadok 24, `answerLabel`: „Zadaj rok, ktorým sa končí latinský nápis.“
+  - Vo výklade histórie (riadok 46) zostáva veta o barokovom mobiliári „vo vnútri“. Je to iba historická informácia, hráča dnu neposiela.
+- Zmena je commitnutá (`b534ecf`) a je aj na GitHube.
+- Pripravil som návrhy:
+  - krok 0.2: odmena za quest iba z dát,
+  - krok 0.3a: potvrdenie pred zmazaním postupu,
+  - krok 0.3b: oprava uloženia s neexistujúcou scénou.
+- Používateľ schválil poradie 0.3a → 0.2 → 0.3b.
+
+**Zmenené súbory:** žiadne v kóde.
+
+**Build:** netýka sa tohto kroku.
+
+**Ďalší krok:** krok 0.3a.
+
+---
+
+## Krok 22 (akčný plán 0.3a): Potvrdenie pred zmazaním postupu
+
+**Čo sa urobilo:**
+- Pred zmazaním uloženej hry sa hra najprv opýta v okienku s tlačidlami **„Áno, začať odznova“** a **„Zrušiť“**:
+  - **úvodná obrazovka**, tlačidlo „Začať odznova“: „Tvoj doterajší postup sa vymaže: body, dôkazy, artefakty aj vyriešené úlohy. Túto akciu nemožno vrátiť.“
+  - **záverečná obrazovka**, tlačidlo „Hrať kapitolu od začiatku“: „Dokončenú kapitolu aj získané body vymažeš a začneš od prvej zastávky. Túto akciu nemožno vrátiť.“
+- Predvolené (vybraté) tlačidlo je **„Zrušiť“**. Kláves **Esc** aj kliknutie mimo okienka ho zavrú bez zmazania.
+- Okienko sa zmestí na malú obrazovku mobilu. Ak by bol text dlhší, dá sa v ňom posúvať.
+- Pri **úplne prvom spustení bez uloženej hry** sa nič nepýta, „Začať pátranie“ funguje ako doteraz.
+- Samotné mazanie postupu (`startNewGame` v `app/page.tsx`) sa nezmenilo.
+
+**Zmenené súbory:**
+- `components/ui/ConfirmDialog.tsx` (nový)
+- `components/screens/LandingScreen.tsx`
+- `components/screens/FinishScreen.tsx`
+- `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb). Kontrola kódu (`eslint`) zmenených súborov je bez chýb.
+
+**V prehliadači:** zatiaľ neoverené používateľom.
+
+**Ďalší krok:**
+- používateľ overí okienko v prehliadači,
+- potom krok 0.2 (odmena za quest), až po potvrdení.
