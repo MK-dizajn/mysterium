@@ -19,6 +19,7 @@ import {
   clearGameState,
   continueAfterHistory,
   createNewGameState,
+  revealHint,
   solvePuzzle,
   talkToNpc,
 } from "../engine";
@@ -340,12 +341,16 @@ export default function Home() {
               },
             }));
           }}
-          onSolved={(hintsUsed) => {
+          onRevealHint={() => {
+            setGameState((currentState) =>
+              revealHint(currentState, currentScene)
+            );
+          }}
+          onSolved={() => {
             setGameState((currentState) => {
               const nextState = solvePuzzle(
                 currentState,
-                currentScene,
-                hintsUsed
+                currentScene
               );
 
               const newlyUnlockedArtifact =

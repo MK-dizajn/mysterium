@@ -275,6 +275,7 @@ export type GameState = {
   inventory: InventoryItem[];
   quests: QuestProgress[];
   flags: Record<string, boolean>;
+  hintsUsed: Record<PuzzleId, number>;
   activeDialogueId?: string;
   activeDialogueNodeId?: string;
   activeNpcId?: string;

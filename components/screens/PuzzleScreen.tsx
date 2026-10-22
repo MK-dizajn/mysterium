@@ -16,7 +16,9 @@ import { StoryCard } from "../ui/StoryCard";
 
 type PuzzleScreenProps = {
   scene: Scene;
-  onSolved: (hintsUsed: number) => void;
+  hintsUsed: number;
+  onRevealHint: () => void;
+  onSolved: () => void;
 };
 
 function normalizeAnswer(value: string) {
@@ -27,14 +29,18 @@ function normalizeAnswer(value: string) {
     .replace(/[\u0300-\u036f]/g, "");
 }
 
-export function PuzzleScreen({ scene, onSolved }: PuzzleScreenProps) {
+export function PuzzleScreen({
+  scene,
+  hintsUsed,
+  onRevealHint,
+  onSolved,
+}: PuzzleScreenProps) {
   const [answer, setAnswer] = useState("");
   const [error, setError] = useState("");
-  const [hintIndex, setHintIndex] = useState(0);
   const [successMessage, setSuccessMessage] = useState("");
 
-  const visibleHints = scene.puzzle.hints.slice(0, hintIndex);
-  const hasMoreHints = hintIndex < scene.puzzle.hints.length;
+  const visibleHints = scene.puzzle.hints.slice(0, hintsUsed);
+  const hasMoreHints = hintsUsed < scene.puzzle.hints.length;
 
   const investigationObjective =
     scene.investigation?.objective ??
@@ -68,7 +74,7 @@ export function PuzzleScreen({ scene, onSolved }: PuzzleScreenProps) {
     setSuccessMessage("Stopa potvrdená. Pátračov záznam sa otvára.");
 
     window.setTimeout(() => {
-      onSolved(hintIndex);
+      onSolved();
     }, 700);
   }
 
@@ -77,7 +83,7 @@ export function PuzzleScreen({ scene, onSolved }: PuzzleScreenProps) {
       return;
     }
 
-    setHintIndex((currentIndex) => currentIndex + 1);
+    onRevealHint();
   }
 
   return (

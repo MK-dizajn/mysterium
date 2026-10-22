@@ -167,3 +167,72 @@ Sem sa po každom dokončenom kroku zapíše krátky záznam: čo sa urobilo, kt
 **Build:** netýka sa tohto kroku (iba dokumentácia).
 
 **Ďalší krok:** podľa akčného plánu, po potvrdení používateľa.
+
+---
+
+## 22. 10. 2026 – Krok 10: Analýza – uložená hra so scénou mimo rozsah
+
+**Otázka:** Čo sa stane, keď uložená hra ukazuje na scénu, ktorá neexistuje (napríklad `currentSceneIndex: 99`, alebo kapitola má po úprave menej scén)?
+
+**Zistenie (iba z čítania kódu, v prehliadači netestované):**
+- **Stránka nespadne.**
+  - Pri načítaní uloženia (`engine/gameStorage.ts`) sa číslo 99 ponechá, lebo je to platné kladné číslo.
+  - Po kliknutí na „Pokračovať v pátraní“ hra na okamih zobrazí náhradnú prvú scénu. V `app/page.tsx` je náhrada `?? currentChapter.scenes[0]`.
+  - Hneď nato kontrola v `app/page.tsx` zistí, že scéna neexistuje, a vráti hráča na úvodnú obrazovku.
+- **Hra sa zotaví, ale nie úplne čisto:**
+  1. Hráč na zlomok sekundy uvidí prvú scénu a potom ho to bez vysvetlenia vráti na úvod.
+  2. Uložená hra s číslom 99 zostane v pamäti prehliadača (zámerne sa nemaže). Po ďalšom F5 sa preto tlačidlo „Pokračovať v pátraní“ objaví znova a vedie opäť späť na úvod. Hráč sa točí v kruhu, kým neklikne „Začať odznova“.
+  3. Teoretické riziko: funkcia `getNextSceneIndex` v `engine/gameProgress.ts` by pri neexistujúcej scéne spadla. Dnes sa k nej hráč nedostane, lebo kontrola ho vráti na úvod skôr.
+- Rovnako sa hra správa pri neexistujúcej kapitole (`currentChapterIndex`).
+- Ak má kapitola menej scén, ale uložené číslo ešte existuje, hra nespadne. Hráč však môže pokračovať na inej scéne, než kde skončil, ak sa poradie scén zmenilo.
+
+**Návrh opravy (zatiaľ neurobená):**
+- Kontrolovať uloženú hru už pri načítaní, ešte pred zobrazením tlačidla „Pokračovať v pátraní“.
+- Ak uložená scéna v hre neexistuje, tlačidlo sa nezobrazí a hráč uvidí krátku správu: „Uložená hra patrí k staršej verzii kapitoly. Začni nové pátranie.“
+- Uloženie sa nezmaže, odloží sa bokom, ako pri poškodenom uložení.
+- Dotknuté súbory: `hooks/useGameEngine.ts`, `engine/gameStorage.ts` alebo nová malá pomocná funkcia v `engine/`, `components/screens/LandingScreen.tsx`.
+
+**Zmenené súbory:** žiadne v kóde (iba tento denník).
+
+**Build:** netýka sa tohto kroku.
+
+**Ďalší krok:** krok 1.1 – návrh ukladania počtu prečítaných nápoved. Čaká na potvrdenie.
+
+Poznámka: opravu z tohto kroku používateľ presunul do kroku 1.3.
+
+---
+
+## 22. 10. 2026 – Krok 11 (akčný plán 1.1): Počet prečítaných nápoved sa ukladá do hry
+
+**Čo sa urobilo:**
+- Počet prečítaných nápoved sa už nepamätá iba na obrazovke s hádankou. Ukladá sa do uloženej hry (`hintsUsed`, pre každú hádanku zvlášť).
+- Po otvorení inventára alebo po F5 sa preto nevynuluje a body za nápovedy sa strhnú správne.
+- Body za hádanku teraz počíta iba engine z uloženého počtu nápoved, obrazovka ich už neposiela.
+- Ochrana, aby sa body za hádanku pripísali iba raz (flag `puzzle-solved-<id>`), zostala zachovaná.
+- Pravidlo bodovania sa nezmenilo: 100 bodov, −20 za nápovedu, minimum 20.
+- Staršie uloženie bez údaja o nápovedách sa načíta bez chyby (doplní sa prázdny zoznam).
+
+**Zmenené súbory:**
+- `types/game.ts` – nový údaj `hintsUsed` v hernom stave
+- `engine/gameEngine.ts` – nové funkcie `revealHint` a `getHintsUsed`; `solvePuzzle` berie počet nápoved z herného stavu
+- `engine/gameStorage.ts` – doplnenie `hintsUsed` pri načítaní staršieho uloženia
+- `components/screens/PuzzleScreen.tsx` – obrazovka už nemá vlastné počítadlo nápoved
+- `components/game/PuzzleFlow.tsx` – odovzdá počet nápoved z herného stavu
+- `app/page.tsx` – prepojenie tlačidla nápovedy s enginom
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Test:** 12 z 12 kontrol prešlo. Test bežal v dočasnom priečinku mimo projektu a nie je commitnutý. Overené:
+- nápovedy sa pripočítavajú a nikdy ich nie je viac, než má hádanka;
+- po uložení a načítaní (F5) zostanú zachované;
+- 2 nápovedy = 60 bodov, 0 nápoved = 100 bodov, minimum 20;
+- druhé vyriešenie tej istej hádanky body nepridá;
+- staré aj poškodené uloženie sa načíta bez chyby;
+- nápovedy jednej hádanky neovplyvnia inú.
+
+**V prehliadači:** zatiaľ neoverené používateľom.
+
+**Ďalší krok:** používateľ overí v prehliadači:
+- prečítať 2 poznámky, otvoriť inventár a vrátiť sa;
+- stlačiť F5 a kliknúť „Pokračovať“;
+- po vyriešení hádanky musí skóre stúpnuť o 60.

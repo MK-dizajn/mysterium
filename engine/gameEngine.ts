@@ -14,6 +14,34 @@ export function createNewGameState(): GameState {
     quests: [],
     flags: {},
     inventory: [],
+    hintsUsed: {},
+  };
+}
+
+function getPuzzleSolvedFlagId(scene: Scene) {
+  return `puzzle-solved-${scene.id}`;
+}
+
+export function getHintsUsed(gameState: GameState, scene: Scene): number {
+  return gameState.hintsUsed[scene.puzzle.id] ?? 0;
+}
+
+export function revealHint(gameState: GameState, scene: Scene): GameState {
+  const hintsUsed = getHintsUsed(gameState, scene);
+
+  if (
+    gameState.flags[getPuzzleSolvedFlagId(scene)] ||
+    hintsUsed >= scene.puzzle.hints.length
+  ) {
+    return gameState;
+  }
+
+  return {
+    ...gameState,
+    hintsUsed: {
+      ...gameState.hintsUsed,
+      [scene.puzzle.id]: hintsUsed + 1,
+    },
   };
 }
 
@@ -122,10 +150,9 @@ export function completeQuest(
 
 export function solvePuzzle(
   gameState: GameState,
-  scene: Scene,
-  hintsUsed: number
+  scene: Scene
 ): GameState {
-  const solvedFlagId = `puzzle-solved-${scene.id}`;
+  const solvedFlagId = getPuzzleSolvedFlagId(scene);
 
   if (gameState.flags[solvedFlagId]) {
     return {
@@ -134,6 +161,7 @@ export function solvePuzzle(
     };
   }
 
+  const hintsUsed = getHintsUsed(gameState, scene);
   const score = calculatePuzzleScore(hintsUsed);
 
   let nextState = addScore(gameState, score);

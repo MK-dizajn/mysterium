@@ -44,6 +44,12 @@ function normalizeGameState(value: unknown): GameState | null {
       saved.flags && typeof saved.flags === "object" && !Array.isArray(saved.flags)
         ? saved.flags
         : defaults.flags,
+    hintsUsed:
+      saved.hintsUsed &&
+      typeof saved.hintsUsed === "object" &&
+      !Array.isArray(saved.hintsUsed)
+        ? saved.hintsUsed
+        : defaults.hintsUsed,
   };
 }
 

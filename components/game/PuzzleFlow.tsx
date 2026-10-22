@@ -1,4 +1,5 @@
 import type { GameState, Scene } from "../../types/game";
+import { getHintsUsed } from "../../engine";
 import { GameLayout } from "../layout/GameLayout";
 import { PuzzleScreen } from "../screens/PuzzleScreen";
 import { JournalReveal } from "../ui/JournalReveal";
@@ -11,7 +12,8 @@ type PuzzleFlowProps = {
   onOpenQuests: () => void;
   onOpenNpcDialogue: (npcId: string) => void;
   onReadDetectiveNote: (flagId: string) => void;
-  onSolved: (hintsUsed: number) => void;
+  onRevealHint: () => void;
+  onSolved: () => void;
 };
 
 export function PuzzleFlow({
@@ -22,6 +24,7 @@ export function PuzzleFlow({
   onOpenQuests,
   onOpenNpcDialogue,
   onReadDetectiveNote,
+  onRevealHint,
   onSolved,
 }: PuzzleFlowProps) {
   const npcGate = scene.npcGate;
@@ -104,7 +107,12 @@ export function PuzzleFlow({
           }
         />
       ) : (
-        <PuzzleScreen scene={scene} onSolved={onSolved} />
+        <PuzzleScreen
+          scene={scene}
+          hintsUsed={getHintsUsed(gameState, scene)}
+          onRevealHint={onRevealHint}
+          onSolved={onSolved}
+        />
       )}
     </GameLayout>
   );
