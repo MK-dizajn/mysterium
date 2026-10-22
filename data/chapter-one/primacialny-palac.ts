@@ -21,6 +21,7 @@ export const primacialnyPalacScene: Scene = {
 
   puzzle: {
     id: "puzzle-primacialny-palac",
+    answerLabel: "Zadaj obe písmená v poradí zľava doprava.",
     question:
       "Ktoré dve písmená držia postavy na fasáde Primaciálneho paláca?",
     acceptedAnswers: [

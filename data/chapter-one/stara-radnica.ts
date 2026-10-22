@@ -21,6 +21,7 @@ export const staraRadnicaScene: Scene = {
 
   puzzle: {
     id: "puzzle-stara-radnica",
+    answerLabel: "Zadaj, aký predmet zostal v stene veže.",
     question:
       "Aký predmet zostal zamurovaný v stene radničnej veže vedľa gotického okna?",
     acceptedAnswers: [

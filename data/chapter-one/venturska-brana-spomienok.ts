@@ -21,6 +21,7 @@ export const venturskaBranaSpomienokScene: Scene = {
 
   puzzle: {
     id: "puzzle-venturska-brana",
+    answerLabel: "Zadaj meno panovníka, ktorý školu založil.",
     question:
       "Nájdi na Ventúrskej ulici budovu Academie Istropolitany a pamätnú tabuľu na jej fasáde. Ktorý panovník podľa tabule založil túto školu?",
     acceptedAnswers: [

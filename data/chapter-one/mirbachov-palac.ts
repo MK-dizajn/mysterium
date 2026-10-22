@@ -21,6 +21,7 @@ export const mirbachovPalacScene: Scene = {
 
   puzzle: {
     id: "puzzle-mirbachov-palac",
+    answerLabel: "Zadaj, čo sa nachádza pod korunou.",
     question:
       "Aký druh rodového znaku sa nachádza v hornej strednej časti fasády pod grófskou korunou?",
     acceptedAnswers: [

@@ -359,3 +359,67 @@ fatal: could not read Username for 'https://github.com': terminal prompts disabl
 **Build:** netýka sa tohto kroku.
 
 **Ďalší krok:** pushnúť cez aplikáciu GitHub Desktop (v nej je používateľ prihlásený), alebo nastaviť prihlásenie pre Git v termináli.
+
+---
+
+## 22. 10. 2026 – Krok 17: Overenie pushu cez GitHub Desktop
+
+**Čo sa urobilo:**
+- Používateľ pushol 8 commitov sám cez GitHub Desktop.
+- Overil som to príkazmi `git fetch`, `git status -sb` a `git log origin/sprint-4-first-playable-chapter -3 --oneline`.
+
+**Výsledok:** push je hotový.
+- Lokálna vetva `sprint-4-first-playable-chapter` je zhodná s GitHubom. Obe sú na verzii `2742611`.
+- Na odoslanie čaká 0 commitov.
+
+**Zmenené súbory:** žiadne (iba overenie).
+
+**Build:** netýka sa tohto kroku.
+
+**Ďalší krok:** krok 0.1 – jasné zadanie úloh v scénach 3 až 10.
+
+---
+
+## 22. 10. 2026 – Krok 18 (akčný plán 0.1): Jasné zadanie úloh v scénach 3 až 10
+
+**Čo sa urobilo:**
+- Do scén 3 až 10 som doplnil `answerLabel`, teda krátky text nad políčkom na odpoveď. Hráč z neho vie, čo má zadať, ale odpoveď mu neprezradí:
+  - 3\. Salvátor: „Zadaj rok, ktorým sa končí latinský nápis.“
+  - 4\. Academia Istropolitana: „Zadaj meno panovníka, ktorý školu založil.“
+  - 5\. Mirbachov palác: „Zadaj, čo sa nachádza pod korunou.“
+  - 6\. Stará radnica: „Zadaj, aký predmet zostal v stene veže.“
+  - 7\. Maximiliánova fontána: „Zadaj, čo má postava oblečené na ochranu v boji.“
+  - 8\. Primaciálny palác: „Zadaj obe písmená v poradí zľava doprava.“
+  - 9\. Bratislavský mier: „Zadaj názov sály, v ktorej bol podpísaný mier.“
+  - 10\. Zlatý prešporský kľúč: „Zadaj dvoma slovami, čo všetky stopy spoločne uchovávajú.“
+- Salvátor (scéna 3):
+  - nový `objective`: hráč má vojsť **dovnútra** lekárne a hľadať latinský odkaz a **rok**,
+  - nový `cinematicText`: už nehovorí, že odkaz je na fasáde, ale že sa ukrýva vo vnútri.
+- Bratislavský mier (scéna 9): nový `objective` začína vetou „V tomto paláci bol 26. decembra 1805 podpísaný Bratislavský mier.“ Nahradil nejasné „Použi pátračov historický záznam“.
+- Prijímané odpovede, nápovedy ani kód obrazoviek a enginu sa nezmenili.
+
+**Zmenené súbory:**
+- `data/chapter-one/lekaren-u-salvatora.ts`
+- `data/chapter-one/venturska-brana-spomienok.ts`
+- `data/chapter-one/mirbachov-palac.ts`
+- `data/chapter-one/stara-radnica.ts`
+- `data/chapter-one/maximilianova-fontana.ts`
+- `data/chapter-one/primacialny-palac.ts`
+- `data/chapter-one/bratislavsky-mier.ts`
+- `data/chapter-one/zlaty-presporsky-kluc.ts`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**V prehliadači:** zatiaľ neoverené používateľom.
+
+**Otvorené veci na overenie v teréne:**
+1. **Lekáreň U Salvátora:**
+   - či je latinský nápis naozaj v interiéri,
+   - či sa tam dá vojsť a v akých hodinách.
+   - Ak nie, texty scény 3 sa prepíšu.
+2. **Primaciálny palác:** či sú písmená na fasáde naozaj v poradí C, I zľava doprava.
+3. **Mirbachov palác:** odpoveď „znak“ (a „rodový znak“) je príliš ľahká, lebo slovo „znak“ je priamo v pátračovej poznámke. Zvážiť jej vyradenie vo Fáze 2.
+
+**Ďalší krok:**
+- používateľ overí nové texty v prehliadači (aspoň scénu 3),
+- stále čaká overenie nápoved z kroku 11 (akčný plán 1.1).

@@ -21,6 +21,7 @@ export const zlatyPresporskyKlucScene: Scene = {
 
   puzzle: {
     id: "puzzle-zlaty-presporsky-kluc",
+    answerLabel: "Zadaj dvoma slovami, čo všetky stopy spoločne uchovávajú.",
     question:
       "Čo podľa pátračovho denníka všetky nájdené stopy spoločne uchovávajú?",
     acceptedAnswers: [

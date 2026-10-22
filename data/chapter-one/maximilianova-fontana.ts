@@ -21,6 +21,7 @@ export const maximilianovaFontanaScene: Scene = {
 
   puzzle: {
     id: "puzzle-maximilianova-fontana",
+    answerLabel: "Zadaj, čo má postava oblečené na ochranu v boji.",
     question:
       "Čo má postava na vrchole fontány oblečené ako ochranu pri boji?",
     acceptedAnswers: [

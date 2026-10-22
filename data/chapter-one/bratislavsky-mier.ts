@@ -13,7 +13,7 @@ export const bratislavskyMierScene: Scene = {
 
   investigation: {
     objective:
-      "Použi pátračov historický záznam. Hľadaná miestnosť sa nachádza v Primaciálnom paláci a jej názov súvisí s predmetmi, ktoré opakujú obraz človeka stojaceho pred nimi.",
+      "V tomto paláci bol 26. decembra 1805 podpísaný Bratislavský mier. Hľadaná miestnosť sa nachádza v Primaciálnom paláci a jej názov súvisí s predmetmi, ktoré opakujú obraz človeka stojaceho pred nimi.",
     detectiveHint:
       "Keď sa do takého predmetu pozrieš, uvidíš svoju vlastnú podobu. V paláci nimi bola vyzdobená celá reprezentačná sieň.",
     observationType: "deduction",
@@ -21,6 +21,7 @@ export const bratislavskyMierScene: Scene = {
 
   puzzle: {
     id: "puzzle-bratislavsky-mier",
+    answerLabel: "Zadaj názov sály, v ktorej bol podpísaný mier.",
     question:
       "V ktorej miestnosti Primaciálneho paláca bol 26. decembra 1805 podpísaný Bratislavský mier?",
     acceptedAnswers: [

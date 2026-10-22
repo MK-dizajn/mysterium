@@ -6,14 +6,14 @@ export const lekarenUSalvatoraScene: Scene = {
   title: "3. Mysli na koniec",
 
   cinematicText:
-  "Po Michalskej a Ventúrskej ulici prichádzaš na Panskú ulicu k historickej Lekárni U Salvátora. Si na správnom mieste. Jej fasáda však ukrýva viac než názov a výzdobu — zostal na nej odkaz starší než samotná budova.",
+  "Po Michalskej a Ventúrskej ulici prichádzaš na Panskú ulicu k historickej Lekárni U Salvátora. Si na správnom mieste. Jej fasáda zaujme na prvý pohľad, no skutočný odkaz, starší než samotná budova, sa ukrýva vo vnútri.",
   
   voiceLine:
     "Liečiteľ musí poznať nielen začiatok svojho rozhodnutia, ale aj jeho následky. Pátrač si preto zapísal jedinú radu: Čokoľvek robíš, mysli na koniec. Nájdi miesto, odkiaľ tieto slová pochádzajú.",
 
   investigation: {
     objective:
-        "Prezri si priečelie Lekárne U Salvátora. Pátrač nehľadá názov budovy ani výklady. Hľadá historický latinský odkaz, ktorý prežil stáročia.",
+        "Vojdi dovnútra Lekárne U Salvátora a prezri si jej historické zariadenie. Pátrač nehľadá názov lekárne ani súčasné nápisy. Hľadá starý latinský odkaz a rok, ktorým sa končí.",
     detectiveHint:
         "Keď nájdeš latinský text, nečítaj iba jeho začiatok. Skutočná stopa sa ukrýva na jeho úplnom konci.",
     observationType: "inscription",
@@ -21,6 +21,7 @@ export const lekarenUSalvatoraScene: Scene = {
 
   puzzle: {
     id: "puzzle-lekaren-salvator",
+    answerLabel: "Zadaj rok, ktorým sa končí latinský nápis.",
     question:
       "Nájdi pri Lekárni U Salvátora latinský nápis, ktorý sa končí slovami „respice finem“. Aký rok je uvedený na jeho konci?",
     acceptedAnswers: [
