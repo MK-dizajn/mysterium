@@ -28,6 +28,8 @@ export function createNewGameState(): GameState {
     flags: {},
     inventory: [],
     hintsUsed: {},
+    foundCodeItemIds: [],
+    revealedCodeItemIds: [],
   };
 }
 

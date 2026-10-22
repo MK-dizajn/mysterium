@@ -22,6 +22,14 @@ export type EvidenceKind =
   | "symbol"
   | "fragment";
 
+/**
+ * Ako hráč hľadá číslicu na predmete (obrazovka „Prezrieť“, krok B1b-2).
+ * Predmet bez inspect má číslicu nájdenú hneď po získaní.
+ */
+export type ItemInspect = {
+  kind: "hotspot" | "count";
+};
+
 export type InventoryItem = {
   id: string;
   title: string;
@@ -33,6 +41,7 @@ export type InventoryItem = {
   secretCode?: string;
   evidenceOrder?: number;
   actId?: ActId;
+  inspect?: ItemInspect;
 };
 
 export type CodexEntry = {
@@ -300,6 +309,10 @@ export type GameState = {
   quests: QuestProgress[];
   flags: Record<string, boolean>;
   hintsUsed: Record<PuzzleId, number>;
+  /** Predmety, na ktorých hráč našiel číslicu kódu. */
+  foundCodeItemIds: string[];
+  /** Predmety, ktorých číslicu hráč odhalil tlačidlom „Ukáž číslicu“. */
+  revealedCodeItemIds: string[];
   activeDialogueId?: string;
   activeDialogueNodeId?: string;
   activeNpcId?: string;

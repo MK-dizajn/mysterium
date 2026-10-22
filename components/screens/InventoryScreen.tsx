@@ -1,5 +1,7 @@
+import type { CodeNotebookLock } from "../../engine";
 import type { InventoryItem } from "../../types/game";
 import { ActionButton } from "../ui/ActionButton";
+import { CodeNotebook } from "../ui/CodeNotebook";
 import { DetectiveIcon } from "../ui/MysteriumIcons";
 import { ScreenContainer } from "../ui/ScreenContainer";
 import { SectionCard } from "../ui/SectionCard";
@@ -7,6 +9,7 @@ import { StoryCard } from "../ui/StoryCard";
 
 type InventoryScreenProps = {
   inventory: InventoryItem[];
+  codeNotebook: CodeNotebookLock[];
   onBack: () => void;
 };
 
@@ -32,6 +35,7 @@ function getEvidenceKindLabel(item: InventoryItem) {
 
 export function InventoryScreen({
   inventory,
+  codeNotebook,
   onBack,
 }: InventoryScreenProps) {
   const sortedInventory = [...inventory].sort((firstItem, secondItem) => {
@@ -44,6 +48,8 @@ export function InventoryScreen({
   return (
     <ScreenContainer>
       <StoryCard label="Zhromaždené stopy" title="Inventár">
+        <CodeNotebook locks={codeNotebook} />
+
         {sortedInventory.length === 0 ? (
           <SectionCard
             icon={<DetectiveIcon className="h-9 w-9" />}

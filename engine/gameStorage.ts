@@ -14,6 +14,12 @@ function isNonNegativeInteger(value: unknown): value is number {
   return typeof value === "number" && Number.isInteger(value) && value >= 0;
 }
 
+function isStringArray(value: unknown): value is string[] {
+  return (
+    Array.isArray(value) && value.every((item) => typeof item === "string")
+  );
+}
+
 /**
  * Doplní chýbajúce alebo poškodené polia zo staršieho uloženia
  * predvolenými hodnotami, aby obnovená hra nespadla.
@@ -56,6 +62,12 @@ function normalizeGameState(value: unknown): GameState | null {
       !Array.isArray(saved.hintsUsed)
         ? saved.hintsUsed
         : defaults.hintsUsed,
+    foundCodeItemIds: isStringArray(saved.foundCodeItemIds)
+      ? saved.foundCodeItemIds
+      : defaults.foundCodeItemIds,
+    revealedCodeItemIds: isStringArray(saved.revealedCodeItemIds)
+      ? saved.revealedCodeItemIds
+      : defaults.revealedCodeItemIds,
   };
 }
 

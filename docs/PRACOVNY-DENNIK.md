@@ -1101,3 +1101,58 @@ Skóre vo finále je pred zmenou aj po nej rovnaké: 10 hádaniek × 100 + odmen
 **V prehliadači:** zatiaľ neoverené používateľom.
 
 **Ďalší krok:** používateľ overí koniec aktu I a II v prehliadači, potom ďalší krok podľa plánu (B1b alebo B3), až po potvrdení.
+
+---
+
+## Krok 38 (krok B1b-1): Stav nájdených číslic a Zápisník kódov
+
+**Čo sa urobilo:**
+- **Herný stav** (`types/game.ts`, `engine/gameEngine.ts`) má dva nové zoznamy:
+  - `foundCodeItemIds` – predmety, na ktorých hráč našiel číslicu,
+  - `revealedCodeItemIds` – predmety, ktorých číslicu odhalil tlačidlom „Ukáž číslicu“ (bez straty bodov, iba sa zapamätá).
+  - Ukladajú sa s hrou, takže prežijú F5.
+- **Nový súbor `engine/codeNotebook.ts`:**
+  - `markCodeDigitFound(stav, idPredmetu, { revealed })` zapíše nájdenú číslicu. Iba pri predmete, ktorý hráč má a ktorý nesie číslicu, a **iba raz**.
+  - `getCodeNotebook(kapitola, stav)` pripraví Zápisník kódov: pre každý akt jeden zámok, miesta v poradí dôkazov. **Číslice berie z dát kapitoly**, nie z uloženého inventára, takže aj staré uloženie so starými kódmi ukáže v zápisníku správne číslice.
+- **Pravidlo „nájdené hneď po získaní“:** predmet bez obrazovky „Prezrieť“ (nové pole `inspect` pri predmete; zatiaľ ho nemá žiadny predmet) má číslicu nájdenú, hneď ako ho hráč má. Do zoznamu sa preto nič nezapisuje a hra sa správa ako doteraz. Zoznam `foundCodeItemIds` sa začne používať v kroku B1b-2.
+- **Nový komponent `components/ui/CodeNotebook.tsx`:**
+  - zámky I, II, III × 3 miesta,
+  - nájdená číslica je veľká,
+  - nenájdená je prázdne prerušované políčko s bodkou a popisom pre čítačku „zatiaľ nenájdená“,
+  - každý riadok je skupina „Zámok I“ atď.
+  - Navrhnutý na šírku 360 px (riadok asi 208 px z dostupných asi 232 px).
+- **Inventár** (`InventoryScreen.tsx`, `CollectionFlow.tsx`): Zápisník kódov je **prvá sekcia**. Pri predmetoch zostáva aj „Tajný údaj“ ako doteraz (skryje sa v B1b-2).
+- **Uloženie** (`engine/gameStorage.ts`): staré uloženie bez zoznamov dostane pri načítaní prázdne zoznamy; poškodené zoznamy sa nahradia prázdnymi.
+- Pri dnešnej (nepoužívanej) truhlici sa nič nemenilo.
+
+**Test (mimo projektu, necommitnutý):**
+- **Celá kapitola pred zmenou a po nej: žiadny rozdiel** (41 riadkov: poradie obrazoviek, akty, útržky, uložené hry, skóre **1010**).
+- **Zápisník a stav – 16 z 16 kontrol prešlo:**
+  - nová hra: prázdne zoznamy, zápisník `I:___ II:___ III:___`,
+  - po scénach 1 a 2: `I:38_`; po celej kapitole: `I:381 II:604 III:927`,
+  - číslica sa zapíše iba raz; predmet, ktorý hráč nemá, alebo predmet bez číslice sa nezapíše,
+  - „Ukáž číslicu“ sa zapíše do nájdených aj odhalených, iba raz,
+  - po uložení a načítaní (F5) zoznamy zostanú,
+  - staré uloženie bez zoznamov: prázdne zoznamy a zápisník ukazuje získané číslice,
+  - poškodené zoznamy sa nahradia prázdnymi,
+  - staré dvojciferné kódy v uloženom inventári: zápisník ukazuje číslicu z dát,
+  - predmet s `inspect` (príprava na B1b-2): pred nájdením prázdne miesto, po nájdení číslica.
+
+**Zmenené súbory:**
+- `types/game.ts`
+- `engine/codeNotebook.ts` (nový)
+- `engine/gameEngine.ts`
+- `engine/gameStorage.ts`
+- `engine/index.ts`
+- `components/ui/CodeNotebook.tsx` (nový)
+- `components/screens/InventoryScreen.tsx`
+- `components/game/CollectionFlow.tsx`
+- `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** zmenené súbory sú bez chýb.
+
+**V prehliadači:** zatiaľ neoverené používateľom (aj šírka 360 px).
+
+**Ďalší krok:** používateľ overí zápisník v prehliadači, potom B1b-2 (prototyp „Prezrieť“ na žetóne), až po potvrdení.
