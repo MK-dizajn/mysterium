@@ -13,6 +13,7 @@ type CodexBarProps = {
   inventory: InventoryItem[];
   quests: QuestProgress[];
   score: number;
+  totalArtifacts: number;
   onOpenInventory: () => void;
   onOpenArtifacts: () => void;
   onOpenQuests: () => void;
@@ -35,6 +36,7 @@ export function CodexBar({
   inventory,
   quests,
   score,
+  totalArtifacts,
   onOpenInventory,
   onOpenArtifacts,
   onOpenQuests,
@@ -138,7 +140,7 @@ export function CodexBar({
             </span>
 
             <span className="mt-0.5 block text-xs text-slate-400">
-              {artifacts.length}/10 objavených
+              {artifacts.length}/{totalArtifacts} objavených
             </span>
           </button>
         </div>

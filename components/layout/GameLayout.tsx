@@ -5,6 +5,7 @@ import { CodexBar } from "../ui/CodexBar";
 type GameLayoutProps = {
   children: ReactNode;
   gameState: GameState;
+  totalArtifacts: number;
   onOpenInventory: () => void;
   onOpenArtifacts: () => void;
   onOpenQuests: () => void;
@@ -13,6 +14,7 @@ type GameLayoutProps = {
 export function GameLayout({
   children,
   gameState,
+  totalArtifacts,
   onOpenInventory,
   onOpenArtifacts,
   onOpenQuests,
@@ -24,6 +26,7 @@ export function GameLayout({
         inventory={gameState.inventory}
         quests={gameState.quests}
         score={gameState.score}
+        totalArtifacts={totalArtifacts}
         onOpenInventory={onOpenInventory}
         onOpenArtifacts={onOpenArtifacts}
         onOpenQuests={onOpenQuests}

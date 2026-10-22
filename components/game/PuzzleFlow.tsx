@@ -7,6 +7,7 @@ import { JournalReveal } from "../ui/JournalReveal";
 type PuzzleFlowProps = {
   gameState: GameState;
   scene: Scene;
+  totalArtifacts: number;
   onOpenInventory: () => void;
   onOpenArtifacts: () => void;
   onOpenQuests: () => void;
@@ -19,6 +20,7 @@ type PuzzleFlowProps = {
 export function PuzzleFlow({
   gameState,
   scene,
+  totalArtifacts,
   onOpenInventory,
   onOpenArtifacts,
   onOpenQuests,
@@ -62,6 +64,7 @@ export function PuzzleFlow({
   return (
     <GameLayout
       gameState={gameState}
+      totalArtifacts={totalArtifacts}
       onOpenInventory={onOpenInventory}
       onOpenArtifacts={onOpenArtifacts}
       onOpenQuests={onOpenQuests}

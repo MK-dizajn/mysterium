@@ -5,6 +5,10 @@ export function getPuzzleSolvedFlagId(scene: Scene) {
   return `puzzle-solved-${scene.id}`;
 }
 
+export function countChapterArtifacts(chapter: Chapter) {
+  return chapter.scenes.filter((scene) => Boolean(scene.artifact)).length;
+}
+
 function isValidIndex(index: number, length: number) {
   return Number.isInteger(index) && index >= 0 && index < length;
 }

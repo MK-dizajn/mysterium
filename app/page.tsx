@@ -18,6 +18,7 @@ import {
   applyDialogueChoiceActions,
   clearGameState,
   continueAfterHistory,
+  countChapterArtifacts,
   createNewGameState,
   revealHint,
   solvePuzzle,
@@ -56,6 +57,8 @@ export default function Home() {
   const currentScene =
     currentChapter.scenes[gameState.currentSceneIndex] ??
     currentChapter.scenes[0];
+
+  const totalArtifacts = countChapterArtifacts(currentChapter);
 
   const ambientScreen: GameScreen = unlockedArtifact
     ? "artifact"
@@ -237,6 +240,7 @@ export default function Home() {
       return (
         <NpcFlow
           gameState={gameState}
+          totalArtifacts={totalArtifacts}
           scene={currentScene}
           onOpenInventory={openInventory}
           onOpenArtifacts={openArtifacts}
@@ -301,6 +305,7 @@ export default function Home() {
       return (
         <PuzzleFlow
           gameState={gameState}
+          totalArtifacts={totalArtifacts}
           scene={currentScene}
           onOpenInventory={openInventory}
           onOpenArtifacts={openArtifacts}
@@ -352,6 +357,7 @@ export default function Home() {
       return (
         <HistoryFlow
           gameState={gameState}
+          totalArtifacts={totalArtifacts}
           scene={currentScene}
           onOpenInventory={openInventory}
           onOpenArtifacts={openArtifacts}

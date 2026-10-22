@@ -745,3 +745,38 @@ Skóre vo finále je pred zmenou aj po nej rovnaké: 10 hádaniek × 100 + odmen
 **Build:** netýka sa tohto kroku.
 
 **Ďalší krok:** časť 0.4b (počet artefaktov z dát kapitoly namiesto „/10“), až po potvrdení používateľa.
+
+---
+
+## Krok 29 (akčný plán 0.4b): Počet artefaktov z dát kapitoly
+
+**Čo sa urobilo:**
+- Číslo za lomkou pri Artefaktoch v hornej lište („1/10 objavených“) už nie je natvrdo 10.
+- Vypočíta sa z aktuálnej kapitoly ako **počet scén, ktoré majú artefakt**. Pre kapitolu 1 je to 10, takže hráč vidí to isté ako predtým.
+- Výpočet je v novej funkcii `countChapterArtifacts` v `engine/gameProgress.ts`, aby sa dal otestovať samostatne. `app/page.tsx` ho vypočíta a cez obrazovky ho odovzdá lište.
+- Vzhľad lišty (ikona pri Artefaktoch) sa nemenil.
+
+**Test (mimo projektu, necommitnutý):**
+| Kapitola | Výsledok | Očakávané |
+|---|---|---|
+| kapitola 1 (skutočné dáta) | 10 | 10 |
+| kapitola s 12 scénami | 12 | 12 |
+| 12 scén, z toho 1 bez artefaktu | 11 | 11 |
+
+**Zmenené súbory:**
+- `engine/gameProgress.ts` (nová funkcia `countChapterArtifacts`; súbor navyše oproti návrhu, kvôli testu)
+- `components/ui/CodexBar.tsx` (`/10` → `/{totalArtifacts}`)
+- `components/layout/GameLayout.tsx`
+- `components/game/PuzzleFlow.tsx`
+- `components/game/HistoryFlow.tsx`
+- `components/game/NpcFlow.tsx`
+- `app/page.tsx`
+- `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** iba stará chyba v `CodexBar.tsx`, riadok 55 (predtým 53; posunula sa o 2 pridané riadky), `react-hooks/set-state-in-effect`, načítanie stavu zvuku. **Existovala už pred touto zmenou.** Nová chyba nevznikla.
+
+**V prehliadači:** zatiaľ neoverené používateľom.
+
+**Ďalší krok:** používateľ overí, že lišta ukazuje rovnaké „x/10“ ako predtým. Potom ďalší krok akčného plánu, až po potvrdení.

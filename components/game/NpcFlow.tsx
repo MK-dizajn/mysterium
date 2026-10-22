@@ -10,6 +10,7 @@ import { NpcScreen } from "../screens/NpcScreen";
 type NpcFlowProps = {
   gameState: GameState;
   scene: Scene;
+  totalArtifacts: number;
   onOpenInventory: () => void;
   onOpenArtifacts: () => void;
   onOpenQuests: () => void;
@@ -21,6 +22,7 @@ type NpcFlowProps = {
 export function NpcFlow({
   gameState,
   scene,
+  totalArtifacts,
   onOpenInventory,
   onOpenArtifacts,
   onOpenQuests,
@@ -54,6 +56,7 @@ export function NpcFlow({
     return (
       <GameLayout
         gameState={gameState}
+        totalArtifacts={totalArtifacts}
         onOpenInventory={onOpenInventory}
         onOpenArtifacts={onOpenArtifacts}
         onOpenQuests={onOpenQuests}
