@@ -644,3 +644,23 @@ Skóre vo finále je pred zmenou aj po nej rovnaké: 10 hádaniek × 100 + odmen
 **Ďalší krok:**
 - používateľ overí v prehliadači,
 - rozhodne, či opraviť 2 staré lint chyby v `hooks/useGameEngine.ts`.
+
+---
+
+## Krok 26: Overenie opravy uloženia v prehliadači
+
+**Čo sa urobilo:**
+- Používateľ otestoval krok 25 (akčný plán 0.3b) v prehliadači. Všetko funguje podľa popisu:
+  - scéna 99 aj text namiesto čísla → hra pokračuje prvou nevyriešenou scénou so zachovaným skóre a nálezmi,
+  - po F5 žiadny návrat na úvod,
+  - záloha `mysterium-progress-v2-backup-before-repair` existuje,
+  - bežná hra sa nezmenila.
+- Pri teste Chrome zablokoval vkladanie kódu do konzoly (bezpečnostné upozornenie prehliadača, nie chyba hry). Pomohlo napísať `allow pasting`.
+- Krok 0.3b je **overený a dokončený**.
+
+**Zmenené súbory:**
+- `docs/PRACOVNY-DENNIK.md` (tento záznam)
+
+**Build:** netýka sa tohto kroku.
+
+**Ďalší krok:** podľa akčného plánu, po potvrdení používateľa.
