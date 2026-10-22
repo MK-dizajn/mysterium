@@ -13,6 +13,7 @@ type CollectionFlowProps = {
   chapter: Chapter;
   onBack: () => void;
   onOpenArtifact: (artifact: Artifact) => void;
+  onInspectItem: (itemId: string) => void;
 };
 
 export function CollectionFlow({
@@ -20,12 +21,14 @@ export function CollectionFlow({
   chapter,
   onBack,
   onOpenArtifact,
+  onInspectItem,
 }: CollectionFlowProps) {
   if (gameState.screen === "inventory") {
     return (
       <InventoryScreen
         inventory={gameState.inventory}
         codeNotebook={getCodeNotebook(chapter, gameState)}
+        onInspectItem={onInspectItem}
         onBack={onBack}
       />
     );

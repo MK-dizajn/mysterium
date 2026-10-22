@@ -1182,3 +1182,64 @@ Skóre vo finále je pred zmenou aj po nej rovnaké: 10 hádaniek × 100 + odmen
 **V prehliadači:** zatiaľ neoverené používateľom.
 
 **Ďalší krok:** používateľ overí zápisník pri 360 px a na počítači, potom B1b-2, až po potvrdení.
+
+---
+
+## Krok 40 (krok B1b-2): Obrazovka „Prezrieť“ – prototyp so žetónom
+
+**Čo sa urobilo:**
+- **Žetón nultého kilometra** (scéna 1) má v dátach obrazovku „Prezrieť“: pole `inspect` v `data/chapter-one/michalska-brana.ts` (druh „hotspot“, obrázok „token“, pokyn pre hráča, popis miesta pre čítačku). Ostatné predmety ho zatiaľ nemajú, ich číslica je nájdená hneď ako doteraz.
+- **Nový kreslený žetón** `components/items/TokenArt.tsx` (SVG):
+  - **líce:** starý mosadzný žetón s veternou ružicou, ryskami, nápismi „BRATISLAVA“ a „0 KM“,
+  - **hrana:** ryhovaný okraj s hladkým miestom, kde je **vyrytá číslica**.
+- **Nová obrazovka** `components/items/ItemInspector.tsx`:
+  - okno cez celú obrazovku; **Esc** ho zavrie; pri otvorení sa zameria prvý ovládací prvok („Otočiť na hranu“),
+  - tlačidlo **„Otočiť na hranu“ / „Otočiť späť“** s krátkou animáciou otočenia,
+  - na hrane je **miesto s číslicou** – skutočné tlačidlo (myš, Tab, Enter, medzerník), plocha aspoň 44 × 44 px, popis pre čítačku „Vyrytá číslica na hrane žetónu“,
+  - po **20 s** nečinnosti jemne **žiari** miesto, kam sa pozrieť (na líci tlačidlo „Otočiť“, na hrane miesto s číslicou); pri vypnutých animáciách zostane výrazný obrys bez pulzovania,
+  - po ďalších **20 s** sa ukáže **„Ukáž číslicu“** – bez straty bodov, zapíše sa do `revealedCodeItemIds`,
+  - po nájdení: číslica sa zvýrazní, krátka animácia, text **„Číslica pre zámok I zapísaná do zápisníka (miesto 1).“** (čítačka ho oznámi), zvuk `digit-found` cez `soundManager`. Súbor zvuku zatiaľ chýba a pri vypnutom zvuku sa preskočí – hra pokračuje bez neho,
+  - zameranie klávesnice potom prejde na tlačidlo „Hotovo“.
+- **Inventár** (`InventoryScreen.tsx`):
+  - pri žetóne je „Tajný údaj“ **skrytý**, kým hráč číslicu nenájde („Číslica je na predmete ukrytá. Prezri ho a nájdi ju.“), a je tam tlačidlo **„Prezrieť“**,
+  - číslica sa teraz berie zo zápisníka, teda z dát kapitoly.
+- **Po vyriešení scény 1** (`HistoryScreen.tsx`) je nová karta **„Nová odmena“** so žetónom a tlačidlom „Prezrieť“. Ukáže sa iba pri predmete s obrazovkou „Prezrieť“, ostatné scény sa nemenia.
+- **Engine** (`engine/codeNotebook.ts`):
+  - `getSceneCodeItemId` (predmet s číslicou za scénu),
+  - `getCodeItemInfo` (zámok, miesto, nájdená/odhalená),
+  - zápisník pri každom mieste vie, či má predmet obrazovku „Prezrieť“.
+- `lib/soundManager.ts`: nový zvuk `digit-found` (`/sounds/digit-found.mp3`).
+- `docs/MEDIA-LICENCIE.md`: doplnený chýbajúci zvuk `digit-found.mp3` a poznámka, že obrázky predmetov sú kreslené v kóde (vlastná práca).
+- Nepoužívaný panel dôkazov truhlice (`ChestEvidencePanel.tsx`) sa nemenil; do hry sa vráti s novou truhlicou.
+
+**Test (mimo projektu, necommitnutý):**
+- **Testy enginu:** pred zmenou 6 z 13 zlyhalo (žetón ešte nemal `inspect`), **po zmene 13 z 13 prešlo**:
+  - získanie žetónu číslicu nezapíše, zápisník má prázdne miesto (`I:___`),
+  - nájdenie zapíše „3“ do zámku I, iba raz, body sa nemenia,
+  - „Ukáž číslicu“ zapíše do nájdených aj odhalených, body sa nemenia,
+  - nájdená číslica prežije F5; nenájdená po F5 zostane nenájdená,
+  - ostatné predmety sú nájdené hneď (`I:_81` po scéne 3).
+- **Celá kapitola pred zmenou a po nej: žiadny rozdiel** (41 riadkov, poradie obrazoviek, skóre **1010**).
+
+**Zmenené súbory:**
+- `types/game.ts`
+- `data/chapter-one/michalska-brana.ts`
+- `engine/codeNotebook.ts`
+- `lib/soundManager.ts`
+- `components/items/TokenArt.tsx` (nový)
+- `components/items/ItemInspector.tsx` (nový)
+- `components/screens/InventoryScreen.tsx`
+- `components/screens/HistoryScreen.tsx`
+- `components/game/CollectionFlow.tsx`
+- `components/game/HistoryFlow.tsx`
+- `app/page.tsx`
+- `docs/MEDIA-LICENCIE.md`
+- `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** iba staré upozornenie v `HistoryScreen.tsx` (nepoužitý `LightbulbIcon`, známe z kroku 27). Nová chyba ani upozornenie nevzniklo.
+
+**V prehliadači:** zatiaľ neoverené používateľom (myš, klávesnica, 360 px, vypnutý zvuk, vypnuté animácie).
+
+**Ďalší krok:** používateľ overí obrazovku „Prezrieť“ v prehliadači, potom B1b-3 (zvyšné predmety), až po potvrdení.

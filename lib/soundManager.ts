@@ -2,6 +2,7 @@ export type SoundId =
   | "artifact-unlock"
   | "chest-unlock"
   | "puzzle-success"
+  | "digit-found"
   | "button-click"
   | "npc-message"
   | "city-ambient";
@@ -33,6 +34,10 @@ const sounds: Record<SoundId, SoundConfig> = {
   "puzzle-success": {
     src: "/sounds/puzzle-success.mp3",
     volume: 0.65,
+  },
+  "digit-found": {
+    src: "/sounds/digit-found.mp3",
+    volume: 0.5,
   },
   "button-click": {
     src: "/sounds/button-click.mp3",

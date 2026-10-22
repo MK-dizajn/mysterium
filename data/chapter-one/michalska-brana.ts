@@ -195,6 +195,13 @@ Pátračovo pravidlo znie: „Prvá stopa patrí mestu, ku ktorému vedie najkra
             secretCode: "3",
             evidenceOrder: 1,
             actId: "act-1",
+            inspect: {
+              kind: "hotspot",
+              art: "token",
+              instruction:
+                "Prezri žetón. Číslica nie je na jeho líci – je vyrytá na okraji. Otoč žetón na hranu a nájdi ju.",
+              hotspotLabel: "Vyrytá číslica na hrane žetónu",
+            },
           },
         },
       ],

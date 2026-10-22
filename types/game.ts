@@ -28,6 +28,12 @@ export type EvidenceKind =
  */
 export type ItemInspect = {
   kind: "hotspot" | "count";
+  /** Ktorý kreslený obrázok predmetu sa použije. */
+  art: "token";
+  /** Pokyn pre hráča na obrazovke „Prezrieť“. */
+  instruction: string;
+  /** Popis miesta s číslicou pre čítačku obrazovky. */
+  hotspotLabel: string;
 };
 
 export type InventoryItem = {

@@ -11,6 +11,7 @@ import { ActTransitionScreen } from "../components/screens/ActTransitionScreen";
 import { FinishScreen } from "../components/screens/FinishScreen";
 import { IntroScreen } from "../components/screens/IntroScreen";
 import { LandingScreen } from "../components/screens/LandingScreen";
+import { ItemInspector } from "../components/items/ItemInspector";
 import { ArtifactUnlock } from "../components/ui/ArtifactUnlock";
 import { mysteriumGame } from "../data/mysterium-game";
 import {
@@ -21,6 +22,9 @@ import {
   countChapterArtifacts,
   createNewGameState,
   getActTransition,
+  getCodeItemInfo,
+  getSceneCodeItemId,
+  markCodeDigitFound,
   revealHint,
   solvePuzzle,
   talkToNpc,
@@ -43,6 +47,9 @@ export default function Home() {
   const [unlockedArtifact, setUnlockedArtifact] =
     useState<Artifact | null>(null);
 
+  const [inspectedItemId, setInspectedItemId] =
+    useState<string | null>(null);
+
   const [previousScreen, setPreviousScreen] =
     useState<GameScreen>("puzzle");
 
@@ -60,6 +67,22 @@ export default function Home() {
     currentChapter.scenes[0];
 
   const totalArtifacts = countChapterArtifacts(currentChapter);
+
+  const sceneCodeItemId = getSceneCodeItemId(currentScene);
+
+  const sceneCodeItem = sceneCodeItemId
+    ? getCodeItemInfo(currentChapter, gameState, sceneCodeItemId)
+    : null;
+
+  const inspectedItem = inspectedItemId
+    ? getCodeItemInfo(currentChapter, gameState, inspectedItemId)
+    : null;
+
+  function findCodeDigit(itemId: string, revealed: boolean) {
+    setGameState((currentState) =>
+      markCodeDigitFound(currentState, itemId, { revealed })
+    );
+  }
 
   const ambientScreen: GameScreen = unlockedArtifact
     ? "artifact"
@@ -247,6 +270,7 @@ export default function Home() {
           chapter={currentChapter}
           onBack={closeCollection}
           onOpenArtifact={openArtifact}
+          onInspectItem={setInspectedItemId}
         />
       );
     }
@@ -317,6 +341,8 @@ export default function Home() {
         <HistoryFlow
           gameState={gameState}
           totalArtifacts={totalArtifacts}
+          codeItem={sceneCodeItem}
+          onInspectItem={setInspectedItemId}
           scene={currentScene}
           onOpenInventory={openInventory}
           onOpenArtifacts={openArtifacts}
@@ -365,6 +391,7 @@ export default function Home() {
           chapter={currentChapter}
           onBack={closeCollection}
           onOpenArtifact={openArtifact}
+          onInspectItem={setInspectedItemId}
         />
       );
     }
@@ -382,6 +409,15 @@ export default function Home() {
     <>
       <CityAmbient currentScreen={ambientScreen} />
       {renderCurrentScreen()}
+
+      {inspectedItem && (
+        <ItemInspector
+          info={inspectedItem}
+          onFound={() => findCodeDigit(inspectedItem.item.id, false)}
+          onReveal={() => findCodeDigit(inspectedItem.item.id, true)}
+          onClose={() => setInspectedItemId(null)}
+        />
+      )}
     </>
   );
 }

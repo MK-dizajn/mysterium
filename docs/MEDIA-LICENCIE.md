@@ -21,5 +21,8 @@ Sem sa zapisuje každý obrázok, zvuk, hudba, hlas a video použité v hre. Hra
 | `public/sounds/npc-message.mp3` | – (súbor je prázdny, 0 B) | – | – | treba vytvoriť |
 | `public/sounds/puzzle-success.mp3` | – (súbor je prázdny, 0 B) | – | – | treba vytvoriť |
 | `public/sounds/button-click.mp3` | – (súbor chýba) | – | – | treba vytvoriť |
+| `public/sounds/digit-found.mp3` | – (súbor chýba) | – | – | treba vytvoriť – krátky zvuk po nájdení číslice na predmete (krok B1b-2) |
+
+Obrázky predmetov na obrazovke „Prezrieť“ (napríklad žetón v `components/items/TokenArt.tsx`) sú kreslené priamo v kóde (SVG a CSS). Sú to vlastná práca projektu, nepotrebujú licenciu tretej strany.
 
 Poznámka: súbory `public/file.svg`, `globe.svg`, `next.svg`, `vercel.svg` a `window.svg` sú predvolené ikony z novej šablóny Next.js. Hra ich nepoužíva.

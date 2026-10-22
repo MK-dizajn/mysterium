@@ -1,3 +1,4 @@
+import type { CodeItemInfo } from "../../engine";
 import type {
   GameState,
   Scene,
@@ -9,9 +10,11 @@ type HistoryFlowProps = {
   gameState: GameState;
   scene: Scene;
   totalArtifacts: number;
+  codeItem: CodeItemInfo | null;
   onOpenInventory: () => void;
   onOpenArtifacts: () => void;
   onOpenQuests: () => void;
+  onInspectItem: (itemId: string) => void;
   onContinue: () => void;
 };
 
@@ -19,9 +22,11 @@ export function HistoryFlow({
   gameState,
   scene,
   totalArtifacts,
+  codeItem,
   onOpenInventory,
   onOpenArtifacts,
   onOpenQuests,
+  onInspectItem,
   onContinue,
 }: HistoryFlowProps) {
   return (
@@ -34,6 +39,8 @@ export function HistoryFlow({
     >
       <HistoryScreen
         scene={scene}
+        codeItem={codeItem}
+        onInspectItem={onInspectItem}
         onContinue={onContinue}
       />
     </GameLayout>

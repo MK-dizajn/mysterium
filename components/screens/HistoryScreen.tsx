@@ -1,3 +1,4 @@
+import type { CodeItemInfo } from "../../engine";
 import type { Scene } from "../../types/game";
 import { ActionButton } from "../ui/ActionButton";
 import { ScreenContainer } from "../ui/ScreenContainer";
@@ -12,11 +13,16 @@ import { StoryCard } from "../ui/StoryCard";
 
 type HistoryScreenProps = {
   scene: Scene;
+  /** Nová odmena s ukrytou číslicou (iba predmet s obrazovkou „Prezrieť“). */
+  codeItem?: CodeItemInfo | null;
+  onInspectItem: (itemId: string) => void;
   onContinue: () => void;
 };
 
 export function HistoryScreen({
   scene,
+  codeItem,
+  onInspectItem,
   onContinue,
 }: HistoryScreenProps) {
   return (
@@ -63,6 +69,39 @@ export function HistoryScreen({
             </p>
           </div>
         </SectionCard>
+
+        {codeItem?.item.inspect && (
+          <SectionCard
+            icon={
+              <span
+                className="text-3xl"
+                aria-hidden="true"
+              >
+                {codeItem.item.icon}
+              </span>
+            }
+            title="Nová odmena"
+            variant="gold"
+          >
+            <h3 className="font-bold text-white">
+              {codeItem.item.title}
+            </h3>
+
+            <p className="mt-2 text-sm leading-relaxed text-amber-100">
+              {codeItem.isFound
+                ? `Číslica pre zámok ${codeItem.lockLabel} je zapísaná v zápisníku.`
+                : "Na predmete je ukrytá číslica kódu. Prezri ho a nájdi ju."}
+            </p>
+
+            <ActionButton
+              variant="secondary"
+              className="mt-4"
+              onClick={() => onInspectItem(codeItem.item.id)}
+            >
+              Prezrieť
+            </ActionButton>
+          </SectionCard>
+        )}
 
         <SectionCard
           icon={<SearchIcon className="h-9 w-9" />}

@@ -1,10 +1,18 @@
-import type { ActId, Chapter, GameState, InventoryItem } from "../types/game";
+import type {
+  ActId,
+  Chapter,
+  GameState,
+  InventoryItem,
+  Scene,
+} from "../types/game";
 import { getActLockEvidence } from "./gameProgress";
 
 export type CodeNotebookSlot = {
   itemId: string;
   /** Nájdená číslica, alebo null, ak ju hráč zatiaľ nenašiel. */
   digit: string | null;
+  /** Predmet má obrazovku „Prezrieť“, na ktorej sa číslica hľadá. */
+  isInspectable: boolean;
 };
 
 export type CodeNotebookLock = {
@@ -81,6 +89,56 @@ export function getCodeNotebook(
       digit: isCodeDigitFound(gameState, item)
         ? (item.secretCode ?? null)
         : null,
+      isInspectable: Boolean(item.inspect),
     })),
   }));
+}
+
+/** Predmet s číslicou, ktorý hráč dostane za vyriešenie scény. */
+export function getSceneCodeItemId(scene: Scene): string | null {
+  const action = (scene.events ?? [])
+    .flatMap((event) => event.actions)
+    .find(
+      (gameAction) =>
+        gameAction.type === "addInventoryItem" &&
+        Boolean(gameAction.item.secretCode)
+    );
+
+  return action?.type === "addInventoryItem" ? action.item.id : null;
+}
+
+export type CodeItemInfo = {
+  /** Predmet podľa dát kapitoly (nie uložená kópia). */
+  item: InventoryItem;
+  lockLabel: string;
+  /** Poradie miesta v zámku od 1. */
+  slotNumber: number;
+  isFound: boolean;
+  isRevealed: boolean;
+};
+
+/** Údaje pre obrazovku „Prezrieť“ a pre tlačidlá pri predmete. */
+export function getCodeItemInfo(
+  chapter: Chapter,
+  gameState: GameState,
+  itemId: string
+): CodeItemInfo | null {
+  for (const act of chapter.acts) {
+    const evidence = getActLockEvidence(chapter, act);
+    const slotIndex = evidence.findIndex((item) => item.id === itemId);
+
+    if (slotIndex !== -1) {
+      const item = evidence[slotIndex];
+
+      return {
+        item,
+        lockLabel: act.lockLabel,
+        slotNumber: slotIndex + 1,
+        isFound: isCodeDigitFound(gameState, item),
+        isRevealed: gameState.revealedCodeItemIds.includes(itemId),
+      };
+    }
+  }
+
+  return null;
 }
