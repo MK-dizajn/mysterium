@@ -917,3 +917,34 @@ Skóre vo finále je pred zmenou aj po nej rovnaké: 10 hádaniek × 100 + odmen
 **Build:** netýka sa tohto kroku (iba dokumentácia).
 
 **Ďalší krok:** krok A3, až po potvrdení používateľa. Treba zvážiť, či A3 (presun dnešných dvoch truhlíc do dát) má ešte zmysel, keď sa truhlice po aktoch nahradia jednou truhlicou na konci kapitoly.
+
+---
+
+## Krok 33: Karty úloh – ako je číslica ukrytá, Zápisník kódov
+
+**Čo sa urobilo:**
+- Doplnil som `docs/KARTY-USLOH.md`. Iba dokument, nič sa nenaprogramovalo.
+- **(1)** Do tabuľky odmien pribudol stĺpec **„Ako je číslica ukrytá“**:
+  - 1 žetón: vyrytá na okraji (otočiť na hranu),
+  - 2 kus mapy: spočítať veže,
+  - 3 strana z denníka: podčiarknutá číslica v poznámke na okraji,
+  - 4 pečať: spočítať lúče okolo koruny,
+  - 5 druhý kus mapy: číslica pri kompase,
+  - 6 nahrávka: Strážca povie číslicu, v prepise sa zvýrazní,
+  - 7 až 9 zuby kľúča: počet zárezov.
+  - Pridaná kontrola pre kreslenie: mapa 8 veží, pečať 6 lúčov, zuby 9, 2 a 7 zárezov.
+- **(2)** Mechanika:
+  - „Prezrieť“ → predmet sa zväčší → hráč číslicu nájde alebo spočíta → zvuk → číslica sa sama zapíše do **„Zápisníka kódov“** (tri zámky po troch miestach, chýbajúce prázdne),
+  - pri nečinnosti detail jemne žiari, „Ukáž číslicu“ je posledná možnosť,
+  - pri truhlici sa kolieska nastavujú podľa zápisníka.
+- **(3)** Obrázky predmetov sa kreslia v kóde (SVG a CSS), nie AI obrázkami.
+- **(4)** Poradie: **B1a** = jednociferné kódy, **B1b** = táto mechanika, samostatný krok po B1a.
+- Do „Otvorených vecí“ pribudol zvuk po nájdení číslice, keďže zvukové súbory hry sú dnes prázdne.
+
+**Zmenené súbory:**
+- `docs/KARTY-USLOH.md`
+- `docs/PRACOVNY-DENNIK.md`
+
+**Build:** netýka sa tohto kroku (iba dokumentácia).
+
+**Ďalší krok:** rozhodnutie používateľa o kroku A3 (vynechať, keďže truhlice po aktoch zaniknú?), potom návrh kroku B1a, až po potvrdení.

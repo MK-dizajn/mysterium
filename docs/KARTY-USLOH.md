@@ -25,18 +25,23 @@ Súvisí s `docs/KONCEPT-ZAZITKU.md` (časti B, C, D a F).
 
 ## 2. Odmeny po úlohách
 
-| Scéna | Miesto | Odmena (predmet) | Číslica |
-|---|---|---|---|
-| 1 | Michalská brána | mosadzný žetón nultého kilometra | **3** |
-| 2 | Najužší dom | kus starej mapy s vyznačeným domom č. 15 | **8** |
-| 3 | Lekáreň U Salvátora | strana z denníka s latinskou vetou a rokom | **1** |
-| 4 | Academia Istropolitana | pečať vzdelanosti | **6** |
-| 5 | Mirbachov palác | druhý kus mapy | **0** |
-| 6 | Stará radnica | hlasová nahrávka Strážcu (zatiaľ iba text) | **4** |
-| 7 | Maximiliánova fontána | prvý zub Zlatého kľúča | **9** |
-| 8 | Primaciálny palác | druhý zub Zlatého kľúča | **2** |
-| 9 | Bratislavský mier | tretí zub Zlatého kľúča | **7** |
-| 10 | Finále | Zlatý prešporský kľúč zložený z troch zubov | – |
+| Scéna | Miesto | Odmena (predmet) | Číslica | Ako je číslica ukrytá |
+|---|---|---|---|---|
+| 1 | Michalská brána | mosadzný žetón nultého kilometra | **3** | vyrytá na okraji – predmet treba otočiť na hranu |
+| 2 | Najužší dom | kus starej mapy s vyznačeným domom č. 15 | **8** | spočítať veže v starom meste |
+| 3 | Lekáreň U Salvátora | strana z denníka s latinskou vetou a rokom | **1** | podčiarknutá číslica v poznámke na okraji |
+| 4 | Academia Istropolitana | pečať vzdelanosti | **6** | spočítať lúče okolo koruny |
+| 5 | Mirbachov palác | druhý kus mapy | **0** | číslica pri kompase |
+| 6 | Stará radnica | hlasová nahrávka Strážcu (zatiaľ iba text) | **4** | Strážca povie číslicu a v prepise sa zvýrazní |
+| 7 | Maximiliánova fontána | prvý zub Zlatého kľúča | **9** | počet zárezov |
+| 8 | Primaciálny palác | druhý zub Zlatého kľúča | **2** | počet zárezov |
+| 9 | Bratislavský mier | tretí zub Zlatého kľúča | **7** | počet zárezov |
+| 10 | Finále | Zlatý prešporský kľúč zložený z troch zubov | – | – |
+
+**Kontrola pri kreslení:** pri predmetoch, kde sa číslica počíta, musí obrázok obsahovať presne toľko prvkov, koľko je číslica:
+- mapa: **8 veží**,
+- pečať: **6 lúčov**,
+- zuby kľúča: **9**, **2** a **7 zárezov**.
 
 - **Vodidlá na ďalšie miesto:** každá odmena nesie vodidlo na ďalšie miesto. Presné znenie doplní autor podľa terénu (pozri Otvorené veci).
 - **Tlačidlo „Ukáž cestu“:** pri každej odmene je tlačidlo, ktoré ukáže dnešný text trasy (`nextInstruction` scény), **bez straty bodov**.
@@ -44,6 +49,26 @@ Súvisí s `docs/KONCEPT-ZAZITKU.md` (časti B, C, D a F).
 **Dnes v hre:**
 - po každej úlohe hráč dostane dôkaz s dvojcifernou číslicou: žetón, mosadzný štítok, lekárnickú pečať, pečať Academie, pečať rodu Nyáry, úlomok delovej gule, rytiersku sponu, emblém C · I, pečať mieru,
 - ďalšie miesto sa ukáže iba v texte „Ďalšia stopa“ na obrazovke histórie.
+
+### Mechanika: hľadanie číslice a Zápisník kódov
+
+1. Pri odmene hráč klikne na **„Prezrieť“**. Predmet sa zväčší.
+2. Hráč na predmete číslicu **nájde** alebo **spočíta** (podľa stĺpca „Ako je číslica ukrytá“).
+3. Po nájdení **zaznie zvuk** a číslica sa **sama zapíše do „Zápisníka kódov“**.
+4. Zápisník kódov má **tri zámky po troch miestach**. Číslice, ktoré hráč ešte nenašiel, sú **prázdne**.
+5. Keď hráč chvíľu nič nerobí, miesto s číslicou na predmete **jemne žiari**.
+6. Tlačidlo **„Ukáž číslicu“** je **posledná možnosť**, ak hráč číslicu nenájde ani po žiare.
+7. Pri truhlici hráč **nastavuje kolieska podľa Zápisníka kódov**.
+
+### Obrázky predmetov
+
+- Obrázky predmetov sa **kreslia v kóde (SVG a CSS)**, nie AI obrázkami.
+- Hra má vďaka tomu vlastné obrázky bez cudzích licencií a dajú sa ľahko meniť, napríklad počet veží alebo zárezov.
+
+### Poradie krokov
+
+- **B1a:** prechod na **jednociferné kódy** (číslice 3-8-1, 6-0-4, 9-2-7 v dátach scén namiesto dnešných dvojíc).
+- **B1b:** samostatný krok **po B1a**: „Prezrieť“, hľadanie číslice na predmete, Zápisník kódov, žiara a „Ukáž číslicu“, kreslené obrázky predmetov.
 
 ## 3. Konce aktov
 
@@ -80,6 +105,7 @@ Poznámka k realizácii: je to zámerná výnimka z doterajšieho pravidla „ul
 | Presné vodidlá na ďalšie miesto pri každej odmene (po terénnom overení) | doplní autor |
 | Texty koncov aktov (hlas Strážcu, pečať, zloženie kľúča) | doplní autor |
 | Adresa a názov ďalšieho miesta (štvrtý útržok v truhlici) | doplní autor |
+| Zvuk po nájdení číslice (zvukové súbory hry sú dnes prázdne) | treba nájsť alebo vytvoriť a zapísať do `docs/MEDIA-LICENCIE.md` |
 
 ---
 
