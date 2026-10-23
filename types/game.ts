@@ -293,7 +293,11 @@ export type Scene = {
   npcs?: Npc[];
 };
 
-export type ActEndingKind = "guardianVoice" | "seal" | "mysteryReveal";
+export type ActEndingKind =
+  | "guardianVoice"
+  | "seal"
+  | "mysteryReveal"
+  | "keyAssembly";
 
 /** Ľahký moment na konci aktu (bez truhlice). */
 export type ActEnding = {
@@ -316,6 +320,77 @@ export type Act = {
   ending?: ActEnding;
 };
 
+/** Strážca prináša truhlicu (video je voliteľné, bez neho sa ukáže text). */
+export type FinaleGuardian = {
+  title: string;
+  text: string;
+  videoSrc?: string;
+  posterSrc?: string;
+  skipLabel: string;
+  continueLabel: string;
+};
+
+/** Jedna truhlica s tromi zámkami, ktoré sa odomykajú v poradí. */
+export type FinaleChest = {
+  title: string;
+  intro: string;
+  /** Zámky v poradí odomykania; kódy sa berú z dôkazov scén aktu. */
+  lockActIds: ActId[];
+  /** Predmet, ktorý sa po troch zámkoch vloží do stredného zámku. */
+  keyItemId: string;
+  wrongCodeText: string;
+  lockOpenedText: string;
+  insertKeyLabel: string;
+  openedText: string;
+  /** Štvrtý útržok fotografie (pridá sa iba raz). */
+  reward: InventoryItem;
+};
+
+/** Historická fotografia zložená z útržkov. */
+export type FinalePhoto = {
+  /** Obrázkový súbor, ktorý kód rozreže na útržky. */
+  imageSrc: string;
+  imageAlt: string;
+  /** Útržky v poradí skladania. */
+  fragmentIds: string[];
+  title: string;
+  frontDescription: string;
+  /** Text na zadnej strane vrátane názvu ďalšieho miesta. */
+  backLines: string[];
+};
+
+/** Zadanie názvu ďalšieho miesta a karta „Ďalšie miesto“. */
+export type FinaleNextPlace = {
+  question: string;
+  acceptedAnswers: string[];
+  wrongAnswerText: string;
+  name: string;
+  address: string;
+  directions: string;
+  /** Dočasný údaj, pred vydaním sa nahradí. */
+  isPlaceholder?: boolean;
+};
+
+/** Záverečný text kapitoly. */
+export type FinaleEnding = {
+  label: string;
+  title: string;
+  summaryTitle: string;
+  summaryText: string;
+  paragraphs: string[];
+  journalQuote: string;
+  continuationTitle: string;
+  continuationText: string;
+};
+
+export type ChapterFinale = {
+  guardian: FinaleGuardian;
+  chest: FinaleChest;
+  photo: FinalePhoto;
+  nextPlace: FinaleNextPlace;
+  ending: FinaleEnding;
+};
+
 export type Chapter = {
   id: ChapterId;
   city: string;
@@ -325,6 +400,7 @@ export type Chapter = {
   quests: Quest[];
   acts: Act[];
   scenes: Scene[];
+  finale?: ChapterFinale;
 };
 
 export type Game = {

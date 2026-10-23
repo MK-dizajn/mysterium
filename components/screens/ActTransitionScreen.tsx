@@ -18,6 +18,7 @@ const ENDING_ICONS: Record<ActEnding["kind"], string> = {
   guardianVoice: "🔊",
   seal: "🛡️",
   mysteryReveal: "🔍",
+  keyAssembly: "🗝️",
 };
 
 export function ActTransitionScreen({

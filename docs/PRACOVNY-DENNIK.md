@@ -1782,3 +1782,59 @@ Prvé behy testu hlásili chyby v samotnom teste (nadpisy sú na obrazovke veľk
 **Lint:** bez chýb.
 
 **Ďalší krok:** čakám na potvrdenie kroku B3a (typy, dáta finále a logika enginu bez obrazoviek).
+
+---
+
+## 23. 10. 2026 – Krok 52 (krok B3a): Dáta finále a logika enginu (bez obrazoviek)
+
+**Čo sa urobilo:**
+- **Typy** (`types/game.ts`): `ChapterFinale` (Strážca, truhlica, fotografia, ďalšie miesto, záverečný text) a voliteľné pole `finale` v kapitole. Nový druh konca aktu `keyAssembly` (zloženie kľúča).
+- **Dáta finále** (`data/chapter-one/finale.ts`, dočasné texty):
+  - zámky I, II, III, kľúč `golden-pressburg-key-complete`,
+  - štvrtý útržok `torn-photo-fragment-chest`,
+  - fotografia zo 4 útržkov so zdrojom obrázka v dátach (`/images/finale/historicka-fotografia.jpg`, súbor sa doplní v kroku B5),
+  - ďalšie miesto Slovenské národné divadlo, Hviezdoslavovo námestie 1 (`isPlaceholder: true`),
+  - záverečný text, zatiaľ prevzatý z `FinishScreen.tsx`; namiesto útržku mapy hovorí o zloženej fotografii.
+- **Koniec aktu III** (`data/chapter-one/acts.ts`): „Zlatý kľúč“ (zloženie kľúča) s odmenou `torn-photo-fragment-act-3`.
+- **Logika** (`engine/finale.ts`):
+  - zámky sa odomykajú iba v poradí I, II, III,
+  - zlý kód ani zámok mimo poradia nič nezmenia,
+  - kľúč sa dá vložiť až po troch zámkoch a iba s kľúčom v inventári,
+  - truhlica sa otvorí až po vložení kľúča a štvrtý útržok pridá iba raz,
+  - zadanie miesta.
+- **Postup** sa ukladá do príznakov hry (`finale-lock-open-act-1` až `-act-3`, `finale-key-inserted`, `finale-chest-opened`, `finale-place-solved`). Uloženie sa nemení.
+- **Porovnanie odpovedí** (`engine/answerMatching.ts`):
+  - odpustí diakritiku, veľké a malé písmená a interpunkciu,
+  - preklepy: 1 pri odpovediach s aspoň 5 písmenami, 2 od 10 písmen,
+  - výmena dvoch susedných písmen = 1 preklep.
+- `ActTransitionScreen.tsx`: iba ikona 🗝️ pre nový druh konca aktu. Bez nej by build neprešiel.
+- **Priebeh hry sa nemení.** Koniec aktu III ani finále sa zatiaľ nezobrazia (krok B3b). Scéna 10 zatiaľ stále dáva „Útržok mapy ďalšieho prípadu“; nahradí sa v kroku B3b alebo B7 spolu so záverečnou obrazovkou.
+
+**Test (mimo projektu, necommitnutý):** pred zmenou 19 chýb (logika ešte neexistovala), po zmene **65 z 65 OK** a 1 upozornenie. Overuje:
+- dáta finále,
+- poradie zámkov,
+- zlý kód,
+- kľúč pred zámkami a bez kľúča v inventári,
+- truhlicu pred kľúčom,
+- štvrtý útržok iba raz (aj po 4 otvoreniach a po F5),
+- tabuľku 21 odpovedí s preklepmi (napr. „S.N.D.“ a „Slovneske narodne divadlo“ prijaté, „SNG“, „SDN“ a „Slovenske narodne muzeum“ odmietnuté),
+- kapitolu bez finále.
+
+**Upozornenie testu:** „ďalšie miesto Slovenské národné divadlo je dočasný údaj (isPlaceholder) – pred vydaním nahradiť“.
+
+**Priebeh celej kapitoly:** bez rozdielu (41 riadkov), skóre **1010**. Test predmetov z B1b-3b: 45 z 45.
+
+**Chyba počas práce:** úprava súboru testu cez PowerShell pokazila slovenské znaky (zlé kódovanie). Súbor testu som opravil. Kód projektu to nezasiahlo.
+
+**Zmenené súbory:**
+- `types/game.ts`
+- `data/chapter-one/finale.ts` (nový), `data/chapter-one/acts.ts`, `data/chapter-one.ts`
+- `engine/finale.ts` (nový), `engine/answerMatching.ts` (nový), `engine/index.ts`
+- `components/screens/ActTransitionScreen.tsx`
+- `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** bez chýb.
+
+**Ďalší krok:** krok (7) kresba Zlatého kľúča, až po potvrdení.
