@@ -31,6 +31,7 @@ import {
   getCodeItemInfo,
   getSceneCodeItemId,
   FINALE_PHOTO_ASSEMBLED_FLAG,
+  FINALE_PHOTO_SEEN_FLAG,
   FINALE_PLACE_SOLVED_FLAG,
   insertFinaleKey,
   leaveFinaleChest,
@@ -546,7 +547,16 @@ export default function Home() {
           onOpenArtifacts={openArtifacts}
           onOpenQuests={openQuests}
         >
-          <FinishScreen onRestart={startNewGame} />
+          {currentChapter.finale && (
+            <FinishScreen
+              finale={currentChapter.finale}
+              score={gameState.score}
+              ownedFragmentIds={gameState.inventory.map((item) => item.id)}
+              hasSeenPhoto={Boolean(gameState.flags[FINALE_PHOTO_SEEN_FLAG])}
+              isPlaceSolved={Boolean(gameState.flags[FINALE_PLACE_SOLVED_FLAG])}
+              onRestart={startNewGame}
+            />
+          )}
         </GameLayout>
       );
     }

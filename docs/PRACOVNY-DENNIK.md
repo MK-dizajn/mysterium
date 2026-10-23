@@ -2344,3 +2344,64 @@ Snímky: zlá odpoveď, fotografia v okne, karta.
 **Lint:** bez chýb.
 
 **Ďalší krok:** B7 (záver kapitoly z dát) alebo B4c (3D truhlica), až po potvrdení.
+
+---
+
+## 24. 10. 2026 – Krok 61 (krok B7): Záverečná obrazovka z dát
+
+**Čo sa urobilo:**
+- **Záverečná obrazovka** (`components/screens/FinishScreen.tsx`) berie všetky texty z dát (`data/chapter-one/finale.ts`, záver kapitoly):
+  - „Kapitola dokončená“, „Zlatý prešporský kľúč“,
+  - text „Kľúč, ktorý si držal, neotvoril dvere…“,
+  - **„Konečné skóre“** s počtom bodov z uloženej hry (1010 pri hre bez nápovedy),
+  - „Posledná strana denníka“ s citátom (úvodzovky „…“ doplní obrazovka),
+  - „Druhý prípad sa blíži“ s vetou o fotografii,
+  - tlačidlá **„Zobraziť ďalšie miesto“**, „Pozrieť fotografiu“ a „Hrať kapitolu od začiatku“.
+- **Odstránené zastarané texty:**
+  - „Prípad uzavretý“ + „…ale mapu.“ z obrazovky aj z dát (`summaryTitle`, `summaryText`),
+  - „Záver vyšetrovania“ s odsekmi o útržkoch a mape,
+  - starý odsek „Pátranie pokračuje“ o mape.
+- **Texty presunuté z obrazovky do dát bez zmeny:** „Posledná strana denníka“, „Hrať kapitolu od začiatku“ a texty potvrdzovacieho okna. **Nové texty** (schválené): „Konečné skóre“, „Zobraziť ďalšie miesto“. Zatvorenie a fotografia používajú existujúce „Zavrieť“ a „Pozrieť fotografiu“.
+- **Karta a fotografia v okne nad záverom**, hráč sa nikam nepresúva a F5 ho vždy vráti na záver:
+  - zatvorenie: „Zavrieť“, Escape alebo ťuknutie mimo okna; zameranie sa vráti na tlačidlo, ktoré okno otvorilo,
+  - tlačidlá sa ukážu, iba ak hráč miesto zadal a fotografiu videl.
+- **Spoločné prvky:**
+  - karta „Ďalšie miesto“ je vyňatá do `components/finale/NextPlaceCard.tsx`,
+  - okno nad obrazovkou do `components/finale/FinaleDialog.tsx`,
+  - zadanie miesta (B6) ich používa a funguje rovnako ako predtým.
+- **Začatie odznova** zmaže iba uloženú hru, zálohy ostávajú (bez zmeny správania, overené testom).
+
+**Test (mimo projektu, necommitnutý):** pred zmenou 5 chýb, po zmene **20 z 20 OK**. Overuje:
+- celú kapitolu so skóre 1010 a F5 na závere,
+- dáta záveru (odstránené polia, nové a presunuté texty),
+- FinishScreen bez natvrdo zapísaných textov,
+- začatie odznova (uložená hra zmazaná, zálohy ostali, nová hra bez bodov, inventára a príznakov),
+- staré uloženia na každom bode cesty: začiatok, scéna 5, koniec aktu III, Strážca, truhlica, fotografia, zadanie, karta, záver.
+
+**Upravené staré testy:** B3b (záverečné vety sú teraz v dátach) 25/25 a texty finále („Prípad uzavretý“ odstránený) 37/37. Ostatné: B6 32/32, B5 21/21, B4b 26/26, B4a 20/20, B3a 65/65, kresba kľúča 54/54, nápovedy 37/37; zadanie miesta v prehliadači (B6) 25/25.
+
+**V prehliadači na dev serveri (360 px; aj `?bez3d` a vypnuté animácie):** 20 z 20 OK.
+- texty z dát, skóre 1010, citát s úvodzovkami, zastarané texty preč,
+- tlačidlá aspoň 44 px, bez vodorovného posúvania,
+- karta v okne (adresa, cesta, odkaz Google Mapy s `noopener`), zameranie, Escape, ťuknutie mimo,
+- fotografia v okne s otočením, „Zavrieť“ so zameraním späť,
+- F5,
+- potvrdzovacie okno z dát, „Zrušiť“, „Áno, začať odznova“ (nová hra a zálohy ostali),
+- pri vypnutých animáciách nič nebeží.
+
+Snímky: záver hore a dole, karta v okne, fotografia v okne, potvrdzovacie okno.
+
+**Chyba počas práce:** prvý beh testu v prehliadači hlásil zastaraný text. Bola to chyba testu: schválený text pokračovania obsahuje „…a pátranie pokračuje.“ Test teraz hľadá iba staré vety.
+
+**Zmenené súbory:**
+- `types/game.ts`, `data/chapter-one/finale.ts`
+- `components/screens/FinishScreen.tsx`, `components/screens/FinalePlaceScreen.tsx`
+- `components/finale/NextPlaceCard.tsx` (nový), `components/finale/FinaleDialog.tsx` (nový)
+- `app/page.tsx`
+- `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** bez chýb.
+
+**Ďalší krok:** podľa plánu B4c (3D truhlica) alebo vodidlá a tlačidlo „Ukáž cestu“, až po potvrdení.

@@ -1,96 +1,146 @@
 "use client";
 
 import { useState } from "react";
+import type { ChapterFinale } from "../../types/game";
+import { FinaleDialog } from "../finale/FinaleDialog";
+import { FinalePhotoViewer } from "../finale/FinalePhotoViewer";
+import { NextPlaceCard } from "../finale/NextPlaceCard";
 import { ActionButton } from "../ui/ActionButton";
 import { ConfirmDialog } from "../ui/ConfirmDialog";
-import { DetectiveIcon } from "../ui/MysteriumIcons";
 import { MessageBox } from "../ui/MessageBox";
 import { ScreenContainer } from "../ui/ScreenContainer";
 import { SectionCard } from "../ui/SectionCard";
 import { StoryCard } from "../ui/StoryCard";
 
 type FinishScreenProps = {
+  finale: ChapterFinale;
+  score: number;
+  /** Útržky, ktoré hráč naozaj má (pre fotografiu v okne). */
+  ownedFragmentIds: string[];
+  /** Hráč videl fotografiu a zadal ďalšie miesto (inak sa tlačidlá neukážu). */
+  hasSeenPhoto: boolean;
+  isPlaceSolved: boolean;
   onRestart: () => void;
 };
 
+const STILL_BUTTON = "motion-reduce:transition-none motion-reduce:active:scale-100";
+const PLACE_BUTTON_ID = "finish-show-place";
+const PHOTO_BUTTON_ID = "finish-show-photo";
+
+/** Záver kapitoly – všetky texty sú v dátach (data/chapter-one/finale.ts). */
 export function FinishScreen({
+  finale,
+  score,
+  ownedFragmentIds,
+  hasSeenPhoto,
+  isPlaceSolved,
   onRestart,
 }: FinishScreenProps) {
+  const { ending, nextPlace, photo } = finale;
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [openDialog, setOpenDialog] = useState<"place" | "photo" | null>(null);
 
   return (
     <ScreenContainer>
-      <StoryCard
-        label="Kapitola dokončená"
-        title="Zlatý prešporský kľúč"
-      >
-        <MessageBox
-          variant="success"
-          title="Prípad uzavretý"
-        >
-          Posledná stopa zapadla na svoje miesto.
-          Starý pátrač mal pravdu — Bratislava
-          neukrývala len príbeh, ale mapu.
-        </MessageBox>
+      <StoryCard label={ending.label} title={ending.title}>
+        <div className="space-y-4 text-[16px] leading-8 text-slate-300">
+          {ending.paragraphs.map((paragraph) => (
+            <p key={paragraph}>{paragraph}</p>
+          ))}
+        </div>
 
         <SectionCard
-          icon={<DetectiveIcon className="h-9 w-9" />}
-          title="Záver vyšetrovania"
+          icon={
+            <span className="text-3xl" aria-hidden="true">
+              ⭐
+            </span>
+          }
+          title={ending.scoreLabel}
         >
-          <div className="space-y-4 text-[15px] leading-8 text-slate-300">
-            <p>
-              Zlatý prešporský kľúč nebol predmetom,
-              ktorý by otváral obyčajné dvere. Tvorili
-              ho spomienky ukryté vo fasádach, nápisoch,
-              erboch a ranách, ktoré na meste zanechali
-              stáročia.
-            </p>
-
-            <p>
-              V Artefaktoch zostáva zaznamenaná
-              pamäť starého Prešporka. Do inventára si
-              získal dokončený kľúč a tri útržky starej
-              fotografie. Posledný útržok ešte čaká.
-            </p>
-          </div>
+          <p className="font-mono text-4xl font-black text-amber-100">{score}</p>
         </SectionCard>
 
-        <MessageBox
-          variant="info"
-          title="Posledná strana denníka"
-        >
-          „Prešporok neukrýval jeden kľúč. Toto bol iba
-          prvý.“
+        <MessageBox variant="info" title={ending.quoteTitle}>
+          {`„${ending.journalQuote}“`}
         </MessageBox>
 
         <SectionCard
           icon={
-            <span
-              className="text-3xl"
-              aria-hidden="true"
-            >
-              🗺️
+            <span className="text-3xl" aria-hidden="true">
+              🖼️
             </span>
           }
-          title="Pátranie pokračuje"
+          title={ending.continuationTitle}
         >
-          <p className="text-[15px] leading-8 text-slate-300">
-            Prvý prípad sa skončil, no útržky fotografie
-            odhaľujú začiatok väčšieho tajomstva.
-            Príbeh bude pokračovať v druhej kapitole.
+          <p className="text-[16px] leading-8 text-slate-300">
+            {ending.continuationText}
           </p>
         </SectionCard>
 
-        <ActionButton onClick={() => setIsConfirmOpen(true)}>
-          Hrať kapitolu od začiatku
-        </ActionButton>
+        <div className="flex flex-col gap-3">
+          {isPlaceSolved && (
+            <ActionButton
+              id={PLACE_BUTTON_ID}
+              onClick={() => setOpenDialog("place")}
+              className={STILL_BUTTON}
+            >
+              {ending.showPlaceLabel}
+            </ActionButton>
+          )}
+
+          {hasSeenPhoto && (
+            <ActionButton
+              id={PHOTO_BUTTON_ID}
+              variant="secondary"
+              onClick={() => setOpenDialog("photo")}
+              className={STILL_BUTTON}
+            >
+              {nextPlace.showPhotoLabel}
+            </ActionButton>
+          )}
+
+          <ActionButton
+            variant="secondary"
+            onClick={() => setIsConfirmOpen(true)}
+            className={STILL_BUTTON}
+          >
+            {ending.restartLabel}
+          </ActionButton>
+        </div>
       </StoryCard>
+
+      {openDialog === "place" && (
+        <FinaleDialog
+          label={nextPlace.cardTitle}
+          closeLabel={nextPlace.closePhotoLabel}
+          returnFocusId={PLACE_BUTTON_ID}
+          onClose={() => setOpenDialog(null)}
+        >
+          <NextPlaceCard nextPlace={nextPlace} titleId="finish-place-card-title" />
+        </FinaleDialog>
+      )}
+
+      {openDialog === "photo" && (
+        <FinaleDialog
+          label={photo.title}
+          closeLabel={nextPlace.closePhotoLabel}
+          returnFocusId={PHOTO_BUTTON_ID}
+          onClose={() => setOpenDialog(null)}
+        >
+          <FinalePhotoViewer
+            photo={photo}
+            ownedFragmentIds={ownedFragmentIds}
+            isTogether
+            isReady
+          />
+        </FinaleDialog>
+      )}
 
       {isConfirmOpen && (
         <ConfirmDialog
-          title="Začať odznova?"
-          message="Dokončenú kapitolu aj získané body vymažeš a začneš od prvej zastávky. Túto akciu nemožno vrátiť."
-          confirmLabel="Áno, začať odznova"
+          title={ending.restartConfirmTitle}
+          message={ending.restartConfirmMessage}
+          confirmLabel={ending.restartConfirmLabel}
           onConfirm={() => {
             setIsConfirmOpen(false);
             onRestart();

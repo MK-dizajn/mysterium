@@ -427,12 +427,20 @@ export type FinaleNextPlace = {
 export type FinaleEnding = {
   label: string;
   title: string;
-  summaryTitle: string;
-  summaryText: string;
   paragraphs: string[];
+  /** Nadpis rámčeka s citátom; citát je bez úvodzoviek (doplní obrazovka). */
+  quoteTitle: string;
   journalQuote: string;
+  scoreLabel: string;
   continuationTitle: string;
   continuationText: string;
+  /** Tlačidlo, ktoré znova ukáže kartu „Ďalšie miesto“. */
+  showPlaceLabel: string;
+  /** Začať kapitolu odznova a potvrdzovacie okno. */
+  restartLabel: string;
+  restartConfirmTitle: string;
+  restartConfirmMessage: string;
+  restartConfirmLabel: string;
 };
 
 export type ChapterFinale = {

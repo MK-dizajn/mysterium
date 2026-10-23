@@ -92,19 +92,23 @@ export const chapterOneFinale: ChapterFinale = {
   },
 
   ending: {
-    // label, summaryTitle a summaryText sú zatiaľ z dnešnej záverečnej obrazovky (rozhodne sa v B7).
     label: "Kapitola dokončená",
     title: "Zlatý prešporský kľúč",
-    summaryTitle: "Prípad uzavretý",
-    summaryText:
-      "Posledná stopa zapadla na svoje miesto. Starý pátrač mal pravdu — Bratislava neukrývala len príbeh, ale mapu.",
     paragraphs: [
       "Kľúč, ktorý si držal, neotvoril dvere, ale pamäť mesta. Michalská brána, úzky dom, lekáreň, stará univerzita, palác, radnica, fontána aj sála, v ktorej sa podpísal mier. Všetko si pamätá, kým sa nenájde niekto, kto si to dokáže prečítať. Pátrač to vedel. Preto nezanechal odpovede, iba stopy.",
     ],
-    // Úvodzovky „…“ doplní záverečná obrazovka (B7).
+    quoteTitle: "Posledná strana denníka",
+    // Úvodzovky „…“ doplní záverečná obrazovka.
     journalQuote: "Prešporok neukrýval jeden kľúč. Toto bol iba prvý.",
+    scoreLabel: "Konečné skóre",
     continuationTitle: "Druhý prípad sa blíži",
     continuationText:
       "Fotografia na teba čaká. Hľadaj miesto, na ktoré ukazuje, a pátranie pokračuje.",
+    showPlaceLabel: "Zobraziť ďalšie miesto",
+    restartLabel: "Hrať kapitolu od začiatku",
+    restartConfirmTitle: "Začať odznova?",
+    restartConfirmMessage:
+      "Dokončenú kapitolu aj získané body vymažeš a začneš od prvej zastávky. Túto akciu nemožno vrátiť.",
+    restartConfirmLabel: "Áno, začať odznova",
   },
 };
