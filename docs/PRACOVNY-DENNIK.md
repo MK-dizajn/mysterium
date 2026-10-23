@@ -1314,3 +1314,42 @@ Skóre vo finále je pred zmenou aj po nej rovnaké: 10 hádaniek × 100 + odmen
 **Build:** netýka sa tohto kroku.
 
 **Ďalší krok:** používateľ potvrdí odpovede k návrhu B1b-2b (A alebo B, spôsob otáčania, prepínač `?bez3d`), potom krok 2b-1.
+
+---
+
+## 23. 10. 2026 – Krok 43 (krok B1b-2b, časť 2b-1): Kresba žetónu ako jeden SVG zdroj
+
+**Rozhodnutie používateľa:** návrh B1b-2b je schválený, **možnosť B (skutočné 3D)**. Robí sa iba krok 2b-1.
+
+**Čo sa urobilo:**
+- Nový súbor `components/items/art/tokenArt.ts`: funkcia `getTokenSvg({ side, digit, isDigitFound, idPrefix })` vráti celé SVG žetónu ako text:
+  - **líce:** veterná ružica, 16 rysiek, „BRATISLAVA“, „0 KM“,
+  - **hrana:** ryhovanie s hladkým miestom a vyrytou číslicou.
+  - Číslica sa berie zo vstupu (z dát predmetu) a escapuje sa.
+  - Je to **jediný zdroj kresby**: použije ho 2D obrazovka a v kroku 2b-2 aj 3D textúra.
+- `components/items/TokenArt.tsx` už nekreslí sám. Vloží SVG z `tokenArt.ts`.
+- Všetky tvary, farby, súradnice, písmo aj tieň sú prenesené bez zmeny, takže **vzhľad sa nemá zmeniť**. Tieň (`drop-shadow`) je teraz na obale namiesto priamo na SVG, s rovnakým výsledkom.
+- Engine, dáta ani ostatné obrazovky sa nemenili.
+
+**Test (mimo projektu, necommitnutý):**
+- **Test kresby:** pred zmenou zlyhal (súbor neexistoval), **po zmene 8 z 8 prešlo**:
+  - hrana obsahuje číslicu z dát žetónu (3), aj pri inej číslici sa zmení,
+  - líce číslicu kódu neobsahuje (iba „BRATISLAVA“ a „0 KM“),
+  - nájdená číslica má svetlejšiu farbu ako nenájdená,
+  - platné SVG s rovnakým rozmerom (`viewBox 0 0 240 240`),
+  - líce má 16 rysiek a hrana 18 ryh, ako pôvodná kresba,
+  - nebezpečné znaky sa escapujú.
+- **Celá kapitola pred zmenou a po nej: žiadny rozdiel** (41 riadkov, poradie obrazoviek, skóre **1010**).
+
+**Zmenené súbory:**
+- `components/items/art/tokenArt.ts` (nový)
+- `components/items/TokenArt.tsx`
+- `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** bez chýb.
+
+**V prehliadači:** zatiaľ neoverené používateľom (žetón má vyzerať rovnako ako pred zmenou).
+
+**Ďalší krok:** používateľ overí vzhľad žetónu, potom krok 2b-2 (3D žetón), až po potvrdení.
