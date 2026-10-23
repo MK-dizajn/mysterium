@@ -107,14 +107,24 @@ export function getTokenGrooveTileSvg() {
     + `</svg>`;
 }
 
-/** Hladká plôška na hrane s vyrytou číslicou (na výšku). */
+/**
+ * Hladká plôška na hrane s vyrytou číslicou (na výšku). Podklad je stredne
+ * tmavá mosadz, aby bola vyrytá tmavá číslica aj nájdená svetlá číslica
+ * dobre čitateľná.
+ */
 export function getTokenDigitPlateSvg(digit: string, isDigitFound: boolean) {
   const safeDigit = escapeXml(digit);
 
+  const digitStyle = isDigitFound
+    ? `fill="#fff1c1" stroke="#3b2608" stroke-width="5" paint-order="stroke"`
+    : `fill="#3b2608"`;
+
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 180" width="120" height="180">`
-    + `<defs><linearGradient id="token-plate" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#b9853a"/><stop offset="0.5" stop-color="#f3d28a"/><stop offset="1" stop-color="#b9853a"/></linearGradient></defs>`
+    + `<defs><linearGradient id="token-plate" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#7a5418"/><stop offset="0.5" stop-color="#c99b4b"/><stop offset="1" stop-color="#7a5418"/></linearGradient></defs>`
     + `<rect width="120" height="180" fill="url(#token-plate)"/>`
-    + `<text x="62" y="128" text-anchor="middle" font-family="Georgia, serif" font-size="110" font-weight="700" fill="#f6dc9c" opacity="0.5">${safeDigit}</text>`
-    + `<text x="60" y="125" text-anchor="middle" font-family="Georgia, serif" font-size="110" font-weight="700" fill="${isDigitFound ? "#fff1c1" : "#5a3d10"}">${safeDigit}</text>`
+    + `<rect x="3" y="3" width="114" height="174" fill="none" stroke="#4a320c" stroke-width="3" opacity="0.6"/>`
+    // Svetlý odlesk pod vyrytou číslicou a samotná číslica
+    + `<text x="62" y="128" text-anchor="middle" font-family="Georgia, serif" font-size="110" font-weight="700" fill="#f6dc9c" opacity="0.45">${safeDigit}</text>`
+    + `<text x="60" y="125" text-anchor="middle" font-family="Georgia, serif" font-size="110" font-weight="700" ${digitStyle}>${safeDigit}</text>`
     + `</svg>`;
 }

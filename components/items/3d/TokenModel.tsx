@@ -42,8 +42,11 @@ export function TokenModel({ digit, isDigitFound }: TokenModelProps) {
 
   const faceTexture = useSvgTexture(FACE_SVG, 1024, 1024);
   const grooveTexture = useSvgTexture(GROOVE_SVG, 32, 128, GROOVE_REPEAT);
-  const plateTexture = useSvgTexture(plateSvg, 240, 360);
+  const plateTexture = useSvgTexture(plateSvg, 480, 720);
 
+  // Textúry prichádzajú až po prvom vykreslení. three.js zostaví shader
+  // materiálu iba raz, preto sa materiál po príchode textúry vytvorí
+  // nanovo (key) – inak by sa textúra nikdy nezobrazila.
   return (
     <group>
       {/* Ryhovaná hrana – valec bez podstáv, otočený osou ku kamere */}
@@ -52,12 +55,13 @@ export function TokenModel({ digit, isDigitFound }: TokenModelProps) {
           args={[TOKEN_RADIUS, TOKEN_RADIUS, TOKEN_THICKNESS, 128, 1, true]}
         />
         <meshStandardMaterial
-          color="#c99b4b"
+          key={grooveTexture ? "grooves" : "plain"}
+          color={grooveTexture ? "#ffffff" : "#c99b4b"}
           map={grooveTexture}
           bumpMap={grooveTexture}
           bumpScale={0.6}
-          metalness={0.45}
-          roughness={0.42}
+          metalness={0.35}
+          roughness={0.45}
         />
       </mesh>
 
@@ -65,10 +69,11 @@ export function TokenModel({ digit, isDigitFound }: TokenModelProps) {
       <mesh position={[0, 0, TOKEN_THICKNESS / 2]}>
         <circleGeometry args={[TOKEN_RADIUS, 128]} />
         <meshStandardMaterial
+          key={faceTexture ? "face" : "plain"}
           color={faceTexture ? "#ffffff" : "#d1a14a"}
           map={faceTexture}
-          metalness={0.35}
-          roughness={0.45}
+          metalness={0.25}
+          roughness={0.5}
         />
       </mesh>
 
@@ -79,10 +84,11 @@ export function TokenModel({ digit, isDigitFound }: TokenModelProps) {
       >
         <circleGeometry args={[TOKEN_RADIUS, 128]} />
         <meshStandardMaterial
+          key={faceTexture ? "face" : "plain"}
           color={faceTexture ? "#ffffff" : "#d1a14a"}
           map={faceTexture}
-          metalness={0.35}
-          roughness={0.45}
+          metalness={0.25}
+          roughness={0.5}
         />
       </mesh>
 
@@ -93,10 +99,11 @@ export function TokenModel({ digit, isDigitFound }: TokenModelProps) {
       >
         <planeGeometry args={[DIGIT_PLATE_WIDTH, DIGIT_PLATE_HEIGHT]} />
         <meshStandardMaterial
-          color={plateTexture ? "#ffffff" : "#e0b562"}
+          key={plateTexture ? "plate" : "plain"}
+          color={plateTexture ? "#ffffff" : "#c99b4b"}
           map={plateTexture}
-          metalness={0.3}
-          roughness={0.4}
+          metalness={0.2}
+          roughness={0.5}
         />
       </mesh>
     </group>

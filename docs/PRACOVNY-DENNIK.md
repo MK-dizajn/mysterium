@@ -1436,3 +1436,57 @@ Skóre vo finále je pred zmenou aj po nej rovnaké: 10 hádaniek × 100 + odmen
 **V prehliadači:** zatiaľ neoverené. Vzhľad 3D žetónu (svetlo, orientácia číslice a nápisov, ryhy) som nemohol vidieť a treba ho skontrolovať.
 
 **Ďalší krok:** používateľ overí 3D žetón v prehliadači, potom krok 2b-3 (výkon a dokončenie), až po potvrdení.
+
+---
+
+## 23. 10. 2026 – Krok 45 (krok 2b-3, časť vzhľad): Oprava vzhľadu 3D žetónu
+
+**Problém (snímka od používateľa):** 3D žetón sa točil a číslica sa zapisovala, ale:
+1. líce bolo jednofarebne pastelovo béžové, bez veternej ružice, bez nápisov „BRATISLAVA“ a „0 KM“ a bez zlatého vzhľadu,
+2. svetlá plôška na hrane bola prázdna, bez číslice 3.
+
+**Diagnóza (overená snímkami z prehliadača, pozri nižšie):**
+- Textúry z SVG sa načítavajú **asynchrónne**, až po prvom vykreslení. Materiál vznikol najprv bez textúry. three.js zostaví program materiálu (shader) iba raz, takže keď textúra neskôr prišla, **shader ju vôbec nepoužil**. Materiál sa iba prepol na bielu farbu (pripravenú pre textúru), preto bolo líce aj plôška biele. To isté platilo pre ryhy hrany.
+- Biela plocha bola navyše prejasnená silným svetlom (ambient 0,9 + smerové 2,4 + bodové 0,8) a tónovaním ACES, preto pôsobila pastelovo béžovo.
+- `colorSpace` textúr bol už správne `sRGB`.
+- Orientácia textúr bola správna; po oprave sú nápisy aj číslica rovno a nie zrkadlovo.
+
+**Čo sa urobilo:**
+- `components/items/3d/TokenModel.tsx`:
+  - materiál sa po príchode textúry **vytvorí nanovo** (`key`), takže sa textúra skutočne zobrazí (líce, rub, ryhy hrany, plôška s číslicou),
+  - nižší lesk materiálov,
+  - plôška s číslicou v dvojnásobnom rozlíšení (480 × 720).
+- `components/items/3d/InspectStage.tsx`:
+  - vypnuté tónovanie (`flat`), aby farby kresby zostali verné,
+  - nižšie svetlá: ambient 0,6, smerové 1,5, bodové 0,35.
+- `components/items/art/tokenArt.ts` (iba 3D plôška, 2D kresba sa nezmenila):
+  - plôška má stredne tmavú mosadz s tenkým rámikom,
+  - nenájdená číslica je tmavohnedá (`#3b2608`),
+  - **nájdená číslica je svetlá (`#fff1c1`) s tmavým obrysom**, zvýraznená ako v 2D a čitateľná na mosadzi.
+- Výkon a uvoľnenie pamäte (zvyšok kroku 2b-3) sa zatiaľ nerobili.
+
+**Kontrola vzhľadu snímkami:**
+- Nástroj: Chrome bez okna (headless) so softvérovým 3D (SwiftShader), riadený skriptom cez Chrome DevTools Protocol, mimo projektu (necommitnutý).
+- Skript otvorí hru (`next start`), vloží uloženú hru so žetónom, otvorí Inventár → „Prezrieť“, klikne „Otočiť na hranu“ a urobí 3 snímky.
+- **Pred opravou:** líce jednofarebný krémový kruh; na hrane svetlý prázdny obdĺžnik, ryhy neviditeľné. Potvrdilo to snímku používateľa.
+- **Po oprave:** líce je zlatá mosadz s veternou ružicou, 16 ryskami, prerušovaným kruhom, „BRATISLAVA“ a „0 KM“; hrana má viditeľné ryhy a čitateľnú tmavohnedú **3**; po zápise je 3 svetlá s tmavým obrysom a zobrazí sa „Číslica pre zámok I zapísaná do zápisníka (miesto 1)“.
+- Obmedzenie: softvérové 3D môže vyzerať o niečo inak než grafická karta v počítači alebo mobile.
+- Pri prvom pokuse po oprave sa stránka nenačítala, lebo na porte 3124 ešte bežal starý skúšobný server z prvého pokusu (servíroval starú verziu). Ukončil som iba tento proces a skript opravil. Vývojový server používateľa (`next dev`) som nechal bežať.
+
+**Test (mimo projektu, necommitnutý):**
+- pred zmenou aj po nej: **test logiky 25 z 25**, **test kresby žetónu 8 z 8**,
+- **celá kapitola: žiadny rozdiel** (41 riadkov, skóre **1010**).
+
+**Zmenené súbory:**
+- `components/items/3d/TokenModel.tsx`
+- `components/items/3d/InspectStage.tsx`
+- `components/items/art/tokenArt.ts`
+- `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** bez chýb.
+
+**V prehliadači:** overené snímkami z prehliadača bez okna. Používateľ zatiaľ neoveril na svojom zariadení.
+
+**Ďalší krok:** používateľ overí vzhľad 3D žetónu u seba, potom zvyšok kroku 2b-3 (výkon a uvoľnenie pamäte), až po potvrdení.

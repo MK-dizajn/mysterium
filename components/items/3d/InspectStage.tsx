@@ -16,6 +16,8 @@ type InspectStageProps = {
 export function InspectStage({ children, onFailure }: InspectStageProps) {
   return (
     <Canvas
+      // Bez tónovania (ACES), aby farby kreslených textúr zostali verné.
+      flat
       frameloop="demand"
       dpr={[1, 1.5]}
       camera={{ position: [0, 0, 3.3], fov: 40, near: 0.1, far: 20 }}
@@ -38,15 +40,15 @@ export function InspectStage({ children, onFailure }: InspectStageProps) {
         touchAction: "none",
       }}
     >
-      <ambientLight intensity={0.9} color="#fff0d2" />
+      <ambientLight intensity={0.6} color="#fff0d2" />
       <directionalLight
         position={[2.5, 3, 4]}
-        intensity={2.4}
+        intensity={1.5}
         color="#ffe0a3"
       />
       <pointLight
         position={[-3, -1, 3]}
-        intensity={0.8}
+        intensity={0.35}
         color="#8fa8ff"
       />
 
