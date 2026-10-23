@@ -96,6 +96,7 @@ export const maximilianovaFontanaScene: Scene = {
               hotspotLabel: "Zárezy na hranách zubu kľúča",
               countPoints: FIRST_KEY_TOOTH_NOTCHES,
               countLabel: "Zárez",
+              artPart: 1,
             },
             evidenceOrder: 7,
             actId: "act-3",

@@ -65,6 +65,8 @@ export type ItemInspect = {
   countPoints?: InspectCountPoint[];
   /** Názov jedného prvku pre čítačku (napríklad „Veža“), bez poradového čísla. */
   countLabel?: string;
+  /** Poradie časti zloženého predmetu (zuby kľúča 1 až 3): spoje a obrys celku. */
+  artPart?: number;
 };
 
 export type InventoryItem = {

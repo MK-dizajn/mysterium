@@ -1838,3 +1838,67 @@ Prvé behy testu hlásili chyby v samotnom teste (nadpisy sú na obrazovke veľk
 **Lint:** bez chýb.
 
 **Ďalší krok:** krok (7) kresba Zlatého kľúča, až po potvrdení.
+
+---
+
+## 23. 10. 2026 – Krok 53 (krok 7): Kresba Zlatého kľúča – tri časti brady a zložený kľúč
+
+**Čo sa urobilo:**
+- **Každý zub je časť brady historického kľúča** (`components/items/art/keyToothArt.ts`, kresba 320 × 240).
+  - Hore je kúsok okrúhleho drieku (valček), pod ním blok brady.
+  - Prvky na počítanie: zárezy v spodnej hrane a okienka v strede brady.
+  - Po bokoch sú rybinové spoje: časť 1 má vpravo výstupok, časť 2 vľavo výrez a vpravo výstupok, časť 3 vľavo výrez.
+  - Rub je zrkadlový a nemá značky.
+- **Počty zostali 9, 2 a 7.** Poloha prvkov je ďalej v dátach (`data/chapter-one/item-art.ts`). Zárezy sú od seba 0,18 šírky kresby, okienka 0,2. Pri zuboch pribudlo poradie časti (`artPart: 1/2/3`).
+- **3D:** vytiahnutý tvar so zárezmi a s okienkami ako otvormi, nad ním valec drieku. Zub sa v 3D zobrazí o niečo väčší (výška 2,15 namiesto 1,9), aby boli plochy aj v 3D od seba aspoň 44 px. 2D záloha a `?bez3d` fungujú.
+- **Zložený kľúč** (`getGoldenKeySvg`): ozdobná hlava v tvare štvorlístka s korunkou, golier, driek s guľkou a brada z troch častí. **Driek má rovnakú hrúbku ako valček na zube** (40 × mierka 0,5 = 20). Časti na seba nadväzujú bez medzery. V hre sa zložený kľúč ukáže až v kroku B3b (koniec aktu III).
+- **Tieňový obrys celého kľúča** sa po nájdení číslice ukáže v okne „Prezrieť“ pod textom. Zvýraznená je zlatá časť, kam zub patrí, ostatné časti sú tieň.
+- **Kresby predmetov** dostávajú jeden objekt s voľbami (strana, číslica, prvky, poradie časti) namiesto dlhého zoznamu parametrov. Ostatné predmety sa kreslia rovnako ako predtým.
+
+**Test (mimo projektu, necommitnutý):** pred zmenou 6 chýb (nová kresba neexistovala), po zmene **54 z 54 OK**. Overuje:
+- počty 9, 2 a 7,
+- zárezy pod spojmi a okienka mimo spojov,
+- ťukacie plochy aspoň 44 px pri šírke 280 px (najmenej 50 px) aj pri 3D zmenšení na 90 % (najmenej 45 px),
+- presný počet prvkov v kresbe a žiadne na rube,
+- spoje podľa poradia časti,
+- 3D obrys so zárezmi a otvormi,
+- rovnakú hrúbku drieku a valčeka a nadväzujúce časti,
+- zložený kľúč s 18 zárezmi a okienkami,
+- obrys so zvýraznenou časťou,
+- ostatné kresby (mapa, pečať, žetón, list).
+
+Test B3a: všetko OK. Priebeh celej kapitoly: bez rozdielu, skóre 1010.
+
+**Snímky z prehliadača:**
+- každý zub v 3D aj `?bez3d`, pri šírke 420 px aj 360 px: líce, rub, nájdená číslica s obrysom,
+- zložený kľúč a tri obrysy (vykreslené z kódu projektu).
+
+Najmenšia vzdialenosť stredov ťukacích plôch nameraná v prehliadači:
+
+| Šírka | 3D | 2D |
+|---|---|---|
+| 420 px | 53 px | 57 px |
+| 360 px | 45 px | 48 px |
+
+**Chyby počas práce:**
+- Prvé meranie v prehliadači ukázalo v 3D iba 43 px (3D predmet je v okne menší ako 2D obrázok). Opravené: spoje sa posunuli nad zárezy, prvky sa rozostúpili a zub je v 3D väčší.
+- Test raz chybne považoval zárez pri okraji za výrez spoja. Test som spresnil, kód to nebol.
+
+**Na rozhodnutie používateľa:**
+- Nápoveda pri zuboch znie „Skús ťuknúť na to, čo vidíš na hranách zubu.“, ale okienka sú teraz v strede brady, nie na hrane. Text som nemenil.
+- Popis pre čítačku pri okienkach je tiež „Zárez“. Text som nemenil.
+
+**Kontrola pred vydaním:** pred vydaním hry treba skontrolovať, či v dátach nezostal žiadny údaj s `isPlaceholder`. Zapísané do nového dokumentu `docs/KONTROLA-PRED-VYDANIM.md`. Kontrola v `package.json` sa podľa rozhodnutia používateľa nepridáva.
+
+**Zmenené súbory:**
+- `components/items/art/keyToothArt.ts`, `components/items/art/itemArtRegistry.ts`
+- `components/items/ItemArtImage.tsx`, `components/items/ItemInspector.tsx`, `components/items/3d/Item3DView.tsx`
+- `types/game.ts`
+- `data/chapter-one/item-art.ts`, `maximilianova-fontana.ts`, `primacialny-palac.ts`, `bratislavsky-mier.ts`
+- `docs/KONTROLA-PRED-VYDANIM.md` (nový), `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** bez chýb.
+
+**Ďalší krok:** čakám na potvrdenie kroku B3b.

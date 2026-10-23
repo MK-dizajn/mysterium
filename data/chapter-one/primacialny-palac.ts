@@ -96,6 +96,7 @@ export const primacialnyPalacScene: Scene = {
               hotspotLabel: "Zárezy na hranách zubu kľúča",
               countPoints: SECOND_KEY_TOOTH_NOTCHES,
               countLabel: "Zárez",
+              artPart: 2,
             },
             evidenceOrder: 8,
             actId: "act-3",

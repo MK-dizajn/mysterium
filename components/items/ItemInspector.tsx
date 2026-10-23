@@ -7,6 +7,7 @@ import type { ItemInspectTranscript } from "../../types/game";
 import { soundManager } from "../../lib/soundManager";
 import { ActionButton } from "../ui/ActionButton";
 import { type ItemArtSide, ITEM_ARTS } from "./art/itemArtRegistry";
+import { getGoldenKeySvg } from "./art/keyToothArt";
 import { InspectErrorBoundary } from "./InspectErrorBoundary";
 import { GLOW_CLASSES, TAP_FEEDBACK_CLASSES } from "./inspectStyles";
 import { ItemArtImage } from "./ItemArtImage";
@@ -349,6 +350,7 @@ export function ItemInspector({
                     onFailure={() => setMode("2d")}
                     countPoints={countPoints}
                     countLabel={inspect.countLabel}
+                    artPart={inspect.artPart}
                     markedIndexes={markedIndexes}
                     onMark={(index) =>
                       markCountElement(index, countPoints?.length ?? 0)
@@ -372,6 +374,7 @@ export function ItemInspector({
                       digit={digit}
                       isDigitFound={isFound}
                       countPoints={countPoints}
+                      artPart={inspect.artPart}
                     />
                   </div>
                 ) : (
@@ -505,6 +508,24 @@ export function ItemInspector({
               <p className="mt-1 text-xs leading-5 text-emerald-200/70">
                 {`Zapísané do zápisníka kódov (zámok ${lockLabel}, miesto ${slotNumber}).`}
               </p>
+
+              {/* Tieňový obrys celého kľúča ukáže, kam táto časť patrí. */}
+              {inspect.art === "keyTooth" && inspect.artPart && (
+                <div
+                  aria-hidden="true"
+                  className="mx-auto mt-3 w-full max-w-[260px] [&>svg]:h-auto [&>svg]:w-full"
+                  dangerouslySetInnerHTML={{
+                    __html: getGoldenKeySvg({
+                      idPrefix: `key-outline-${inspect.artPart}`,
+                      pieceNotches: [1, 2, 3].map((part) =>
+                        part === inspect.artPart ? countPoints : undefined
+                      ),
+                      highlightPart: inspect.artPart,
+                      variant: "silhouette",
+                    }),
+                  }}
+                />
+              )}
             </div>
           )}
         </div>

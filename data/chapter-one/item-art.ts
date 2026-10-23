@@ -36,36 +36,36 @@ export const EDUCATION_SEAL_RAYS: InspectCountPoint[] = [
 ].map(sealRay);
 
 /*
- * Zuby Zlatého kľúča (scény 7 až 9) – zárezy na hornej (y 0,24)
- * a dolnej (y 0,76) hrane. Na jednej hrane je najviac 5 zárezov,
- * aby mal každý dosť miesta na ťuknutie.
+ * Zuby Zlatého kľúča (scény 7 až 9) – tri časti brady. Zárezy sú
+ * v spodnej hrane brady (y 0,81), okienka v jej strede (y 0,49).
+ * Zárezy sú od seba 0,18 šírky kresby, okienka 0,2 (aj v 3D aspoň 44 px).
  */
-const TOP = 0.24;
-const BOTTOM = 0.76;
+const WINDOW = 0.49;
+const SLOT = 0.81;
 
 export const FIRST_KEY_TOOTH_NOTCHES: InspectCountPoint[] = [
-  { x: 0.14, y: BOTTOM },
-  { x: 0.32, y: BOTTOM },
-  { x: 0.5, y: BOTTOM },
-  { x: 0.68, y: BOTTOM },
-  { x: 0.86, y: BOTTOM },
-  { x: 0.23, y: TOP },
-  { x: 0.41, y: TOP },
-  { x: 0.59, y: TOP },
-  { x: 0.77, y: TOP },
+  { x: 0.14, y: SLOT },
+  { x: 0.32, y: SLOT },
+  { x: 0.5, y: SLOT },
+  { x: 0.68, y: SLOT },
+  { x: 0.86, y: SLOT },
+  { x: 0.2, y: WINDOW },
+  { x: 0.4, y: WINDOW },
+  { x: 0.6, y: WINDOW },
+  { x: 0.8, y: WINDOW },
 ];
 
 export const SECOND_KEY_TOOTH_NOTCHES: InspectCountPoint[] = [
-  { x: 0.35, y: BOTTOM },
-  { x: 0.65, y: TOP },
+  { x: 0.32, y: SLOT },
+  { x: 0.68, y: WINDOW },
 ];
 
 export const THIRD_KEY_TOOTH_NOTCHES: InspectCountPoint[] = [
-  { x: 0.17, y: BOTTOM },
-  { x: 0.39, y: BOTTOM },
-  { x: 0.61, y: BOTTOM },
-  { x: 0.83, y: BOTTOM },
-  { x: 0.28, y: TOP },
-  { x: 0.5, y: TOP },
-  { x: 0.72, y: TOP },
+  { x: 0.23, y: SLOT },
+  { x: 0.41, y: SLOT },
+  { x: 0.59, y: SLOT },
+  { x: 0.77, y: SLOT },
+  { x: 0.3, y: WINDOW },
+  { x: 0.5, y: WINDOW },
+  { x: 0.7, y: WINDOW },
 ];

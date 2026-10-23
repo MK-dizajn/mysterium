@@ -97,6 +97,7 @@ export const bratislavskyMierScene: Scene = {
               hotspotLabel: "Zárezy na hranách zubu kľúča",
               countPoints: THIRD_KEY_TOOTH_NOTCHES,
               countLabel: "Zárez",
+              artPart: 3,
             },
             evidenceOrder: 9,
             actId: "act-3",

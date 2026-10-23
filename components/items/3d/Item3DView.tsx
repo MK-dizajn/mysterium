@@ -11,10 +11,10 @@ import {
   useRef,
   useState,
 } from "react";
-import { ExtrudeGeometry, type Group, Shape } from "three";
+import { ExtrudeGeometry, type Group, Path, Shape } from "three";
 import type { InspectCountPoint, ItemInspectArt } from "../../../types/game";
 import { ITEM_ARTS } from "../art/itemArtRegistry";
-import { getKeyToothOutline } from "../art/keyToothArt";
+import { getKeyBitOutline, KEY_BIT } from "../art/keyToothArt";
 import { GLOW_CLASSES, TAP_FEEDBACK_CLASSES } from "../inspectStyles";
 import { isBackFacing, isFrontVisible, stepDwell } from "./facing";
 import { InspectStage } from "./InspectStage";
@@ -38,6 +38,8 @@ const MAX_FRAME_SECONDS = 0.05;
  * pomer strán ako predmet, takže predmet vyplní asi 80 % plochy aj pri náklone.
  */
 const WORLD_HEIGHT = 1.9;
+/** Zub kľúča je väčší, aby boli jeho prvky na ťuknutie aj v 3D od seba aspoň 44 px. */
+const TOOTH_WORLD_HEIGHT = 2.15;
 const PAPER_DEPTH = 0.02;
 const SEAL_THICKNESS = 0.16;
 const TOOTH_DEPTH = 0.14;
@@ -116,6 +118,7 @@ type ModelProps = {
   textureWidth: number;
   textureHeight: number;
   countPoints?: InspectCountPoint[];
+  artPart?: number;
 };
 
 /** Tenký list papiera: líce a rub z kresby v components/items/art/. */
@@ -132,11 +135,25 @@ function PaperModel({
   const definition = ITEM_ARTS[art];
 
   const frontSvg = useMemo(
-    () => definition.getSvg("front", digit, false, `${art}-front`, countPoints),
+    () =>
+      definition.getSvg({
+        side: "front",
+        digit,
+        isDigitFound: false,
+        idPrefix: `${art}-front`,
+        countPoints,
+      }),
     [definition, art, digit, countPoints]
   );
   const backSvg = useMemo(
-    () => definition.getSvg("hidden", digit, isFound, `${art}-back`, countPoints),
+    () =>
+      definition.getSvg({
+        side: "hidden",
+        digit,
+        isDigitFound: isFound,
+        idPrefix: `${art}-back`,
+        countPoints,
+      }),
     [definition, art, digit, isFound, countPoints]
   );
 
@@ -186,11 +203,25 @@ function SealModel({ art, worldHeight, countPoints }: ModelProps) {
   const radius = worldHeight / 2;
 
   const frontSvg = useMemo(
-    () => definition.getSvg("front", "", false, "seal-front", countPoints),
+    () =>
+      definition.getSvg({
+        side: "front",
+        digit: "",
+        isDigitFound: false,
+        idPrefix: "seal-front",
+        countPoints,
+      }),
     [definition, countPoints]
   );
   const backSvg = useMemo(
-    () => definition.getSvg("hidden", "", false, "seal-back", countPoints),
+    () =>
+      definition.getSvg({
+        side: "hidden",
+        digit: "",
+        isDigitFound: false,
+        idPrefix: "seal-back",
+        countPoints,
+      }),
     [definition, countPoints]
   );
 
@@ -235,23 +266,45 @@ function SealModel({ art, worldHeight, countPoints }: ModelProps) {
   );
 }
 
-/** Zub kľúča: vytiahnutý tvar so zárezmi presne podľa zoznamu. */
-function ToothModel({ worldWidth, worldHeight, countPoints = [] }: ModelProps) {
+/**
+ * Zub kľúča (časť brady): vytiahnutý tvar so zárezmi a okienkami presne
+ * podľa zoznamu a kúsok okrúhleho drieku nad ním.
+ */
+function ToothModel({
+  worldWidth,
+  worldHeight,
+  countPoints = [],
+  artPart = 1,
+}: ModelProps) {
   const geometry = useMemo(() => {
+    const toWorld = (point: InspectCountPoint): [number, number] => [
+      (point.x - 0.5) * worldWidth,
+      (0.5 - point.y) * worldHeight,
+    ];
+    const tracePath = (path: Path, points: InspectCountPoint[]) => {
+      points.forEach((point, index) => {
+        const [x, y] = toWorld(point);
+
+        if (index === 0) {
+          path.moveTo(x, y);
+        } else {
+          path.lineTo(x, y);
+        }
+      });
+
+      path.closePath();
+    };
+
+    const { outline, holes } = getKeyBitOutline(countPoints, artPart);
     const shape = new Shape();
 
-    getKeyToothOutline(countPoints).forEach((point, index) => {
-      const x = (point.x - 0.5) * worldWidth;
-      const y = (0.5 - point.y) * worldHeight;
+    tracePath(shape, outline);
+    holes.forEach((hole) => {
+      const holePath = new Path();
 
-      if (index === 0) {
-        shape.moveTo(x, y);
-      } else {
-        shape.lineTo(x, y);
-      }
+      tracePath(holePath, hole);
+      shape.holes.push(holePath);
     });
-
-    shape.closePath();
 
     const extruded = new ExtrudeGeometry(shape, {
       depth: TOOTH_DEPTH,
@@ -264,14 +317,32 @@ function ToothModel({ worldWidth, worldHeight, countPoints = [] }: ModelProps) {
     extruded.translate(0, 0, -TOOTH_DEPTH / 2);
 
     return extruded;
-  }, [countPoints, worldWidth, worldHeight]);
+  }, [countPoints, artPart, worldWidth, worldHeight]);
 
   useEffect(() => () => geometry.dispose(), [geometry]);
 
+  // Valček drieku: rovnaká hrúbka ako driek zloženého kľúča.
+  const unit = worldHeight / KEY_BIT.height;
+  const rodRadius = (KEY_BIT.rodHeight / 2) * unit;
+  const rodLength = (KEY_BIT.bitRight - KEY_BIT.bitLeft) * unit;
+  const rodX =
+    ((KEY_BIT.bitLeft + KEY_BIT.bitRight) / 2 / KEY_BIT.width - 0.5) *
+    worldWidth;
+  const rodY =
+    (0.5 - (KEY_BIT.rodTop + KEY_BIT.rodHeight / 2) / KEY_BIT.height) *
+    worldHeight;
+
   return (
-    <mesh geometry={geometry}>
-      <meshStandardMaterial color="#d4a23c" metalness={0.35} roughness={0.35} />
-    </mesh>
+    <group>
+      <mesh geometry={geometry}>
+        <meshStandardMaterial color="#d4a23c" metalness={0.35} roughness={0.35} />
+      </mesh>
+
+      <mesh position={[rodX, rodY, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[rodRadius, rodRadius, rodLength, 48]} />
+        <meshStandardMaterial color="#e0b552" metalness={0.4} roughness={0.3} />
+      </mesh>
+    </group>
   );
 }
 
@@ -375,6 +446,8 @@ type Item3DViewProps = {
   countLabel?: string;
   markedIndexes?: number[];
   onMark?: (index: number) => void;
+  /** Poradie časti zloženého predmetu (zuby kľúča). */
+  artPart?: number;
 };
 
 /** 3D predmet (list, mapa, pečať, zub kľúča) na obrazovke „Prezrieť“. */
@@ -394,6 +467,7 @@ export default function Item3DView({
   countLabel = "",
   markedIndexes = [],
   onMark,
+  artPart,
 }: Item3DViewProps) {
   const definition = ITEM_ARTS[art];
   const model = definition.model3D === "token" ? "paper" : definition.model3D;
@@ -404,8 +478,8 @@ export default function Item3DView({
   const surfaceRef = useRef<HTMLDivElement>(null);
 
   const aspect = definition.width / definition.height;
-  const worldHeight = WORLD_HEIGHT;
-  const worldWidth = WORLD_HEIGHT * aspect;
+  const worldHeight = model === "tooth" ? TOOTH_WORLD_HEIGHT : WORLD_HEIGHT;
+  const worldWidth = worldHeight * aspect;
   const textureWidth = Math.round(
     aspect >= 1 ? MAX_TEXTURE_SIZE : MAX_TEXTURE_SIZE * aspect
   );
@@ -489,6 +563,7 @@ export default function Item3DView({
     textureWidth,
     textureHeight,
     countPoints,
+    artPart,
   };
 
   return (
