@@ -7,7 +7,7 @@ export const venturskaBranaSpomienokScene: Scene = {
   title: "4. Dom, v ktorom sa začalo vzdelanie",
 
   cinematicText:
-  "Z Panskej ulice sa vraciaš na Ventúrsku a po krátkej chôdzi prichádzaš k domu číslo 3. Si na správnom mieste. Za nenápadnou fasádou sa kedysi stretávali učenci, astronómovia a ľudia, ktorí sa snažili porozumieť svetu.",
+  "Z Panskej ulice sa vraciaš na Ventúrsku a po krátkej chôdzi prichádzaš k domu, v ktorom sa pred stáročiami učilo. Si na správnom mieste. Za nenápadnou fasádou sa kedysi stretávali učenci, astronómovia a ľudia, ktorí sa snažili porozumieť svetu.",
 
   voiceLine:
     "Prvý údaj si našiel na dome. Druhý v odkaze lekárnika. Teraz hľadaj miesto, kde sa otázky nepovažovali za slabosť, ale za začiatok poznania. Meno muža, ktorý ho založil, otvorí ďalšiu časť denníka.",
@@ -35,7 +35,7 @@ export const venturskaBranaSpomienokScene: Scene = {
       "matej",
     ],
     hints: [
-      "Hľadaj budovu na adrese Ventúrska 3.",
+      "Hľadaj na Ventúrskej ulici budovu Academie Istropolitany s pamätnou tabuľou.",
       "Odpoveď je napísaná na tmavej pamätnej tabuli upevnenej na fasáde.",
     ],
   },

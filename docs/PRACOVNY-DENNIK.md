@@ -2478,3 +2478,31 @@ Snímky: história s vodidlom a cestou, Inventár, úloha s cestou.
 **Lint:** zmenené súbory bez chýb (staré upozornenie `LightbulbIcon`).
 
 **Ďalší krok:** B4c (3D truhlica) alebo iný krok podľa plánu, až po potvrdení.
+
+---
+
+## 24. 10. 2026 – Krok 63: Scéna 4 bez čísla domu
+
+**Čo sa urobilo** (`data/chapter-one/venturska-brana-spomienok.ts`, schválené znenie):
+- **Úvodný text** (`cinematicText`): „…prichádzaš k domu **číslo 3**.“ → „…prichádzaš k domu, **v ktorom sa pred stáročiami učilo**.“ Zvyšok textu (smer, „Si na správnom mieste“, atmosféra) je bez zmeny.
+- **Prvá nápoveda úlohy:** „Hľadaj budovu na adrese Ventúrska 3.“ → „Hľadaj na Ventúrskej ulici budovu Academie Istropolitany s pamätnou tabuľou.“ Pri prieskume sa ukázalo, že číslo domu je aj tu. Druhá nápoveda je bez zmeny.
+- Rok založenia 1465 ostal (nie je číslo domu).
+
+**Test (mimo projektu, necommitnutý):** pred zmenou 3 chyby, po zmene **7 zo 7 OK**. Overuje:
+- v dátach scény 4 nie je „číslo 3“, „Ventúrska 3“, „Ventúrskej 3“ ani „domu 3“,
+- obe schválené znenia,
+- druhú nápovedu bez zmeny,
+- nápovedy neprezrádzajú odpoveď (Korvín),
+- rok 1465 ostal.
+
+Test C1 (vodidlá) a celá kapitola (B7): všetko OK.
+
+**Zmenené súbory:**
+- `data/chapter-one/venturska-brana-spomienok.ts`
+- `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** bez chýb.
+
+**Ďalší krok:** B4c (3D truhlica) alebo iný krok podľa plánu, až po potvrdení.
