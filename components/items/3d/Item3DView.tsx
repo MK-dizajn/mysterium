@@ -15,7 +15,7 @@ import { ExtrudeGeometry, type Group, Shape } from "three";
 import type { InspectCountPoint, ItemInspectArt } from "../../../types/game";
 import { ITEM_ARTS } from "../art/itemArtRegistry";
 import { getKeyToothOutline } from "../art/keyToothArt";
-import { GLOW_CLASSES } from "../inspectStyles";
+import { GLOW_CLASSES, TAP_FEEDBACK_CLASSES } from "../inspectStyles";
 import { isBackFacing, isFrontVisible, stepDwell } from "./facing";
 import { InspectStage } from "./InspectStage";
 import {
@@ -559,7 +559,7 @@ export default function Item3DView({
                     onClick={() => onMark?.(index)}
                     aria-label={countLabel}
                     aria-pressed={isMarked}
-                    className={`block h-11 w-11 rounded-full outline-none focus-visible:ring-4 focus-visible:ring-amber-300 ${
+                    className={`block h-11 w-11 rounded-full outline-none focus-visible:ring-4 focus-visible:ring-amber-300 ${TAP_FEEDBACK_CLASSES} ${
                       isMarked
                         ? "border-2 border-amber-200 bg-amber-300/35 shadow-[0_0_12px_rgba(252,211,77,0.6)]"
                         : isHotspotGlowing

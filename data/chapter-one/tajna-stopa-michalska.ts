@@ -83,7 +83,7 @@ Nájdi fasádu, ktorá je nápadne užšia než všetky ostatné. Keď dom objav
               kind: "count",
               art: "oldTownMap",
               intro: "Preskúmaj predmet a objav niečo, čo si nečakal.",
-              hint: "Pozri sa na horizonty starého mesta.",
+              hint: "Skús ťuknúť na to, čo ťa v meste zaujme.",
               foundText:
                 "Objavil si číslo, ktoré ti na konci pomôže odomknúť tajomstvo.",
               hotspotLabel: "Veže na mape starého mesta",

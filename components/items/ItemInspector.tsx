@@ -8,7 +8,7 @@ import { soundManager } from "../../lib/soundManager";
 import { ActionButton } from "../ui/ActionButton";
 import { type ItemArtSide, ITEM_ARTS } from "./art/itemArtRegistry";
 import { InspectErrorBoundary } from "./InspectErrorBoundary";
-import { GLOW_CLASSES } from "./inspectStyles";
+import { GLOW_CLASSES, TAP_FEEDBACK_CLASSES } from "./inspectStyles";
 import { ItemArtImage } from "./ItemArtImage";
 import { canUse3D } from "./supportsWebGL";
 import { useReducedMotion } from "./useReducedMotion";
@@ -414,7 +414,7 @@ export function ItemInspector({
                           left: `${point.x * 100}%`,
                           top: `${point.y * 100}%`,
                         }}
-                        className={`absolute h-11 w-11 -translate-x-1/2 -translate-y-1/2 rounded-full outline-none focus-visible:ring-4 focus-visible:ring-amber-300 ${
+                        className={`absolute h-11 w-11 -translate-x-1/2 -translate-y-1/2 rounded-full outline-none focus-visible:ring-4 focus-visible:ring-amber-300 ${TAP_FEEDBACK_CLASSES} ${
                           isMarked
                             ? "border-2 border-amber-200 bg-amber-300/35 shadow-[0_0_12px_rgba(252,211,77,0.6)]"
                             : isHintVisible
@@ -446,9 +446,9 @@ export function ItemInspector({
 
         {definition && mode === "3d" && !isFound && (
           <p className="mt-3 text-xs leading-5 text-slate-400">
-            {definition.shape === "coin"
-              ? "Predmet otáčaj ťahaním prstom alebo myšou, prípadne šípkami na klávesnici."
-              : "Predmet nakláňaj ťahaním prstom alebo myšou, prípadne šípkami na klávesnici."}
+            {isCountMode
+              ? "Ťahaj, nakláňaj a ťukaj na detaily."
+              : "Ťahaj a nakláňaj predmet."}
           </p>
         )}
 

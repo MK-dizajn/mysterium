@@ -91,7 +91,7 @@ export const venturskaBranaSpomienokScene: Scene = {
               kind: "count",
               art: "educationSeal",
               intro: "Preskúmaj predmet a objav niečo, čo si nečakal.",
-              hint: "Svetlo poznania vychádza z koruny. Prezri si ho pozorne.",
+              hint: "Skús ťuknúť na to, čo žiari okolo koruny.",
               foundText:
                 "Objavil si číslo, ktoré ti na konci pomôže odomknúť tajomstvo.",
               hotspotLabel: "Lúče okolo koruny na pečati",

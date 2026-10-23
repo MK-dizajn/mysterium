@@ -91,7 +91,7 @@ export const bratislavskyMierScene: Scene = {
               kind: "count",
               art: "keyTooth",
               intro: "Preskúmaj predmet a objav niečo, čo si nečakal.",
-              hint: "Posledný zub uzatvára kľúč. Prezri si pozorne obe jeho hrany.",
+              hint: "Skús ťuknúť na to, čo vidíš na hranách zubu.",
               foundText:
                 "Objavil si číslo, ktoré ti na konci pomôže odomknúť tajomstvo.",
               hotspotLabel: "Zárezy na hranách zubu kľúča",

@@ -90,7 +90,7 @@ export const maximilianovaFontanaScene: Scene = {
               kind: "count",
               art: "keyTooth",
               intro: "Preskúmaj predmet a objav niečo, čo si nečakal.",
-              hint: "Každý zub kľúča má svoj vlastný tvar. Pozri sa zblízka na jeho hrany.",
+              hint: "Skús ťuknúť na to, čo vidíš na hranách zubu.",
               foundText:
                 "Objavil si číslo, ktoré ti na konci pomôže odomknúť tajomstvo.",
               hotspotLabel: "Zárezy na hranách zubu kľúča",

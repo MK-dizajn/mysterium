@@ -1685,3 +1685,43 @@ Používateľ potvrdil, že 3D žetón vyzerá dobre.
 **Lint:** bez chýb.
 
 **Ďalší krok:** používateľ skontroluje texty nápovedy a popisov a vyskúša predmety v prehliadači.
+
+---
+
+## 23. 10. 2026 – Rozbor (bez zmeny kódu): tvar Zlatého kľúča a Inventár po konci kapitoly
+
+- **Zuby kľúča:** návrh, aby každý zub bol tretinou brady historického kľúča. Nad ním má byť kúsok drieku, po bokoch spoje, ktoré ukazujú poradie. Zložený kľúč má ozdobnú hlavu, driek a bradu z troch častí. Návrh je nakreslený mimo projektu a odfotený v prehliadači. Otvorené: pri 9 prvkoch treba prvky rozostúpiť, aby boli od seba aspoň 44 px.
+- **Inventár po konci kapitoly:** záverečná obrazovka má dnes iba tlačidlo „Hrať kapitolu od začiatku“. Inventár, zápisník kódov aj Artefakty sú tam nedostupné. Návrh: pridať tlačidlá „Inventár“ a „Artefakty“.
+- Oba návrhy čakajú na potvrdenie.
+
+---
+
+## 23. 10. 2026 – Krok 50: Ťukanie na detaily pri počítacích predmetoch
+
+**Čo sa urobilo:**
+- Riadok pod predmetom (v 3D): pri mape, pečati a zuboch „Ťahaj, nakláňaj a ťukaj na detaily.“, pri ostatných predmetoch „Ťahaj a nakláňaj predmet.“ Predtým: „Predmet nakláňaj/otáčaj ťahaním prstom alebo myšou, prípadne šípkami na klávesnici.“
+- Veže, lúče a zárezy sa pod myšou a pri dotyku krátko rozsvietia a kurzor sa zmení na ukazovateľ. Platí to v 3D aj v 2D. Štýl je na jednom mieste (`TAP_FEEDBACK_CLASSES` v `inspectStyles.ts`).
+- Nové nápovedy po 20 s (v dátach pri predmete): mapa „Skús ťuknúť na to, čo ťa v meste zaujme.“, pečať „Skús ťuknúť na to, čo žiari okolo koruny.“, všetky tri zuby „Skús ťuknúť na to, čo vidíš na hranách zubu.“ Po nápovede sa prvky rozžiaria ako doteraz.
+- Logika ani počet prvkov sa nezmenili.
+
+**Poznámka:** v 2D verzii (`?bez3d`) sa riadok pod predmetom nezobrazuje, ani predtým sa nezobrazoval. Predmet sa tam nedá ťahať ani nakláňať, takže text „Ťahaj, nakláňaj…“ by bol nepravdivý. Nechané bez zmeny, rozhodne používateľ.
+
+**Test (mimo projektu, necommitnutý):** pred zmenou 11 chýb, po zmene všetko OK. Overuje:
+- nové nápovedy,
+- nové riadky pod predmetom,
+- žiadne „počítaj“, „spočítaj“ ani „číslica“ v textoch počítacích predmetov,
+- rozsvietenie pod myšou a pri dotyku a kurzor ukazovateľ,
+- nezmenený počet prvkov.
+
+**Snímky z prehliadača (3D aj `?bez3d`):** pre každý predmet líce, prechod myšou nad prvkom (kurzor ukazovateľ, prvok sa rozsvieti) a nápoveda po 20 s.
+
+**Zmenené súbory:**
+- `components/items/inspectStyles.ts`, `components/items/ItemInspector.tsx`, `components/items/3d/Item3DView.tsx`
+- `data/chapter-one/tajna-stopa-michalska.ts`, `venturska-brana-spomienok.ts`, `maximilianova-fontana.ts`, `primacialny-palac.ts`, `bratislavsky-mier.ts`
+- `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** bez chýb.
+
+**Ďalší krok:** potvrdenie návrhov z rozboru (Inventár po konci kapitoly, tvar Zlatého kľúča).
