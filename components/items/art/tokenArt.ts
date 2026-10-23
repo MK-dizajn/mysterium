@@ -47,7 +47,8 @@ function getFrontSvg(faceGradientId: string, withShadow = true) {
     + `<polygon points="120,84 126,114 156,120 126,126 120,156 114,126 84,120 114,114" fill="#f2d48c" opacity="0.9" transform="rotate(45 120 120)"/>`
     + `<circle cx="120" cy="120" r="6" fill="#4a320c"/>`
     + `<text x="120" y="78" text-anchor="middle" font-family="Georgia, serif" font-size="11" letter-spacing="3" fill="#4a320c">BRATISLAVA</text>`
-    + `<text x="120" y="172" text-anchor="middle" font-family="Georgia, serif" font-size="14" font-weight="700" letter-spacing="2" fill="#4a320c">0 KM</text>`
+    // Georgia má nízke „starodávne“ číslice (0 vyzerá ako „o“), preto písmo s číslicami rovnakej výšky.
+    + `<text x="120" y="172" text-anchor="middle" font-family="'Times New Roman', Times, 'Liberation Serif', serif" font-size="15" font-weight="700" letter-spacing="2" fill="#4a320c" style="font-variant-numeric: lining-nums">0 KM</text>`
     + `</g>`;
 }
 

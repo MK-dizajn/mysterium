@@ -1490,3 +1490,53 @@ Skóre vo finále je pred zmenou aj po nej rovnaké: 10 hádaniek × 100 + odmen
 **V prehliadači:** overené snímkami z prehliadača bez okna. Používateľ zatiaľ neoveril na svojom zariadení.
 
 **Ďalší krok:** používateľ overí vzhľad 3D žetónu u seba, potom zvyšok kroku 2b-3 (výkon a uvoľnenie pamäte), až po potvrdení.
+
+---
+
+## 23. 10. 2026 – Krok 46 (krok 2b-3, dokončenie): Nula na žetóne, výkon a uvoľnenie pamäte
+
+Používateľ potvrdil, že 3D žetón vyzerá dobre.
+
+**Čo sa urobilo:**
+1. **„0 KM“ na líci žetónu** (`components/items/art/tokenArt.ts`):
+   - písmo Georgia má nízke „starodávne“ číslice, nula vyzerala ako malé „o“ („o KM“),
+   - nápis „0 KM“ má teraz písmo s číslicami rovnakej výšky (Times New Roman, Times, Liberation Serif) a `font-variant-numeric: lining-nums`,
+   - platí pre 2D aj 3D, kresba je spoločná.
+2. **Výkon a uvoľnenie pamäte:**
+   - kreslenie iba pri pohybe (`frameloop="demand"`) a rozlíšenie najviac 1,5× boli už nastavené v kroku 44; overené, bez zmeny,
+   - `components/items/3d/useSvgTexture.ts`: pri výmene textúry (napríklad po nájdení číslice) sa stará textúra uvoľní **až po nasadení novej**, aby materiál nikdy nekreslil uvoľnenú textúru; pri zatvorení okna sa uvoľní posledná textúra,
+   - `components/items/supportsWebGL.ts`: skúška WebGL sa robí **iba raz** a výsledok sa zapamätá (predtým vznikal skúšobný 3D kontext pri každom otvorení „Prezrieť“); prepínač `?bez3d` funguje ďalej,
+   - materiály, tvary a plátno uvoľňuje react-three-fiber sám pri zatvorení okna – overené záťažovým testom,
+   - jedno 3D plátno naraz: v hre je jediné okno „Prezrieť“ a iné 3D sa nezobrazuje – overené (vždy najviac 1 plátno).
+
+**Kontrola snímkami z prehliadača** (Chrome bez okna, softvérové 3D, skript mimo projektu):
+- detail líca v dvojnásobnom zväčšení: nápis je zreteľne **„0 KM“** s vysokou nulou,
+- hrana s ryhami a čitateľnou 3, po zápise svetlá 3 s obrysom a správa o zápise – bez zmeny oproti kroku 45.
+
+**Záťažový test (20× a 40× otvoriť a zavrieť „Prezrieť“):**
+- otvorené okno má vždy **1 plátno**, po každom zatvorení **0 plátien**,
+- prehliadač ani raz nehlásil „príliš veľa WebGL kontextov“,
+- pamäť JavaScriptu po upratovaní: 6,9 MB na začiatku → 8,3 MB po 10 kolách → 9,8 MB po 40 kolách. Po zahriatí rastie asi o **50 kB na jedno otvorenie a zatvorenie**. Grafické kontexty a plátna sa uvoľňujú správne. Malý zvyšok je pravdepodobne v knižniciach; pri bežnom hraní ide o stovky kB. **Zapisujem ako pozorovanie na neskôr.**
+- v konzole je iba upozornenie knižnice react-three-fiber „THREE.Clock … deprecated“ (pochádza z knižnice, nie z nášho kódu, hru neovplyvňuje).
+
+**Veľkosť stiahnutých častí** (`next build` + `next start`, gzip):
+- pri otvorení stránky: 9 súborov, **717 kB, gzip 213 kB**, **bez 3D knižnice**,
+- 3D časť (stiahne sa až pri „Prezrieť“): **877 kB, gzip 232 kB**.
+
+**Test (mimo projektu, necommitnutý):**
+- pred zmenou aj po nej: **logika 25 z 25**, **kresba žetónu 8 z 8**,
+- **celá kapitola: žiadny rozdiel** (41 riadkov, skóre **1010**).
+
+**Zmenené súbory:**
+- `components/items/art/tokenArt.ts`
+- `components/items/3d/useSvgTexture.ts`
+- `components/items/supportsWebGL.ts`
+- `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** bez chýb.
+
+**Stav:** krok **B1b-2b (2b-1 až 2b-3) je dokončený**. Zostáva overenie plynulosti na mobile používateľom.
+
+**Ďalší krok:** používateľ overí plynulosť (emulácia mobilu so spomalením procesora alebo skutočný telefón), potom B1b-3 (ostatné predmety), až po potvrdení.

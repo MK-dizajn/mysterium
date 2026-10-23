@@ -1,16 +1,7 @@
-/**
- * Dá sa použiť 3D zobrazenie predmetu? Nie, ak prehliadač nevie WebGL,
- * alebo ak je v adrese skrytý prepínač ?bez3d (na skúšanie 2D zálohy).
- */
-export function canUse3D() {
-  if (typeof window === "undefined") {
-    return false;
-  }
+/** Výsledok skúšky WebGL; skúša sa iba raz za návštevu stránky. */
+let isWebGLSupported: boolean | null = null;
 
-  if (new URLSearchParams(window.location.search).has("bez3d")) {
-    return false;
-  }
-
+function detectWebGL() {
   try {
     const canvas = document.createElement("canvas");
     const gl = canvas.getContext("webgl2") ?? canvas.getContext("webgl");
@@ -26,4 +17,22 @@ export function canUse3D() {
   } catch {
     return false;
   }
+}
+
+/**
+ * Dá sa použiť 3D zobrazenie predmetu? Nie, ak prehliadač nevie WebGL,
+ * alebo ak je v adrese skrytý prepínač ?bez3d (na skúšanie 2D zálohy).
+ */
+export function canUse3D() {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  if (new URLSearchParams(window.location.search).has("bez3d")) {
+    return false;
+  }
+
+  isWebGLSupported ??= detectWebGL();
+
+  return isWebGLSupported;
 }
