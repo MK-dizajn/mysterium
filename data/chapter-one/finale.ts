@@ -1,36 +1,36 @@
 import type { ChapterFinale } from "../../types/game";
 
 /*
- * Finále kapitoly I (kroky B3 až B7). Texty sú dočasné, nahradí ich autor.
- * Obrazovky finále zatiaľ neexistujú; hra tieto dáta začne používať v kroku B3b.
+ * Finále kapitoly I (kroky B3 až B7). Texty sú schválené autorom; dočasná
+ * je ešte cesta k ďalšiemu miestu (isPlaceholder), overí sa v teréne.
+ * Obrazovky finále pribudnú v krokoch B4 až B7.
  */
 export const chapterOneFinale: ChapterFinale = {
   guardian: {
     title: "Strážca prichádza",
     text:
-      "Z tieňa brány vystúpi Strážca. V náručí nesie starú okovanú truhlicu a opatrne ju položí pred teba. „Pátrač ju zamkol tromi zámkami. Otvorí ju iba ten, kto prešiel celú cestu.“",
+      "Z tmy pod bránou sa ozvú kroky. Strážca nesie ťažkú truhlicu a kladie ju pred teba. ‚Pátrač ju uzamkol tromi zámkami a jeden kľúč nestačil. Každý zámok sa otvára tým, čo si našiel. Poznáš kódy. Máš aj kľúč.‘",
     skipLabel: "Preskočiť",
-    continueLabel: "Pristúpiť k truhlici",
+    continueLabel: "Otvoriť truhlicu",
   },
 
   chest: {
-    title: "Pátračova truhlica",
+    title: "Truhlica starého pátrača",
     intro:
-      "Truhlica má tri zámky a uprostred kľúčovú dierku. Zámky sa otvárajú jeden po druhom, od prvého po tretí.",
+      "Tri zámky, tri trojice číslic. Otváraj ich v poradí, v akom si získaval stopy.",
     lockActIds: ["act-1", "act-2", "act-3"],
     keyItemId: "golden-pressburg-key-complete",
-    wrongCodeText:
-      "Mechanizmus sa nepohol. Niektorá číslica nesedí. Pozri sa do Zápisníka kódov.",
-    lockOpenedText: "Zámok cvakol a povolil.",
+    wrongCodeText: "Zámok sa ani nepohol. Niektorá číslica nesedí.",
+    lockOpenedText: "Zámok cvakol. Ďalší čaká.",
     insertKeyLabel: "Vložiť Zlatý kľúč",
     openedText:
-      "Kľúč sa otočil a veko sa pomaly zdvihlo. Na dne truhlice leží posledný útržok fotografie.",
+      "Veko sa pomaly dvíha. Vnútri leží posledný útržok fotografie.",
     reward: {
       id: "torn-photo-fragment-chest",
       title: "Štvrtý útržok fotografie",
       icon: "🖼️",
       description:
-        "Posledný útržok starej fotografie z pátračovej truhlice. Po zložení so zvyšnými tromi vznikne celý obraz.",
+        "Posledný útržok, ktorý pátrač ukryl pod zámkami. Teraz sa dajú zložiť všetky štyri.",
       actId: "act-3",
     },
   },
@@ -45,46 +45,48 @@ export const chapterOneFinale: ChapterFinale = {
       "torn-photo-fragment-act-3",
       "torn-photo-fragment-chest",
     ],
-    title: "Zložená fotografia",
+    title: "Historická fotografia",
     frontDescription:
-      "Štyri útržky do seba zapadli. Pred tebou je stará fotografia, na ktorej mesto vyzerá inak, než ho poznáš.",
+      "Štyri útržky sa samy spojili. Na starej snímke stojí budova, ktorú ešte nepoznáš, a na rube je poznámka.",
     backLines: [
-      "Kto dočítal až sem, nech ide ďalej.",
-      "Ďalšia stopa čaká tam, kde mesto hrá divadlo.",
-      "Slovenské národné divadlo",
+      "Prešporok ukrýval viac než jeden kľúč.",
+      "Tam, kde sa za oponou skrýva pamäť mesta, nájdeš ďalšiu stopu.",
+      "Miesto: Slovenské národné divadlo",
       "— pátrač",
     ],
   },
 
   nextPlace: {
-    question: "Napíš názov miesta zo zadnej strany fotografie.",
+    question: "Kde pokračuje pátranie? Zadaj názov miesta z fotografie.",
     acceptedAnswers: [
       "Slovenské národné divadlo",
       "SND",
       "Národné divadlo",
     ],
-    wrongAnswerText:
-      "Toto miesto pátrač nemyslel. Pozri sa znova na zadnú stranu fotografie.",
+    wrongAnswerText: "Toto nie je to miesto. Pozri sa na fotografiu ešte raz.",
     name: "Slovenské národné divadlo",
-    address: "Hviezdoslavovo námestie 1, 811 02 Bratislava",
+    address: "Hviezdoslavovo námestie 1, Bratislava",
+    mapsButtonLabel: "Otvoriť v mapách",
+    // Cesta je dočasná, overí sa v teréne.
     directions:
-      "Z Hlavného námestia prejdi Rybárskou bránou na Hviezdoslavovo námestie. Historická budova divadla stojí na jeho konci, chôdza trvá asi 5 minút.",
+      "Od Primaciálneho námestia sa vráť na Hlavné námestie a prejdi ulicou Rybárska brána na Hviezdoslavovo námestie. Divadlo stojí na jeho konci.",
     isPlaceholder: true,
   },
 
   ending: {
+    // label, summaryTitle a summaryText sú zatiaľ z dnešnej záverečnej obrazovky (rozhodne sa v B7).
     label: "Kapitola dokončená",
     title: "Zlatý prešporský kľúč",
     summaryTitle: "Prípad uzavretý",
     summaryText:
       "Posledná stopa zapadla na svoje miesto. Starý pátrač mal pravdu — Bratislava neukrývala len príbeh, ale mapu.",
     paragraphs: [
-      "Zlatý prešporský kľúč nebol predmetom, ktorý by otváral obyčajné dvere. Tvorili ho spomienky ukryté vo fasádach, nápisoch, erboch a ranách, ktoré na meste zanechali stáročia.",
-      "V Artefaktoch zostáva zaznamenaná pamäť starého Prešporka. V inventári máš dokončený kľúč aj zloženú fotografiu, ktorej zadná strana ukazuje, kam viedla pátračova cesta ďalej.",
+      "Kľúč, ktorý si držal, neotvoril dvere, ale pamäť mesta. Michalská brána, úzky dom, lekáreň, stará univerzita, palác, radnica, fontána aj sála, v ktorej sa podpísal mier. Všetko si pamätá, kým sa nenájde niekto, kto si to dokáže prečítať. Pátrač to vedel. Preto nezanechal odpovede, iba stopy.",
     ],
-    journalQuote: "„Prešporok neukrýval jeden kľúč. Toto bol iba prvý.“",
-    continuationTitle: "Pátranie pokračuje",
+    // Úvodzovky „…“ doplní záverečná obrazovka (B7).
+    journalQuote: "Prešporok neukrýval jeden kľúč. Toto bol iba prvý.",
+    continuationTitle: "Druhý prípad sa blíži",
     continuationText:
-      "Prvý prípad sa skončil, no fotografia odhaľuje začiatok väčšieho tajomstva. Príbeh bude pokračovať v druhej kapitole.",
+      "Fotografia na teba čaká. Hľadaj miesto, na ktoré ukazuje, a pátranie pokračuje.",
   },
 };

@@ -61,18 +61,17 @@ export const chapterOneActs: Act[] = [
       "zlaty-presporsky-kluc",
     ],
     lockLabel: "III",
-    // Dočasný text; zobrazí sa až po zmene priebehu hry (krok B3b).
     ending: {
       kind: "keyAssembly",
-      label: "Zlatý kľúč",
+      label: "Kľúč je kompletný",
       text:
-        "Tri zuby zapadli do seba, akoby nikdy neboli oddelené. V tvojej dlani leží Zlatý prešporský kľúč. Pod ním sa objavil tretí útržok fotografie.",
+        "Tri zuby do seba zapadli bez jedinej škáry, akoby na seba čakali celé storočia. V rukách držíš Zlatý prešporský kľúč. Neotvára obyčajný zámok. Strážca vie, ktorý.",
       reward: {
         id: "torn-photo-fragment-act-3",
         title: "Tretí útržok fotografie",
         icon: "🖼️",
         description:
-          "Tretí útržok starej fotografie, ktorý sa objavil pri zložení Zlatého kľúča. Obraz je takmer celý, chýba mu už iba posledný kúsok.",
+          "Tretí útržok starej fotografie, ktorý sa objavil v okamihu, keď sa kľúč spojil.",
         actId: "act-3",
       },
       continueLabel: "Prijať útržok a pokračovať",

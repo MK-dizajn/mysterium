@@ -383,6 +383,8 @@ export type FinaleNextPlace = {
   wrongAnswerText: string;
   name: string;
   address: string;
+  /** Text tlačidla, ktoré otvorí adresu v Google Mapách. */
+  mapsButtonLabel: string;
   directions: string;
   /** Dočasný údaj, pred vydaním sa nahradí. */
   isPlaceholder?: boolean;

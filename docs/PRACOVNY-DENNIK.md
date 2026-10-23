@@ -2034,3 +2034,53 @@ Prvý beh hlásil jednu chybu v teste (nadpis karty je veľkými písmenami). Te
 **Lint:** bez chýb.
 
 **Ďalší krok:** texty finále do dát, až po potvrdení.
+
+---
+
+## 24. 10. 2026 – Krok 56: Schválené texty finále v dátach
+
+**Čo sa urobilo:** dočasné texty nahradili schválené (v `data/chapter-one/acts.ts` a `data/chapter-one/finale.ts`). Priebeh hry ani obrazovky sa nemenia.
+
+**Koniec aktu III:**
+- nadpis „Kľúč je kompletný“ (predtým „Zlatý kľúč“),
+- nový text („Tri zuby do seba zapadli bez jedinej škáry… Strážca vie, ktorý.“),
+- nový popis tretieho útržku,
+- názov útržku a tlačidlo sa nemenia.
+
+**Strážca:** nový text s úvodzovkami ‚…‘, tlačidlo „Otvoriť truhlicu“ (predtým „Pristúpiť k truhlici“). Nadpis a „Preskočiť“ sa nemenia.
+
+**Truhlica:**
+- nadpis „Truhlica starého pátrača“,
+- nové texty: úvod, zlý kód, zámok odomknutý, otvorenie, popis štvrtého útržku,
+- „Vložiť Zlatý kľúč“ a názov útržku sa nemenia.
+
+**Fotografia:** nadpis „Historická fotografia“, nový popis a 4 riadky zadnej strany. Popis obrázka pre čítačku sa nemení.
+
+**Zadanie miesta:**
+- nová otázka, zlá odpoveď a cesta (cesta je dočasná, `isPlaceholder` ostáva),
+- adresa „Hviezdoslavovo námestie 1, Bratislava“ (bez neovereného PSČ),
+- nové pole `mapsButtonLabel` „Otvoriť v mapách“ (`types/game.ts`), aby boli všetky texty finále na jednom mieste,
+- názov a prijaté odpovede sa nemenia.
+
+**Záver kapitoly:**
+- nadpis „Zlatý prešporský kľúč“, nový text (jeden odsek), citát bez úvodzoviek (doplní ich obrazovka v B7),
+- pokračovanie „Druhý prípad sa blíži“,
+- „Kapitola dokončená“, „Prípad uzavretý“ a jeho text ostali, rozhodne sa o nich v B7,
+- dnešná záverečná obrazovka (`FinishScreen.tsx`) sa nemenila, do dát prejde v B7.
+
+**Testy (mimo projektu, necommitnuté):**
+- **Texty finále:** pred zmenou 23 chýb, po zmene **37 z 37 OK**. Každé pole sa presne zhoduje so schváleným textom, `isPlaceholder` ostáva, iba slovenské úvodzovky „…“ a ‚…‘.
+- **Priebeh a staré uloženia (test z B3b):** 26 z 26, skóre 1010, staré uloženia (začiatok, uprostred, záverečná obrazovka) fungujú.
+- **Ďalšie testy:** B3a 65 z 65 (upozornenie na dočasné miesto), kresba kľúča 54 z 54, nápovedy 37 z 37.
+- **V prehliadači na dev serveri (3D aj `?bez3d`):** koniec aktu III ukazuje nadpis, text a popis útržku z dát.
+
+**Zmenené súbory:**
+- `data/chapter-one/acts.ts`, `data/chapter-one/finale.ts`
+- `types/game.ts`
+- `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** bez chýb.
+
+**Ďalší krok:** B4a (obrazovka Strážcu), až po potvrdení.
