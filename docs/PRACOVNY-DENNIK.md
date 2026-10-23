@@ -2273,3 +2273,74 @@ Snímky: útržky, zložená fotografia, priblíženie, zadná strana, náhrada.
 **Lint:** bez chýb.
 
 **Ďalší krok:** B6 (zadanie názvu miesta a karta „Ďalšie miesto“) alebo B4c (3D truhlica), až po potvrdení.
+
+---
+
+## 24. 10. 2026 – Krok 60 (krok B6): Zadanie názvu miesta a karta „Ďalšie miesto“
+
+**Čo sa urobilo:**
+- **Priebeh:** fotografia → „Pokračovať v pátraní“ → **zadanie miesta** → po správnej odpovedi **karta „Ďalšie miesto“** → „Dokončiť kapitolu“ → dočasne záverečná obrazovka (kým pribudne záver z dát v B7).
+  - Zadanie aj karta sú jedna obrazovka `finalePlace`. Čo sa ukáže, rozhoduje príznak `finale-place-solved` z B3a, takže F5 vráti hráča k zadaniu alebo na kartu.
+- **Zadanie** (`components/screens/FinalePlaceScreen.tsx`, nový):
+  - otázka z dát je popisom poľa (čítačka ju prečíta),
+  - „Overiť odpoveď“ je vypnuté, kým je pole prázdne (aj iba medzery). Enter na prázdnom poli nič neurobí a nič nehlási,
+  - kontrola ide iba cez `submitFinalePlace` / `isAnswerAccepted` (veľké a malé písmená, diakritika, preklepy; „Slovenské národné divadlo“, „SND“, „Národné divadlo“),
+  - zlá odpoveď: „Toto nie je to miesto. Pozri sa na fotografiu ešte raz.“ (čítačka ju prečíta), bez straty bodov.
+- **„Pozrieť fotografiu“** otvorí okno nad zadaním:
+  - priblíženie, štipnutie a otočenie ako v B5, hneď celá fotografia,
+  - zatvorenie: „Zavrieť“, Escape alebo ťuknutie mimo,
+  - zameranie: na „Zavrieť“ a po zatvorení späť na „Pozrieť fotografiu“,
+  - napísaný text ostane.
+- **Karta „Ďalšie miesto“:**
+  - názov, „Adresa“ s celou adresou a „Ako sa tam dostaneš“ s popisom cesty z dát, všetko vždy viditeľné,
+  - „Otvoriť v mapách“ je odkaz na Google Mapy s názvom a adresou (`target="_blank"`, `rel="noopener noreferrer"`, 54 px),
+  - po správnej odpovedi prejde zameranie na nadpis karty,
+  - dočasnosť údajov (`isPlaceholder`) sa hráčovi nezobrazuje.
+- **Prehliadanie fotografie** (priblíženie, štipnutie, posúvanie, otočenie, náhrada) je presunuté do `components/finale/FinalePhotoViewer.tsx`. Používa ho obrazovka fotografie (vyzerá a funguje rovnako) aj okno pri zadaní.
+- **Nové schválené texty v dátach:** „Overiť odpoveď“, „Pozrieť fotografiu“, „Zavrieť“, „Ďalšie miesto“, „Adresa“, „Ako sa tam dostaneš“, „Dokončiť kapitolu“.
+- **Engine** (`engine/finale.ts`):
+  - `leaveFinalePhoto` vedie na zadanie miesta,
+  - nové `leaveFinalePlace` (iba po správnej odpovedi) a `getFinaleMapsUrl`,
+  - prevod: záverečná obrazovka po fotografii z B5 (miesto nezadané) sa vráti k zadaniu. Záloha `…-backup-before-finale` iba ak ešte neexistuje. Prevody z B4a, B4b a B5 platia ďalej.
+
+**Test (mimo projektu, necommitnutý):** pred zmenou 11 chýb, po zmene **32 z 32 OK**. Overuje:
+- celú kapitolu so skóre 1010 a poradím `… finaleChest|10 → finalePhoto|10 → finalePlace|10 → finish|10`,
+- F5 po každom kroku, pri zadaní aj na karte,
+- prijaté odpovede: „Slovenské národné divadlo“, bez diakritiky, veľkými písmenami, s preklepom, „SND“, „snd“, „Národné divadlo“,
+- odmietnuté odpovede bez zmeny stavu a skóre: prázdne, iba medzery, „SNG“, „Bratislavský hrad“,
+- odchod z karty pred správnou odpoveďou nejde, 4× „Dokončiť kapitolu“,
+- nové texty a adresa,
+- odkaz do Google Máp,
+- staré uloženia: začiatok, uprostred, na Strážcovi, v truhlici, na fotografii, dočasné záverečné obrazovky z B5 (→ zadanie, záloha), B4b (→ fotografia) aj B4a (→ truhlica), záver po zadanom mieste.
+
+**Upravené staré testy** na nové poradie: B3b 26/26, B4a 20/20, B4b 26/26, B5 21/21; test fotografie v prehliadači (B5) 17/17. Ostatné: texty 37/37, B3a 65/65, kresba kľúča 54/54, nápovedy 37/37.
+
+**V prehliadači na dev serveri (360 px; aj `?bez3d` a vypnuté animácie):** 25 z 25 OK.
+- prázdne pole, medzery aj Enter bez hlásenia,
+- zlá odpoveď s hlásením pre čítačku, bez straty bodov,
+- tlačidlá aspoň 44 px,
+- fotografia v okne (zameranie, otočenie, Escape, text ostal, zameranie späť),
+- F5 pri zadaní,
+- správna odpoveď a karta s adresou a cestou,
+- odkaz Google Mapy v novom okne s `noopener`,
+- karta bez zmienky o dočasnosti, zameranie na nadpis karty,
+- F5 na karte,
+- „Dokončiť kapitolu“ vedie na záver a F5 tam ostane, skóre 1010,
+- pri vypnutých animáciách nič nebeží.
+
+Snímky: zlá odpoveď, fotografia v okne, karta.
+
+**Neoverené:** otvorenie Google Máp na skutočnom mobile (aplikácia alebo prehliadač). Odkaz je overený, samotné otvorenie treba vyskúšať na telefóne.
+
+**Zmenené súbory:**
+- `types/game.ts`, `data/chapter-one/finale.ts`
+- `engine/finale.ts`
+- `components/finale/FinalePhotoViewer.tsx` (nový), `components/screens/FinalePlaceScreen.tsx` (nový), `components/screens/FinalePhotoScreen.tsx`
+- `app/page.tsx`
+- `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** bez chýb.
+
+**Ďalší krok:** B7 (záver kapitoly z dát) alebo B4c (3D truhlica), až po potvrdení.

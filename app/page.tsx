@@ -12,6 +12,7 @@ import { ActTransitionScreen } from "../components/screens/ActTransitionScreen";
 import { FinaleChestScreen } from "../components/screens/FinaleChestScreen";
 import { FinaleGuardianScreen } from "../components/screens/FinaleGuardianScreen";
 import { FinalePhotoScreen } from "../components/screens/FinalePhotoScreen";
+import { FinalePlaceScreen } from "../components/screens/FinalePlaceScreen";
 import { FinishScreen } from "../components/screens/FinishScreen";
 import { IntroScreen } from "../components/screens/IntroScreen";
 import { LandingScreen } from "../components/screens/LandingScreen";
@@ -30,15 +31,18 @@ import {
   getCodeItemInfo,
   getSceneCodeItemId,
   FINALE_PHOTO_ASSEMBLED_FLAG,
+  FINALE_PLACE_SOLVED_FLAG,
   insertFinaleKey,
   leaveFinaleChest,
   leaveFinaleGuardian,
   leaveFinalePhoto,
+  leaveFinalePlace,
   markCodeDigitFound,
   markFinalePhotoAssembled,
   openFinaleChest,
   revealHint,
   solvePuzzle,
+  submitFinalePlace,
   talkToNpc,
   unlockFinaleLock,
 } from "../engine";
@@ -489,6 +493,42 @@ export default function Home() {
             onContinue={() =>
               setGameState((currentState) =>
                 leaveFinalePhoto(currentChapter, currentState)
+              )
+            }
+          />
+        </GameLayout>
+      );
+    }
+
+    if (gameState.screen === "finalePlace" && currentChapter.finale) {
+      return (
+        <GameLayout
+          gameState={gameState}
+          totalArtifacts={totalArtifacts}
+          onOpenInventory={openInventory}
+          onOpenArtifacts={openArtifacts}
+          onOpenQuests={openQuests}
+        >
+          <FinalePlaceScreen
+            finale={currentChapter.finale}
+            ownedFragmentIds={gameState.inventory.map((item) => item.id)}
+            isSolved={Boolean(gameState.flags[FINALE_PLACE_SOLVED_FLAG])}
+            onSubmit={(answer) => {
+              const result = submitFinalePlace(
+                currentChapter,
+                gameState,
+                answer
+              );
+
+              if (result.gameState !== gameState) {
+                setGameState(result.gameState);
+              }
+
+              return result.isCorrect;
+            }}
+            onFinish={() =>
+              setGameState((currentState) =>
+                leaveFinalePlace(currentChapter, currentState)
               )
             }
           />

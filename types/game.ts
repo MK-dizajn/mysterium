@@ -174,6 +174,7 @@ export type GameScreen =
   | "finaleGuardian"
   | "finaleChest"
   | "finalePhoto"
+  | "finalePlace"
   | "finish"
   | "artifact"
   | "inventory"
@@ -403,6 +404,16 @@ export type FinaleNextPlace = {
   question: string;
   acceptedAnswers: string[];
   wrongAnswerText: string;
+  submitLabel: string;
+  /** Otvorí fotografiu nad zadaním a jej zatvorenie. */
+  showPhotoLabel: string;
+  closePhotoLabel: string;
+  /** Karta po správnej odpovedi. */
+  cardTitle: string;
+  addressLabel: string;
+  directionsLabel: string;
+  /** Tlačidlo z karty ďalej. */
+  finishLabel: string;
   name: string;
   address: string;
   /** Text tlačidla, ktoré otvorí adresu v Google Mapách. */

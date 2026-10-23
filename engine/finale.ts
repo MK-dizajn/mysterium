@@ -1,4 +1,9 @@
-import type { ActId, Chapter, GameState } from "../types/game";
+import type {
+  ActId,
+  Chapter,
+  FinaleNextPlace,
+  GameState,
+} from "../types/game";
 import { isAnswerAccepted } from "./answerMatching";
 import { getActLockCodes } from "./gameProgress";
 
@@ -88,10 +93,7 @@ export function markFinalePhotoAssembled(
   return setFlag(gameState, FINALE_PHOTO_ASSEMBLED_FLAG);
 }
 
-/**
- * Odchod od fotografie. Dočasne vedie na záver kapitoly, kým pribudne
- * zadanie ďalšieho miesta (krok B6).
- */
+/** Odchod od fotografie k zadaniu ďalšieho miesta. */
 export function leaveFinalePhoto(
   _chapter: Chapter,
   gameState: GameState
@@ -102,8 +104,36 @@ export function leaveFinalePhoto(
 
   return {
     ...setFlag(gameState, FINALE_PHOTO_SEEN_FLAG),
+    screen: "finalePlace",
+  };
+}
+
+/**
+ * Odchod z karty „Ďalšie miesto“ (iba po správnej odpovedi). Dočasne vedie
+ * na dnešnú záverečnú obrazovku, kým pribudne záver z dát (krok B7).
+ */
+export function leaveFinalePlace(
+  _chapter: Chapter,
+  gameState: GameState
+): GameState {
+  if (
+    gameState.screen !== "finalePlace" ||
+    !gameState.flags[FINALE_PLACE_SOLVED_FLAG]
+  ) {
+    return gameState;
+  }
+
+  return {
+    ...gameState,
     screen: "finish",
   };
+}
+
+/** Odkaz, ktorý otvorí ďalšie miesto v Google Mapách (hra polohu nezisťuje). */
+export function getFinaleMapsUrl(nextPlace: FinaleNextPlace) {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+    `${nextPlace.name}, ${nextPlace.address}`
+  )}`;
 }
 
 /** Predmety, ktoré dávali staršie verzie hry a finále ich nahradilo. */
@@ -132,9 +162,14 @@ export function migrateFinishedSaveToFinale(
       return { ...gameState, screen: "finaleChest" };
     }
 
-    return gameState.flags[FINALE_PHOTO_SEEN_FLAG]
+    if (!gameState.flags[FINALE_PHOTO_SEEN_FLAG]) {
+      return { ...gameState, screen: "finalePhoto" };
+    }
+
+    // Hra po fotografii bez zadaného miesta (krok B5) sa vráti k zadaniu.
+    return gameState.flags[FINALE_PLACE_SOLVED_FLAG]
       ? gameState
-      : { ...gameState, screen: "finalePhoto" };
+      : { ...gameState, screen: "finalePlace" };
   }
 
   const lastAct = chapter.acts[chapter.acts.length - 1];
