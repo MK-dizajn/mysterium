@@ -2506,3 +2506,28 @@ Test C1 (vodidlá) a celá kapitola (B7): všetko OK.
 **Lint:** bez chýb.
 
 **Ďalší krok:** B4c (3D truhlica) alebo iný krok podľa plánu, až po potvrdení.
+
+---
+
+## 24. 10. 2026 – Záver dňa
+
+**Hotové dnes:**
+- **Nápovedy v troch stupňoch** pri počítacích predmetoch (krok 54).
+- **B3b** – koniec aktu III so zložením Zlatého kľúča a tretím útržkom (krok 55).
+- **Texty finále v dátach** (krok 56).
+- **B4a** – obrazovka „Strážca prichádza“, miesto pre video a prevod starých záverečných uložení so zálohou (krok 57).
+- **B4b** – truhlica s tromi zámkami v 2D, Zápisník kódov pri truhlici, štvrtý útržok (krok 58).
+- **B5** – historická fotografia zo štyroch útržkov, priblíženie a otočenie, dočasný obrázok (krok 59).
+- **B6** – zadanie názvu miesta a karta „Ďalšie miesto“ s odkazom do Google Máp (krok 60).
+- **B7** – záverečná obrazovka z dát, konečné skóre, karta a fotografia v okne (krok 61).
+- **C1** – vodidlá na ďalšie miesto, „Ukáž cestu“ bez straty bodov, odstránené úniky odpovedí (krok 62).
+- **Úprava scény 4** – úvodný text a prvá nápoveda bez čísla domu (krok 63).
+
+Celá kapitola je prejditeľná od začiatku po záver: scény 1–10 → koniec aktu III → Strážca → truhlica → fotografia → zadanie miesta → záver. Skóre 1010.
+
+**Ukončenie:** vývojový server (`npm run dev`) zastavený, všetko commitnuté, nič sa nepushovalo.
+
+**Najbližšie kroky v tomto poradí:**
+1. **B4c – 3D truhlica v troch krokoch:** zámky rozložené po truhlici, priblíženie (zoom) na zámok, hlásenie po odomknutí, 2D truhlica ostáva ako záloha. Návrh je v súbore `b4c-3d-truhlica.md` v projekte Mysterium (v priečinku projektu na disku zatiaľ nie je).
+2. **Terénna kontrola** ciest a vodidiel podľa `docs/KONTROLA-PRED-VYDANIM.md`.
+3. **Video a zvuky** (video Strážcu, zvukové súbory hry sú zatiaľ prázdne).
