@@ -2084,3 +2084,58 @@ Prvý beh hlásil jednu chybu v teste (nadpis karty je veľkými písmenami). Te
 **Lint:** bez chýb.
 
 **Ďalší krok:** B4a (obrazovka Strážcu), až po potvrdení.
+
+---
+
+## 24. 10. 2026 – Krok 57 (krok B4a): Obrazovka „Strážca prichádza“
+
+**Čo sa urobilo:**
+- **Priebeh:** koniec aktu III → „Prijať útržok a pokračovať“ → **Strážca prichádza** → „Otvoriť truhlicu“ alebo „Preskočiť“ → dočasne záverečná obrazovka (kým pribudne truhlica v B4b).
+  - Pri vstupe do finále sa do uloženia zapíše príznak `finale-started` a obrazovka `finaleGuardian`, takže F5 vráti hráča na Strážcu.
+  - Funkcie `startFinale` a `leaveFinaleGuardian` sú v `engine/finale.ts`. Koniec posledného aktu vedie do finále iba vtedy, ak ho kapitola má.
+- **Obrazovka** (`components/screens/FinaleGuardianScreen.tsx`, nová):
+  - nadpis, text a tlačidlá z dát; hore panel Úlohy, Inventár, Artefakty,
+  - bez videa: pokojné nehybné pozadie a text,
+  - video: stačí doplniť `videoSrc` (prípadne `posterSrc` a nové pole `captionsSrc` pre titulky .vtt) do `finale.ts`. Spúšťa sa iba ovládačmi prehliadača, nič sa nesťahuje vopred, pri chybe zmizne a ostane text,
+  - „Preskočiť“ je vždy viditeľné, tlačidlá majú 54 px, text 16 px, pri vypnutých animáciách sa nič nehýbe (ani tlačidlo pri stlačení).
+- **Prevod starých uložení** (`engine/gameStorage.ts`, `migrateFinishedSaveToFinale` v `engine/finale.ts`): hra na záverečnej obrazovke bez príznaku `finale-started` sa pri načítaní presunie na obrazovku Strážcu.
+  - Tretí útržok sa pridá iba ak chýba, „Útržok mapy ďalšieho prípadu“ sa odstráni, ostatné ostáva.
+  - Pôvodné uloženie sa zálohuje pod novým kľúčom `mysterium-progress-v2-backup-before-finale`, iba raz a už sa neprepíše. Kľúč `…-backup-before-repair` sa pri tomto prevode nepoužíva.
+  - Hry dohrané po zmene majú príznak, ostanú na záverečnej obrazovke a nezacyklia sa.
+
+**Test (mimo projektu, necommitnutý):** pred zmenou 11 chýb a test spadol (nové funkcie ešte neexistovali), po zmene **20 z 20 OK**. Overuje:
+- celú kapitolu so skóre 1010 a poradím `… history|10 → actTransition|10 → finaleGuardian|10 → finish|10`,
+- F5 po každom kroku a F5 na Strážcovi,
+- 4× „Prijať útržok“ aj 4× „Otvoriť truhlicu“ (tretí útržok raz),
+- staré uloženia:
+  - začiatok a scéna 5 bez zálohy,
+  - stará záverečná obrazovka: prevod, záloha = pôvodné uloženie, tretí útržok raz, mapa preč, skóre ostáva,
+  - druhé načítanie: záloha sa neprepíše,
+  - po prevode Strážca → záver → F5 ostane na závere,
+  - záverečná obrazovka s príznakom ostane.
+
+**Ostatné testy:** texty finále 37/37, B3a 65/65, kresba kľúča 54/54, nápovedy 37/37. Starý test B3b hlási 4 očakávané rozdiely: predpokladal záverečnú obrazovku hneď po konci aktu III a žiadny prevod uložení, a to sa týmto krokom zámerne zmenilo.
+
+**V prehliadači na dev serveri (360 px; aj `?bez3d` a vypnuté animácie):** 13 z 13 OK.
+- Po „Prijať útržok“ príde Strážca.
+- Tlačidlá 286 × 54 px, text 16 px, bez vodorovného posúvania.
+- Bez videa sa nič nespúšťa.
+- F5 na Strážcovi, Inventár a späť.
+- „Otvoriť truhlicu“ vedie na záver a F5 tam ostane.
+- Stará záverečná obrazovka sa prevedie so zálohou.
+- Pri vypnutých animáciách beží 0 animácií.
+- Snímky: Strážca, tlačidlá a obrazovka po prevode.
+
+**Neoverené:** prehrávanie videa a náhrada pri chybe videa. Súbor videa ešte neexistuje; overí sa, keď sa doplní.
+
+**Zmenené súbory:**
+- `types/game.ts`
+- `engine/finale.ts`, `engine/gameEngine.ts`, `engine/gameStorage.ts`
+- `components/screens/FinaleGuardianScreen.tsx` (nový), `app/page.tsx`
+- `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** bez chýb.
+
+**Ďalší krok:** B4b (truhlica v 2D), až po potvrdení.

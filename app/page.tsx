@@ -9,6 +9,7 @@ import { NpcFlow } from "../components/game/NpcFlow";
 import { GameLayout } from "../components/layout/GameLayout";
 import { PuzzleFlow } from "../components/game/PuzzleFlow";
 import { ActTransitionScreen } from "../components/screens/ActTransitionScreen";
+import { FinaleGuardianScreen } from "../components/screens/FinaleGuardianScreen";
 import { FinishScreen } from "../components/screens/FinishScreen";
 import { IntroScreen } from "../components/screens/IntroScreen";
 import { LandingScreen } from "../components/screens/LandingScreen";
@@ -26,6 +27,7 @@ import {
   getActTransition,
   getCodeItemInfo,
   getSceneCodeItemId,
+  leaveFinaleGuardian,
   markCodeDigitFound,
   revealHint,
   solvePuzzle,
@@ -385,6 +387,27 @@ export default function Home() {
             .map((item) => item.inspect?.countPoints)}
           onContinue={finishActEnding}
         />
+      );
+    }
+
+    if (gameState.screen === "finaleGuardian" && currentChapter.finale) {
+      return (
+        <GameLayout
+          gameState={gameState}
+          totalArtifacts={totalArtifacts}
+          onOpenInventory={openInventory}
+          onOpenArtifacts={openArtifacts}
+          onOpenQuests={openQuests}
+        >
+          <FinaleGuardianScreen
+            guardian={currentChapter.finale.guardian}
+            onContinue={() =>
+              setGameState((currentState) =>
+                leaveFinaleGuardian(currentChapter, currentState)
+              )
+            }
+          />
+        </GameLayout>
       );
     }
 

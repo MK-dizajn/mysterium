@@ -15,6 +15,7 @@ import {
 } from "./gameProgress";
 import { calculatePuzzleScore } from "./gameScoring";
 import { runSceneEvents } from "./events";
+import { startFinale } from "./finale";
 
 export function createNewGameState(): GameState {
   return {
@@ -288,7 +289,7 @@ export function continueAfterHistory(
 
 /**
  * Ukončí koniec aktu: udelí odmenu z dát (iba raz), prepne na ďalší akt
- * a pokračuje ďalšou scénou; po poslednom akte ide na záver kapitoly.
+ * a pokračuje ďalšou scénou; po poslednom akte ide do finále (Strážca).
  * Mimo obrazovky konca aktu nerobí nič, takže opakované kliknutie
  * nič nezdvojí.
  */
@@ -315,7 +316,7 @@ export function completeActEnding(
     reward !== undefined &&
     !gameState.inventory.some((item) => item.id === reward.id);
 
-  return {
+  const nextState: GameState = {
     ...gameState,
     currentActId: transition.nextAct?.id ?? transition.completedAct.id,
     screen: transition.nextAct ? "puzzle" : "finish",
@@ -323,4 +324,9 @@ export function completeActEnding(
       ? [...gameState.inventory, reward]
       : gameState.inventory,
   };
+
+  // Po poslednom akte začína finále (ak ho kapitola má), inak záver kapitoly.
+  return !transition.nextAct && chapter.finale
+    ? startFinale(nextState)
+    : nextState;
 }

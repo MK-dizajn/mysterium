@@ -171,6 +171,7 @@ export type GameScreen =
   | "history"
   | "actTransition"
   | "actChest"
+  | "finaleGuardian"
   | "finish"
   | "artifact"
   | "inventory"
@@ -341,8 +342,12 @@ export type Act = {
 export type FinaleGuardian = {
   title: string;
   text: string;
+  /** Video (napríklad /videos/straz.mp4); nikdy sa nespustí samo. */
   videoSrc?: string;
+  /** Obrázok pred spustením videa. */
   posterSrc?: string;
+  /** Titulky k videu (súbor .vtt). */
+  captionsSrc?: string;
   skipLabel: string;
   continueLabel: string;
 };

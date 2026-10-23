@@ -1,10 +1,13 @@
 import type { Game, GameState } from "../types/game";
 import { SAVE_KEY } from "./constants";
+import { migrateFinishedSaveToFinale } from "./finale";
 import { createNewGameState } from "./gameEngine";
 import { repairGameProgress } from "./gameProgress";
 
 const CORRUPTED_SAVE_KEY = `${SAVE_KEY}-corrupted`;
 const REPAIR_BACKUP_KEY = `${SAVE_KEY}-backup-before-repair`;
+/** Uloženie dohranej hry pred prevodom do finále (zapíše sa iba raz). */
+const FINALE_BACKUP_KEY = `${SAVE_KEY}-backup-before-finale`;
 
 // Neplatné číslo kapitoly alebo scény nenahrádzame nulou, ale označíme ho,
 // aby ho repairGameProgress rozpoznal a hráča poslal na správne miesto.
@@ -121,8 +124,9 @@ function migrateRemovedScreens(gameState: GameState): GameState {
 
 /**
  * Načíta uloženú hru a ak ukazuje na neexistujúcu kapitolu alebo scénu
- * alebo na obrazovku, ktorá už neexistuje, opraví ju. Pôvodné uloženie
- * sa pred opravou odloží pod samostatný kľúč.
+ * alebo na obrazovku, ktorá už neexistuje, opraví ju. Hru dohranú pred
+ * finále presunie do finále. Pôvodné uloženie sa pred opravou aj pred
+ * prevodom do finále odloží pod samostatný kľúč.
  */
 export function loadRepairedGameState(game: Game): GameState | null {
   const gameState = loadGameState();
@@ -135,23 +139,37 @@ export function loadRepairedGameState(game: Game): GameState | null {
     repairGameProgress(game, gameState)
   );
 
-  if (repairedState === gameState) {
+  const chapter = game.chapters[repairedState.currentChapterIndex];
+  const finaleState = chapter
+    ? migrateFinishedSaveToFinale(chapter, repairedState)
+    : repairedState;
+
+  if (finaleState === gameState) {
     return gameState;
   }
 
   try {
     const originalProgress = localStorage.getItem(SAVE_KEY);
 
-    if (originalProgress) {
+    if (originalProgress && repairedState !== gameState) {
       localStorage.setItem(REPAIR_BACKUP_KEY, originalProgress);
+    }
+
+    // Záloha pred prevodom do finále sa neprepisuje, ostane prvé uloženie.
+    if (
+      originalProgress &&
+      finaleState !== repairedState &&
+      localStorage.getItem(FINALE_BACKUP_KEY) === null
+    ) {
+      localStorage.setItem(FINALE_BACKUP_KEY, originalProgress);
     }
   } catch {
     // Úložisko nie je dostupné, oprava aj tak pokračuje.
   }
 
-  saveGameState(repairedState);
+  saveGameState(finaleState);
 
-  return repairedState;
+  return finaleState;
 }
 
 export function saveGameState(gameState: GameState) {

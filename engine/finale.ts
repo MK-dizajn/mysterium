@@ -8,6 +8,8 @@ import { getActLockCodes } from "./gameProgress";
  * a opakované kliknutie ani obnovenie stránky nič nezdvojí.
  */
 
+/** Hráč vstúpil do finále (obrazovka Strážcu); bez neho ide o starú dohranú hru. */
+export const FINALE_STARTED_FLAG = "finale-started";
 export const FINALE_KEY_INSERTED_FLAG = "finale-key-inserted";
 export const FINALE_CHEST_OPENED_FLAG = "finale-chest-opened";
 export const FINALE_PLACE_SOLVED_FLAG = "finale-place-solved";
@@ -24,6 +26,67 @@ function setFlag(gameState: GameState, flagId: string): GameState {
       [flagId]: true,
     },
   };
+}
+
+/** Vstup do finále po konci posledného aktu: obrazovka Strážcu. */
+export function startFinale(gameState: GameState): GameState {
+  return {
+    ...setFlag(gameState, FINALE_STARTED_FLAG),
+    screen: "finaleGuardian",
+  };
+}
+
+/**
+ * Odchod z obrazovky Strážcu („Otvoriť truhlicu“ aj „Preskočiť“).
+ * Dočasne vedie na záver kapitoly, kým pribudne truhlica (krok B4b).
+ */
+export function leaveFinaleGuardian(
+  _chapter: Chapter,
+  gameState: GameState
+): GameState {
+  if (gameState.screen !== "finaleGuardian") {
+    return gameState;
+  }
+
+  return {
+    ...gameState,
+    screen: "finish",
+  };
+}
+
+/** Predmety, ktoré dávali staršie verzie hry a finále ich nahradilo. */
+const REPLACED_ITEM_IDS = ["chapter-two-map-fragment"];
+
+/**
+ * Hra dohraná pred finále (záverečná obrazovka bez príznaku finále)
+ * sa presunie na obrazovku Strážcu: dostane odmenu konca posledného
+ * aktu (iba ak chýba) a nahradené predmety sa odstránia.
+ */
+export function migrateFinishedSaveToFinale(
+  chapter: Chapter,
+  gameState: GameState
+): GameState {
+  if (
+    gameState.screen !== "finish" ||
+    !chapter.finale ||
+    gameState.flags[FINALE_STARTED_FLAG]
+  ) {
+    return gameState;
+  }
+
+  const lastAct = chapter.acts[chapter.acts.length - 1];
+  const reward = lastAct?.ending?.reward;
+  const inventory = gameState.inventory.filter(
+    (item) => !REPLACED_ITEM_IDS.includes(item.id)
+  );
+  const shouldAddReward =
+    reward !== undefined && !inventory.some((item) => item.id === reward.id);
+
+  return startFinale({
+    ...gameState,
+    currentActId: lastAct?.id ?? gameState.currentActId,
+    inventory: shouldAddReward ? [...inventory, reward] : inventory,
+  });
 }
 
 export type FinaleLock = {
