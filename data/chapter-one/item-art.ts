@@ -1,4 +1,15 @@
-import type { InspectCountPoint } from "../../types/game";
+import type { InspectCountPoint, InspectTiming } from "../../types/game";
+
+/**
+ * Časy nápovedí pri počítacích predmetoch: 1. nápoveda po 20 s,
+ * 2. nápoveda po 40 s a „Ukáž číslicu“ po 60 s (od otvorenia alebo
+ * poslednej aktivity). Predmet môže mať aj vlastné časy.
+ */
+export const COUNT_INSPECT_TIMING: InspectTiming = {
+  hintMs: 20_000,
+  secondHintMs: 40_000,
+  revealMs: 60_000,
+};
 
 /*
  * Poloha prvkov na počítanie na líci predmetov kapitoly I
@@ -40,32 +51,36 @@ export const EDUCATION_SEAL_RAYS: InspectCountPoint[] = [
  * v spodnej hrane brady (y 0,81), okienka v jej strede (y 0,49).
  * Zárezy sú od seba 0,18 šírky kresby, okienka 0,2 (aj v 3D aspoň 44 px).
  */
-const WINDOW = 0.49;
-const SLOT = 0.81;
+const slot = (x: number): InspectCountPoint => ({ x, y: 0.81, label: "Zárez" });
+const keyWindow = (x: number): InspectCountPoint => ({
+  x,
+  y: 0.49,
+  label: "Okienko",
+});
 
 export const FIRST_KEY_TOOTH_NOTCHES: InspectCountPoint[] = [
-  { x: 0.14, y: SLOT },
-  { x: 0.32, y: SLOT },
-  { x: 0.5, y: SLOT },
-  { x: 0.68, y: SLOT },
-  { x: 0.86, y: SLOT },
-  { x: 0.2, y: WINDOW },
-  { x: 0.4, y: WINDOW },
-  { x: 0.6, y: WINDOW },
-  { x: 0.8, y: WINDOW },
+  slot(0.14),
+  slot(0.32),
+  slot(0.5),
+  slot(0.68),
+  slot(0.86),
+  keyWindow(0.2),
+  keyWindow(0.4),
+  keyWindow(0.6),
+  keyWindow(0.8),
 ];
 
 export const SECOND_KEY_TOOTH_NOTCHES: InspectCountPoint[] = [
-  { x: 0.32, y: SLOT },
-  { x: 0.68, y: WINDOW },
+  slot(0.32),
+  keyWindow(0.68),
 ];
 
 export const THIRD_KEY_TOOTH_NOTCHES: InspectCountPoint[] = [
-  { x: 0.23, y: SLOT },
-  { x: 0.41, y: SLOT },
-  { x: 0.59, y: SLOT },
-  { x: 0.77, y: SLOT },
-  { x: 0.3, y: WINDOW },
-  { x: 0.5, y: WINDOW },
-  { x: 0.7, y: WINDOW },
+  slot(0.23),
+  slot(0.41),
+  slot(0.59),
+  slot(0.77),
+  keyWindow(0.3),
+  keyWindow(0.5),
+  keyWindow(0.7),
 ];

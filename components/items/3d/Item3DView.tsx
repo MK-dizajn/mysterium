@@ -632,7 +632,7 @@ export default function Item3DView({
                   <button
                     type="button"
                     onClick={() => onMark?.(index)}
-                    aria-label={countLabel}
+                    aria-label={point.label ?? countLabel}
                     aria-pressed={isMarked}
                     className={`block h-11 w-11 rounded-full outline-none focus-visible:ring-4 focus-visible:ring-amber-300 ${TAP_FEEDBACK_CLASSES} ${
                       isMarked

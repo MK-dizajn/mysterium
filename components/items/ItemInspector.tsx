@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import type { CodeItemInfo } from "../../engine";
-import type { ItemInspectTranscript } from "../../types/game";
+import type { InspectTiming, ItemInspectTranscript } from "../../types/game";
 import { soundManager } from "../../lib/soundManager";
 import { ActionButton } from "../ui/ActionButton";
 import { type ItemArtSide, ITEM_ARTS } from "./art/itemArtRegistry";
@@ -41,10 +41,13 @@ type ItemInspectorProps = {
   onClose: () => void;
 };
 
-/** Po tejto dobe nečinnosti sa rozžiari miesto a ukáže sa nápoveda. */
-const IDLE_HINT_MS = 20_000;
-/** Po ďalšej dobe nečinnosti sa ukáže „Ukáž číslicu“ ako posledná možnosť. */
-const IDLE_REVEAL_MS = 20_000;
+/**
+ * Časy bez vlastných údajov predmetu: po 20 s nečinnosti sa rozžiari miesto
+ * a ukáže sa nápoveda, po 40 s „Ukáž číslicu“ ako posledná možnosť.
+ */
+const DEFAULT_TIMING: InspectTiming = { hintMs: 20_000, revealMs: 40_000 };
+/** Ako dlho svieti riadok po prvom ťuknutí na prvok. */
+const FIRST_TAP_NOTE_MS = 5000;
 const FLIP_MS = 220;
 const FOUND_ANIMATION_MS = 1600;
 
@@ -115,6 +118,9 @@ export function ItemInspector({
   const [activityCount, setActivityCount] = useState(0);
   const [isJustFound, setIsJustFound] = useState(false);
   const [markedIndexes, setMarkedIndexes] = useState<number[]>([]);
+  const [isFirstTapNoteVisible, setIsFirstTapNoteVisible] = useState(false);
+  const hasShownFirstTapNoteRef = useRef(false);
+  const firstTapNoteTimerRef = useRef<number | null>(null);
   const isFoundRequestedRef = useRef(false);
   const dialogRef = useRef<HTMLDivElement>(null);
   const isTranscript = inspect?.kind === "transcript";
@@ -143,20 +149,44 @@ export function ItemInspector({
     }
   }, [shouldFocusDialog]);
 
+  // Stupne nápovedy podľa dát predmetu: nápoveda, prípadne 2. nápoveda,
+  // nakoniec „Ukáž číslicu“. Časy sú od otvorenia alebo poslednej aktivity.
+  const timing = inspect?.timing ?? DEFAULT_TIMING;
+  const hasSecondHint = Boolean(
+    inspect?.secondHint && timing.secondHintMs !== undefined
+  );
+  const stageTimes = hasSecondHint
+    ? [timing.hintMs, timing.secondHintMs ?? timing.hintMs, timing.revealMs]
+    : [timing.hintMs, timing.revealMs];
+  const revealStage = stageTimes.length;
+  const nextStageDelay =
+    idleStage < revealStage
+      ? stageTimes[idleStage] - (idleStage > 0 ? stageTimes[idleStage - 1] : 0)
+      : null;
+
   useEffect(() => {
-    if (isFound || idleStage >= 2) {
+    if (isFound || nextStageDelay === null) {
       return;
     }
 
     const timer = window.setTimeout(
       () => setIdleStage((stage) => stage + 1),
-      idleStage === 0 ? IDLE_HINT_MS : IDLE_REVEAL_MS
+      nextStageDelay
     );
 
     return () => {
       window.clearTimeout(timer);
     };
-  }, [idleStage, activityCount, isFound]);
+  }, [idleStage, nextStageDelay, activityCount, isFound]);
+
+  useEffect(
+    () => () => {
+      if (firstTapNoteTimerRef.current !== null) {
+        window.clearTimeout(firstTapNoteTimerRef.current);
+      }
+    },
+    []
+  );
 
   function registerActivity() {
     setActivityCount((count) => count + 1);
@@ -216,9 +246,25 @@ export function ItemInspector({
     }
 
     const nextMarkedIndexes = [...markedIndexes, index];
+    const isComplete = nextMarkedIndexes.length === total;
     setMarkedIndexes(nextMarkedIndexes);
 
-    if (nextMarkedIndexes.length === total) {
+    // Po prvom ťuknutí sa raz ukáže povzbudenie (bez počtu), potom už nie.
+    if (!hasShownFirstTapNoteRef.current) {
+      hasShownFirstTapNoteRef.current = true;
+
+      if (inspect?.firstTapText && !isComplete) {
+        setIsFirstTapNoteVisible(true);
+        firstTapNoteTimerRef.current = window.setTimeout(
+          () => setIsFirstTapNoteVisible(false),
+          FIRST_TAP_NOTE_MS
+        );
+      }
+    } else {
+      setIsFirstTapNoteVisible(false);
+    }
+
+    if (isComplete) {
       markFound(false);
     }
   }
@@ -237,7 +283,8 @@ export function ItemInspector({
   const isCountMode = countPoints !== undefined;
 
   const isHintVisible = idleStage >= 1 && !isFound;
-  const canReveal = idleStage >= 2 && !isFound;
+  const isSecondHintVisible = hasSecondHint && idleStage >= 2 && !isFound;
+  const canReveal = idleStage >= revealStage && !isFound;
   const isHiddenSideInView =
     mode === "3d" ? isHiddenSideFacing3D : side2D === "hidden";
 
@@ -411,7 +458,7 @@ export function ItemInspector({
                         onClick={() =>
                           markCountElement(index, countPoints.length)
                         }
-                        aria-label={inspect.countLabel}
+                        aria-label={point.label ?? inspect.countLabel}
                         aria-pressed={isMarked}
                         style={{
                           left: `${point.x * 100}%`,
@@ -447,18 +494,32 @@ export function ItemInspector({
           </div>
         )}
 
-        {definition && mode === "3d" && !isFound && (
+        {definition && !isFound && (mode === "3d" || isCountMode) && (
           <p className="mt-3 text-xs leading-5 text-slate-400">
-            {isCountMode
-              ? "Ťahaj, nakláňaj a ťukaj na detaily."
-              : "Ťahaj a nakláňaj predmet."}
+            {mode === "2d"
+              ? "Ťukaj na detaily."
+              : isCountMode
+                ? "Ťahaj, nakláňaj a ťukaj na detaily."
+                : "Ťahaj a nakláňaj predmet."}
           </p>
         )}
 
         <div aria-live="polite" className="w-full">
+          {isFirstTapNoteVisible && !isFound && (
+            <p className="mt-3 text-sm italic leading-6 text-amber-100/80">
+              {inspect.firstTapText}
+            </p>
+          )}
+
           {isHintVisible && (
             <p className="mt-4 rounded-2xl border border-amber-300/25 bg-amber-400/10 px-4 py-3 text-sm leading-6 text-amber-100">
               {inspect.hint}
+            </p>
+          )}
+
+          {isSecondHintVisible && (
+            <p className="mt-3 rounded-2xl border border-amber-300/25 bg-amber-400/10 px-4 py-3 text-sm leading-6 text-amber-100">
+              {inspect.secondHint}
             </p>
           )}
 

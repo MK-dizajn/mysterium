@@ -1,5 +1,5 @@
 import type { Scene } from "../../types/game";
-import { THIRD_KEY_TOOTH_NOTCHES } from "./item-art";
+import { COUNT_INSPECT_TIMING, THIRD_KEY_TOOTH_NOTCHES } from "./item-art";
 
 export const bratislavskyMierScene: Scene = {
   id: "bratislavsky-mier",
@@ -91,7 +91,11 @@ export const bratislavskyMierScene: Scene = {
               kind: "count",
               art: "keyTooth",
               intro: "Preskúmaj predmet a objav niečo, čo si nečakal.",
-              hint: "Skús ťuknúť na to, čo vidíš na hranách zubu.",
+              hint: "Skús ťuknúť na to, čo vidíš na zube.",
+              secondHint:
+                "Označ každý detail, ktorý vidíš. Keď označíš všetky, objavíš číslo.",
+              firstTapText: "Pokračuj. Zdá sa, že tu ešte niečo je.",
+              timing: COUNT_INSPECT_TIMING,
               foundText:
                 "Objavil si číslo, ktoré ti na konci pomôže odomknúť tajomstvo.",
               hotspotLabel: "Zárezy na hranách zubu kľúča",

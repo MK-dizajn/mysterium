@@ -38,6 +38,15 @@ export type ItemInspectArt =
 export type InspectCountPoint = {
   x: number;
   y: number;
+  /** Názov prvku pre čítačku (napríklad „Okienko“); inak countLabel predmetu. */
+  label?: string;
+};
+
+/** Kedy sa ukážu nápovedy a „Ukáž číslicu“ (ms od otvorenia alebo poslednej aktivity). */
+export type InspectTiming = {
+  hintMs: number;
+  secondHintMs?: number;
+  revealMs: number;
 };
 
 export type ItemInspectTranscript = {
@@ -56,6 +65,12 @@ export type ItemInspect = {
   intro: string;
   /** Jemná nápoveda po asi 20 s nečinnosti. */
   hint: string;
+  /** Druhý stupeň nápovedy (napríklad po 40 s). */
+  secondHint?: string;
+  /** Krátky riadok po prvom ťuknutí na prvok (iba raz). */
+  firstTapText?: string;
+  /** Vlastné časy nápovedí; bez nich 20 s nápoveda a 40 s „Ukáž číslicu“. */
+  timing?: InspectTiming;
   /** Text po objavení číslice. */
   foundText: string;
   /** Popis miesta s číslicou pre čítačku obrazovky (nie je viditeľný). */

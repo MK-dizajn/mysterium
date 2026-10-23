@@ -1932,3 +1932,51 @@ Najmenšia vzdialenosť stredov ťukacích plôch nameraná v prehliadači:
 **Otvorené otázky pre používateľa:**
 - nápoveda pri zuboch („…na hranách zubu“) a popis „Zárez“ pre okienka (krok 53),
 - riadok pod predmetom v 2D verzii (krok 50).
+
+---
+
+## 24. 10. 2026 – Krok 54: Nápovedy v troch stupňoch pri počítacích predmetoch
+
+**Čo sa urobilo (mapa, pečať, tri zuby):**
+- **Stupne nápovedy** (časy od otvorenia okna alebo poslednej aktivity, ako doteraz):
+
+  | Čas | Čo sa ukáže |
+  |---|---|
+  | 20 s | 1. nápoveda a jemná žiara prvkov |
+  | 40 s | 2. nápoveda „Označ každý detail, ktorý vidíš. Keď označíš všetky, objavíš číslo.“ |
+  | 60 s | tlačidlo „Ukáž číslicu“ (predtým po 40 s) |
+
+- **Nápoveda pri zuboch:** „Skús ťuknúť na to, čo vidíš na zube.“ (predtým „…na hranách zubu“).
+- **Po prvom ťuknutí** sa raz ukáže riadok „Pokračuj. Zdá sa, že tu ešte niečo je.“ (bez počtu). Zmizne pri ďalšom ťuknutí alebo po 5 s. Pri tom istom otvorení okna sa už neukáže.
+- **Čítačka obrazovky:** zárezy sa volajú „Zárez“, okienka „Okienko“ (popis je pri polohe prvku v dátach).
+- **2D záloha (`?bez3d`):** pod počítacím predmetom je riadok „Ťukaj na detaily.“ Riadky pod predmetom ostali v kóde okna, ako rozhodol používateľ.
+- **Texty a časy sú v dátach pri predmete:** `secondHint`, `firstTapText`, `timing`. Spoločné časy 20/40/60 s sú v `COUNT_INSPECT_TIMING` v `data/chapter-one/item-art.ts` a predmet môže mať aj vlastné.
+- **Ostatné predmety** (žetón, list, mapa s kompasom, nahrávka) sa nemenia: nápoveda po 20 s, „Ukáž číslicu“ po 40 s.
+
+**Testy (mimo projektu, necommitnuté):**
+- **Dáta:** pred zmenou 22 chýb, po zmene 37 z 37 OK. Overuje texty bez „počítaj“ a „spočítaj“, 2. nápovedu, text po prvom ťuknutí a časy pri všetkých 5 predmetoch, „Zárez“ a „Okienko“ a nezmenené ostatné predmety.
+- **Prehliadač na dev serveri** (hodiny zrýchlené 10×): pred zmenou 8 chýb, po zmene 16 z 16 OK v 2D aj 3D. Overené časy:
+  - 15 s žiadna nápoveda,
+  - 26 s 1. nápoveda,
+  - 46 s 2. nápoveda,
+  - 46 s ani 55 s ešte bez „Ukáž číslicu“,
+  - 67 s „Ukáž číslicu“ je.
+
+  Ďalej: riadok po prvom ťuknutí iba raz (1. ťuknutie áno, 2. a 3. nie), čítačka 5× „Zárez“ a 4× „Okienko“, žetón ako predtým (po 40 s).
+- **Test kresby kľúča (krok 7):** stále všetko OK.
+
+**Overenie:** vývojový server (`npm run dev`) beží na http://localhost:3000. Testy v prehliadači bežali proti nemu. Snímky boli spravené po 55 s, po 67 s a po prvom ťuknutí.
+
+**Zmenené súbory:**
+- `types/game.ts`
+- `data/chapter-one/item-art.ts`, `tajna-stopa-michalska.ts`, `venturska-brana-spomienok.ts`, `maximilianova-fontana.ts`, `primacialny-palac.ts`, `bratislavsky-mier.ts`
+- `components/items/ItemInspector.tsx`, `components/items/3d/Item3DView.tsx`
+- `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** bez chýb.
+
+**Otvorené otázky z kroku 50 a 53 sú týmto vyriešené** (nápoveda zubov, „Okienko“, riadok v 2D).
+
+**Ďalší krok:** B3b, až po potvrdení.

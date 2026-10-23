@@ -1,5 +1,5 @@
 import type { Scene } from "../../types/game";
-import { EDUCATION_SEAL_RAYS } from "./item-art";
+import { COUNT_INSPECT_TIMING, EDUCATION_SEAL_RAYS } from "./item-art";
 
 export const venturskaBranaSpomienokScene: Scene = {
   id: "venturska-brana-spomienok",
@@ -92,6 +92,10 @@ export const venturskaBranaSpomienokScene: Scene = {
               art: "educationSeal",
               intro: "Preskúmaj predmet a objav niečo, čo si nečakal.",
               hint: "Skús ťuknúť na to, čo žiari okolo koruny.",
+              secondHint:
+                "Označ každý detail, ktorý vidíš. Keď označíš všetky, objavíš číslo.",
+              firstTapText: "Pokračuj. Zdá sa, že tu ešte niečo je.",
+              timing: COUNT_INSPECT_TIMING,
               foundText:
                 "Objavil si číslo, ktoré ti na konci pomôže odomknúť tajomstvo.",
               hotspotLabel: "Lúče okolo koruny na pečati",

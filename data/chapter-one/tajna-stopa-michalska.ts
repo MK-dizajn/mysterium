@@ -1,5 +1,5 @@
 import type { Scene } from "../../types/game";
-import { OLD_TOWN_TOWERS } from "./item-art";
+import { COUNT_INSPECT_TIMING, OLD_TOWN_TOWERS } from "./item-art";
 
 export const tajnaStopaMichalskaScene: Scene = {
   id: "tajna-stopa-michalska",
@@ -84,6 +84,10 @@ Nájdi fasádu, ktorá je nápadne užšia než všetky ostatné. Keď dom objav
               art: "oldTownMap",
               intro: "Preskúmaj predmet a objav niečo, čo si nečakal.",
               hint: "Skús ťuknúť na to, čo ťa v meste zaujme.",
+              secondHint:
+                "Označ každý detail, ktorý vidíš. Keď označíš všetky, objavíš číslo.",
+              firstTapText: "Pokračuj. Zdá sa, že tu ešte niečo je.",
+              timing: COUNT_INSPECT_TIMING,
               foundText:
                 "Objavil si číslo, ktoré ti na konci pomôže odomknúť tajomstvo.",
               hotspotLabel: "Veže na mape starého mesta",
