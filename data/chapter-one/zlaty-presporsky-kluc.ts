@@ -62,7 +62,8 @@ export const zlatyPresporskyKlucScene: Scene = {
       "Zlatý prešporský kľúč je symbolom schopnosti čítať mesto ako denník. Každá fasáda, nápis, poškodenie či umelecký detail môže byť zápisom, ktorý prežil celé generácie. Kľúč patrí tomu, kto tieto zápisy dokáže nájsť, pochopiť a uchovať.",
   },
 
-  nextInstruction:
+  // Bez cesty: ďalej nasleduje finále na tom istom mieste.
+  nextReflection:
   "Zlatý prešporský kľúč sa pred tebou konečne odhalil. Neotvára obyčajné dvere — odhaľuje pamäť mesta.\n\nNa poslednej strane však zostala veta: „Kľúč otvára viac, než si myslíš.“ Prvý prípad sa skončil. Pátranie pokračuje v ďalšej kapitole.",
 
   events: [
@@ -94,6 +95,7 @@ export const zlatyPresporskyKlucScene: Scene = {
             id: "golden-pressburg-key-complete",
             title: "Zlatý prešporský kľúč",
             icon: "🗝️",
+            clue: "Kľúč otvára viac, než si myslíš. Strážca vie, ktorý zámok.",
             description:
               "Prvý zo stratených kľúčov starého pátrača. Neotvára obyčajné dvere — odhaľuje spomienky, ktoré mesto ukrylo priamo pred očami svojich obyvateľov.",
           },

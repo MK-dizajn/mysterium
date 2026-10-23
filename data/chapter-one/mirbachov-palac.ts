@@ -59,8 +59,11 @@ export const mirbachovPalacScene: Scene = {
       "Mirbachov palác je jedným z najzachovalejších rokokových palácov starého Prešporka. Jeho fasáda spája prísnu symetriu s bohatou ornamentálnou výzdobou. Rodový erb nad priečelím pripomína Nyáryovcov, hoci palác dnes nesie meno až svojho posledného súkromného majiteľa Emila Mirbacha.",
   },
 
-  nextInstruction:
-  "Rodový erb pripomenul, že mená majiteľov sa môžu stratiť, no ich znaky zostávajú.\n\nZ Františkánskeho námestia pokračuj krátkou cestou na Hlavné námestie. Zastav sa pred vežou Starej radnice.",
+  nextReflection:
+    "Rodový erb pripomenul, že mená majiteľov sa môžu stratiť, no ich znaky zostávajú.",
+
+  route:
+    "Z Františkánskeho námestia pokračuj krátkou cestou na Hlavné námestie. Zastav sa pred vežou Starej radnice.",
 
   events: [
     {
@@ -87,6 +90,7 @@ export const mirbachovPalacScene: Scene = {
               "Útržok starej mapy s pôdorysom námestia pri Mirbachovom paláci. Niekto ho starostlivo zložil a uschoval medzi pátračove poznámky.",
             evidenceKind: "document",
             secretCode: "0",
+            clue: "Hlavné námestie je blízko. Choď k veži, z ktorej sa mesto kedysi spravovalo samo.",
             evidenceOrder: 5,
             actId: "act-2",
             inspect: {

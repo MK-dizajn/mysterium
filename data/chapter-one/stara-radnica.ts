@@ -59,8 +59,11 @@ export const staraRadnicaScene: Scene = {
       "Stará radnica vznikala postupným spájaním viacerých historických domov a patrí medzi najstaršie mestské stavby Bratislavy. Jej veža neuchováva iba hodiny a architektonické detaily. V stene zostala aj skutočná stopa napoleonského bombardovania, ktorú väčšina návštevníkov námestia nikdy nezbadá.",
   },
 
-  nextInstruction:
-  "Stopa v múre dokázala, že mesto uchováva aj udalosti, na ktoré by možno najradšej zabudlo.\n\nZostaň na Hlavnom námestí a prejdi niekoľko krokov do jeho stredu k Maximiliánovej fontáne.",
+  nextReflection:
+    "Stopa v múre dokázala, že mesto uchováva aj udalosti, na ktoré by možno najradšej zabudlo.",
+
+  route:
+    "Zostaň na Hlavnom námestí a prejdi niekoľko krokov do jeho stredu k Maximiliánovej fontáne.",
 
   events: [
     {
@@ -87,6 +90,7 @@ export const staraRadnicaScene: Scene = {
               "Krátky záznam hlasu Strážcu Michalskej brány. Zatiaľ máš k dispozícii iba jeho prepis.",
             evidenceKind: "document",
             secretCode: "4",
+            clue: "V strede námestia už stáročia tečie voda. Niekto nad ňou drží stráž.",
             evidenceOrder: 6,
             actId: "act-2",
             inspect: {

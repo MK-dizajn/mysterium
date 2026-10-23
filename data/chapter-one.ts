@@ -41,5 +41,12 @@ export const chapterOne: Chapter = {
     zlatyPresporskyKlucScene,
   ],
 
+  guidance: {
+    nextClueTitle: "Ďalšia stopa",
+    showRouteLabel: "Ukáž cestu",
+    hideRouteLabel: "Skryť cestu",
+    inventoryClueLabel: "Stopa",
+  },
+
   finale: chapterOneFinale,
 };

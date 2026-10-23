@@ -1,6 +1,7 @@
 import type { CodeItemInfo } from "../../engine";
-import type { Scene } from "../../types/game";
+import type { ChapterGuidance, Scene } from "../../types/game";
 import { ActionButton } from "../ui/ActionButton";
+import { RouteHint } from "../ui/RouteHint";
 import { ScreenContainer } from "../ui/ScreenContainer";
 import { MessageBox } from "../ui/MessageBox";
 import {
@@ -15,6 +16,9 @@ type HistoryScreenProps = {
   scene: Scene;
   /** Nová odmena s ukrytou číslicou (iba predmet s obrazovkou „Prezrieť“). */
   codeItem?: CodeItemInfo | null;
+  /** Vodidlo na ďalšie miesto z odmeny scény. */
+  clue?: string;
+  guidance: ChapterGuidance;
   onInspectItem: (itemId: string) => void;
   onContinue: () => void;
 };
@@ -22,6 +26,8 @@ type HistoryScreenProps = {
 export function HistoryScreen({
   scene,
   codeItem,
+  clue,
+  guidance,
   onInspectItem,
   onContinue,
 }: HistoryScreenProps) {
@@ -105,11 +111,27 @@ export function HistoryScreen({
 
         <SectionCard
           icon={<SearchIcon className="h-9 w-9" />}
-          title="Ďalšia stopa"
+          title={guidance.nextClueTitle}
         >
-          <p className="text-sm leading-relaxed text-slate-300">
-            {scene.nextInstruction}
+          <p className="whitespace-pre-line text-sm leading-relaxed text-slate-300">
+            {scene.nextReflection}
           </p>
+
+          {clue && (
+            <p className="mt-4 border-l-2 border-amber-300/50 pl-4 font-serif text-[16px] italic leading-7 text-amber-100">
+              {clue}
+            </p>
+          )}
+
+          {scene.route && (
+            <div className="mt-4">
+              <RouteHint
+                route={scene.route}
+                showLabel={guidance.showRouteLabel}
+                hideLabel={guidance.hideRouteLabel}
+              />
+            </div>
+          )}
         </SectionCard>
 
         <ActionButton onClick={onContinue}>

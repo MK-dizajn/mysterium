@@ -1,4 +1,4 @@
-import type { GameState, Scene } from "../../types/game";
+import type { ChapterGuidance, GameState, Scene } from "../../types/game";
 import { getHintsUsed } from "../../engine";
 import { GameLayout } from "../layout/GameLayout";
 import { PuzzleScreen } from "../screens/PuzzleScreen";
@@ -7,6 +7,9 @@ import { JournalReveal } from "../ui/JournalReveal";
 type PuzzleFlowProps = {
   gameState: GameState;
   scene: Scene;
+  /** Cesta z predchádzajúcej scény pre „Ukáž cestu“. */
+  arrivalRoute?: string;
+  guidance: ChapterGuidance;
   totalArtifacts: number;
   onOpenInventory: () => void;
   onOpenArtifacts: () => void;
@@ -20,6 +23,8 @@ type PuzzleFlowProps = {
 export function PuzzleFlow({
   gameState,
   scene,
+  arrivalRoute,
+  guidance,
   totalArtifacts,
   onOpenInventory,
   onOpenArtifacts,
@@ -113,6 +118,8 @@ export function PuzzleFlow({
         <PuzzleScreen
           scene={scene}
           hintsUsed={getHintsUsed(gameState, scene)}
+          arrivalRoute={arrivalRoute}
+          guidance={guidance}
           onRevealHint={onRevealHint}
           onSolved={onSolved}
         />

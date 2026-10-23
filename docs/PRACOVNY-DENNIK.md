@@ -2405,3 +2405,76 @@ Snímky: záver hore a dole, karta v okne, fotografia v okne, potvrdzovacie okno
 **Lint:** bez chýb.
 
 **Ďalší krok:** podľa plánu B4c (3D truhlica) alebo vodidlá a tlačidlo „Ukáž cestu“, až po potvrdení.
+
+---
+
+## 24. 10. 2026 – Krok 62 (krok C1): Vodidlá na ďalšie miesto a „Ukáž cestu“
+
+**Prieskum (pred zmenou):** dnešný `nextInstruction` mal tri úniky:
+- scéna 3 „na **Ventúrskej 3**“ (holá adresa s číslom domu),
+- scéna 4 „…a **rodovým znakom**“ (odpoveď úlohy 5),
+- scéna 8 „…k jeho **Zrkadlovej sieni**“ (odpoveď úlohy 9, najvážnejší).
+
+**Čo sa urobilo:**
+- **Vodidlá** (schválené, 1 až 2 vety, bez odpovede) sú v dátach pri odmene každej scény (`clue`). Pri scéne 10 je vodidlo pri Zlatom kľúči a nadväzuje na finále („Kľúč otvára viac, než si myslíš. Strážca vie, ktorý zámok.“).
+- **`nextInstruction` je rozdelený** na poznámku pátrača (`nextReflection`) a cestu (`route`). Nič sa nestratilo, iba sa očistili úniky:
+  - scéna 1: nová cesta k najužšiemu domu,
+  - scéna 3: cesta „…s pamätnou tabuľou“ bez čísla domu,
+  - scéna 4: poznámka bez „a rodovým znakom“,
+  - scéna 8: vodidlo „Ostaň pri paláci. Jeho steny pamätajú viac, než ukazuje priečelie.“ a cesta „Zostaň pri Primaciálnom paláci. Ďalšia úloha sa odohráva na tom istom mieste.“ (nič neposiela dovnútra),
+  - scéna 10: bez cesty, finále nasleduje na mieste.
+- **Obrazovka histórie:** v karte „Ďalšia stopa“ je poznámka, vodidlo a tlačidlo „Ukáž cestu“, ktoré rozbalí cestu a zmení sa na „Skryť cestu“.
+- **Úloha ďalšej scény:** hore „Ukáž cestu“ s cestou, ktorá hráča mala doviesť sem. Pri scéne 1 (štart) tlačidlo nie je.
+- **„Ukáž cestu“** nestojí body, nepočíta sa ako nápoveda a nič neukladá (`components/ui/RouteHint.tsx`, 44 px, čítačka prečíta cestu).
+- **Inventár:** pri predmete riadok „Stopa: …“. Vodidlo sa berie z dát kapitoly, takže sa ukáže aj pri staršej uloženej kópii predmetu (`getItemClue`, `getSceneClue` v `engine/codeNotebook.ts`).
+- **Nové texty v dátach kapitoly** (`guidance`): „Ďalšia stopa“ (presunuté z obrazovky), „Ukáž cestu“, „Skryť cestu“, „Stopa“.
+- **Dokumenty:**
+  - tabuľka vodidiel a ciest je v `docs/KARTY-USLOH.md`,
+  - overenie vodidiel a ciest v teréne (najmä scéna 1, Spasiteľ nad lekárňou, pamätná tabuľa, „pri františkánoch“, priechod k palácu) je v `docs/KONTROLA-PRED-VYDANIM.md`.
+
+**Test (mimo projektu, necommitnutý):** pred zmenou 41 chýb (vrátane zachytených únikov), po zmene **63 z 63 OK**. Overuje:
+- schválené vodidlá pri odmenách všetkých 10 scén, poznámky a cesty,
+- vodidlá bez číslic,
+- vodidlá, poznámky ani cesty neprezrádzajú odpoveď ďalšej úlohy,
+- scéna 3 bez „Ventúrskej 3“, scéna 4 bez „znak“, scéna 8 bez cesty dovnútra a bez „zrkadl“,
+- texty `guidance`,
+- vodidlo z dát aj pre starú kópiu predmetu,
+- obrazovky používajú vodidlo, poznámku a „Ukáž cestu“.
+
+**Ostatné testy:** B7 20/20, B6 32/32, B5 21/21, B4b 26/26, B4a 20/20, B3b (upravený na `nextReflection`) 25/25, texty 37/37, B3a 65/65, kresba kľúča 54/54, nápovedy 37/37. Skóre 1010 bez zmeny.
+
+**V prehliadači na dev serveri (360 px; aj `?bez3d` a vypnuté animácie):** 14 z 14 OK.
+- história scény 3: poznámka a vodidlo, cesta skrytá až do ťuknutia, bez „Ventúrskej 3“,
+- „Ukáž cestu“ / „Skryť cestu“, cesta v oblasti pre čítačku,
+- skóre aj nápovedy bez zmeny,
+- tlačidlá aspoň 44 px,
+- Inventár so „Stopa“ aj pri starej kópii,
+- úloha scény 4 s cestou zo scény 3,
+- scéna 1 bez tlačidla,
+- história scény 10 s vodidlom na finále a bez cesty,
+- pri vypnutých animáciách nič nebeží.
+
+Snímky: história s vodidlom a cestou, Inventár, úloha s cestou.
+
+**Chyby počas práce:**
+- Test B3b čítal zrušený `nextInstruction`, upravený.
+- V teste v prehliadači som zabudol na koniec aktu I po scéne 3 a raz porovnal názov miesta, ktorý je na obrazovke veľkými písmenami. Opravené v teste, kód hry to nebol.
+- Lint celého priečinka obrazoviek ukázal staré chyby v nepoužívanom `ActChestScreen.tsx` (známe). Zmenené súbory sú bez chýb, ostalo iba staré upozornenie `LightbulbIcon` v `HistoryScreen.tsx` (známe od kroku 27).
+
+**Na rozhodnutie používateľa (mimo tohto kroku, nemenené):** úvodný text scény 4 (`cinematicText`) hovorí „…prichádzaš k domu číslo 3“. Hráč je vtedy už na mieste, takže to nie je cesta, ale je to to isté číslo ako odstránené „Ventúrska 3“.
+
+**Zmenené súbory:**
+- `types/game.ts`
+- `data/chapter-one.ts` a všetkých 10 scén v `data/chapter-one/`
+- `engine/codeNotebook.ts`
+- `components/ui/RouteHint.tsx` (nový)
+- `components/screens/HistoryScreen.tsx`, `PuzzleScreen.tsx`, `InventoryScreen.tsx`
+- `components/game/HistoryFlow.tsx`, `PuzzleFlow.tsx`, `CollectionFlow.tsx`
+- `app/page.tsx`
+- `docs/KARTY-USLOH.md`, `docs/KONTROLA-PRED-VYDANIM.md`, `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** zmenené súbory bez chýb (staré upozornenie `LightbulbIcon`).
+
+**Ďalší krok:** B4c (3D truhlica) alebo iný krok podľa plánu, až po potvrdení.

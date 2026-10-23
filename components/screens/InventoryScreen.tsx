@@ -1,5 +1,5 @@
 import type { CodeNotebookLock } from "../../engine";
-import type { InventoryItem } from "../../types/game";
+import type { ChapterGuidance, InventoryItem } from "../../types/game";
 import { ActionButton } from "../ui/ActionButton";
 import { CodeNotebook } from "../ui/CodeNotebook";
 import { DetectiveIcon } from "../ui/MysteriumIcons";
@@ -10,6 +10,9 @@ import { StoryCard } from "../ui/StoryCard";
 type InventoryScreenProps = {
   inventory: InventoryItem[];
   codeNotebook: CodeNotebookLock[];
+  guidance: ChapterGuidance;
+  /** Vodidlo predmetu z dát kapitoly (aj pri starej uloženej kópii). */
+  getClue: (itemId: string) => string | undefined;
   onInspectItem: (itemId: string) => void;
   onBack: () => void;
 };
@@ -37,6 +40,8 @@ function getEvidenceKindLabel(item: InventoryItem) {
 export function InventoryScreen({
   inventory,
   codeNotebook,
+  guidance,
+  getClue,
   onInspectItem,
   onBack,
 }: InventoryScreenProps) {
@@ -93,6 +98,15 @@ export function InventoryScreen({
                   <p className="text-sm leading-6 text-slate-300">
                     {item.description}
                   </p>
+
+                  {getClue(item.id) && (
+                    <p className="border-l-2 border-amber-300/50 pl-4 text-sm leading-6 text-amber-100">
+                      <span className="font-bold">
+                        {guidance.inventoryClueLabel}:
+                      </span>{" "}
+                      <span className="font-serif italic">{getClue(item.id)}</span>
+                    </p>
+                  )}
 
                   {item.secretCode && (() => {
                     const slot = notebookSlots.find(

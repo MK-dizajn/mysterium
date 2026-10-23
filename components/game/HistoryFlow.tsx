@@ -1,5 +1,6 @@
 import type { CodeItemInfo } from "../../engine";
 import type {
+  ChapterGuidance,
   GameState,
   Scene,
 } from "../../types/game";
@@ -11,6 +12,8 @@ type HistoryFlowProps = {
   scene: Scene;
   totalArtifacts: number;
   codeItem: CodeItemInfo | null;
+  clue?: string;
+  guidance: ChapterGuidance;
   onOpenInventory: () => void;
   onOpenArtifacts: () => void;
   onOpenQuests: () => void;
@@ -23,6 +26,8 @@ export function HistoryFlow({
   scene,
   totalArtifacts,
   codeItem,
+  clue,
+  guidance,
   onOpenInventory,
   onOpenArtifacts,
   onOpenQuests,
@@ -40,6 +45,8 @@ export function HistoryFlow({
       <HistoryScreen
         scene={scene}
         codeItem={codeItem}
+        clue={clue}
+        guidance={guidance}
         onInspectItem={onInspectItem}
         onContinue={onContinue}
       />

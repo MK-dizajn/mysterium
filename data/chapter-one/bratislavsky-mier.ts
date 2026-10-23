@@ -59,8 +59,11 @@ export const bratislavskyMierScene: Scene = {
       "Bratislava sa v roku 1805 na krátky čas ocitla v centre európskej diplomacie. V Primaciálnom paláci sa rokovalo o následkoch Napoleonovho víťazstva pri Slavkove. Zmluva vstúpila do dejín ako Bratislavský, v zahraničí aj Prešporský mier.",
   },
 
-  nextInstruction:
-  "Mier uzavrel poslednú historickú stopu. Teraz už máš všetky časti skladačky, no stále musíš pochopiť, čo ich spája.\n\nZostaň pri Primaciálnom paláci a otvor poslednú časť pátračovho prípadu.",
+  nextReflection:
+    "Mier uzavrel poslednú historickú stopu. Teraz už máš všetky časti skladačky, no stále musíš pochopiť, čo ich spája.",
+
+  route:
+    "Zostaň pri Primaciálnom paláci a otvor poslednú časť pátračovho prípadu.",
 
   events: [
     {
@@ -87,6 +90,7 @@ export const bratislavskyMierScene: Scene = {
               "Tretí zub Zlatého kľúča. Patrí k miestnosti, v ktorej sa podpísal mier, ktorý zmenil Európu.",
             evidenceKind: "object",
             secretCode: "7",
+            clue: "Všetky stopy máš pri sebe. Neodchádzaj – otvor denník a pozri sa na ne spolu.",
             inspect: {
               kind: "count",
               art: "keyTooth",

@@ -76,8 +76,13 @@ Pátračovo pravidlo znie: „Prvá stopa patrí mestu, ku ktorému vedie najkra
       "Kovový kruh spája Bratislavu so vzdialenými miestami sveta. Pátrač si však nevybral najvzdialenejšie mesto. Zaujímalo ho to najbližšie. Niekedy nie je najťažšie nájsť vzdialenú odpoveď, ale všimnúť si tú, ktorá leží priamo pred tebou.",
   },
 
-  nextInstruction:
-    "Keď vyslovíš meno najbližšieho mesta, v denníku sa odkryje prvá veta: „Brána je iba začiatok. Ďalšiu stopu hľadaj v dome, ktorý mal medzi susedmi sotva miesto.“",
+  // Prvá veta denníka je vodidlo pri odmene (clue).
+  nextReflection:
+    "Keď vyslovíš meno najbližšieho mesta, v denníku sa odkryje prvá veta.",
+
+  // Overiť v teréne (docs/KONTROLA-PRED-VYDANIM.md).
+  route:
+    "Najužší dom stojí len pár krokov od Michalskej brány. Prejdi bránou a obzri sa po úzkych domoch hneď pri nej.",
 
   dialogues: [
     {
@@ -193,6 +198,7 @@ Pátračovo pravidlo znie: „Prvá stopa patrí mestu, ku ktorému vedie najkra
               "Mosadzný žetón s vyrytými smermi svetových miest. Na jeho zadnej strane sa nachádza jedna číslica tajného kódu.",
             evidenceKind: "object",
             secretCode: "3",
+            clue: "Brána je iba začiatok. Ďalšia stopa býva v dome, ktorý mal medzi susedmi sotva miesto – nehľadaj ďaleko od brány.",
             evidenceOrder: 1,
             actId: "act-1",
             inspect: {

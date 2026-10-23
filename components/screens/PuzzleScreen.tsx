@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import type { Scene } from "../../types/game";
+import type { ChapterGuidance, Scene } from "../../types/game";
 import { ActionButton } from "../ui/ActionButton";
+import { RouteHint } from "../ui/RouteHint";
 import { TextInput } from "../ui/TextInput";
 import { ScreenContainer } from "../ui/ScreenContainer";
 import { MessageBox } from "../ui/MessageBox";
@@ -17,6 +18,9 @@ import { StoryCard } from "../ui/StoryCard";
 type PuzzleScreenProps = {
   scene: Scene;
   hintsUsed: number;
+  /** Cesta, ktorá hráča mala doviesť sem (z predchádzajúcej scény). */
+  arrivalRoute?: string;
+  guidance: ChapterGuidance;
   onRevealHint: () => void;
   onSolved: () => void;
 };
@@ -32,6 +36,8 @@ function normalizeAnswer(value: string) {
 export function PuzzleScreen({
   scene,
   hintsUsed,
+  arrivalRoute,
+  guidance,
   onRevealHint,
   onSolved,
 }: PuzzleScreenProps) {
@@ -89,6 +95,15 @@ export function PuzzleScreen({
   return (
     <ScreenContainer>
       <StoryCard label={scene.location} title={scene.title}>
+        {/* Ak sa hráč cestou stratil: bez straty bodov. */}
+        {arrivalRoute && (
+          <RouteHint
+            route={arrivalRoute}
+            showLabel={guidance.showRouteLabel}
+            hideLabel={guidance.hideRouteLabel}
+          />
+        )}
+
         <p className="text-amber-200">{scene.cinematicText}</p>
 
         <SectionCard

@@ -96,6 +96,8 @@ export type InventoryItem = {
   evidenceOrder?: number;
   actId?: ActId;
   inspect?: ItemInspect;
+  /** Vodidlo na ďalšie miesto – smeruje, ale neprezrádza odpoveď ďalšej úlohy. */
+  clue?: string;
 };
 
 export type CodexEntry = {
@@ -304,7 +306,10 @@ export type Scene = {
   puzzle: Puzzle;
   history: CodexEntry;
   artifact: Artifact;
-  nextInstruction: string;
+  /** Pátračova poznámka po vyriešení (nad vodidlom na ďalšie miesto). */
+  nextReflection: string;
+  /** Cesta na ďalšie miesto pre „Ukáž cestu“ (bez úniku odpovede). */
+  route?: string;
 
   conditions?: Condition[];
   branches?: SceneBranch[];
@@ -451,6 +456,14 @@ export type ChapterFinale = {
   ending: FinaleEnding;
 };
 
+/** Texty vodidiel a tlačidla „Ukáž cestu“. */
+export type ChapterGuidance = {
+  nextClueTitle: string;
+  showRouteLabel: string;
+  hideRouteLabel: string;
+  inventoryClueLabel: string;
+};
+
 export type Chapter = {
   id: ChapterId;
   city: string;
@@ -460,6 +473,7 @@ export type Chapter = {
   quests: Quest[];
   acts: Act[];
   scenes: Scene[];
+  guidance: ChapterGuidance;
   finale?: ChapterFinale;
 };
 

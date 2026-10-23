@@ -58,8 +58,12 @@ export const primacialnyPalacScene: Scene = {
       "Primaciálny palác je jednou z najvýznamnejších klasicistických stavieb Bratislavy. Dal ho postaviť ostrihomský arcibiskup Jozef Batthyány. Fasáda neukazuje iba jeho erb a cirkevnú moc, ale aj zásady, ku ktorým sa hlásil: láskavosť a spravodlivosť.",
   },
 
-  nextInstruction:
-  "Láskavosť a spravodlivosť vytvorili ďalšiu časť skladačky. Palác však ukrýva ešte jednu stopu spojenú s udalosťou, ktorá zmenila Európu.\n\nZostaň pri Primaciálnom paláci. Ďalšia úloha sa viaže k jeho Zrkadlovej sieni a Bratislavskému mieru.",
+  nextReflection:
+    "Láskavosť a spravodlivosť vytvorili ďalšiu časť skladačky. Palác však ukrýva ešte jednu stopu spojenú s udalosťou, ktorá zmenila Európu.",
+
+  // Bez „Zrkadlovej sieni“ (odpoveď ďalšej úlohy) a bez cesty dovnútra – všetko je zvonku.
+  route:
+    "Zostaň pri Primaciálnom paláci. Ďalšia úloha sa odohráva na tom istom mieste.",
 
   events: [
     {
@@ -86,6 +90,7 @@ export const primacialnyPalacScene: Scene = {
               "Druhý zub Zlatého kľúča. Našiel si ho pri paláci, kde láskavosť a spravodlivosť stoja vedľa seba.",
             evidenceKind: "object",
             secretCode: "2",
+            clue: "Ostaň pri paláci. Jeho steny pamätajú viac, než ukazuje priečelie.",
             inspect: {
               kind: "count",
               art: "keyTooth",

@@ -29,6 +29,7 @@ import {
   getActLockEvidence,
   getActTransition,
   getCodeItemInfo,
+  getSceneClue,
   getSceneCodeItemId,
   FINALE_PHOTO_ASSEMBLED_FLAG,
   FINALE_PHOTO_SEEN_FLAG,
@@ -308,6 +309,10 @@ export default function Home() {
           gameState={gameState}
           totalArtifacts={totalArtifacts}
           scene={currentScene}
+          arrivalRoute={
+            currentChapter.scenes[gameState.currentSceneIndex - 1]?.route
+          }
+          guidance={currentChapter.guidance}
           onOpenInventory={openInventory}
           onOpenArtifacts={openArtifacts}
           onOpenQuests={openQuests}
@@ -360,6 +365,8 @@ export default function Home() {
           gameState={gameState}
           totalArtifacts={totalArtifacts}
           codeItem={sceneCodeItem}
+          clue={getSceneClue(currentScene)}
+          guidance={currentChapter.guidance}
           onInspectItem={setInspectedItemId}
           scene={currentScene}
           onOpenInventory={openInventory}

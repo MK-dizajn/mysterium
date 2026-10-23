@@ -59,8 +59,12 @@ export const venturskaBranaSpomienokScene: Scene = {
       "Budova Academie Istropolitany na Ventúrskej ulici je pripomienkou obdobia, keď sa Bratislava stala miestom európskeho vzdelania. Medzi jej učiteľmi boli matematici, astronómovia, lekári a humanisti. Mnoho ľudí prejde popri budove bez toho, aby tušili, že kráčajú okolo jednej z najvýznamnejších kapitol dejín vzdelávania na Slovensku.",
   },
 
-  nextInstruction:
-  "Meno zakladateľa pridalo do skladačky ďalšiu vrstvu. Pátrač teraz vedie tvoju pozornosť od vzdelania k moci a rodovým znakom.\n\nPokračuj po Ventúrskej smerom na Františkánske námestie. Zastav sa pred Mirbachovým palácom.",
+  // Bez „rodovým znakom“ – prezrádzalo odpoveď ďalšej úlohy.
+  nextReflection:
+    "Meno zakladateľa pridalo do skladačky ďalšiu vrstvu. Pátrač teraz vedie tvoju pozornosť od vzdelania k moci.",
+
+  route:
+    "Pokračuj po Ventúrskej smerom na Františkánske námestie. Zastav sa pred Mirbachovým palácom.",
 
   events: [
     {
@@ -87,6 +91,7 @@ export const venturskaBranaSpomienokScene: Scene = {
               "Bronzová pečať s otvorenou knihou a kráľovskou korunou. Pripomína časy, keď v meste vznikla prvá univerzita.",
             evidenceKind: "object",
             secretCode: "6",
+            clue: "Pri františkánoch stojí palác, ktorý nesie meno svojho posledného majiteľa.",
             inspect: {
               kind: "count",
               art: "educationSeal",

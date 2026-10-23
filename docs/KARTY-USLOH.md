@@ -46,6 +46,25 @@ Súvisí s `docs/KONCEPT-ZAZITKU.md` (časti B, C, D a F).
 - **Vodidlá na ďalšie miesto:** každá odmena nesie vodidlo na ďalšie miesto. Presné znenie doplní autor podľa terénu (pozri Otvorené veci).
 - **Tlačidlo „Ukáž cestu“:** pri každej odmene je tlačidlo, ktoré ukáže dnešný text trasy (`nextInstruction` scény), **bez straty bodov**.
 
+### Vodidlá na ďalšie miesto a „Ukáž cestu“ (krok C1, hotové)
+
+Vodidlo je v dátach pri odmene scény (`clue`) a zobrazí sa na obrazovke histórie v karte „Ďalšia stopa“ a v Inventári pri predmete („Stopa: …“). Pôvodný `nextInstruction` je rozdelený na poznámku pátrača (`nextReflection`) a cestu (`route`). Cestu ukáže tlačidlo „Ukáž cestu“ na obrazovke histórie a na úlohe ďalšej scény – bez straty bodov, nepočíta sa ako nápoveda.
+
+| Scéna → ďalšia | Vodidlo | Cesta („Ukáž cestu“) |
+|---|---|---|
+| 1 → 2 | Brána je iba začiatok. Ďalšia stopa býva v dome, ktorý mal medzi susedmi sotva miesto – nehľadaj ďaleko od brány. | Najužší dom stojí len pár krokov od Michalskej brány. Prejdi bránou a obzri sa po úzkych domoch hneď pri nej. |
+| 2 → 3 | Choď tam, kde sa mesto kedysi liečilo. Nad vchodom dodnes bdie Spasiteľ. | Pokračuj Michalskou ulicou smerom na Ventúrsku a následne na Panskú ulicu. Tvojou ďalšou zastávkou je historická Lekáreň U Salvátora. |
+| 3 → 4 | Vráť sa na ulicu, kde sa v meste prvýkrát učilo ako na univerzite. Hľadaj dom poznania. | Pokračuj po Panskej ulici späť na Ventúrsku. Zastav sa pri budove Academie Istropolitany s pamätnou tabuľou. |
+| 4 → 5 | Pri františkánoch stojí palác, ktorý nesie meno svojho posledného majiteľa. | Pokračuj po Ventúrskej smerom na Františkánske námestie. Zastav sa pred Mirbachovým palácom. |
+| 5 → 6 | Hlavné námestie je blízko. Choď k veži, z ktorej sa mesto kedysi spravovalo samo. | Z Františkánskeho námestia pokračuj krátkou cestou na Hlavné námestie. Zastav sa pred vežou Starej radnice. |
+| 6 → 7 | V strede námestia už stáročia tečie voda. Niekto nad ňou drží stráž. | Zostaň na Hlavnom námestí a prejdi niekoľko krokov do jeho stredu k Maximiliánovej fontáne. |
+| 7 → 8 | Prejdi krátkym priechodom k palácu, kde kedysi sídlili arcibiskupi. | Z Hlavného námestia pokračuj cez krátky priechod na Primaciálne námestie. Zastav sa pred hlavným priečelím Primaciálneho paláca. |
+| 8 → 9 | Ostaň pri paláci. Jeho steny pamätajú viac, než ukazuje priečelie. | Zostaň pri Primaciálnom paláci. Ďalšia úloha sa odohráva na tom istom mieste. |
+| 9 → 10 | Všetky stopy máš pri sebe. Neodchádzaj – otvor denník a pozri sa na ne spolu. | Zostaň pri Primaciálnom paláci a otvor poslednú časť pátračovho prípadu. |
+| 10 → finále | Kľúč otvára viac, než si myslíš. Strážca vie, ktorý zámok. | – (finále nasleduje na tom istom mieste) |
+
+Odstránené úniky: „na Ventúrskej 3“ (scéna 3), „…a rodovým znakom“ (scéna 4, odpoveď úlohy 5) a „…k jeho Zrkadlovej sieni“ (scéna 8, odpoveď úlohy 9). Všetko je dostupné zvonku, nič neposiela hráča dovnútra budov.
+
 **Dnes v hre:**
 - po každej úlohe hráč dostane dôkaz s dvojcifernou číslicou: žetón, mosadzný štítok, lekárnickú pečať, pečať Academie, pečať rodu Nyáry, úlomok delovej gule, rytiersku sponu, emblém C · I, pečať mieru,
 - ďalšie miesto sa ukáže iba v texte „Ďalšia stopa“ na obrazovke histórie.

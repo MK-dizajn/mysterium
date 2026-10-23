@@ -51,8 +51,11 @@ Nájdi fasádu, ktorá je nápadne užšia než všetky ostatné. Keď dom objav
       "Nenápadná stavba pri Michalskej bráne pripomína, že najzaujímavejšie mestské objavy nemusia byť najväčšie. Dom sa tiesni v úzkej medzere medzi okolitými stavbami a mnoho návštevníkov si ho napriek jeho výnimočnosti vôbec nevšimne.",
   },
 
-    nextInstruction:
-  "Číslo bolo iba prvou časťou skladačky. Samo osebe ešte nič neotvára.\n\nPokračuj Michalskou ulicou smerom na Ventúrsku a následne na Panskú ulicu. Tvojou ďalšou zastávkou je historická Lekáreň U Salvátora.",
+  nextReflection:
+    "Číslo bolo iba prvou časťou skladačky. Samo osebe ešte nič neotvára.",
+
+  route:
+    "Pokračuj Michalskou ulicou smerom na Ventúrsku a následne na Panskú ulicu. Tvojou ďalšou zastávkou je historická Lekáreň U Salvátora.",
 
   events: [
     {
@@ -79,6 +82,7 @@ Nájdi fasádu, ktorá je nápadne užšia než všetky ostatné. Keď dom objav
               "Útržok starej mapy Prešporka s hradbami a strechami starého mesta. Jeden úzky dom je na nej starostlivo vyznačený.",
             evidenceKind: "document",
             secretCode: "8",
+            clue: "Choď tam, kde sa mesto kedysi liečilo. Nad vchodom dodnes bdie Spasiteľ.",
             inspect: {
               kind: "count",
               art: "oldTownMap",

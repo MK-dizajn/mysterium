@@ -56,8 +56,12 @@ export const lekarenUSalvatoraScene: Scene = {
       "Lekáreň U Salvátora patrí medzi najvýraznejšie historické lekárne Bratislavy. Budova pochádza z roku 1904, no jej príbeh siaha omnoho hlbšie. Vzácny barokový mobiliár má viac než 300 rokov a latinský nápis pripomína zásadu, ktorá platila pre lekárnikov aj pátračov: konať rozvážne a myslieť na následky.",
   },
 
-  nextInstruction:
-  "Rok 1658 bol druhou časťou skladačky. Pátrač tým pripomenul, že každé rozhodnutie má svoj dôsledok.\n\nPokračuj po Panskej ulici späť na Ventúrsku. Zastav sa pri budove Academie Istropolitany na Ventúrskej 3.",
+  nextReflection:
+    "Rok 1658 bol druhou časťou skladačky. Pátrač tým pripomenul, že každé rozhodnutie má svoj dôsledok.",
+
+  // Bez čísla domu – číslo by sa dalo zameniť za stopu alebo číslicu kódu.
+  route:
+    "Pokračuj po Panskej ulici späť na Ventúrsku. Zastav sa pri budove Academie Istropolitany s pamätnou tabuľou.",
 
   events: [
     {
@@ -84,6 +88,7 @@ export const lekarenUSalvatoraScene: Scene = {
               "Zažltnutá strana vytrhnutá z pátračovho denníka. Pátrač si na ňu prepísal latinský odkaz z Lekárne U Salvátora.",
             evidenceKind: "document",
             secretCode: "1",
+            clue: "Vráť sa na ulicu, kde sa v meste prvýkrát učilo ako na univerzite. Hľadaj dom poznania.",
             evidenceOrder: 3,
             actId: "act-1",
             inspect: {

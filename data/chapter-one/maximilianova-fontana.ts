@@ -58,8 +58,11 @@ export const maximilianovaFontanaScene: Scene = {
       "Fontána stojí na Hlavnom námestí od roku 1572. Jej mohutná kruhová nádrž a vysoký stĺp s rytierom tvorili nielen výzdobu, ale pripomínali aj význam vody pre mesto. Postava môže predstavovať kráľa Maximiliána II. alebo legendárneho Rolanda. Bratislava si ponechala obe vysvetlenia.",
   },
 
-  nextInstruction:
-  "Rytier nad vodou pripomenul, že ochranca mesta nemusí mať iba jedno meno.\n\nZ Hlavného námestia pokračuj cez krátky priechod na Primaciálne námestie. Zastav sa pred hlavným priečelím Primaciálneho paláca.",
+  nextReflection:
+    "Rytier nad vodou pripomenul, že ochranca mesta nemusí mať iba jedno meno.",
+
+  route:
+    "Z Hlavného námestia pokračuj cez krátky priechod na Primaciálne námestie. Zastav sa pred hlavným priečelím Primaciálneho paláca.",
 
   events: [
     {
@@ -86,6 +89,7 @@ export const maximilianovaFontanaScene: Scene = {
               "Prvý zo zubov Zlatého prešporského kľúča. Pátrač ho ukryl pri fontáne, nad ktorou stráži rytier.",
             evidenceKind: "object",
             secretCode: "9",
+            clue: "Prejdi krátkym priechodom k palácu, kde kedysi sídlili arcibiskupi.",
             inspect: {
               kind: "count",
               art: "keyTooth",

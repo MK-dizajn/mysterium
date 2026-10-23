@@ -110,6 +110,40 @@ export function getSceneCodeItemId(scene: Scene): string | null {
   return action?.type === "addInventoryItem" ? action.item.id : null;
 }
 
+function getSceneRewardItems(scene: Scene): InventoryItem[] {
+  return (scene.events ?? [])
+    .flatMap((event) => event.actions)
+    .flatMap((action) =>
+      action.type === "addInventoryItem" ? [action.item] : []
+    );
+}
+
+/** Vodidlo na ďalšie miesto z odmeny scény (predmet „nesie“ stopu). */
+export function getSceneClue(scene: Scene): string | undefined {
+  return getSceneRewardItems(scene).find((item) => item.clue)?.clue;
+}
+
+/**
+ * Vodidlo predmetu podľa dát kapitoly – uložená kópia predmetu
+ * zo staršej hry ho nemusí mať.
+ */
+export function getItemClue(
+  chapter: Chapter,
+  itemId: string
+): string | undefined {
+  for (const scene of chapter.scenes) {
+    const item = getSceneRewardItems(scene).find(
+      (rewardItem) => rewardItem.id === itemId
+    );
+
+    if (item?.clue) {
+      return item.clue;
+    }
+  }
+
+  return undefined;
+}
+
 export type CodeItemInfo = {
   /** Predmet podľa dát kapitoly (nie uložená kópia). */
   item: InventoryItem;
