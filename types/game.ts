@@ -26,14 +26,29 @@ export type EvidenceKind =
  * Ako hráč hľadá číslicu na predmete (obrazovka „Prezrieť“, krok B1b-2).
  * Predmet bez inspect má číslicu nájdenú hneď po získaní.
  */
+export type ItemInspectArt = "token" | "journalPage" | "squareMap";
+
+export type ItemInspectTranscript = {
+  before: string;
+  /** Zvýraznené slovo; kliknutím naň hráč objaví číslicu. */
+  highlight: string;
+  after: string;
+};
+
 export type ItemInspect = {
-  kind: "hotspot" | "count";
-  /** Ktorý kreslený obrázok predmetu sa použije. */
-  art: "token";
-  /** Pokyn pre hráča na obrazovke „Prezrieť“. */
-  instruction: string;
-  /** Popis miesta s číslicou pre čítačku obrazovky. */
+  /** hotspot = miesto na kreslenom predmete, transcript = slovo v prepise. */
+  kind: "hotspot" | "count" | "transcript";
+  /** Ktorý kreslený obrázok predmetu sa použije (pri prepise nie je). */
+  art?: ItemInspectArt;
+  /** Úvodný text – tajomný, neprezrádza, že a kde je niečo ukryté. */
+  intro: string;
+  /** Jemná nápoveda po asi 20 s nečinnosti. */
+  hint: string;
+  /** Text po objavení číslice. */
+  foundText: string;
+  /** Popis miesta s číslicou pre čítačku obrazovky (nie je viditeľný). */
   hotspotLabel: string;
+  transcript?: ItemInspectTranscript;
 };
 
 export type InventoryItem = {

@@ -22,6 +22,14 @@ export function isDigitFacing(yaw: number, tilt: number) {
   return getDigitFacingDot(yaw, tilt) >= FACING_MIN_DOT;
 }
 
+/**
+ * Plochý predmet (list, mapa): je jeho rub (lokálna os -Z) natočený
+ * k hráčovi? Na rube je skrytý detail.
+ */
+export function isBackFacing(yaw: number, tilt: number) {
+  return -Math.cos(yaw) * Math.cos(tilt) >= FACING_MIN_DOT;
+}
+
 /** Uhol prevedený do rozsahu (-π, π]. */
 function normalizeAngle(angle: number) {
   const fullTurn = Math.PI * 2;

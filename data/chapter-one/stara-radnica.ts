@@ -81,14 +81,29 @@ export const staraRadnicaScene: Scene = {
           type: "addInventoryItem",
           item: {
             id: "evidence-cannonball-fragment",
-            title: "Úlomok delovej gule",
-            icon: "⚫",
+            title: "Nahrávka Strážcu",
+            icon: "🎙️",
             description:
-              "Ťažký kovový úlomok so stopami poškodenia. Na jeho povrchu je vyrazená jedna číslica tajného kódu.",
-            evidenceKind: "fragment",
+              "Krátky záznam hlasu Strážcu Michalskej brány. Zatiaľ máš k dispozícii iba jeho prepis.",
+            evidenceKind: "document",
             secretCode: "4",
             evidenceOrder: 6,
             actId: "act-2",
+            inspect: {
+              kind: "transcript",
+              intro: "Preskúmaj predmet a objav niečo, čo si nečakal.",
+              hint: "Prečítaj si slová Strážcu ešte raz. Jedno z nich vyslovil dôraznejšie než ostatné.",
+              foundText:
+                "Objavil si číslo, ktoré ti na konci pomôže odomknúť tajomstvo.",
+              hotspotLabel: "Zvýraznené slovo v prepise nahrávky",
+              transcript: {
+                before:
+                  "„Hovorí sa, že mesto si pamätá všetko. Je to pravda. Tieto múry videli obliehanie aj mier, korunovácie aj požiare. Keď do radničnej veže narazila delová guľa, mesto ju nevyhodilo – nechalo ju v múre ako svedka. Pátrač tam vtedy stál so mnou a povedal: ‚Zapamätaj si",
+                highlight: "štyri",
+                after:
+                  "veci, ktoré toto mesto nikdy nezabudne.‘ Viac nepovedal. A ja som odvtedy čakal, kým sa objaví niekto, kto bude pokračovať v jeho ceste.“",
+              },
+            },
           },
         },
       ],

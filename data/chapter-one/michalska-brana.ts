@@ -198,8 +198,10 @@ Pátračovo pravidlo znie: „Prvá stopa patrí mestu, ku ktorému vedie najkra
             inspect: {
               kind: "hotspot",
               art: "token",
-              instruction:
-                "Prezri žetón. Číslica nie je na jeho líci – je vyrytá na okraji. Otoč žetón na hranu a nájdi ju.",
+              intro: "Preskúmaj predmet a objav niečo, čo si nečakal.",
+              hint: "Skús predmet otočiť a pozrieť si ho zblízka.",
+              foundText:
+                "Objavil si číslo, ktoré ti na konci pomôže odomknúť tajomstvo.",
               hotspotLabel: "Vyrytá číslica na hrane žetónu",
             },
           },

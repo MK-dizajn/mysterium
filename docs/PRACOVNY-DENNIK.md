@@ -1540,3 +1540,83 @@ Používateľ potvrdil, že 3D žetón vyzerá dobre.
 **Stav:** krok **B1b-2b (2b-1 až 2b-3) je dokončený**. Zostáva overenie plynulosti na mobile používateľom.
 
 **Ďalší krok:** používateľ overí plynulosť (emulácia mobilu so spomalením procesora alebo skutočný telefón), potom B1b-3 (ostatné predmety), až po potvrdení.
+
+---
+
+## 23. 10. 2026 – Krok 47 (krok B1b-3a): Ploché predmety, nahrávka a tajomné texty
+
+**Čo sa urobilo:**
+- **Tri nové predmety na obrazovke „Prezrieť“** (id predmetov sa nezmenili, kvôli uloženým hrám):
+  - **scéna 3 – „Pátračova strana z denníka“** (📜, číslica 1): tenký list papiera. Líce má latinský odkaz z lekárne a rok 1658, rub poznámky a **podčiarknutú 1** v poznámke na okraji („Môj prvý krok:“).
+  - **scéna 5 – „Kus mapy: námestie“** (🗺️, číslica 0): líce má pôdorys Františkánskeho námestia s malým kompasom v rohu, rub pátračov náčrt kompasu a **0 pri severe**.
+  - **scéna 6 – „Nahrávka Strážcu“** (🎙️, číslica 4): 2D prepis, slovo **„štyri“** je zvýraznené a kliknutím naň sa číslica objaví (3D nepotrebuje, sama sa nezapisuje).
+- **Popisy** troch predmetov sú nové a nespomínajú pôvodný druh predmetu (pečať, úlomok).
+- **Kresby v kóde** (SVG, jeden zdroj pre 2D aj 3D):
+  - `components/items/art/journalPageArt.ts`, `mapArt.ts`,
+  - spoločný papier a ručne písaná číslica v `paper.ts`,
+  - register všetkých kresieb `itemArtRegistry.ts` (tvar, rozmery, miesto číslice, názvy tlačidiel).
+- **Plochý predmet v 3D** (`components/items/3d/Flat3DView.tsx`):
+  - tenká doska s textúrou líca a rubu,
+  - ťahaním sa **nakláňa ±30°** do strán aj hore a dole a po pustení sa vráti,
+  - šípky nakláňajú,
+  - **„Obrátiť“** ho plynulo otočí o 180°,
+  - keď je rub otočený k hráčovi (do 25°), nad číslicou je HTML tlačidlo (48 × 48 px), ťuknutie alebo Enter zapíše hneď a po **1,5 s** sa zapíše sama (pri vypnutých animáciách iba ťuknutím alebo Enterom).
+- **Logika** (`facing.ts`, `rotationPhysics.ts`): natočenie rubu `isBackFacing` a nakláňanie s obrátením (`createFlatState`, `applyFlatDrag`, `releaseFlatDrag`, `flipFlat`, `nudgeFlat`, `stepFlat`, `isFlatAtRest`).
+- **Všeobecné okno „Prezrieť“** (`components/items/ItemInspector.tsx`) pre všetky predmety (žetón, list, prepis), 3D aj 2D. `TokenArt.tsx` nahradil všeobecný `ItemArtImage.tsx` (súbor `TokenArt.tsx` je odstránený).
+- **2D záloha a `?bez3d`:** všetky kreslené predmety majú 2D verziu. Ťuknutie na predmet ho otočí aj bez tlačidla, skryté miesto je tlačidlo nad číslicou.
+
+**Doplnok – tajomné texty (platí pre všetky predmety, aj žetón):**
+- texty sú v dátach pri každom predmete (pole `inspect`: `intro`, `hint`, `foundText`, `hotspotLabel`),
+- **úvod:** „Preskúmaj predmet a objav niečo, čo si nečakal.“ (bez slov okraj, hrana, číslica),
+- **po asi 20 s nečinnosti:** žiara a jemná nápoveda daného predmetu,
+- **po ďalších asi 20 s:** „Ukáž číslicu“,
+- **po objavení:** „Objavil si číslo, ktoré ti na konci pomôže odomknúť tajomstvo.“ a menším písmom „Zapísané do zápisníka kódov (zámok I, miesto 1).“
+- **žetón:** „Otočiť na hranu“ sa ukáže až spolu s nápovedou po 20 s,
+- **ploché predmety:** „Obrátiť“ je viditeľné hneď, lebo ťahaním sa list iba nakláňa a bez tlačidla by sa na rub nedalo dostať,
+- **čítačka obrazovky:** popisy ovládania a skrytých miest (`hotspotLabel`) zostali, viditeľné texty sú tajomné.
+
+**Rozhodnutia, ktoré nemali v zadaní presné určenie:**
+- **Skrytý detail plochých predmetov je na rube.** Keby bola číslica na líci, zapísala by sa sama 1,5 s po otvorení a hráč by nič neobjavoval. Na líci strany denníka je latinský odkaz, na líci mapy pôdorys námestia s malým kompasom v rohu.
+- **Rozmery v 3D:** list má výšku 1,9 (asi 80 % plochy). Po prvej snímke bola mapa príliš malá a texty na rube sa ťažko čítali.
+
+**Snímky z prehliadača** (Chrome bez okna, softvérové 3D, skript mimo projektu):
+- **3D:**
+  - žetón (bez „Otočiť na hranu“ po otvorení, hrana, nájdená číslica),
+  - strana z denníka (líce s latinským odkazom, rub s poznámkou a podčiarknutou 1, nájdená 1 zvýraznená žltým zvýrazňovačom),
+  - mapa (líce s námestím a kompasom, rub s náčrtom kompasu a 0 pri severe, nájdená 0),
+  - nahrávka (prepis so zvýrazneným „štyri“, po kliknutí „štyri (4)“ zelene).
+  - Pri všetkých sa ukázal úvodný a záverečný text a správne miesto v zápisníku (I-1, I-3, II-2, II-3).
+- **2D záloha `?bez3d`:** strana, mapa, žetón – otočenie, kliknutie na skryté miesto, zápis.
+- **Časovanie (žetón):** 0 s iba úvod; po 22 s nápoveda „Skús predmet otočiť a pozrieť si ho zblízka.“ a žiariace „Otočiť na hranu“; po 43 s „Ukáž číslicu“, ktoré číslicu zapíše.
+
+**Test (mimo projektu, necommitnutý):**
+- **nový test B1b-3a:** pred zmenou 10 chýb, **po zmene 28 z 28**:
+  - dáta a názvy troch predmetov, id bez zmeny, popisy bez starého druhu,
+  - 4 predmety s „Prezrieť“, úvody bez slov okraj, hrana, číslica, nápovedy a texty po objavení, presné texty žetónu,
+  - rub natočený pri 180° (aj s náklonom 20°, nie s 30°), náklon ±30°, návrat, plynulé a okamžité „Obrátiť“,
+  - bez prezerania je zápisník `I:_8_ II:6__ III:927`; nájdenie zapíše iba raz; „Ukáž číslicu“ bez straty bodov; prežije F5.
+- **logika žetónu 25 z 25**, **kresba žetónu 8 z 8**,
+- **celá kapitola: žiadny rozdiel** (41 riadkov, skóre **1010**).
+
+**Veľkosť:**
+- pri otvorení stránky 9 súborov, **gzip 216 kB** (predtým 213 kB; pribudli kresby a všeobecné okno), bez 3D knižnice,
+- 3D časť (až pri „Prezrieť“) **gzip 231 kB**.
+
+**Nezmenené (návrh na neskôr):** mimo okna „Prezrieť“ ostali texty, ktoré prezrádzajú skrytú číslicu:
+- v Inventári: „Číslica je na predmete ukrytá. Prezri ho a nájdi ju.“,
+- v karte „Nová odmena“ po vyriešení úlohy: „Na predmete je ukrytá číslica kódu. Prezri ho a nájdi ju.“
+
+**Zmenené súbory:**
+- `types/game.ts`
+- `data/chapter-one/michalska-brana.ts`, `lekaren-u-salvatora.ts`, `mirbachov-palac.ts`, `stara-radnica.ts`
+- `components/items/art/paper.ts` (nový), `journalPageArt.ts` (nový), `mapArt.ts` (nový), `itemArtRegistry.ts` (nový)
+- `components/items/ItemArtImage.tsx` (nový), `components/items/TokenArt.tsx` (odstránený)
+- `components/items/ItemInspector.tsx`
+- `components/items/3d/Flat3DView.tsx` (nový), `Token3DView.tsx`, `facing.ts`, `rotationPhysics.ts`
+- `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** bez chýb.
+
+**Ďalší krok:** používateľ skontroluje znenie textov a predmety v prehliadači, potom B1b-3b (počítacie predmety: mapa s vežami, pečať, zuby kľúča), až po potvrdení.

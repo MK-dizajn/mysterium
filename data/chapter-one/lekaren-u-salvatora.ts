@@ -78,14 +78,23 @@ export const lekarenUSalvatoraScene: Scene = {
           type: "addInventoryItem",
           item: {
             id: "evidence-apothecary-seal",
-            title: "Lekárnická pečať",
-            icon: "🧪",
+            title: "Pátračova strana z denníka",
+            icon: "📜",
             description:
-              "Tmavá vosková pečať s jemným odtlačkom historickej lekárne. Na spodnej hrane je vyrytá jedna číslica tajného kódu.",
-            evidenceKind: "object",
+              "Zažltnutá strana vytrhnutá z pátračovho denníka. Pátrač si na ňu prepísal latinský odkaz z Lekárne U Salvátora.",
+            evidenceKind: "document",
             secretCode: "1",
             evidenceOrder: 3,
             actId: "act-1",
+            inspect: {
+              kind: "hotspot",
+              art: "journalPage",
+              intro: "Preskúmaj predmet a objav niečo, čo si nečakal.",
+              hint: "Aj druhá strana listu môže niečo skrývať. Pozri sa, čo si pátrač poznačil.",
+              foundText:
+                "Objavil si číslo, ktoré ti na konci pomôže odomknúť tajomstvo.",
+              hotspotLabel: "Podčiarknutá číslica v poznámke na zadnej strane listu",
+            },
           },
         },
       ],

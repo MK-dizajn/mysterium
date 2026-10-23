@@ -176,6 +176,7 @@ type Token3DViewProps = {
   reducedMotion: boolean;
   /** Každé zvýšenie čísla = „Otočiť na hranu“. */
   snapRequestCount: number;
+  focusOnMount: boolean;
   onFacingChange: (isFacing: boolean) => void;
   onFound: () => void;
   onFailure: () => void;
@@ -189,6 +190,7 @@ export default function Token3DView({
   isHotspotGlowing,
   reducedMotion,
   snapRequestCount,
+  focusOnMount,
   onFacingChange,
   onFound,
   onFailure,
@@ -196,6 +198,13 @@ export default function Token3DView({
   const [controller] = useState(() => new RotationController());
   const [isFacing, setIsFacing] = useState(false);
   const lastSnapRequestRef = useRef(snapRequestCount);
+  const surfaceRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (focusOnMount) {
+      surfaceRef.current?.focus({ preventScroll: true });
+    }
+  }, [focusOnMount]);
 
   useEffect(() => {
     if (snapRequestCount === lastSnapRequestRef.current) {
@@ -270,6 +279,7 @@ export default function Token3DView({
 
   return (
     <div
+      ref={surfaceRef}
       role="group"
       tabIndex={0}
       aria-label="Žetón – otáčaj ho ťahaním alebo šípkami doľava a doprava, nakláňaj šípkami hore a dole"

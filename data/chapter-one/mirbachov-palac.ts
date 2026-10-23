@@ -81,14 +81,23 @@ export const mirbachovPalacScene: Scene = {
           type: "addInventoryItem",
           item: {
             id: "evidence-nyary-crest-seal",
-            title: "Pečať rodu Nyáry",
-            icon: "🛡️",
+            title: "Kus mapy: námestie",
+            icon: "🗺️",
             description:
-              "Tmavá vosková pečať s odtlačkom rodového erbu. Na zadnej strane je vyrytá jedna číslica tajného kódu.",
-            evidenceKind: "symbol",
+              "Útržok starej mapy s pôdorysom námestia pri Mirbachovom paláci. Niekto ho starostlivo zložil a uschoval medzi pátračove poznámky.",
+            evidenceKind: "document",
             secretCode: "0",
             evidenceOrder: 5,
             actId: "act-2",
+            inspect: {
+              kind: "hotspot",
+              art: "squareMap",
+              intro: "Preskúmaj predmet a objav niečo, čo si nečakal.",
+              hint: "Mapy majú dve strany. Hľadaj značku, podľa ktorej sa pátrač orientoval.",
+              foundText:
+                "Objavil si číslo, ktoré ti na konci pomôže odomknúť tajomstvo.",
+              hotspotLabel: "Číslica pri kompase na zadnej strane mapy",
+            },
           },
         },
       ],
