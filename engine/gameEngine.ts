@@ -234,15 +234,28 @@ export function continueAfterHistory(
   chapter: Chapter
 ): GameState {
   const nextIndex = getNextSceneIndex(chapter, gameState);
+  const completedScene = chapter.scenes[gameState.currentSceneIndex];
 
   if (isChapterFinished(chapter, nextIndex)) {
+    const lastAct = completedScene
+      ? getActForScene(chapter, completedScene.id)
+      : undefined;
+
+    // Posledný akt s koncom v dátach: najprv jeho koniec, potom záver kapitoly.
+    if (lastAct?.ending) {
+      return {
+        ...gameState,
+        currentActId: lastAct.id,
+        screen: "actTransition",
+      };
+    }
+
     return {
       ...gameState,
       screen: "finish",
     };
   }
 
-  const completedScene = chapter.scenes[gameState.currentSceneIndex];
   const nextScene = chapter.scenes[nextIndex];
 
   const completedAct = completedScene
@@ -275,8 +288,9 @@ export function continueAfterHistory(
 
 /**
  * Ukončí koniec aktu: udelí odmenu z dát (iba raz), prepne na ďalší akt
- * a pokračuje ďalšou scénou. Mimo obrazovky konca aktu nerobí nič,
- * takže opakované kliknutie nič nezdvojí.
+ * a pokračuje ďalšou scénou; po poslednom akte ide na záver kapitoly.
+ * Mimo obrazovky konca aktu nerobí nič, takže opakované kliknutie
+ * nič nezdvojí.
  */
 export function completeActEnding(
   chapter: Chapter,
@@ -304,7 +318,7 @@ export function completeActEnding(
   return {
     ...gameState,
     currentActId: transition.nextAct?.id ?? transition.completedAct.id,
-    screen: "puzzle",
+    screen: transition.nextAct ? "puzzle" : "finish",
     inventory: shouldAddReward
       ? [...gameState.inventory, reward]
       : gameState.inventory,

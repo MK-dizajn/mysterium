@@ -1980,3 +1980,57 @@ Najmenšia vzdialenosť stredov ťukacích plôch nameraná v prehliadači:
 **Otvorené otázky z kroku 50 a 53 sú týmto vyriešené** (nápoveda zubov, „Okienko“, riadok v 2D).
 
 **Ďalší krok:** B3b, až po potvrdení.
+
+---
+
+## 24. 10. 2026 – Krok 55 (krok B3b): Koniec aktu III – zloženie Zlatého kľúča
+
+**Čo sa urobilo:**
+- **Priebeh** (`engine/gameEngine.ts`): po histórii scény 10 príde **koniec aktu III** (dnešná obrazovka konca aktu), po „Prijať útržok a pokračovať“ záverečná obrazovka. Funguje všeobecne: koniec posledného aktu sa ukáže, iba ak ho dáta majú. Tretí útržok fotografie pridá tá istá funkcia ako pri akte I a II, iba raz.
+- **Obrazovka konca aktu III** (`ActTransitionScreen.tsx`):
+  - nad textom je zložený Zlatý kľúč z kroku 7,
+  - tri časti brady sa postupne zosunú k sebe (zľava, zdola, sprava), pri vypnutých animáciách je hneď celý kľúč,
+  - riadok „Nasleduje“ sa pri poslednom akte neukáže,
+  - zárezy troch zubov odovzdáva `app/page.tsx` z dát,
+  - kresba kľúča má okolo každej časti obal pre animáciu (`keyToothArt.ts`); vzhľad sa nemení.
+- **Scéna 10** (`zlaty-presporsky-kluc.ts`):
+  - „Útržok mapy ďalšieho prípadu“ vypadol z odmien; štvrtý útržok fotografie dá truhlica vo finále (dáta z B3a),
+  - „Ďalšia stopa“: namiesto „…zostal útržok mapy a veta: „Prešporok neukrýval jeden kľúč. Toto bol iba prvý.““ je teraz „…zostala veta: „Kľúč otvára viac, než si myslíš.““, zvyšok textu je rovnaký. Veta o jednom kľúči patrí do záveru kapitoly (B7).
+- **Záverečná obrazovka** (`FinishScreen.tsx`), dočasne až do B4:
+  - „…získal dokončený kľúč a tri útržky starej fotografie. Posledný útržok ešte čaká.“
+  - „…no útržky fotografie odhaľujú začiatok väčšieho tajomstva.“
+- **Uložené hry na záverečnej obrazovke** ostávajú na nej, bez prevodu do finále a bez zálohy (prevod príde v B4a). Útržok mapy v nich ostáva, tretí útržok zatiaľ nedostanú.
+
+**Test (mimo projektu, necommitnutý):** pred zmenou 14 chýb, po zmene **26 z 26 OK**. Overuje:
+- celú kapitolu so skóre 1010,
+- poradie obrazoviek: pribudol iba „koniec aktu III“ medzi históriou scény 10 a záverom,
+- konce aktov po scéne 3, 6 a 10,
+- útržky 1, 2, 3 každý práve raz, útržok mapy už nie, Zlatý kľúč áno, štvrtý útržok ešte nie,
+- F5 po každom kroku celej kapitoly (rovnaké poradie, inventár aj skóre),
+- 4× kliknutie na konci aktu III, F5 na konci aktu III a po prijatí,
+- staré uloženia: začiatok, uprostred aktu II, akt III pred scénou 10 a záverečná obrazovka (bez prevodu, bez zálohy, inventár bez zmeny),
+- texty scény 10 a záverečnej obrazovky.
+
+Testy z B3a, kroku 7 a nápovedí: všetko OK.
+
+**V prehliadači na dev serveri** (3D, `?bez3d`, vypnuté animácie):
+- koniec aktu III so zloženým kľúčom; animácia beží, pri vypnutých animáciách je kľúč hneď celý,
+- karta tretieho útržku, bez „Nasleduje“,
+- po prijatí záverečná obrazovka s novými vetami,
+- v uloženej hre tretí útržok práve raz.
+
+Prvý beh hlásil jednu chybu v teste (nadpis karty je veľkými písmenami). Test som opravil, kód hry to nebol.
+
+**Zmenené súbory:**
+- `engine/gameEngine.ts`
+- `components/screens/ActTransitionScreen.tsx`, `components/screens/FinishScreen.tsx`
+- `components/items/art/keyToothArt.ts`
+- `app/page.tsx`
+- `data/chapter-one/zlaty-presporsky-kluc.ts`
+- `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** bez chýb.
+
+**Ďalší krok:** texty finále do dát, až po potvrdení.

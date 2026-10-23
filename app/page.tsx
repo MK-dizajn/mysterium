@@ -22,6 +22,7 @@ import {
   continueAfterHistory,
   countChapterArtifacts,
   createNewGameState,
+  getActLockEvidence,
   getActTransition,
   getCodeItemInfo,
   getSceneCodeItemId,
@@ -372,6 +373,16 @@ export default function Home() {
           nextActTitle={actTransition.nextAct?.title ?? ""}
           evidenceCount={actTransition.evidenceCount}
           ending={actTransition.completedAct.ending}
+          keyPieceNotches={getActLockEvidence(
+            currentChapter,
+            actTransition.completedAct
+          )
+            .filter((item) => item.inspect?.art === "keyTooth")
+            .sort(
+              (first, second) =>
+                (first.inspect?.artPart ?? 0) - (second.inspect?.artPart ?? 0)
+            )
+            .map((item) => item.inspect?.countPoints)}
           onContinue={finishActEnding}
         />
       );

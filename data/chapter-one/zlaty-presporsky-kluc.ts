@@ -63,7 +63,7 @@ export const zlatyPresporskyKlucScene: Scene = {
   },
 
   nextInstruction:
-  "Zlatý prešporský kľúč sa pred tebou konečne odhalil. Neotvára obyčajné dvere — odhaľuje pamäť mesta.\n\nNa poslednej strane však zostal útržok mapy a veta: „Prešporok neukrýval jeden kľúč. Toto bol iba prvý.“ Prvý prípad sa skončil. Pátranie pokračuje v ďalšej kapitole.",
+  "Zlatý prešporský kľúč sa pred tebou konečne odhalil. Neotvára obyčajné dvere — odhaľuje pamäť mesta.\n\nNa poslednej strane však zostala veta: „Kľúč otvára viac, než si myslíš.“ Prvý prípad sa skončil. Pátranie pokračuje v ďalšej kapitole.",
 
   events: [
     {
@@ -98,16 +98,7 @@ export const zlatyPresporskyKlucScene: Scene = {
               "Prvý zo stratených kľúčov starého pátrača. Neotvára obyčajné dvere — odhaľuje spomienky, ktoré mesto ukrylo priamo pred očami svojich obyvateľov.",
           },
         },
-        {
-          type: "addInventoryItem",
-          item: {
-            id: "chapter-two-map-fragment",
-            title: "Útržok mapy ďalšieho prípadu",
-            icon: "🗺️",
-            description:
-              "Poškodený kúsok mapy s neznámym symbolom. Pátrač ho ukryl za poslednou stranou denníka. Dokazuje, že Zlatý prešporský kľúč bol iba začiatkom väčšieho prípadu.",
-          },
-        },
+        // Štvrtý útržok fotografie dá truhlica vo finále (data/chapter-one/finale.ts).
       ],
     },
   ],

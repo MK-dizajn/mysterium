@@ -293,10 +293,11 @@ export function getGoldenKeySvg({
           ? shadowAttribute
           : "";
 
-      return `<g transform="translate(${pieceX - KEY_BIT.bitLeft * layout.pieceScale} ${layout.pieceY}) scale(${layout.pieceScale})">`
+      // Vonkajšia skupina sa dá posúvať animáciou (CSS by prepísalo transform vnútornej).
+      return `<g data-key-piece="${part}"><g transform="translate(${pieceX - KEY_BIT.bitLeft * layout.pieceScale} ${layout.pieceY}) scale(${layout.pieceScale})">`
         + getBit(notches, part, fill, attributes)
         + (isSilhouette && !isHighlighted ? "" : getWardOutlines(notches, "data-key-ward"))
-        + `</g>`;
+        + `</g></g>`;
     })
     .join("");
 

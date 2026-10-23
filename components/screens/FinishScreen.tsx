@@ -49,8 +49,8 @@ export function FinishScreen({
             <p>
               V Artefaktoch zostáva zaznamenaná
               pamäť starého Prešporka. Do inventára si
-              získal dokončený kľúč aj poškodený útržok
-              mapy ďalšieho prípadu.
+              získal dokončený kľúč a tri útržky starej
+              fotografie. Posledný útržok ešte čaká.
             </p>
           </div>
         </SectionCard>
@@ -75,8 +75,8 @@ export function FinishScreen({
           title="Pátranie pokračuje"
         >
           <p className="text-[15px] leading-8 text-slate-300">
-            Prvý prípad sa skončil, no útržok mapy
-            odhaľuje začiatok väčšieho tajomstva.
+            Prvý prípad sa skončil, no útržky fotografie
+            odhaľujú začiatok väčšieho tajomstva.
             Príbeh bude pokračovať v druhej kapitole.
           </p>
         </SectionCard>
