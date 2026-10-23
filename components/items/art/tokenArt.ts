@@ -27,7 +27,7 @@ function escapeXml(value: string) {
     .replace(/"/g, "&quot;");
 }
 
-function getFrontSvg(faceGradientId: string) {
+function getFrontSvg(faceGradientId: string, withShadow = true) {
   const ticks = TICK_ANGLES.map((angle) => {
     const isMain = angle % 90 === 0;
 
@@ -36,7 +36,9 @@ function getFrontSvg(faceGradientId: string) {
 
   return `<defs><radialGradient id="${faceGradientId}" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#f8e3a1"/><stop offset="0.45" stop-color="#d1a14a"/><stop offset="1" stop-color="#6f4b16"/></radialGradient></defs>`
     + `<g>`
-    + `<circle cx="120" cy="124" r="104" fill="#2a1c07" opacity="0.6"/>`
+    + (withShadow
+      ? `<circle cx="120" cy="124" r="104" fill="#2a1c07" opacity="0.6"/>`
+      : "")
     + `<circle cx="120" cy="120" r="100" fill="url(#${faceGradientId})" stroke="#5c3f12" stroke-width="3"/>`
     + `<circle cx="120" cy="120" r="86" fill="none" stroke="#8a6224" stroke-width="2" stroke-dasharray="2 4"/>`
     + ticks
@@ -86,4 +88,33 @@ export function getTokenSvg({
       : getEdgeSvg(`${idPrefix}-edge`, digit, isDigitFound);
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">${content}</svg>`;
+}
+
+/*
+ * Textúry pre 3D žetón (krok 2b-2) z tej istej kresby a farieb.
+ */
+
+/** Líce bez tieňa, orezané tak, že kotúč vyplní celý kruh textúry. */
+export function getTokenFaceTextureSvg() {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 20 200 200" width="200" height="200">${getFrontSvg("token-face-texture", false)}</svg>`;
+}
+
+/** Jedna ryha hrany; v 3D sa opakuje okolo celého obvodu. */
+export function getTokenGrooveTileSvg() {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 64" width="16" height="64">`
+    + `<rect width="16" height="64" fill="#c99b4b"/>`
+    + `<line x1="8" y1="0" x2="8" y2="64" stroke="#6e4c18" stroke-width="2" opacity="0.55"/>`
+    + `</svg>`;
+}
+
+/** Hladká plôška na hrane s vyrytou číslicou (na výšku). */
+export function getTokenDigitPlateSvg(digit: string, isDigitFound: boolean) {
+  const safeDigit = escapeXml(digit);
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 180" width="120" height="180">`
+    + `<defs><linearGradient id="token-plate" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#b9853a"/><stop offset="0.5" stop-color="#f3d28a"/><stop offset="1" stop-color="#b9853a"/></linearGradient></defs>`
+    + `<rect width="120" height="180" fill="url(#token-plate)"/>`
+    + `<text x="62" y="128" text-anchor="middle" font-family="Georgia, serif" font-size="110" font-weight="700" fill="#f6dc9c" opacity="0.5">${safeDigit}</text>`
+    + `<text x="60" y="125" text-anchor="middle" font-family="Georgia, serif" font-size="110" font-weight="700" fill="${isDigitFound ? "#fff1c1" : "#5a3d10"}">${safeDigit}</text>`
+    + `</svg>`;
 }

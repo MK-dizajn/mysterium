@@ -1353,3 +1353,86 @@ Skóre vo finále je pred zmenou aj po nej rovnaké: 10 hádaniek × 100 + odmen
 **V prehliadači:** zatiaľ neoverené používateľom (žetón má vyzerať rovnako ako pred zmenou).
 
 **Ďalší krok:** používateľ overí vzhľad žetónu, potom krok 2b-2 (3D žetón), až po potvrdení.
+
+---
+
+## 23. 10. 2026 – Krok 44 (krok B1b-2b, časť 2b-2): Skutočný 3D žetón
+
+**Čo sa urobilo:**
+- **3D žetón** (three.js, react-three-fiber, drei) na obrazovke „Prezrieť“:
+  - `components/items/3d/TokenModel.tsx` – valec s **ryhovanou hranou** (opakovaná ryha, jemný reliéf), **líce a rub** z kresby v `tokenArt.ts`, **hladká plôška s vyrytou číslicou** na hrane. Všetko je kreslené v kóde, nie AI obrázky.
+  - `components/items/art/tokenArt.ts` – pridané 3 kresby pre 3D z tých istých farieb: líce bez tieňa, ryha hrany, plôška s číslicou (2D kresba sa nezmenila).
+  - `components/items/3d/useSvgTexture.ts` – prevod SVG na textúru, pri zatvorení sa uvoľní.
+- **Spoločný „stôl“** `components/items/3d/InspectStage.tsx`:
+  - jedno plátno, svetlo, kamera,
+  - kreslí iba pri pohybe (`frameloop="demand"`), rozlíšenie najviac 1,5×,
+  - na plátne vypnuté posúvanie stránky (`touch-action: none`),
+  - pri strate grafického kontextu sa prepne na 2D.
+- **Ovládanie** (`components/items/3d/Token3DView.tsx`):
+  - ťahanie myšou alebo prstom **voľne doľava a doprava so zotrvačnosťou**,
+  - **nakláňanie hore a dole najviac ±35°**, po pustení sa vráti,
+  - **šípky** ← → otáčajú po 15°, ↑ ↓ nakláňajú (náklon chvíľu podrží), **Home** vráti do základnej polohy,
+  - tlačidlo **„Otočiť na hranu“** plynulo natočí žetón najkratšou cestou tak, aby bola číslica otočená k hráčovi.
+- **Natočenie hrany** (`components/items/3d/facing.ts`, čistá funkcia):
+  - číslica je natočená k hráčovi, keď smer k nej a smer ku kamere zvierajú najviac **25°**,
+  - číslica je na jednej strane hrany: ukáže sa pri otočení o 90° jedným smerom, na druhej strane nie je.
+- **HTML tlačidlo nad číslicou** (cez drei `Html`): skutočné tlačidlo 48 × 64 px s popisom pre čítačku. Zobrazí sa **iba keď je číslica natočená k hráčovi**. Tab a Enter fungujú. Čítačka oznámi „Vyrytá číslica je natočená k tebe“.
+- **Zápis číslice:**
+  - keď je číslica natočená k hráčovi aspoň **1,5 s**, zapíše sa sama,
+  - ťuknutie alebo Enter ju zapíše hneď,
+  - **pri vypnutých animáciách sa sama nezapíše** – iba ťuknutím alebo Enterom,
+  - zapíše sa iba raz, aj keď ťuknutie a automatický zápis prídu naraz.
+- **Vypnuté animácie:** bez zotrvačnosti, náklon sa vráti hneď, „Otočiť na hranu“ je okamžité, žiara iba ako obrys.
+- **Fyzika otáčania** (`components/items/3d/rotationPhysics.ts`, čisté funkcie): ťahanie, zotrvačnosť, náklon, plynulé natočenie.
+- **Načítanie a záloha** (`components/items/ItemInspector.tsx`, `supportsWebGL.ts`, `InspectErrorBoundary.tsx`, `useReducedMotion.ts`, `inspectStyles.ts`):
+  - 3D časť sa stiahne **až pri otvorení „Prezrieť“** (`next/dynamic`); kým sa sťahuje, ukáže sa 2D líce,
+  - **záloha na dnešnú 2D obrazovku** (žetón, „Otočiť na hranu“, miesto s číslicou), keď prehliadač nevie WebGL, keď 3D spadne alebo sa stratí grafický kontext,
+  - **skrytý prepínač `?bez3d`** v adrese zapne 2D zálohu na skúšku,
+  - jedno plátno naraz (v hre nie je iné 3D).
+- Engine, dáta ani uloženie hry sa nemenili.
+
+**Rozhodnutia, ktoré nemali v zadaní presné číslo:**
+- citlivosť ťahania 0,01 rad/px,
+- zotrvačnosť slabne s koeficientom 4/s a zastaví sa pod 0,05 rad/s,
+- náklon sa vracia s koeficientom 10/s,
+- „Otočiť na hranu“ dobieha s koeficientom 8/s,
+- krok šípok 15°, podržanie náklonu z klávesnice 0,9 s,
+- hrúbka žetónu 0,24 (aby bola číslica na hrane čitateľná),
+- tolerancia natočenia 25° (podľa návrhu).
+
+**Test (mimo projektu, necommitnutý):**
+- **Test logiky:** pred zmenou zlyhal (súbory neexistovali), **po zmene 25 z 25 prešlo**:
+  - natočenie: 0° nie, −90° áno, +90° (druhá strana) nie, 180° nie; −90° ± 20° áno, ± 30° nie; náklon 15° áno, 35° nie; celá otáčka navyše áno; „Otočiť na hranu“ ide najkratšou cestou (zo 170° na 270°, z −30° na −90°),
+  - zotrvačnosť: po pustení sa ešte otáča a postupne sa zastaví; pri vypnutých animáciách sa zastaví hneď,
+  - náklon: obmedzený na ±35°, po pustení sa vráti, pri vypnutých animáciách hneď,
+  - „Otočiť na hranu“: plynulé a dorazí do cieľa, pri vypnutých animáciách okamžité,
+  - zápis: po 1,4 s ešte nie, po 1,5 s áno; po odtočení sa odpočet vynuluje; **pri vypnutých animáciách ani po 5 s nie**; nájdená číslica sa znova nezapíše.
+- **Celá kapitola: žiadny rozdiel** (41 riadkov, skóre **1010**, poradie obrazoviek).
+- **Test kresby žetónu (2b-1):** stále 8 z 8.
+
+**Veľkosť stiahnutých častí** (`next build` + `next start`, merané gzip):
+- pri otvorení stránky: 9 súborov, spolu **717 kB, gzip 213 kB** – **neobsahujú 3D knižnicu**,
+- 3D časť (stiahne sa až pri „Prezrieť“, jednorazovo): **877 kB, gzip 232 kB** + doplnok 4 kB (gzip 1 kB).
+
+**Zmenené súbory:**
+- `components/items/art/tokenArt.ts`
+- `components/items/ItemInspector.tsx`
+- `components/items/3d/facing.ts` (nový)
+- `components/items/3d/rotationPhysics.ts` (nový)
+- `components/items/3d/useSvgTexture.ts` (nový)
+- `components/items/3d/InspectStage.tsx` (nový)
+- `components/items/3d/TokenModel.tsx` (nový)
+- `components/items/3d/Token3DView.tsx` (nový)
+- `components/items/InspectErrorBoundary.tsx` (nový)
+- `components/items/inspectStyles.ts` (nový)
+- `components/items/supportsWebGL.ts` (nový)
+- `components/items/useReducedMotion.ts` (nový)
+- `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** bez chýb. Prvý pokus hlásil 7 chýb (priamy zápis do polí ovládača otáčania), opravené presunom zápisov do metód.
+
+**V prehliadači:** zatiaľ neoverené. Vzhľad 3D žetónu (svetlo, orientácia číslice a nápisov, ryhy) som nemohol vidieť a treba ho skontrolovať.
+
+**Ďalší krok:** používateľ overí 3D žetón v prehliadači, potom krok 2b-3 (výkon a dokončenie), až po potvrdení.

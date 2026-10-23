@@ -1,10 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
+import { useEffect, useRef, useState } from "react";
 import type { CodeItemInfo } from "../../engine";
 import { soundManager } from "../../lib/soundManager";
 import { ActionButton } from "../ui/ActionButton";
+import { InspectErrorBoundary } from "./InspectErrorBoundary";
+import { GLOW_CLASSES } from "./inspectStyles";
+import { canUse3D } from "./supportsWebGL";
 import { TokenArt } from "./TokenArt";
+import { useReducedMotion } from "./useReducedMotion";
+
+/** 3D žetón sa stiahne až pri prvom otvorení „Prezrieť“. */
+const Token3DView = dynamic(() => import("./3d/Token3DView"), {
+  ssr: false,
+  loading: () => <TokenArt side="front" digit="" isDigitFound={false} />,
+});
 
 type ItemInspectorProps = {
   info: CodeItemInfo;
@@ -20,9 +31,6 @@ const IDLE_REVEAL_MS = 20_000;
 const FLIP_MS = 220;
 const FOUND_ANIMATION_MS = 1600;
 
-const GLOW_CLASSES =
-  "ring-4 ring-amber-300 ring-offset-2 ring-offset-black motion-safe:animate-pulse";
-
 export function ItemInspector({
   info,
   onFound,
@@ -31,12 +39,21 @@ export function ItemInspector({
 }: ItemInspectorProps) {
   const { item, lockLabel, slotNumber, isFound } = info;
   const inspect = item.inspect;
+  const reducedMotion = useReducedMotion();
+
+  // 3D, ak ho prehliadač zvládne a nie je zapnutý prepínač ?bez3d.
+  const [mode, setMode] = useState<"3d" | "2d">(() =>
+    canUse3D() ? "3d" : "2d"
+  );
+  const [snapRequestCount, setSnapRequestCount] = useState(0);
+  const [isFacing3D, setIsFacing3D] = useState(false);
 
   const [side, setSide] = useState<"front" | "edge">("front");
   const [isFlipping, setIsFlipping] = useState(false);
   const [idleStage, setIdleStage] = useState(0);
   const [activityCount, setActivityCount] = useState(0);
   const [isJustFound, setIsJustFound] = useState(false);
+  const isFoundRequestedRef = useRef(false);
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -72,7 +89,12 @@ export function ItemInspector({
     setIdleStage((stage) => (stage >= 2 ? stage : 0));
   }
 
-  function flipToken() {
+  function turnToEdge() {
+    if (mode === "3d") {
+      setSnapRequestCount((count) => count + 1);
+      return;
+    }
+
     setIsFlipping(true);
 
     window.setTimeout(() => {
@@ -84,9 +106,12 @@ export function ItemInspector({
   }
 
   function markFound(revealed: boolean) {
-    if (isFound) {
+    // Ťuknutie a automatický zápis môžu prísť naraz – zapíšeme raz.
+    if (isFound || isFoundRequestedRef.current) {
       return;
     }
+
+    isFoundRequestedRef.current = true;
 
     if (revealed) {
       onReveal();
@@ -107,6 +132,7 @@ export function ItemInspector({
 
   const isGlowing = idleStage >= 1 && !isFound;
   const canReveal = idleStage >= 2 && !isFound;
+  const isDigitInView = mode === "3d" ? isFacing3D : side === "edge";
 
   return (
     <div
@@ -140,39 +166,66 @@ export function ItemInspector({
         </p>
 
         <div className="relative mt-5 aspect-square w-full max-w-[280px]">
-          <div
-            className={`h-full w-full transition-transform duration-200 ease-in-out ${
-              isFlipping ? "scale-x-0" : "scale-x-100"
-            }`}
-          >
-            <TokenArt
-              side={side}
-              digit={item.secretCode}
-              isDigitFound={isFound}
-            />
-          </div>
+          {mode === "3d" ? (
+            <InspectErrorBoundary onError={() => setMode("2d")}>
+              <Token3DView
+                digit={item.secretCode}
+                isFound={isFound}
+                hotspotLabel={inspect.hotspotLabel}
+                isHotspotGlowing={isGlowing}
+                reducedMotion={reducedMotion}
+                snapRequestCount={snapRequestCount}
+                onFacingChange={setIsFacing3D}
+                onFound={() => markFound(false)}
+                onFailure={() => setMode("2d")}
+              />
+            </InspectErrorBoundary>
+          ) : (
+            <>
+              <div
+                className={`h-full w-full transition-transform duration-200 ease-in-out ${
+                  isFlipping ? "scale-x-0" : "scale-x-100"
+                }`}
+              >
+                <TokenArt
+                  side={side}
+                  digit={item.secretCode}
+                  isDigitFound={isFound}
+                />
+              </div>
 
-          {side === "edge" && !isFlipping && !isFound && (
-            <button
-              type="button"
-              onClick={() => markFound(false)}
-              aria-label={inspect.hotspotLabel}
-              className={`absolute left-[38%] top-[38%] h-[24%] min-h-11 w-[24%] min-w-11 rounded-xl outline-none focus-visible:ring-4 focus-visible:ring-amber-300 ${
-                isGlowing ? GLOW_CLASSES : ""
-              }`}
-            />
+              {side === "edge" && !isFlipping && !isFound && (
+                <button
+                  type="button"
+                  onClick={() => markFound(false)}
+                  aria-label={inspect.hotspotLabel}
+                  className={`absolute left-[38%] top-[38%] h-[24%] min-h-11 w-[24%] min-w-11 rounded-xl outline-none focus-visible:ring-4 focus-visible:ring-amber-300 ${
+                    isGlowing ? GLOW_CLASSES : ""
+                  }`}
+                />
+              )}
+            </>
           )}
         </div>
+
+        {mode === "3d" && !isFound && (
+          <p className="mt-3 text-xs leading-5 text-slate-400">
+            Žetón otáčaj ťahaním prstom alebo myšou, prípadne šípkami na
+            klávesnici.
+          </p>
+        )}
 
         <div className="mt-5 flex w-full flex-col gap-3">
           {!isFound && (
             <ActionButton
               autoFocus
               variant="secondary"
-              onClick={flipToken}
-              className={isGlowing && side === "front" ? GLOW_CLASSES : ""}
+              onClick={turnToEdge}
+              className={isGlowing && !isDigitInView ? GLOW_CLASSES : ""}
             >
-              {side === "front" ? "Otočiť na hranu" : "Otočiť späť"}
+              {mode === "2d" && side === "edge"
+                ? "Otočiť späť"
+                : "Otočiť na hranu"}
             </ActionButton>
           )}
 
@@ -201,6 +254,10 @@ export function ItemInspector({
                 {` (miesto ${slotNumber}).`}
               </p>
             </div>
+          )}
+
+          {!isFound && mode === "3d" && isFacing3D && (
+            <p className="sr-only">Vyrytá číslica je natočená k tebe.</p>
           )}
         </div>
 
