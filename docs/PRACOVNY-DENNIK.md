@@ -1620,3 +1620,24 @@ Používateľ potvrdil, že 3D žetón vyzerá dobre.
 **Lint:** bez chýb.
 
 **Ďalší krok:** používateľ skontroluje znenie textov a predmety v prehliadači, potom B1b-3b (počítacie predmety: mapa s vežami, pečať, zuby kľúča), až po potvrdení.
+
+---
+
+## 23. 10. 2026 – Krok 48: Tajomné texty aj mimo okna „Prezrieť“
+
+**Čo sa urobilo:** dva texty, ktoré prezrádzali skrytú číslicu, sú nahradené textom **„Preskúmaj predmet zblízka.“**:
+- Inventár (`components/screens/InventoryScreen.tsx`): predtým „Číslica je na predmete ukrytá. Prezri ho a nájdi ju.“
+- karta „Nová odmena“ po vyriešení úlohy (`components/screens/HistoryScreen.tsx`): predtým „Na predmete je ukrytá číslica kódu. Prezri ho a nájdi ju.“
+
+**Test (mimo projektu, necommitnutý):** pred zmenou 6 chýb, **po zmene 6 z 6** – oba súbory obsahujú „Preskúmaj predmet zblízka.“ a neobsahujú „ukrytá“ ani pôvodné vety.
+
+**Zmenené súbory:**
+- `components/screens/InventoryScreen.tsx`
+- `components/screens/HistoryScreen.tsx`
+- `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** iba staré upozornenie v `HistoryScreen.tsx` (nepoužitý `LightbulbIcon`, známe od kroku 27).
+
+**Ďalší krok:** krok B1b-3b (počítacie predmety).

@@ -120,7 +120,7 @@ export function InventoryScreen({
                           </>
                         ) : (
                           <p className="mt-2 text-sm leading-6 text-slate-300">
-                            Číslica je na predmete ukrytá. Prezri ho a nájdi ju.
+                            Preskúmaj predmet zblízka.
                           </p>
                         )}
 

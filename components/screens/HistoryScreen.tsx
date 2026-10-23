@@ -90,7 +90,7 @@ export function HistoryScreen({
             <p className="mt-2 text-sm leading-relaxed text-amber-100">
               {codeItem.isFound
                 ? `Číslica pre zámok ${codeItem.lockLabel} je zapísaná v zápisníku.`
-                : "Na predmete je ukrytá číslica kódu. Prezri ho a nájdi ju."}
+                : "Preskúmaj predmet zblízka."}
             </p>
 
             <ActionButton
