@@ -28,7 +28,7 @@ const Token3DView = dynamic(() => import("./3d/Token3DView"), {
   loading: Loading3D,
 });
 
-const Flat3DView = dynamic(() => import("./3d/Flat3DView"), {
+const Item3DView = dynamic(() => import("./3d/Item3DView"), {
   ssr: false,
   loading: Loading3D,
 });
@@ -113,9 +113,14 @@ export function ItemInspector({
   const [idleStage, setIdleStage] = useState(0);
   const [activityCount, setActivityCount] = useState(0);
   const [isJustFound, setIsJustFound] = useState(false);
+  const [markedIndexes, setMarkedIndexes] = useState<number[]>([]);
   const isFoundRequestedRef = useRef(false);
   const dialogRef = useRef<HTMLDivElement>(null);
   const isTranscript = inspect?.kind === "transcript";
+  const isCount = inspect?.kind === "count";
+  // Zameranie na slovo prepisu alebo na prvý prvok na počítanie by
+  // prezradilo, kde hľadať – vtedy sa zameria celé okno.
+  const shouldFocusDialog = isTranscript || (isCount && mode === "2d");
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -132,11 +137,10 @@ export function ItemInspector({
   }, [onClose]);
 
   useEffect(() => {
-    // Pri prepise by zameranie na zvýraznené slovo prezradilo, kde hľadať.
-    if (isTranscript) {
+    if (shouldFocusDialog) {
       dialogRef.current?.focus({ preventScroll: true });
     }
-  }, [isTranscript]);
+  }, [shouldFocusDialog]);
 
   useEffect(() => {
     if (isFound || idleStage >= 2) {
@@ -193,10 +197,29 @@ export function ItemInspector({
     }
 
     soundManager.play("digit-found");
-    setSide2D("hidden");
+
+    // Pri počítaní zostáva líce s označenými prvkami.
+    if (!isCount) {
+      setSide2D("hidden");
+    }
+
     setIsJustFound(true);
 
     window.setTimeout(() => setIsJustFound(false), FOUND_ANIMATION_MS);
+  }
+
+  /** Označí prvok na počítanie; keď sú označené všetky, číslica sa objaví. */
+  function markCountElement(index: number, total: number) {
+    if (isFound || markedIndexes.includes(index)) {
+      return;
+    }
+
+    const nextMarkedIndexes = [...markedIndexes, index];
+    setMarkedIndexes(nextMarkedIndexes);
+
+    if (nextMarkedIndexes.length === total) {
+      markFound(false);
+    }
   }
 
   if (!inspect || !item.secretCode) {
@@ -205,7 +228,12 @@ export function ItemInspector({
 
   const digit = item.secretCode;
   const definition =
-    inspect.kind === "hotspot" && inspect.art ? ITEM_ARTS[inspect.art] : null;
+    (inspect.kind === "hotspot" || inspect.kind === "count") && inspect.art
+      ? ITEM_ARTS[inspect.art]
+      : null;
+  const countPoints =
+    inspect.kind === "count" ? (inspect.countPoints ?? []) : undefined;
+  const isCountMode = countPoints !== undefined;
 
   const isHintVisible = idleStage >= 1 && !isFound;
   const canReveal = idleStage >= 2 && !isFound;
@@ -226,9 +254,11 @@ export function ItemInspector({
 
   const artFrameClass =
     definition?.shape === "flat"
-      ? definition.width >= definition.height
+      ? definition.width > definition.height
         ? "w-full max-w-[320px]"
-        : "w-full max-w-[240px]"
+        : definition.width === definition.height
+          ? "w-full max-w-[280px]"
+          : "w-full max-w-[240px]"
       : "aspect-square w-full max-w-[280px]";
 
   const hotspotSizeClass =
@@ -305,7 +335,7 @@ export function ItemInspector({
                     onFailure={() => setMode("2d")}
                   />
                 ) : (
-                  <Flat3DView
+                  <Item3DView
                     art={inspect.art}
                     digit={digit}
                     isFound={isFound}
@@ -317,30 +347,85 @@ export function ItemInspector({
                     onFacingChange={setIsHiddenSideFacing3D}
                     onFound={() => markFound(false)}
                     onFailure={() => setMode("2d")}
+                    countPoints={countPoints}
+                    countLabel={inspect.countLabel}
+                    markedIndexes={markedIndexes}
+                    onMark={(index) =>
+                      markCountElement(index, countPoints?.length ?? 0)
+                    }
                   />
                 )}
               </InspectErrorBoundary>
             ) : (
               <>
-                {/* Ťuknutie na predmet ho otočí (aj bez tlačidla). */}
-                <button
-                  type="button"
-                  autoFocus
-                  onClick={flip2D}
-                  aria-label={`Otočiť predmet: ${item.title}`}
-                  className={`block h-full w-full rounded-2xl outline-none transition-transform duration-200 ease-in-out focus-visible:ring-4 focus-visible:ring-amber-300/60 ${
-                    isFlipping ? "scale-x-0" : "scale-x-100"
-                  }`}
-                >
-                  <ItemArtImage
-                    art={inspect.art}
-                    side={side2D}
-                    digit={digit}
-                    isDigitFound={isFound}
-                  />
-                </button>
+                {isCountMode ? (
+                  // Pri počítaní sa predmet otáča iba tlačidlom, aby ťuknutie
+                  // vedľa prvku omylom neotočilo predmet.
+                  <div
+                    className={`h-full w-full transition-transform duration-200 ease-in-out ${
+                      isFlipping ? "scale-x-0" : "scale-x-100"
+                    }`}
+                  >
+                    <ItemArtImage
+                      art={inspect.art}
+                      side={side2D}
+                      digit={digit}
+                      isDigitFound={isFound}
+                      countPoints={countPoints}
+                    />
+                  </div>
+                ) : (
+                  /* Ťuknutie na predmet ho otočí (aj bez tlačidla). */
+                  <button
+                    type="button"
+                    autoFocus
+                    onClick={flip2D}
+                    aria-label={`Otočiť predmet: ${item.title}`}
+                    className={`block h-full w-full rounded-2xl outline-none transition-transform duration-200 ease-in-out focus-visible:ring-4 focus-visible:ring-amber-300/60 ${
+                      isFlipping ? "scale-x-0" : "scale-x-100"
+                    }`}
+                  >
+                    <ItemArtImage
+                      art={inspect.art}
+                      side={side2D}
+                      digit={digit}
+                      isDigitFound={isFound}
+                    />
+                  </button>
+                )}
 
-                {side2D === "hidden" && !isFlipping && !isFound && (
+                {isCountMode &&
+                  side2D === "front" &&
+                  !isFlipping &&
+                  !isFound &&
+                  countPoints.map((point, index) => {
+                    const isMarked = markedIndexes.includes(index);
+
+                    return (
+                      <button
+                        key={`${point.x}-${point.y}`}
+                        type="button"
+                        onClick={() =>
+                          markCountElement(index, countPoints.length)
+                        }
+                        aria-label={inspect.countLabel}
+                        aria-pressed={isMarked}
+                        style={{
+                          left: `${point.x * 100}%`,
+                          top: `${point.y * 100}%`,
+                        }}
+                        className={`absolute h-11 w-11 -translate-x-1/2 -translate-y-1/2 rounded-full outline-none focus-visible:ring-4 focus-visible:ring-amber-300 ${
+                          isMarked
+                            ? "border-2 border-amber-200 bg-amber-300/35 shadow-[0_0_12px_rgba(252,211,77,0.6)]"
+                            : isHintVisible
+                              ? GLOW_CLASSES
+                              : ""
+                        }`}
+                      />
+                    );
+                  })}
+
+                {!isCountMode && side2D === "hidden" && !isFlipping && !isFound && (
                   <button
                     type="button"
                     onClick={() => markFound(false)}
@@ -384,7 +469,11 @@ export function ItemInspector({
             <ActionButton
               variant="secondary"
               onClick={turn}
-              className={isHintVisible && !isHiddenSideInView ? GLOW_CLASSES : ""}
+              className={
+                isHintVisible && !isCountMode && !isHiddenSideInView
+                  ? GLOW_CLASSES
+                  : ""
+              }
             >
               {turnLabel}
             </ActionButton>

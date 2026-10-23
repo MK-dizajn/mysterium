@@ -1,5 +1,5 @@
 import { useId } from "react";
-import type { ItemInspectArt } from "../../types/game";
+import type { InspectCountPoint, ItemInspectArt } from "../../types/game";
 import { type ItemArtSide, ITEM_ARTS } from "./art/itemArtRegistry";
 
 type ItemArtImageProps = {
@@ -7,6 +7,7 @@ type ItemArtImageProps = {
   side: ItemArtSide;
   digit: string;
   isDigitFound: boolean;
+  countPoints?: InspectCountPoint[];
 };
 
 /**
@@ -18,6 +19,7 @@ export function ItemArtImage({
   side,
   digit,
   isDigitFound,
+  countPoints,
 }: ItemArtImageProps) {
   const idPrefix = `${art}-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
 
@@ -27,7 +29,13 @@ export function ItemArtImage({
       className="h-full w-full drop-shadow-[0_18px_30px_rgba(0,0,0,0.6)] [&>svg]:h-full [&>svg]:w-full"
       // Kresbu generuje náš vlastný kód; texty sa v nej escapujú.
       dangerouslySetInnerHTML={{
-        __html: ITEM_ARTS[art].getSvg(side, digit, isDigitFound, idPrefix),
+        __html: ITEM_ARTS[art].getSvg(
+          side,
+          digit,
+          isDigitFound,
+          idPrefix,
+          countPoints
+        ),
       }}
     />
   );

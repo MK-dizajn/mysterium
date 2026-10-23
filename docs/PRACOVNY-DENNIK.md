@@ -1641,3 +1641,47 @@ Používateľ potvrdil, že 3D žetón vyzerá dobre.
 **Lint:** iba staré upozornenie v `HistoryScreen.tsx` (nepoužitý `LightbulbIcon`, známe od kroku 27).
 
 **Ďalší krok:** krok B1b-3b (počítacie predmety).
+
+---
+
+## 23. 10. 2026 – Krok 49: Počítacie predmety (B1b-3b)
+
+**Čo sa urobilo:** päť predmetov sa prezerá na spoločnom „stole“ (okno „Prezrieť“). Hráč ťuká na prvky na líci predmetu. Ťuknutý prvok sa označí. Keď sú označené všetky, číslica je nájdená. Počítadlo sa nikde nezobrazuje a žiadny text neprezrádza, že treba počítať.
+
+| Scéna | Predmet | Prvky | Číslica | Zápisník |
+|---|---|---|---|---|
+| 2 | Kus mapy: staré mesto | veže | 8 | zámok I, miesto 2 |
+| 4 | Pečať vzdelanosti | lúče | 6 | zámok II, miesto 1 |
+| 7 | Prvý zub Zlatého kľúča | zárezy | 9 | zámok III, miesto 1 |
+| 8 | Druhý zub Zlatého kľúča | zárezy | 2 | zámok III, miesto 2 |
+| 9 | Tretí zub Zlatého kľúča | zárezy | 7 | zámok III, miesto 3 |
+
+- Poloha a počet prvkov sú v zozname v dátach (`data/chapter-one/item-art.ts`). Kresba vykreslí presne tieto prvky.
+- Zárezy sú rozdelené na hornú a dolnú hranu zuba, aby boli ťukacie plochy aj na mobile od seba aspoň 44 px.
+- 3D: mapa je plochý list, ktorý sa dá nakláňať a obracať. Pečať je valec s reliéfom. Zub je vytiahnutý tvar so zárezmi. Záložná 2D verzia a `?bez3d` fungujú.
+- Ovládanie klávesnicou: Tab prechádza medzi prvkami, Enter prvok označí. Čítačka prečíta „Veža“, „Lúč“ alebo „Zárez“ a stav označený/neoznačený, bez čísla.
+- Texty: úvod „Preskúmaj predmet a objav niečo, čo si nečakal.“, po 20 s nápoveda pre konkrétny predmet (zároveň sa prvky jemne rozžiaria), po ďalších 20 s „Ukáž číslicu“.
+- `Flat3DView.tsx` je premenovaný na `Item3DView.tsx` (teraz kreslí aj pečať a zub).
+
+**Chyba nájdená pri snímkach a opravená:** v 3D bol pri počítacích predmetoch na líci text tlačidla „Obrátiť späť“ namiesto „Obrátiť“ (3D pohľad hlásil opačnú stranu). Opravené. Opravené je aj oznámenie pre čítačku, ktoré teraz hovorí „Zadná strana … je otočená k tebe.“
+
+**Testy (mimo projektu, necommitnuté):**
+- Nový test: pred zmenou 30 chýb, po zmene 45 z 45 OK. Vzdialenosti ťukacích plôch pri šírke 280 px: mapa 51 px, pečať 46 px, zuby 50, 106 a 62 px.
+- Priebeh celej hry: bez rozdielu oproti stavu pred zmenou (41 riadkov).
+- Fyzika: 25 z 25. Kresba žetónu: 8 z 8.
+- Starý test B1b-3a: 4 očakávané rozdiely. Test predpokladal, že tieto číslice sa zapíšu samy, a to už neplatí. Nejde o chybu.
+- Snímky z prehliadača (3D aj `?bez3d`) pre každý predmet: líce, rub, čiastočne označené, nájdená číslica. Zápisník na konci: I ·8·, II 6··, III 927.
+
+**Zmenené súbory:**
+- `types/game.ts`
+- `data/chapter-one/item-art.ts` (nový), `tajna-stopa-michalska.ts`, `venturska-brana-spomienok.ts`, `maximilianova-fontana.ts`, `primacialny-palac.ts`, `bratislavsky-mier.ts`
+- `components/items/art/oldTownMapArt.ts`, `educationSealArt.ts`, `keyToothArt.ts` (nové), `itemArtRegistry.ts`
+- `components/items/ItemArtImage.tsx`, `components/items/ItemInspector.tsx`
+- `components/items/3d/Item3DView.tsx` (premenovaný z `Flat3DView.tsx`), `facing.ts`
+- `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** bez chýb.
+
+**Ďalší krok:** používateľ skontroluje texty nápovedy a popisov a vyskúša predmety v prehliadači.

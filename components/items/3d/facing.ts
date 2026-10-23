@@ -30,6 +30,14 @@ export function isBackFacing(yaw: number, tilt: number) {
   return -Math.cos(yaw) * Math.cos(tilt) >= FACING_MIN_DOT;
 }
 
+/**
+ * Je líce predmetu dosť natočené k hráčovi, aby sa dali ťukať prvky
+ * na počítanie? Stačí uhol do 60°, aby sa dalo aj nakláňať.
+ */
+export function isFrontVisible(yaw: number, tilt: number) {
+  return Math.cos(yaw) * Math.cos(tilt) >= 0.5;
+}
+
 /** Uhol prevedený do rozsahu (-π, π]. */
 function normalizeAngle(angle: number) {
   const fullTurn = Math.PI * 2;

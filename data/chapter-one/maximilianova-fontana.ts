@@ -1,4 +1,5 @@
 import type { Scene } from "../../types/game";
+import { FIRST_KEY_TOOTH_NOTCHES } from "./item-art";
 
 export const maximilianovaFontanaScene: Scene = {
   id: "maximilianova-fontana",
@@ -79,12 +80,23 @@ export const maximilianovaFontanaScene: Scene = {
           type: "addInventoryItem",
           item: {
             id: "evidence-guardian-buckle",
-            title: "Rytierska spona strážcu",
-            icon: "⚔️",
+            title: "Prvý zub Zlatého kľúča",
+            icon: "🗝️",
             description:
-              "Kovová spona zdobená motívom rytiera z fontány. Na vnútornej strane je vyrytá jedna číslica tajného kódu.",
+              "Prvý zo zubov Zlatého prešporského kľúča. Pátrač ho ukryl pri fontáne, nad ktorou stráži rytier.",
             evidenceKind: "object",
             secretCode: "9",
+            inspect: {
+              kind: "count",
+              art: "keyTooth",
+              intro: "Preskúmaj predmet a objav niečo, čo si nečakal.",
+              hint: "Každý zub kľúča má svoj vlastný tvar. Pozri sa zblízka na jeho hrany.",
+              foundText:
+                "Objavil si číslo, ktoré ti na konci pomôže odomknúť tajomstvo.",
+              hotspotLabel: "Zárezy na hranách zubu kľúča",
+              countPoints: FIRST_KEY_TOOTH_NOTCHES,
+              countLabel: "Zárez",
+            },
             evidenceOrder: 7,
             actId: "act-3",
           },

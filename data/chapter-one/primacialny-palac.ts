@@ -1,4 +1,5 @@
 import type { Scene } from "../../types/game";
+import { SECOND_KEY_TOOTH_NOTCHES } from "./item-art";
 
 export const primacialnyPalacScene: Scene = {
   id: "primacialny-palac",
@@ -79,12 +80,23 @@ export const primacialnyPalacScene: Scene = {
           type: "addInventoryItem",
           item: {
             id: "evidence-ci-emblem",
-            title: "Emblém C · I",
-            icon: "⚖️",
+            title: "Druhý zub Zlatého kľúča",
+            icon: "🗝️",
             description:
-              "Medený emblém s písmenami C a I, symbolmi láskavosti a spravodlivosti. Na zadnej strane je vyrytá jedna číslica tajného kódu.",
-            evidenceKind: "symbol",
+              "Druhý zub Zlatého kľúča. Našiel si ho pri paláci, kde láskavosť a spravodlivosť stoja vedľa seba.",
+            evidenceKind: "object",
             secretCode: "2",
+            inspect: {
+              kind: "count",
+              art: "keyTooth",
+              intro: "Preskúmaj predmet a objav niečo, čo si nečakal.",
+              hint: "Tento zub vyzerá jednoduchšie než prvý. Aj tak si jeho hrany prezri zblízka.",
+              foundText:
+                "Objavil si číslo, ktoré ti na konci pomôže odomknúť tajomstvo.",
+              hotspotLabel: "Zárezy na hranách zubu kľúča",
+              countPoints: SECOND_KEY_TOOTH_NOTCHES,
+              countLabel: "Zárez",
+            },
             evidenceOrder: 8,
             actId: "act-3",
           },

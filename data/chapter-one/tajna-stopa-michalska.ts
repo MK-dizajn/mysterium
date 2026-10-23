@@ -1,4 +1,5 @@
 import type { Scene } from "../../types/game";
+import { OLD_TOWN_TOWERS } from "./item-art";
 
 export const tajnaStopaMichalskaScene: Scene = {
   id: "tajna-stopa-michalska",
@@ -72,12 +73,23 @@ Nájdi fasádu, ktorá je nápadne užšia než všetky ostatné. Keď dom objav
           type: "addInventoryItem",
           item: {
             id: "evidence-brass-house-token",
-            title: "Mosadzný domový štítok",
-            icon: "🏷️",
+            title: "Kus mapy: staré mesto",
+            icon: "🗺️",
             description:
-              "Malý mosadzný štítok s obrysom úzkeho domu. Na zadnej strane je vyrytá jedna číslica tajného kódu.",
-            evidenceKind: "object",
+              "Útržok starej mapy Prešporka s hradbami a strechami starého mesta. Jeden úzky dom je na nej starostlivo vyznačený.",
+            evidenceKind: "document",
             secretCode: "8",
+            inspect: {
+              kind: "count",
+              art: "oldTownMap",
+              intro: "Preskúmaj predmet a objav niečo, čo si nečakal.",
+              hint: "Pozri sa na horizonty starého mesta.",
+              foundText:
+                "Objavil si číslo, ktoré ti na konci pomôže odomknúť tajomstvo.",
+              hotspotLabel: "Veže na mape starého mesta",
+              countPoints: OLD_TOWN_TOWERS,
+              countLabel: "Veža",
+            },
             evidenceOrder: 2,
             actId: "act-1",
           },

@@ -1,4 +1,5 @@
 import type { Scene } from "../../types/game";
+import { EDUCATION_SEAL_RAYS } from "./item-art";
 
 export const venturskaBranaSpomienokScene: Scene = {
   id: "venturska-brana-spomienok",
@@ -80,12 +81,23 @@ export const venturskaBranaSpomienokScene: Scene = {
           type: "addInventoryItem",
           item: {
             id: "evidence-academia-seal",
-            title: "Pečať Academie Istropolitany",
-            icon: "🎓",
+            title: "Pečať vzdelanosti",
+            icon: "🏵️",
             description:
-              "Kovová pečať s obrysom otvorenej knihy a kráľovskej koruny. Na jej hrane je vyrazená jedna číslica tajného kódu.",
+              "Bronzová pečať s otvorenou knihou a kráľovskou korunou. Pripomína časy, keď v meste vznikla prvá univerzita.",
             evidenceKind: "object",
             secretCode: "6",
+            inspect: {
+              kind: "count",
+              art: "educationSeal",
+              intro: "Preskúmaj predmet a objav niečo, čo si nečakal.",
+              hint: "Svetlo poznania vychádza z koruny. Prezri si ho pozorne.",
+              foundText:
+                "Objavil si číslo, ktoré ti na konci pomôže odomknúť tajomstvo.",
+              hotspotLabel: "Lúče okolo koruny na pečati",
+              countPoints: EDUCATION_SEAL_RAYS,
+              countLabel: "Lúč",
+            },
             evidenceOrder: 4,
             actId: "act-2",
           },

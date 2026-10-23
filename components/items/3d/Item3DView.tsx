@@ -11,11 +11,12 @@ import {
   useRef,
   useState,
 } from "react";
-import type { Group } from "three";
-import type { ItemInspectArt } from "../../../types/game";
+import { ExtrudeGeometry, type Group, Shape } from "three";
+import type { InspectCountPoint, ItemInspectArt } from "../../../types/game";
 import { ITEM_ARTS } from "../art/itemArtRegistry";
+import { getKeyToothOutline } from "../art/keyToothArt";
 import { GLOW_CLASSES } from "../inspectStyles";
-import { isBackFacing, stepDwell } from "./facing";
+import { isBackFacing, isFrontVisible, stepDwell } from "./facing";
 import { InspectStage } from "./InspectStage";
 import {
   applyFlatDrag,
@@ -33,12 +34,17 @@ import { useSvgTexture } from "./useSvgTexture";
 
 const MAX_FRAME_SECONDS = 0.05;
 /**
- * Výška listu v 3D. Kamera vidí asi 2,4 na výšku a plátno má rovnaký
- * pomer strán ako predmet, takže list vyplní asi 80 % plochy aj pri náklone.
+ * Výška predmetu v 3D. Kamera vidí asi 2,4 na výšku a plátno má rovnaký
+ * pomer strán ako predmet, takže predmet vyplní asi 80 % plochy aj pri náklone.
  */
 const WORLD_HEIGHT = 1.9;
 const PAPER_DEPTH = 0.02;
+const SEAL_THICKNESS = 0.16;
+const TOOTH_DEPTH = 0.14;
+const TOOTH_BEVEL = 0.02;
 const MAX_TEXTURE_SIZE = 1024;
+/** Značky a tlačidlá stoja kúsok pred povrchom, aby ich model nezakryl. */
+const MARKER_OFFSET = 0.03;
 
 /** Premenlivý stav nakláňania mimo Reactu (rovnako ako pri žetóne). */
 class FlatController {
@@ -101,7 +107,7 @@ class FlatController {
   }
 }
 
-type FlatModelProps = {
+type ModelProps = {
   art: ItemInspectArt;
   digit: string;
   isFound: boolean;
@@ -109,10 +115,11 @@ type FlatModelProps = {
   worldHeight: number;
   textureWidth: number;
   textureHeight: number;
+  countPoints?: InspectCountPoint[];
 };
 
 /** Tenký list papiera: líce a rub z kresby v components/items/art/. */
-function FlatModel({
+function PaperModel({
   art,
   digit,
   isFound,
@@ -120,16 +127,17 @@ function FlatModel({
   worldHeight,
   textureWidth,
   textureHeight,
-}: FlatModelProps) {
+  countPoints,
+}: ModelProps) {
   const definition = ITEM_ARTS[art];
 
   const frontSvg = useMemo(
-    () => definition.getSvg("front", digit, false, `${art}-front`),
-    [definition, art, digit]
+    () => definition.getSvg("front", digit, false, `${art}-front`, countPoints),
+    [definition, art, digit, countPoints]
   );
   const backSvg = useMemo(
-    () => definition.getSvg("hidden", digit, isFound, `${art}-back`),
-    [definition, art, digit, isFound]
+    () => definition.getSvg("hidden", digit, isFound, `${art}-back`, countPoints),
+    [definition, art, digit, isFound, countPoints]
   );
 
   const frontTexture = useSvgTexture(frontSvg, textureWidth, textureHeight);
@@ -172,23 +180,133 @@ function FlatModel({
   );
 }
 
-type FlatControllerViewProps = {
+/** Bronzová pečať: nízky valec, líce s reliéfom z kresby, hladký rub. */
+function SealModel({ art, worldHeight, countPoints }: ModelProps) {
+  const definition = ITEM_ARTS[art];
+  const radius = worldHeight / 2;
+
+  const frontSvg = useMemo(
+    () => definition.getSvg("front", "", false, "seal-front", countPoints),
+    [definition, countPoints]
+  );
+  const backSvg = useMemo(
+    () => definition.getSvg("hidden", "", false, "seal-back", countPoints),
+    [definition, countPoints]
+  );
+
+  const frontTexture = useSvgTexture(frontSvg, MAX_TEXTURE_SIZE, MAX_TEXTURE_SIZE);
+  const backTexture = useSvgTexture(backSvg, MAX_TEXTURE_SIZE, MAX_TEXTURE_SIZE);
+
+  return (
+    <group>
+      <mesh rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry
+          args={[radius, radius, SEAL_THICKNESS, 96, 1, true]}
+        />
+        <meshStandardMaterial color="#7a4e1c" metalness={0.35} roughness={0.5} />
+      </mesh>
+
+      <mesh position={[0, 0, SEAL_THICKNESS / 2]}>
+        <circleGeometry args={[radius, 96]} />
+        <meshStandardMaterial
+          key={frontTexture ? "front" : "plain"}
+          color={frontTexture ? "#ffffff" : "#b07a32"}
+          map={frontTexture}
+          bumpMap={frontTexture}
+          bumpScale={1.2}
+          metalness={0.3}
+          roughness={0.5}
+        />
+      </mesh>
+
+      <mesh position={[0, 0, -SEAL_THICKNESS / 2]} rotation={[0, Math.PI, 0]}>
+        <circleGeometry args={[radius, 96]} />
+        <meshStandardMaterial
+          key={backTexture ? "back" : "plain"}
+          color={backTexture ? "#ffffff" : "#b07a32"}
+          map={backTexture}
+          bumpMap={backTexture}
+          bumpScale={1.2}
+          metalness={0.3}
+          roughness={0.5}
+        />
+      </mesh>
+    </group>
+  );
+}
+
+/** Zub kľúča: vytiahnutý tvar so zárezmi presne podľa zoznamu. */
+function ToothModel({ worldWidth, worldHeight, countPoints = [] }: ModelProps) {
+  const geometry = useMemo(() => {
+    const shape = new Shape();
+
+    getKeyToothOutline(countPoints).forEach((point, index) => {
+      const x = (point.x - 0.5) * worldWidth;
+      const y = (0.5 - point.y) * worldHeight;
+
+      if (index === 0) {
+        shape.moveTo(x, y);
+      } else {
+        shape.lineTo(x, y);
+      }
+    });
+
+    shape.closePath();
+
+    const extruded = new ExtrudeGeometry(shape, {
+      depth: TOOTH_DEPTH,
+      bevelEnabled: true,
+      bevelThickness: TOOTH_BEVEL,
+      bevelSize: TOOTH_BEVEL,
+      bevelSegments: 2,
+    });
+
+    extruded.translate(0, 0, -TOOTH_DEPTH / 2);
+
+    return extruded;
+  }, [countPoints, worldWidth, worldHeight]);
+
+  useEffect(() => () => geometry.dispose(), [geometry]);
+
+  return (
+    <mesh geometry={geometry}>
+      <meshStandardMaterial color="#d4a23c" metalness={0.35} roughness={0.35} />
+    </mesh>
+  );
+}
+
+/** Ako ďaleko pred stredom predmetu je jeho líce (pre značky). */
+function getFrontSurfaceZ(model: "paper" | "seal" | "tooth") {
+  if (model === "seal") {
+    return SEAL_THICKNESS / 2 + MARKER_OFFSET;
+  }
+
+  if (model === "tooth") {
+    return TOOTH_DEPTH / 2 + TOOTH_BEVEL + MARKER_OFFSET;
+  }
+
+  return PAPER_DEPTH / 2 + MARKER_OFFSET;
+}
+
+type ControllerViewProps = {
   controller: FlatController;
   reducedMotion: boolean;
   isFound: boolean;
+  isCountMode: boolean;
   onFacingChange: (isFacing: boolean) => void;
   onAutoRecord: () => void;
   children: ReactNode;
 };
 
-function FlatControllerView({
+function ControllerView({
   controller,
   reducedMotion,
   isFound,
+  isCountMode,
   onFacingChange,
   onAutoRecord,
   children,
-}: FlatControllerViewProps) {
+}: ControllerViewProps) {
   const groupRef = useRef<Group>(null);
   const invalidate = useThree((state) => state.invalidate);
 
@@ -207,22 +325,27 @@ function FlatControllerView({
     const { yaw, tilt } = controller.state;
     groupRef.current?.rotation.set(tilt, yaw, 0);
 
-    const isFacing = isBackFacing(yaw, tilt);
+    // Pri počítaní je dôležité líce, inak rub so skrytou číslicou.
+    const isFacing = isCountMode
+      ? isFrontVisible(yaw, tilt)
+      : isBackFacing(yaw, tilt);
 
     if (controller.setFacing(isFacing)) {
       onFacingChange(isFacing);
     }
 
+    // Pri počítaní sa číslica sama nezapisuje.
     if (
       controller.advanceDwell(
-        { isFacing, reducedMotion, isFound },
+        { isFacing: isFacing && !isCountMode, reducedMotion, isFound },
         dtSec * 1000
       )
     ) {
       onAutoRecord();
     }
 
-    const isCountingDown = isFacing && !isFound && !reducedMotion;
+    const isCountingDown =
+      isFacing && !isCountMode && !isFound && !reducedMotion;
 
     if (isFlatAtRest(controller.state) && !isCountingDown) {
       return;
@@ -234,7 +357,7 @@ function FlatControllerView({
   return <group ref={groupRef}>{children}</group>;
 }
 
-type Flat3DViewProps = {
+type Item3DViewProps = {
   art: ItemInspectArt;
   digit: string;
   isFound: boolean;
@@ -247,10 +370,15 @@ type Flat3DViewProps = {
   onFacingChange: (isFacing: boolean) => void;
   onFound: () => void;
   onFailure: () => void;
+  /** Prvky na počítanie (inak sa hľadá skrytá číslica na rube). */
+  countPoints?: InspectCountPoint[];
+  countLabel?: string;
+  markedIndexes?: number[];
+  onMark?: (index: number) => void;
 };
 
-/** 3D plochý predmet (list, mapa) na obrazovke „Prezrieť“. */
-export default function Flat3DView({
+/** 3D predmet (list, mapa, pečať, zub kľúča) na obrazovke „Prezrieť“. */
+export default function Item3DView({
   art,
   digit,
   isFound,
@@ -262,8 +390,14 @@ export default function Flat3DView({
   onFacingChange,
   onFound,
   onFailure,
-}: Flat3DViewProps) {
+  countPoints,
+  countLabel = "",
+  markedIndexes = [],
+  onMark,
+}: Item3DViewProps) {
   const definition = ITEM_ARTS[art];
+  const model = definition.model3D === "token" ? "paper" : definition.model3D;
+  const isCountMode = Boolean(countPoints?.length);
   const [controller] = useState(() => new FlatController());
   const [isFacing, setIsFacing] = useState(false);
   const lastTurnRequestRef = useRef(turnRequestCount);
@@ -283,8 +417,10 @@ export default function Flat3DView({
   const hotspotPosition: [number, number, number] = [
     -(definition.hotspotCenter.x - 0.5) * worldWidth,
     (0.5 - definition.hotspotCenter.y) * worldHeight,
-    -PAPER_DEPTH / 2 - 0.03,
+    -PAPER_DEPTH / 2 - MARKER_OFFSET,
   ];
+
+  const frontZ = getFrontSurfaceZ(model);
 
   useEffect(() => {
     if (focusOnMount) {
@@ -303,7 +439,8 @@ export default function Flat3DView({
 
   function handleFacingChange(nextIsFacing: boolean) {
     setIsFacing(nextIsFacing);
-    onFacingChange(nextIsFacing);
+    // Okno potrebuje vedieť, či je k hráčovi otočený rub.
+    onFacingChange(isCountMode ? !nextIsFacing : nextIsFacing);
   }
 
   function handlePointerDown(event: PointerEvent<HTMLDivElement>) {
@@ -343,6 +480,17 @@ export default function Flat3DView({
     event.preventDefault();
   }
 
+  const modelProps: ModelProps = {
+    art,
+    digit,
+    isFound,
+    worldWidth,
+    worldHeight,
+    textureWidth,
+    textureHeight,
+    countPoints,
+  };
+
   return (
     <div
       ref={surfaceRef}
@@ -361,24 +509,23 @@ export default function Flat3DView({
       className="relative h-full w-full cursor-grab touch-none select-none rounded-2xl outline-none focus-visible:ring-4 focus-visible:ring-amber-300/60 active:cursor-grabbing"
     >
       <InspectStage onFailure={onFailure}>
-        <FlatControllerView
+        <ControllerView
           controller={controller}
           reducedMotion={reducedMotion}
           isFound={isFound}
+          isCountMode={isCountMode}
           onFacingChange={handleFacingChange}
           onAutoRecord={onFound}
         >
-          <FlatModel
-            art={art}
-            digit={digit}
-            isFound={isFound}
-            worldWidth={worldWidth}
-            worldHeight={worldHeight}
-            textureWidth={textureWidth}
-            textureHeight={textureHeight}
-          />
+          {model === "seal" ? (
+            <SealModel {...modelProps} />
+          ) : model === "tooth" ? (
+            <ToothModel {...modelProps} />
+          ) : (
+            <PaperModel {...modelProps} />
+          )}
 
-          {isFacing && !isFound && (
+          {!isCountMode && isFacing && !isFound && (
             <Html position={hotspotPosition} center>
               <button
                 type="button"
@@ -390,7 +537,40 @@ export default function Flat3DView({
               />
             </Html>
           )}
-        </FlatControllerView>
+
+          {isCountMode &&
+            isFacing &&
+            !isFound &&
+            countPoints?.map((point, index) => {
+              const isMarked = markedIndexes.includes(index);
+
+              return (
+                <Html
+                  key={`${point.x}-${point.y}`}
+                  position={[
+                    (point.x - 0.5) * worldWidth,
+                    (0.5 - point.y) * worldHeight,
+                    frontZ,
+                  ]}
+                  center
+                >
+                  <button
+                    type="button"
+                    onClick={() => onMark?.(index)}
+                    aria-label={countLabel}
+                    aria-pressed={isMarked}
+                    className={`block h-11 w-11 rounded-full outline-none focus-visible:ring-4 focus-visible:ring-amber-300 ${
+                      isMarked
+                        ? "border-2 border-amber-200 bg-amber-300/35 shadow-[0_0_12px_rgba(252,211,77,0.6)]"
+                        : isHotspotGlowing
+                          ? GLOW_CLASSES
+                          : ""
+                    }`}
+                  />
+                </Html>
+              );
+            })}
+        </ControllerView>
       </InspectStage>
     </div>
   );

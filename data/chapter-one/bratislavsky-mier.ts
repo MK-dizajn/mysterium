@@ -1,4 +1,5 @@
 import type { Scene } from "../../types/game";
+import { THIRD_KEY_TOOTH_NOTCHES } from "./item-art";
 
 export const bratislavskyMierScene: Scene = {
   id: "bratislavsky-mier",
@@ -80,12 +81,23 @@ export const bratislavskyMierScene: Scene = {
           type: "addInventoryItem",
           item: {
             id: "evidence-peace-seal",
-            title: "Pečať Bratislavského mieru",
-            icon: "🕊️",
+            title: "Tretí zub Zlatého kľúča",
+            icon: "🗝️",
             description:
-              "Laková pečať z mierového dokumentu uzavretého v Primaciálnom paláci. Na jej okraji je vyrytá jedna číslica tajného kódu.",
-            evidenceKind: "document",
+              "Tretí zub Zlatého kľúča. Patrí k miestnosti, v ktorej sa podpísal mier, ktorý zmenil Európu.",
+            evidenceKind: "object",
             secretCode: "7",
+            inspect: {
+              kind: "count",
+              art: "keyTooth",
+              intro: "Preskúmaj predmet a objav niečo, čo si nečakal.",
+              hint: "Posledný zub uzatvára kľúč. Prezri si pozorne obe jeho hrany.",
+              foundText:
+                "Objavil si číslo, ktoré ti na konci pomôže odomknúť tajomstvo.",
+              hotspotLabel: "Zárezy na hranách zubu kľúča",
+              countPoints: THIRD_KEY_TOOTH_NOTCHES,
+              countLabel: "Zárez",
+            },
             evidenceOrder: 9,
             actId: "act-3",
           },

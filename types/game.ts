@@ -26,7 +26,19 @@ export type EvidenceKind =
  * Ako hráč hľadá číslicu na predmete (obrazovka „Prezrieť“, krok B1b-2).
  * Predmet bez inspect má číslicu nájdenú hneď po získaní.
  */
-export type ItemInspectArt = "token" | "journalPage" | "squareMap";
+export type ItemInspectArt =
+  | "token"
+  | "journalPage"
+  | "squareMap"
+  | "oldTownMap"
+  | "educationSeal"
+  | "keyTooth";
+
+/** Poloha prvku na počítanie na líci predmetu (0 až 1 zľava a zhora). */
+export type InspectCountPoint = {
+  x: number;
+  y: number;
+};
 
 export type ItemInspectTranscript = {
   before: string;
@@ -49,6 +61,10 @@ export type ItemInspect = {
   /** Popis miesta s číslicou pre čítačku obrazovky (nie je viditeľný). */
   hotspotLabel: string;
   transcript?: ItemInspectTranscript;
+  /** Prvky na počítanie (kind "count"); ich počet sa rovná číslici. */
+  countPoints?: InspectCountPoint[];
+  /** Názov jedného prvku pre čítačku (napríklad „Veža“), bez poradového čísla. */
+  countLabel?: string;
 };
 
 export type InventoryItem = {
