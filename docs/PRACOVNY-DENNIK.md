@@ -2201,3 +2201,75 @@ Snímky: truhlica, zlý kód, zápisník, kľúč a veko, otvorená truhlica.
 **Lint:** bez chýb.
 
 **Ďalší krok:** B4c (3D truhlica) alebo B5 (fotografia) podľa plánu, až po potvrdení.
+
+---
+
+## 24. 10. 2026 – Krok 59 (krok B5): Historická fotografia zo štyroch útržkov
+
+**Čo sa urobilo:**
+- **Priebeh:** truhlica → „Prijať útržok a pokračovať“ → **Historická fotografia** → „Pokračovať v pátraní“ → dočasne záverečná obrazovka (kým pribudne zadanie miesta v B6).
+- **Príznaky v uložení:**
+  - `finale-photo-assembled`: zapíše sa hneď pri prvom príchode, takže F5 ukáže celú fotografiu bez opakovaného skladania,
+  - `finale-photo-seen`: pri odchode, aby sa záver po F5 nevracal k fotografii.
+- **Dočasný obrázok** `public/images/finale/historicka-fotografia.jpg` (1200 × 900 px, 86 kB):
+  - vlastná sépiová kresba budovy s kolonádou na námestí, so zrnom, škrabancami a vinetáciou,
+  - nakreslená ako SVG a prevedená v prehliadači na JPG,
+  - cesta je v dátach, dá sa vymeniť bez zásahu do kódu.
+- **Obrazovka** (`components/screens/FinalePhotoScreen.tsx`, nová, 2D):
+  - **útržky:** jeden obrázok sa zobrazí štyrikrát a každá kópia sa oreže tvarom `clip-path` so zúbkovanými trhlinami. Susedné útržky zdieľajú body trhliny, takže presne zapadnú. Ukážu sa iba útržky, ktoré hráč má,
+  - **skladanie:** pri prvom príchode ležia útržky 0,9 s od seba a potom sa za 1,2 s zložia. Pri vypnutých animáciách je fotografia hneď celá,
+  - **preskúmanie:**
+    - tlačidlá + a − (48 px, kroky 1×, 1,5×, 2×, 3×),
+    - ťuknutie priblíži na 2× v mieste ťuknutia, ďalšie vráti späť,
+    - štipnutie dvoma prstami,
+    - posúvanie priblíženej fotografie s okrajmi,
+  - **„Otočiť“:** prevráti na zadnú stranu s poznámkou pátrača z dát. Pri vypnutých animáciách je otočenie okamžité. Čítačka oznámi stranu,
+  - **náhrada:** ak sa obrázok nenačíta, ukáže sa sépiová plocha s popisom z dát a všetko ďalej funguje.
+- **Nové schválené texty v dátach:** „Otočiť“, „Priblížiť“/„Oddialiť“ (+/− pre čítačku), „Predná/Zadná strana fotografie“, „Pokračovať v pátraní“.
+- **Engine** (`engine/finale.ts`):
+  - `leaveFinaleChest` vedie na fotografiu,
+  - nové `markFinalePhotoAssembled` a `leaveFinalePhoto`,
+  - prevod: záverečná obrazovka po truhlici z B4b (bez `finale-photo-seen`) sa vráti k fotografii. Záloha `…-backup-before-finale` iba ak ešte neexistuje. Prevody z B4a a B4b platia ďalej.
+- **Dokumenty:** obrázok je zapísaný v `docs/MEDIA-LICENCIE.md` (vlastná práca, dočasný). V `docs/KONTROLA-PRED-VYDANIM.md` pribudla položka „nahradiť dočasnú fotografiu skutočnou“.
+
+**Test (mimo projektu, necommitnutý):** pred zmenou 10 chýb, po zmene **21 z 21 OK**. Overuje:
+- celú kapitolu so skóre 1010 a poradím `… finaleGuardian|10 → finaleChest|10 → finalePhoto|10 → finish|10`,
+- všetky štyri útržky práve raz,
+- F5 po každom kroku a F5 na fotografii (už zložená),
+- 4× „Pokračovať v pátraní“,
+- dáta (nové texty, popis obrázka, zadná strana) a súbor obrázka (86 kB),
+- staré uloženia: začiatok, uprostred, na Strážcovi, v truhlici, dočasná záverečná obrazovka z B4b (→ fotografia, záloha) aj z B4a (→ truhlica), záver po fotografii.
+
+**Upravené staré testy** na nové poradie: B3b 26/26, B4a 20/20, B4b 26/26. Ostatné: texty 37/37, B3a 65/65, kresba kľúča 54/54, nápovedy 37/37.
+
+**V prehliadači na dev serveri (360 px; aj `?bez3d` a vypnuté animácie):** 17 z 17 OK.
+- štyri útržky z jedného obrázka, najprv od seba, potom zložené (pri vypnutých animáciách hneď celé, 0 bežiacich animácií),
+- popis pre čítačku z dát,
+- tlačidlá aspoň 44 px, bez vodorovného posúvania,
+- + a − (1,5× → 2× → 1×), ťuknutie (2× → 1×),
+- zadná strana a oznámenie pre čítačku,
+- otočenie bez prechodu pri vypnutých animáciách,
+- F5 ukáže hneď celú fotografiu,
+- nenačítaný obrázok → náhrada,
+- pokračovanie na záver, F5 tam ostane, skóre 1010.
+
+Snímky: útržky, zložená fotografia, priblíženie, zadná strana, náhrada.
+
+**Chyby počas práce:**
+- Lint našiel zbytočné nastavenie stavu v efekte. Odstránené: pri vypnutých animáciách je fotografia hneď celá aj bez neho.
+- Dve chyby boli v teste (pomocná funkcia a kontrola otočenia sledovala dĺžku prechodu namiesto toho, či prechod beží). Opravené v teste, kód hry to nebol.
+
+**Neoverené:** štipnutie dvoma prstami na skutočnom dotykovom displeji. Prehliadač v teste ho nevie verne napodobniť.
+
+**Zmenené súbory:**
+- `types/game.ts`, `data/chapter-one/finale.ts`
+- `engine/finale.ts`
+- `components/screens/FinalePhotoScreen.tsx` (nový), `app/page.tsx`
+- `public/images/finale/historicka-fotografia.jpg` (nový)
+- `docs/MEDIA-LICENCIE.md`, `docs/KONTROLA-PRED-VYDANIM.md`, `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** bez chýb.
+
+**Ďalší krok:** B6 (zadanie názvu miesta a karta „Ďalšie miesto“) alebo B4c (3D truhlica), až po potvrdení.

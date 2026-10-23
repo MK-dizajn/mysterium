@@ -173,6 +173,7 @@ export type GameScreen =
   | "actChest"
   | "finaleGuardian"
   | "finaleChest"
+  | "finalePhoto"
   | "finish"
   | "artifact"
   | "inventory"
@@ -387,6 +388,14 @@ export type FinalePhoto = {
   frontDescription: string;
   /** Text na zadnej strane vrátane názvu ďalšieho miesta. */
   backLines: string[];
+  turnLabel: string;
+  /** Tlačidlá + a − (popis pre čítačku). */
+  zoomInLabel: string;
+  zoomOutLabel: string;
+  /** Oznámenie strany pre čítačku po otočení. */
+  frontSideLabel: string;
+  backSideLabel: string;
+  continueLabel: string;
 };
 
 /** Zadanie názvu ďalšieho miesta a karta „Ďalšie miesto“. */

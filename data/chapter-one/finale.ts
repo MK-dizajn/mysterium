@@ -40,7 +40,8 @@ export const chapterOneFinale: ChapterFinale = {
   },
 
   photo: {
-    // Dočasný obrázok sa doplní v kroku B5, neskôr ho nahradí historická fotografia.
+    // Dočasný sépiový obrázok (vlastná kresba); nahradí ho historická fotografia
+    // v pomere 4 : 3 – stačí vymeniť súbor alebo cestu, kód netreba meniť.
     imageSrc: "/images/finale/historicka-fotografia.jpg",
     imageAlt: "Stará sépiová fotografia mesta",
     fragmentIds: [
@@ -58,6 +59,12 @@ export const chapterOneFinale: ChapterFinale = {
       "Miesto: Slovenské národné divadlo",
       "— pátrač",
     ],
+    turnLabel: "Otočiť",
+    zoomInLabel: "Priblížiť",
+    zoomOutLabel: "Oddialiť",
+    frontSideLabel: "Predná strana fotografie",
+    backSideLabel: "Zadná strana fotografie",
+    continueLabel: "Pokračovať v pátraní",
   },
 
   nextPlace: {

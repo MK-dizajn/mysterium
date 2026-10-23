@@ -22,6 +22,7 @@ Sem sa zapisuje každý obrázok, zvuk, hudba, hlas a video použité v hre. Hra
 | `public/sounds/puzzle-success.mp3` | – (súbor je prázdny, 0 B) | – | – | treba vytvoriť |
 | `public/sounds/button-click.mp3` | – (súbor chýba) | – | – | treba vytvoriť |
 | `public/sounds/digit-found.mp3` | – (súbor chýba) | – | – | treba vytvoriť – krátky zvuk po nájdení číslice na predmete (krok B1b-2) |
+| `public/images/finale/historicka-fotografia.jpg` | vlastná kresba v kóde (SVG), prevedená v prehliadači na JPG | vlastná práca projektu, bez licencie tretej strany | 24. 10. 2026 | **dočasný obrázok** (krok B5): sépiová „stará fotografia“ budovy s kolonádou na námestí, so zrnom a vinetáciou. Pred vydaním ho nahradí skutočná historická fotografia (pomer 4 : 3) – pri nej zapísať zdroj a licenciu. |
 
 Obrázky predmetov na obrazovke „Prezrieť“ (napríklad žetón v `components/items/TokenArt.tsx`) sú kreslené priamo v kóde (SVG a CSS). Sú to vlastná práca projektu, nepotrebujú licenciu tretej strany.
 

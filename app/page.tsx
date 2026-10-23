@@ -11,6 +11,7 @@ import { PuzzleFlow } from "../components/game/PuzzleFlow";
 import { ActTransitionScreen } from "../components/screens/ActTransitionScreen";
 import { FinaleChestScreen } from "../components/screens/FinaleChestScreen";
 import { FinaleGuardianScreen } from "../components/screens/FinaleGuardianScreen";
+import { FinalePhotoScreen } from "../components/screens/FinalePhotoScreen";
 import { FinishScreen } from "../components/screens/FinishScreen";
 import { IntroScreen } from "../components/screens/IntroScreen";
 import { LandingScreen } from "../components/screens/LandingScreen";
@@ -28,10 +29,13 @@ import {
   getActTransition,
   getCodeItemInfo,
   getSceneCodeItemId,
+  FINALE_PHOTO_ASSEMBLED_FLAG,
   insertFinaleKey,
   leaveFinaleChest,
   leaveFinaleGuardian,
+  leaveFinalePhoto,
   markCodeDigitFound,
+  markFinalePhotoAssembled,
   openFinaleChest,
   revealHint,
   solvePuzzle,
@@ -457,6 +461,36 @@ export default function Home() {
               )
             }
             onInspectItem={setInspectedItemId}
+          />
+        </GameLayout>
+      );
+    }
+
+    if (gameState.screen === "finalePhoto" && currentChapter.finale) {
+      return (
+        <GameLayout
+          gameState={gameState}
+          totalArtifacts={totalArtifacts}
+          onOpenInventory={openInventory}
+          onOpenArtifacts={openArtifacts}
+          onOpenQuests={openQuests}
+        >
+          <FinalePhotoScreen
+            photo={currentChapter.finale.photo}
+            ownedFragmentIds={gameState.inventory.map((item) => item.id)}
+            isAssembled={Boolean(
+              gameState.flags[FINALE_PHOTO_ASSEMBLED_FLAG]
+            )}
+            onAssembled={() =>
+              setGameState((currentState) =>
+                markFinalePhotoAssembled(currentChapter, currentState)
+              )
+            }
+            onContinue={() =>
+              setGameState((currentState) =>
+                leaveFinalePhoto(currentChapter, currentState)
+              )
+            }
           />
         </GameLayout>
       );

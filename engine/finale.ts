@@ -11,6 +11,10 @@ import { getActLockCodes } from "./gameProgress";
 /** Hráč vstúpil do finále (obrazovka Strážcu); bez neho ide o starú dohranú hru. */
 export const FINALE_STARTED_FLAG = "finale-started";
 export const FINALE_KEY_INSERTED_FLAG = "finale-key-inserted";
+/** Útržky sa už raz zložili – po F5 sa ukáže hneď celá fotografia. */
+export const FINALE_PHOTO_ASSEMBLED_FLAG = "finale-photo-assembled";
+/** Hráč odišiel od fotografie ďalej. */
+export const FINALE_PHOTO_SEEN_FLAG = "finale-photo-seen";
 export const FINALE_CHEST_OPENED_FLAG = "finale-chest-opened";
 export const FINALE_PLACE_SOLVED_FLAG = "finale-place-solved";
 
@@ -51,10 +55,7 @@ export function leaveFinaleGuardian(
   };
 }
 
-/**
- * Odchod od otvorenej truhlice po prevzatí štvrtého útržku. Dočasne vedie
- * na záver kapitoly, kým pribudne fotografia (krok B5).
- */
+/** Odchod od otvorenej truhlice po prevzatí štvrtého útržku k fotografii. */
 export function leaveFinaleChest(
   _chapter: Chapter,
   gameState: GameState
@@ -68,6 +69,39 @@ export function leaveFinaleChest(
 
   return {
     ...gameState,
+    screen: "finalePhoto",
+  };
+}
+
+/** Zapíše, že sa útržky zložili (skladanie sa prehrá iba pri prvom príchode). */
+export function markFinalePhotoAssembled(
+  _chapter: Chapter,
+  gameState: GameState
+): GameState {
+  if (
+    gameState.screen !== "finalePhoto" ||
+    gameState.flags[FINALE_PHOTO_ASSEMBLED_FLAG]
+  ) {
+    return gameState;
+  }
+
+  return setFlag(gameState, FINALE_PHOTO_ASSEMBLED_FLAG);
+}
+
+/**
+ * Odchod od fotografie. Dočasne vedie na záver kapitoly, kým pribudne
+ * zadanie ďalšieho miesta (krok B6).
+ */
+export function leaveFinalePhoto(
+  _chapter: Chapter,
+  gameState: GameState
+): GameState {
+  if (gameState.screen !== "finalePhoto") {
+    return gameState;
+  }
+
+  return {
+    ...setFlag(gameState, FINALE_PHOTO_SEEN_FLAG),
     screen: "finish",
   };
 }
@@ -81,7 +115,9 @@ const REPLACED_ITEM_IDS = ["chapter-two-map-fragment"];
  *   Strážcu, dostane odmenu konca posledného aktu (iba ak chýba)
  *   a nahradené predmety sa odstránia,
  * - hra, ktorá prešla dočasným finále bez truhlice (krok B4a), sa vráti
- *   k neotvorenej truhlici.
+ *   k neotvorenej truhlici,
+ * - hra, ktorá po truhlici skončila bez fotografie (krok B4b), sa vráti
+ *   k fotografii.
  */
 export function migrateFinishedSaveToFinale(
   chapter: Chapter,
@@ -92,9 +128,13 @@ export function migrateFinishedSaveToFinale(
   }
 
   if (gameState.flags[FINALE_STARTED_FLAG]) {
-    return gameState.flags[FINALE_CHEST_OPENED_FLAG]
+    if (!gameState.flags[FINALE_CHEST_OPENED_FLAG]) {
+      return { ...gameState, screen: "finaleChest" };
+    }
+
+    return gameState.flags[FINALE_PHOTO_SEEN_FLAG]
       ? gameState
-      : { ...gameState, screen: "finaleChest" };
+      : { ...gameState, screen: "finalePhoto" };
   }
 
   const lastAct = chapter.acts[chapter.acts.length - 1];
