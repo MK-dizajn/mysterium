@@ -2139,3 +2139,65 @@ Prvý beh hlásil jednu chybu v teste (nadpis karty je veľkými písmenami). Te
 **Lint:** bez chýb.
 
 **Ďalší krok:** B4b (truhlica v 2D), až po potvrdení.
+
+---
+
+## 24. 10. 2026 – Krok 58 (krok B4b): Truhlica s tromi zámkami (2D)
+
+**Čo sa urobilo:**
+- **Priebeh:** Strážca → „Otvoriť truhlicu“ alebo „Preskočiť“ → **Truhlica starého pátrača** → zámky I, II, III → „Vložiť Zlatý kľúč“ → veko sa otvorí, štvrtý útržok → „Prijať útržok a pokračovať“ → dočasne záverečná obrazovka (kým pribudne fotografia v B5).
+- **Obrazovka** (`components/screens/FinaleChestScreen.tsx`, nová):
+  - **truhlica:** existujúca 2D kresba (`ChestStage`, `ChestLid`, `ChestBody`, svetlo a hmla po otvorení). Na prednej strane sú štítky zámkov I, II, III so stavom 🔒/🔓 a v strede kľúčová dierka, do ktorej sa zasunie Zlatý kľúč (kresba z kroku 7),
+  - **zámky:** riadky „Zámok I/II/III“ po troch číselníkoch, pod zámkom na rade „Odomknúť zámok“. Odomknutý zámok ukazuje ✓, nie číslice, takže kódy sa nikde nezobrazujú. Zámky, ktoré nie sú na rade, sú stlmené a nedajú sa meniť,
+  - **hlásenia:** „Zámok sa ani nepohol. Niektorá číslica nesedí.“ (bez označenia číslice) a „Zámok cvakol. Ďalší čaká.“, čítačka ich prečíta,
+  - **kontrola kódu** je iba v engine (`unlockFinaleLock`),
+  - **vloženie kľúča a otvorenie veka** zapíše engine jedným ťuknutím (`insertFinaleKey` a `openFinaleChest`), animácia je iba vizuálna,
+  - **Zápisník kódov** je priamo pod zámkami. Pri každej nenájdenej číslici je tlačidlo „Prezrieť“, ktoré otvorí predmet nad truhlicou. Čítačka hlási „Prezrieť: názov predmetu“.
+- **Číselník** (`components/ui/chest/ChestDial.tsx`): šípky aj číslica 44 × 44 px, ťuknutie na číslicu ju zvýši, popis pre čítačku „Zámok I, číslica 1: 3“. Dva staré nevyužité súbory (`ChestCodePanel`, `ChestCode`) dostali popis, aby prešla kontrola typov.
+- **Zápisník kódov** (`components/ui/CodeNotebook.tsx`, `engine/codeNotebook.ts`): voliteľné tlačidlá „Prezrieť“ (iba pri truhlici, v Inventári bez zmeny) a názov predmetu v údajoch miesta.
+- **Nové texty v dátach** (schválené): „Odomknúť zámok“, „Prijať útržok a pokračovať“, „odomknutý“/„zamknutý“.
+- **Engine** (`engine/finale.ts`): `leaveFinaleGuardian` vedie na truhlicu, nové `leaveFinaleChest` (iba po otvorení truhlice).
+- **Prevod uložení:** hra z dočasnej záverečnej obrazovky z B4a (príznak finále, truhlica neotvorená) sa vráti k truhlici. Záloha `…-backup-before-finale` sa zapíše iba ak ešte neexistuje. Prevod z B4a (stará záverečná obrazovka → Strážca) platí ďalej.
+- **Vypnuté animácie** (`app/globals.css`, iba trieda `finale-chest`): veko je hneď otvorené a nič sa nehýbe. Hmla, svetlo a častice sa vtedy vôbec nevykreslia.
+
+**Test (mimo projektu, necommitnutý):** pred zmenou 9 chýb, po zmene **26 z 26 OK**. Overuje:
+- celú kapitolu so skóre 1010 a poradím `… actTransition|10 → finaleGuardian|10 → finaleChest|10 → finish|10`,
+- F5 po každom kroku (aj po každom zámku a po otvorení),
+- zlý kód: stav bez zmeny, výsledok iba „wrong“, text bez číslic,
+- zámky II a III mimo poradia, kľúč pred zámkami, odchod pred otvorením,
+- F5 po zámku I,
+- 4× „Vložiť Zlatý kľúč“ a 4× „Prijať útržok“ (útržok raz),
+- nové texty,
+- staré uloženia: začiatok, scéna 5, Strážca, dočasná záverečná obrazovka z B4a (prevod, záloha, existujúca záloha sa neprepíše), záver po truhlici, stará záverečná obrazovka spred finále.
+
+**Upravené testy:**
+- test z B3b (podľa zadania): nové poradie obrazoviek, Strážca po konci aktu III, prevod starej záverečnej obrazovky, štvrtý útržok raz; 26 z 26,
+- test z B4a: zo Strážcu sa ide na truhlicu; 20 z 20.
+
+Ostatné testy: texty 37/37, B3a 65/65, kresba kľúča 54/54, nápovedy 37/37.
+
+**V prehliadači na dev serveri (360 px; aj `?bez3d` a vypnuté animácie):** 17 z 17 OK.
+- kódy sa nezobrazujú,
+- všetky tlačidlá aspoň 44 × 44 px, bez vodorovného posúvania,
+- zlý kód, správny kód I, F5 so zámkom I,
+- „Prezrieť“ zo zápisníka a návrat k truhlici,
+- zámky II a III, kľúč, veko, štvrtý útržok raz,
+- F5 po otvorení,
+- pokračovanie na záver,
+- pri vypnutých animáciách je útržok hneď viditeľný a beží 0 animácií.
+
+Snímky: truhlica, zlý kód, zápisník, kľúč a veko, otvorená truhlica.
+
+**Zmenené súbory:**
+- `types/game.ts`, `data/chapter-one/finale.ts`
+- `engine/finale.ts`, `engine/codeNotebook.ts`
+- `components/screens/FinaleChestScreen.tsx` (nový)
+- `components/ui/chest/ChestDial.tsx`, `ChestCodePanel.tsx`, `ChestCode.tsx`, `components/ui/CodeNotebook.tsx`
+- `app/page.tsx`, `app/globals.css`
+- `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** bez chýb.
+
+**Ďalší krok:** B4c (3D truhlica) alebo B5 (fotografia) podľa plánu, až po potvrdení.

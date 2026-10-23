@@ -22,9 +22,13 @@ export const chapterOneFinale: ChapterFinale = {
     keyItemId: "golden-pressburg-key-complete",
     wrongCodeText: "Zámok sa ani nepohol. Niektorá číslica nesedí.",
     lockOpenedText: "Zámok cvakol. Ďalší čaká.",
+    unlockLabel: "Odomknúť zámok",
+    lockOpenLabel: "odomknutý",
+    lockClosedLabel: "zamknutý",
     insertKeyLabel: "Vložiť Zlatý kľúč",
     openedText:
       "Veko sa pomaly dvíha. Vnútri leží posledný útržok fotografie.",
+    continueLabel: "Prijať útržok a pokračovať",
     reward: {
       id: "torn-photo-fragment-chest",
       title: "Štvrtý útržok fotografie",

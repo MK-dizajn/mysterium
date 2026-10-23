@@ -41,6 +41,7 @@ export function ChestCode({
       <div className="relative flex gap-1">
         <ChestDial
           value={firstDigit}
+          label={`${label}, číslica 1`}
           disabled={disabled}
           onChange={(digit) =>
             updateDigit("first", digit)
@@ -49,6 +50,7 @@ export function ChestCode({
 
         <ChestDial
           value={secondDigit}
+          label={`${label}, číslica 2`}
           disabled={disabled}
           onChange={(digit) =>
             updateDigit("second", digit)

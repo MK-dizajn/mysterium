@@ -172,6 +172,7 @@ export type GameScreen =
   | "actTransition"
   | "actChest"
   | "finaleGuardian"
+  | "finaleChest"
   | "finish"
   | "artifact"
   | "inventory"
@@ -362,8 +363,15 @@ export type FinaleChest = {
   keyItemId: string;
   wrongCodeText: string;
   lockOpenedText: string;
+  /** Tlačidlo pod zámkom, ktorý je na rade. */
+  unlockLabel: string;
+  /** Stav zámku pre čítačku. */
+  lockOpenLabel: string;
+  lockClosedLabel: string;
   insertKeyLabel: string;
   openedText: string;
+  /** Tlačidlo po prevzatí štvrtého útržku. */
+  continueLabel: string;
   /** Štvrtý útržok fotografie (pridá sa iba raz). */
   reward: InventoryItem;
 };

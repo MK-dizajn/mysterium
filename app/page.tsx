@@ -9,6 +9,7 @@ import { NpcFlow } from "../components/game/NpcFlow";
 import { GameLayout } from "../components/layout/GameLayout";
 import { PuzzleFlow } from "../components/game/PuzzleFlow";
 import { ActTransitionScreen } from "../components/screens/ActTransitionScreen";
+import { FinaleChestScreen } from "../components/screens/FinaleChestScreen";
 import { FinaleGuardianScreen } from "../components/screens/FinaleGuardianScreen";
 import { FinishScreen } from "../components/screens/FinishScreen";
 import { IntroScreen } from "../components/screens/IntroScreen";
@@ -27,11 +28,15 @@ import {
   getActTransition,
   getCodeItemInfo,
   getSceneCodeItemId,
+  insertFinaleKey,
+  leaveFinaleChest,
   leaveFinaleGuardian,
   markCodeDigitFound,
+  openFinaleChest,
   revealHint,
   solvePuzzle,
   talkToNpc,
+  unlockFinaleLock,
 } from "../engine";
 import { useGameEngine } from "../hooks/useGameEngine";
 import type { Artifact, GameScreen } from "../types/game";
@@ -406,6 +411,52 @@ export default function Home() {
                 leaveFinaleGuardian(currentChapter, currentState)
               )
             }
+          />
+        </GameLayout>
+      );
+    }
+
+    if (gameState.screen === "finaleChest" && currentChapter.finale) {
+      return (
+        <GameLayout
+          gameState={gameState}
+          totalArtifacts={totalArtifacts}
+          onOpenInventory={openInventory}
+          onOpenArtifacts={openArtifacts}
+          onOpenQuests={openQuests}
+        >
+          <FinaleChestScreen
+            chapter={currentChapter}
+            gameState={gameState}
+            onUnlock={(actId, digits) => {
+              const unlock = unlockFinaleLock(
+                currentChapter,
+                gameState,
+                actId,
+                digits
+              );
+
+              if (unlock.gameState !== gameState) {
+                setGameState(unlock.gameState);
+              }
+
+              return unlock.result;
+            }}
+            onOpenChest={() =>
+              setGameState(
+                (currentState) =>
+                  openFinaleChest(
+                    currentChapter,
+                    insertFinaleKey(currentChapter, currentState).gameState
+                  ).gameState
+              )
+            }
+            onContinue={() =>
+              setGameState((currentState) =>
+                leaveFinaleChest(currentChapter, currentState)
+              )
+            }
+            onInspectItem={setInspectedItemId}
           />
         </GameLayout>
       );

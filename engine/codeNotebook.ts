@@ -9,6 +9,8 @@ import { getActLockEvidence } from "./gameProgress";
 
 export type CodeNotebookSlot = {
   itemId: string;
+  /** Názov predmetu (napríklad pre tlačidlo „Prezrieť“ v čítačke). */
+  itemTitle: string;
   /** Nájdená číslica, alebo null, ak ju hráč zatiaľ nenašiel. */
   digit: string | null;
   /** Predmet má obrazovku „Prezrieť“, na ktorej sa číslica hľadá. */
@@ -86,6 +88,7 @@ export function getCodeNotebook(
     lockLabel: act.lockLabel,
     slots: getActLockEvidence(chapter, act).map((item) => ({
       itemId: item.id,
+      itemTitle: item.title,
       digit: isCodeDigitFound(gameState, item)
         ? (item.secretCode ?? null)
         : null,

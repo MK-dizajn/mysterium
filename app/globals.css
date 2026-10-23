@@ -940,6 +940,17 @@ body {
   .chest-stage-glow {
     transition: none;
   }
+
+  /* Truhlica vo finále: pri vypnutých animáciách je veko hneď otvorené a nič sa nehýbe. */
+  .finale-chest *,
+  .finale-chest *::before,
+  .finale-chest *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0ms !important;
+    transition-delay: 0ms !important;
+  }
 }
 /* -------------------------------------------------------------------------- */
 /* Journal Reveal                                                             */

@@ -3,9 +3,11 @@ import { SectionCard } from "./SectionCard";
 
 type CodeNotebookProps = {
   locks: CodeNotebookLock[];
+  /** Na obrazovke truhlice: pri nenájdenej číslici tlačidlo „Prezrieť“. */
+  onInspectItem?: (itemId: string) => void;
 };
 
-export function CodeNotebook({ locks }: CodeNotebookProps) {
+export function CodeNotebook({ locks, onInspectItem }: CodeNotebookProps) {
   return (
     <SectionCard
       icon={
@@ -38,24 +40,41 @@ export function CodeNotebook({ locks }: CodeNotebookProps) {
 
             <div className="flex gap-2">
               {lock.slots.map((slot, slotIndex) => (
-                <span
+                <div
                   key={slot.itemId}
-                  className={`flex h-12 w-10 items-center justify-center rounded-xl border font-mono text-2xl font-black ${
-                    slot.digit === null
-                      ? "border-dashed border-slate-600 bg-slate-950/60 text-slate-600"
-                      : "border-amber-300/40 bg-amber-400/10 text-amber-100"
-                  }`}
+                  className="flex flex-col items-center gap-1.5"
                 >
-                  <span aria-hidden="true">
-                    {slot.digit ?? "·"}
+                  <span
+                    className={`flex h-12 w-10 items-center justify-center rounded-xl border font-mono text-2xl font-black ${
+                      slot.digit === null
+                        ? "border-dashed border-slate-600 bg-slate-950/60 text-slate-600"
+                        : "border-amber-300/40 bg-amber-400/10 text-amber-100"
+                    }`}
+                  >
+                    <span aria-hidden="true">
+                      {slot.digit ?? "·"}
+                    </span>
+
+                    <span className="sr-only">
+                      {`Číslica ${slotIndex + 1}: ${
+                        slot.digit ?? "zatiaľ nenájdená"
+                      }`}
+                    </span>
                   </span>
 
-                  <span className="sr-only">
-                    {`Číslica ${slotIndex + 1}: ${
-                      slot.digit ?? "zatiaľ nenájdená"
-                    }`}
-                  </span>
-                </span>
+                  {onInspectItem &&
+                    slot.digit === null &&
+                    slot.isInspectable && (
+                      <button
+                        type="button"
+                        onClick={() => onInspectItem(slot.itemId)}
+                        aria-label={`Prezrieť: ${slot.itemTitle}`}
+                        className="min-h-11 rounded-xl border border-amber-300/30 bg-slate-950/70 px-2 text-xs font-bold text-amber-100 transition hover:border-amber-300/60 motion-reduce:transition-none"
+                      >
+                        Prezrieť
+                      </button>
+                    )}
+                </div>
               ))}
             </div>
           </div>

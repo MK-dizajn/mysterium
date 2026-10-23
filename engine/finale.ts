@@ -36,15 +36,33 @@ export function startFinale(gameState: GameState): GameState {
   };
 }
 
-/**
- * Odchod z obrazovky Strážcu („Otvoriť truhlicu“ aj „Preskočiť“).
- * Dočasne vedie na záver kapitoly, kým pribudne truhlica (krok B4b).
- */
+/** Odchod z obrazovky Strážcu („Otvoriť truhlicu“ aj „Preskočiť“) k truhlici. */
 export function leaveFinaleGuardian(
   _chapter: Chapter,
   gameState: GameState
 ): GameState {
   if (gameState.screen !== "finaleGuardian") {
+    return gameState;
+  }
+
+  return {
+    ...gameState,
+    screen: "finaleChest",
+  };
+}
+
+/**
+ * Odchod od otvorenej truhlice po prevzatí štvrtého útržku. Dočasne vedie
+ * na záver kapitoly, kým pribudne fotografia (krok B5).
+ */
+export function leaveFinaleChest(
+  _chapter: Chapter,
+  gameState: GameState
+): GameState {
+  if (
+    gameState.screen !== "finaleChest" ||
+    !gameState.flags[FINALE_CHEST_OPENED_FLAG]
+  ) {
     return gameState;
   }
 
@@ -58,20 +76,25 @@ export function leaveFinaleGuardian(
 const REPLACED_ITEM_IDS = ["chapter-two-map-fragment"];
 
 /**
- * Hra dohraná pred finále (záverečná obrazovka bez príznaku finále)
- * sa presunie na obrazovku Strážcu: dostane odmenu konca posledného
- * aktu (iba ak chýba) a nahradené predmety sa odstránia.
+ * Prevod uložení na záverečnej obrazovke:
+ * - hra dohraná pred finále (bez príznaku finále) sa presunie na obrazovku
+ *   Strážcu, dostane odmenu konca posledného aktu (iba ak chýba)
+ *   a nahradené predmety sa odstránia,
+ * - hra, ktorá prešla dočasným finále bez truhlice (krok B4a), sa vráti
+ *   k neotvorenej truhlici.
  */
 export function migrateFinishedSaveToFinale(
   chapter: Chapter,
   gameState: GameState
 ): GameState {
-  if (
-    gameState.screen !== "finish" ||
-    !chapter.finale ||
-    gameState.flags[FINALE_STARTED_FLAG]
-  ) {
+  if (gameState.screen !== "finish" || !chapter.finale) {
     return gameState;
+  }
+
+  if (gameState.flags[FINALE_STARTED_FLAG]) {
+    return gameState.flags[FINALE_CHEST_OPENED_FLAG]
+      ? gameState
+      : { ...gameState, screen: "finaleChest" };
   }
 
   const lastAct = chapter.acts[chapter.acts.length - 1];

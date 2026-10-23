@@ -87,6 +87,7 @@ export function ChestCodePanel({
                       <ChestDial
                         key={`chest-digit-${codeIndex}-${digitIndex}`}
                         value={Number(digit)}
+                        label={`Zámok ${pairLabels[codeIndex] ?? codeIndex + 1}, číslica ${digitIndex + 1}`}
                         disabled={isUnlocked}
                         onChange={(nextDigit) =>
                           updateDigit(
