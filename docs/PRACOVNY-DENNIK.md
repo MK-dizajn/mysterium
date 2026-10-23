@@ -1902,3 +1902,33 @@ Najmenšia vzdialenosť stredov ťukacích plôch nameraná v prehliadači:
 **Lint:** bez chýb.
 
 **Ďalší krok:** čakám na potvrdenie kroku B3b.
+
+---
+
+## 23. 10. 2026 – Záver dňa
+
+**Hotové dnes:**
+- **B1b-3b** – počítacie predmety (mapa, pečať, tri zuby kľúča) v 3D aj 2D (krok 49).
+- **Ťukanie na detaily** – nový riadok pod predmetom, rozsvietenie prvkov, nápovedy o ťukaní (krok 50).
+- **B3-0** – Inventár, zápisník kódov a Artefakty dostupné aj na záverečnej obrazovke (krok 51).
+- **B3a** – dáta finále, koniec aktu III a logika finále v engine, zatiaľ bez obrazoviek (krok 52).
+- **Krok 7** – kresba Zlatého kľúča: tri časti brady, zložený kľúč a tieňový obrys (krok 53).
+- Rozbory finále a kresby kľúča s rozhodnutiami používateľa a nový dokument `docs/KONTROLA-PRED-VYDANIM.md`.
+
+**Ukončenie:** vývojový server (`npm run dev`) zastavený, všetko commitnuté, nič sa nepushovalo.
+
+**Najbližšie kroky v tomto poradí:**
+1. Nápovedy v troch stupňoch.
+2. B3b – po scéne 10 koniec aktu III (zloženie kľúča, tretí útržok) a prechod do finále.
+3. Texty finále do dát.
+4. B4a – obrazovka Strážcu (miesto pre video, „Preskočiť“).
+5. B4b – truhlica v 2D: tri zámky v poradí, Zápisník kódov na obrazovke truhlice, vloženie kľúča.
+6. B4c – 3D truhlica.
+7. B5 – fotografia zo štyroch útržkov (obrázkový súbor rozrezaný na útržky).
+8. B6 – zadanie názvu miesta a karta „Ďalšie miesto“.
+9. B7 – záverečný text kapitoly z dát.
+10. Vodidlá na ďalšie miesto pri odmenách a tlačidlo „Ukáž cestu“.
+
+**Otvorené otázky pre používateľa:**
+- nápoveda pri zuboch („…na hranách zubu“) a popis „Zárez“ pre okienka (krok 53),
+- riadok pod predmetom v 2D verzii (krok 50).
