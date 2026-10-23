@@ -6,6 +6,7 @@ import { ArtifactFlow } from "../components/game/ArtifactFlow";
 import { CollectionFlow } from "../components/game/CollectionFlow";
 import { HistoryFlow } from "../components/game/HistoryFlow";
 import { NpcFlow } from "../components/game/NpcFlow";
+import { GameLayout } from "../components/layout/GameLayout";
 import { PuzzleFlow } from "../components/game/PuzzleFlow";
 import { ActTransitionScreen } from "../components/screens/ActTransitionScreen";
 import { FinishScreen } from "../components/screens/FinishScreen";
@@ -376,8 +377,19 @@ export default function Home() {
       );
     }
 
+    // Inventár, zápisník kódov a Artefakty ostávajú dostupné aj po konci kapitoly.
     if (gameState.screen === "finish") {
-      return <FinishScreen onRestart={startNewGame} />;
+      return (
+        <GameLayout
+          gameState={gameState}
+          totalArtifacts={totalArtifacts}
+          onOpenInventory={openInventory}
+          onOpenArtifacts={openArtifacts}
+          onOpenQuests={openQuests}
+        >
+          <FinishScreen onRestart={startNewGame} />
+        </GameLayout>
+      );
     }
 
     if (

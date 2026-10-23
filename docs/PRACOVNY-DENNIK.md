@@ -1725,3 +1725,60 @@ Používateľ potvrdil, že 3D žetón vyzerá dobre.
 **Lint:** bez chýb.
 
 **Ďalší krok:** potvrdenie návrhov z rozboru (Inventár po konci kapitoly, tvar Zlatého kľúča).
+
+---
+
+## 23. 10. 2026 – Rozbor finále kapitoly (bez zmeny kódu) a rozhodnutia používateľa
+
+**Zistenia:**
+- Po scéne 10 hra ide rovno na záverečnú obrazovku. Akt III nemá koniec. Truhlica, skladanie fotografie ani zadanie miesta neexistujú.
+- Scéna 10 dáva „Zlatý prešporský kľúč“ a „Útržok mapy ďalšieho prípadu“.
+- Žiadny súbor truhlice (`components/ui/chest`, `components/ui/chest-3d`, `ActChestScreen`, `ChestIntroScreen`, `RewardReveal`) hra dnes nepoužíva.
+- **Dá sa znova použiť:**
+  - koliesko `ChestDial` (treba ho zväčšiť na 44 px, dnes má 32 px),
+  - `ChestCodePanel`,
+  - 3D truhlica (treba 3 × 3 okienka a kľúčovú dierku v strede),
+  - 2D truhlica ako záloha,
+  - `ChestIntroScreen` (Strážca),
+  - `RewardReveal` (štvrtý útržok),
+  - `CodeNotebook`,
+  - `Item3DView` (fotografia).
+- **Nahradí sa:** `ChestEvidencePanel` (dvojciferné kódy) nahradí Zápisník kódov priamo na obrazovke truhlice.
+
+**Návrh:** pole `finale` v kapitole (Strážca, truhlica, fotografia, ďalšie miesto, záverečný text) a koniec aktu III (zloženie kľúča, tretí útržok). Postup finále sa uloží do príznakov hry. Kroky: B3-0, B3a, (7), B3b, B4a, B4b, B4c, B5, B6, B7.
+
+**Rozhodnutia používateľa:**
+- Uložená hra na záverečnej obrazovke prejde po zmene do finále (so zálohou uloženia).
+- Zuby kľúča ostanú v Inventári aj po zložení.
+- „Útržok mapy ďalšieho prípadu“ zo scény 10 nahradí štvrtý útržok fotografie. Záverečný text sa upraví.
+- Zámky sa odomykajú v pevnom poradí I, II, III.
+- „Otvoriť v mapách“ otvára Google Mapy.
+- **B5:** fotografia bude obrázkový súbor (zatiaľ dočasný sépiový), zdroj je v dátach. Kód ho rozreže na 4 útržky s roztrhnutými hranami.
+- **Kresba kľúča (krok 7):** návrh schválený, vrátane tieňového obrysu celého kľúča pod zubom po nájdení číslice. Valček na zube a driek zloženého kľúča majú rovnakú hrúbku. Ťukacie plochy aspoň 44 px, ak treba, zub bude v okne väčší. Počty 9, 2 a 7 sa nemenia. Robí sa po B3a a pred B3b.
+
+---
+
+## 23. 10. 2026 – Krok 51 (krok B3-0): Inventár a Artefakty aj po konci kapitoly
+
+**Čo sa urobilo:** záverečná obrazovka má hore ten istý panel ako ostatné obrazovky hry: Úlohy, Inventár (so Zápisníkom kódov a „Prezrieť“) a Artefakty. „Späť“ vráti hráča na záverečnú obrazovku. Funguje to aj po obnovení stránky (F5), lebo hra si to miesto pamätá. Tlačidlo „Hrať kapitolu od začiatku“ ostalo. Texty záverečnej obrazovky sa nemenili (budú v kroku B7).
+
+**Test (v prehliadači, mimo projektu, necommitnutý):** pred zmenou 13 chýb, po zmene 16 z 16 OK, v 3D aj `?bez3d`. Overuje:
+- tlačidlá Inventár a Artefakty na záverečnej obrazovke,
+- otvorenie Zápisníka kódov,
+- prezretie zubu a nájdenie číslice po konci kapitoly (zápisník III: 9 → 92),
+- F5 v Inventári a potom návrat na záverečnú obrazovku,
+- Artefakty a Úlohy a návrat späť.
+
+Prvé behy testu hlásili chyby v samotnom teste (nadpisy sú na obrazovke veľkými písmenami, test otvoril iný zub). Test som opravil. Kód hry to nebol.
+
+**Snímky z prehliadača:** záverečná obrazovka s panelom, Inventár otvorený zo záverečnej obrazovky, Artefakty, návrat na záverečnú obrazovku.
+
+**Zmenené súbory:**
+- `app/page.tsx`
+- `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** bez chýb.
+
+**Ďalší krok:** čakám na potvrdenie kroku B3a (typy, dáta finále a logika enginu bez obrazoviek).
