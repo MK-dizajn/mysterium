@@ -2866,3 +2866,58 @@ Snímky: pred vložením (zelené zámky bez koliesok), kľúč pri dierke, oto�
 **Lint:** zmenené súbory bez chýb. V celom projekte ostávajú staré nálezy v súboroch, ktoré sa nemenili.
 
 **Ďalší krok:** podľa plánu, až po potvrdení.
+
+## 25. 10. 2026 – Krok 68 (krok C3): Upratovanie – test B1b-3b, rozostupy v zápisníku, koncept kapitol
+
+**1. Test B1b-3b (mimo projektu, necommitnutý):**
+- **Príčina 5 trvalých chýb:** test volal kresbu starým spôsobom (`getSvg("front", číslica, …)`), kým kresby sa volajú s jedným balíkom nastavení (`getSvg({ side, digit, …, countPoints, artPart })`). Dostal prázdnu kresbu a napočítal 0 prvkov. Kresby boli v poriadku: pri dnešnom volaní nakreslia presne 8, 6, 9, 2 a 7 prvkov.
+- Opravený jeden riadok volania (vrátane `artPart` pre zuby kľúča): **pred 40 z 45, po 45 z 45**. Test je zaradený medzi stále spúšťané testy.
+
+**2. Zápisník kódov – rozostupy (`components/ui/CodeNotebook.tsx`):**
+- **Kontrola na 360 px pred zmenou:**
+  - štítky „ZÁMOK I/II/III“ boli v Inventári aj na obrazovke truhlice zarovnané a na jeden riadok (`nowrap`), bez vodorovného posúvania,
+  - na obrazovke truhlice však okienka číslic nemali rovnaké rozostupy (60 a 72 px), lebo tlačidlo „Prezrieť“ (64 px) je širšie ako okienko (40 px).
+- **Zmena:**
+  - pri truhlici (keď sú v zápisníku tlačidlá „Prezrieť“) má každé miesto rovnako široký stĺpec (64 px),
+  - okienko aj tlačidlo vyplnia stĺpec,
+  - Inventár (bez tlačidiel) ostáva bez zmeny.
+  - Prvá verzia okienko v stĺpci centrovala, takže sa posunulo o 12 px od začiatku štítku. Opravené: okienko je široké ako stĺpec a začína presne pod štítkom.
+- **Meranie po zmene (360 px):**
+  - Inventár bez zmeny: rozostupy 48 a 48, prvé okienko pod štítkom,
+  - obrazovka truhlice: **rozostupy 72 a 72**, prvé okienko presne pod štítkom (x = 41),
+  - štítky zarovnané a na jeden riadok, tlačidlá 64 × 44 px s neorezaným textom, bez vodorovného posúvania.
+- Snímky: `c3-zapisnik-inventar.png`, `c3-zapisnik-truhlica.png`.
+
+**3. `docs/KONCEPT-KAPITOL.md` zosúladený s dnešným stavom:**
+- Kapitola 2 je po novom „Jedna truhlica na konci kapitoly“: tri zámky v poradí I, II, III, tri číslice z predmetov aktu, kľúč, Zápisník kódov ukazuje chýbajúce číslice.
+- Nové kapitoly:
+  - „Odmena po každej úlohe“ (predmet s vodidlom a ukrytou číslicou, okno „Prezrieť“),
+  - „Koniec aktu“ (krátka scéna bez truhlice, útržok fotografie),
+  - „Finále“ (Strážca, truhlica, fotografia, názov miesta, karta „Ďalšie miesto“, záver).
+- Príklad pri ďalších kapitolách: namiesto útržku mapy historická fotografia a karta „Ďalšie miesto“.
+- Porovnanie s kapitolou I k 25. 10. 2026: nové riadky (truhlica vo finále, predmet po úlohe, konce aktov, finále), stĺpec „Predmet“ v tabuľke úloh **bez číslic kódov**, poznámka o dočasnom ďalšom mieste.
+- **Nič sa nezmazalo bez náhrady:** pôvodné pravidlo „Truhlica po každom akte“ je v novej kapitole „Zmeny konceptu“ s odkazom na koncept zážitku (krok 14) a kroky B1 až B7.
+- Kapitoly sa prečíslovali (pribudli 3 až 5). Žiadny iný dokument sa na ne neodvoláva číslom.
+- Kontrola: údaje porovnané s dátami hry (10 úloh, 3 akty, odmeny aktov, finále), v dokumente nie sú kódy.
+
+**Testy po zmene:**
+- **Node:** B1b-3b 45/45, fyzika otáčania 25/25, B4c-3 24/24, B4c-2 34/34, B4c-1 18/18, C1 63/63, B7 20/20 (celá kapitola, skóre **1010**), B6 32/32, B5 21/21, B4b 26/26, B4a 20/20, B3b 25/25 (aj staré uloženia), texty 37/37, B3a 65/65, kresba kľúča 54/54, nápovedy 37/37.
+- **Prehliadač:** test truhlice B4b (3D aj `?bez3d`, používa zápisník s tlačidlami „Prezrieť“) OK.
+
+**Zistené, nemenené:**
+- **Starý Node test zápisníka z kroku B1b-1 hlási 6 chýb**, rovnako aj na stave pred touto zmenou (aj pred B4c-2 a B4c-3). Predpokladá pravidlo z B1b-1, že predmet bez okna „Prezrieť“ má číslicu nájdenú hneď. Dnes majú okno „Prezrieť“ všetky predmety a číslica sa zapíše až po nájdení (to overuje B1b-3b). Test nebol medzi stále spúšťanými, preto sa to neukázalo. Navrhujem ho v samostatnom malom kroku aktualizovať alebo vyradiť.
+- `docs/KARTY-USLOH.md` a `docs/KONCEPT-ZAZITKU.md` ešte uvádzajú, že `KONCEPT-KAPITOL.md` má „truhlica po každom akte“. To už neplatí; navrhujem tieto poznámky upraviť v samostatnom kroku.
+
+**Chyby počas práce:**
+- Prvé meranie „obrazovky truhlice“ bolo omylom znova v Inventári, lebo hra si po obnovení stránky pamätala Inventár. Opravený skript merania.
+- Do časti „Zmeny konceptu“ som najprv napísal dôvod zmeny, ktorý nie je nikde doložený. Nahradil som ho odkazom na koncept zážitku (krok 14) a kroky B1 až B7.
+
+**Zmenené súbory:**
+- `components/ui/CodeNotebook.tsx` (commit „zápisník“)
+- `docs/KONCEPT-KAPITOL.md`, `docs/PRACOVNY-DENNIK.md` (commit „dokumentácia“)
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** `CodeNotebook.tsx` bez chýb.
+
+**Ďalší krok:** podľa plánu, až po potvrdení (napríklad starý test B1b-1 a poznámky v `KARTY-USLOH.md` a `KONCEPT-ZAZITKU.md`).
