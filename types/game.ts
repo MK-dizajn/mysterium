@@ -389,6 +389,10 @@ export type FinaleChest = {
   /** Nadpis rozbaliteľného bloku s 2D ovládaním pod 3D truhlicou. */
   accessibleControlsTitle: string;
   insertKeyLabel: string;
+  /** Riadok pod 3D truhlicou počas vkladania kľúča a otvárania veka. */
+  keyTurningText: string;
+  /** Riadok pod 3D truhlicou po otvorení. */
+  openedHint: string;
   openedText: string;
   /** Tlačidlo po prevzatí štvrtého útržku. */
   continueLabel: string;

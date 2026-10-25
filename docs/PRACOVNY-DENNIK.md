@@ -2714,3 +2714,93 @@ Snímky: priblíženie, zlý kód, po odomknutí, 2D blok, zámok III, všetko o
 **Lint:** nové a zmenené súbory bez chýb.
 
 **Ďalší krok:** B4c-3 (vloženie Zlatého kľúča a otvorenie veka v 3D), prípadne malý krok s opravou zbytočného kreslenia pri 3D predmetoch, až po potvrdení.
+
+## 25. 10. 2026 – Krok 66 (krok B4c-3): Zlatý kľúč a otvorenie veka v 3D
+
+**Čo sa urobilo:**
+- **Tlačidlo „Vložiť Zlatý kľúč“:** po treťom zámku je nad scénou (54 px) a aj v zbalenom bloku „Ovládanie pre klávesnicu a čítačku“. Obe robia to isté.
+- **Animácia otvárania (3,6 s):**
+  1. priblíženie ku kľúčovej dierke, trochu zboku a zhora (0,7 s),
+  2. Zlatý kľúč priletí a zasunie sa (0,7 s),
+  3. otočí sa o štvrť otáčky (0,6 s),
+  4. pohľad sa oddiali a veko sa plynulo zdvihne, z truhlice vyjde teplé svetlo (žiariace dno, lúč, svetlo vnútri),
+  5. štvrtý útržok vystúpi a ostane sa vznášať nad truhlicou,
+  6. potom text o otvorení, karta útržku a „Prijať útržok a pokračovať“ ako doteraz.
+  - Útržok sa po vystúpení nehýbe, aby plátno v pokoji nekreslilo.
+  - Pod scénou je počas animácie „Kľúč zapadol. Pomaly ho otáčaš…“ a po otvorení „Štvrtý útržok sa vznáša nad truhlicou.“ (aj pre čítačku).
+  - Zvuk otvárania pri zdvihnutí veka.
+- **Preskočenie (tvoja doplnená požiadavka):** ťuknutie na scénu počas animácie ju hneď dokončí. Na klávesnici to isté robí Esc, Enter alebo medzerník.
+- **Zlatý kľúč v 3D** (nový `components/finale/chest3d/ChestKey3D.tsx`): štvorlístková hlava s otvormi a stredom s korunkou, driek s dvoma krúžkami, brada s tromi zubmi (podľa kresby z kroku 7). Iba základné tvary, nič sa nesťahuje.
+- **Štvrtý útržok v 3D** (nový `components/finale/chest3d/PhotoFragment3D.tsx`): papier s roztrhnutými okrajmi a pravý dolný diel historickej fotografie z dát (rovnaký obrázok ako pri skladaní, nič zvonku). Kým sa obrázok nenačíta alebo ak zlyhá, je to sépiový papier.
+- **Spoločný tvar útržkov:** body trhlín sú v novom `components/finale/photoPieces.ts`. Používa ho obrazovka fotografie (`FinalePhotoViewer.tsx`, bez zmeny vzhľadu) aj 3D útržok.
+- **Odomknutý zámok v 3D (tvoje rozhodnutie):** kolieska neukazuje vôbec, ani pred F5, ani po ňom. Je iba zelený s vysunutým oblúkom.
+- **Engine a uloženie sa nemenili:**
+  - jedno ťuknutie zapíše `insertFinaleKey` a `openFinaleChest` (cez `app/page.tsx`, ako doteraz),
+  - útržok je v uložení hneď a práve raz,
+  - opakované ťuknutie nič nepridá (tlačidlo zmizne a obrazovka si pamätá, že kľúč už vložila),
+  - animácia je iba vizuálna.
+- **Vypnuté animácie:** hneď konečný stav (kľúč otočený v dierke, veko otvorené, svetlo, útržok, karta).
+- **F5 s otvorenou truhlicou (aj počas animácie):** hneď konečný stav, bez opakovania animácie.
+- **Po otvorení** sa skryjú štítky zámkov.
+- **2D záloha** (`?bez3d`, chyba WebGL) sa správa ako doteraz.
+- **Nové schválené texty:** `keyTurningText` „Kľúč zapadol. Pomaly ho otáčaš…“, `openedHint` „Štvrtý útržok sa vznáša nad truhlicou.“
+- **Výpočty v `chestZoom.ts`:** časová os otvárania, priblíženie na kľúčovú dierku, pohľad na otvorenú truhlicu (menšia a nižšie, aby sa nad ňu zmestil útržok). Pohľad má po novom aj posun do strany a pootočenie.
+
+**Test (mimo projektu, necommitnutý):** pred zmenou 11 chýb, po zmene **24 z 24 OK**. Overuje:
+- texty,
+- časovú os: začiatok, koniec = konečný stav, najviac 4 s, poradie (priblíženie → zasunutie → otočenie → veko → útržok), plynulo jedným smerom,
+- pohľad bez skokov (celá truhlica → dierka → otvorená truhlica), dierka v strede obrázka a zboku,
+- spoločný tvar útržkov, kľúč s tromi zubmi bez sťahovania, útržok z dát,
+- odomknutý zámok bez koliesok,
+- zapojenie (tlačidlo nad scénou aj v bloku, preskočenie, riadky pod scénou, 2D záloha).
+
+**Test B4c-2** je doplnený o kontrolu „odomknutý zámok v 3D bez koliesok“: 34 z 34.
+
+**V prehliadači na dev serveri (360 px), nový test:** pred zmenou 6 chýb v 3D (`?bez3d` OK).
+- **Po zmene 3D: 18 z 18.**
+  - tlačidlo nad scénou (54 px) aj v bloku,
+  - **4 ťuknutia naraz: útržok v uložení hneď a práve raz**, tlačidlá zmiznú,
+  - počas animácie text o otáčaní a kreslí sa,
+  - po animácii (3,7 s) text, karta, pokračovanie a riadok o útržku, štítky skryté,
+  - **plátno potom nekreslí**,
+  - F5 po otvorení: hneď karta, bez animácie, plátno nekreslí,
+  - **F5 počas animácie:** hneď otvorená truhlica, útržok raz,
+  - **ťuknutie na scénu počas animácie ju dokončí (za 0,2 s)**, útržok raz,
+  - pokračovanie na fotografiu, bez chýb v prehliadači.
+- **Vypnuté animácie: 13 z 13** (hneď otvorené).
+- **`?bez3d` a nefunkčné WebGL:** OK (2D ako doteraz, 4 ťuknutia, útržok raz, F5).
+
+**Všetky doterajšie testy:** B4c-2 34/34, B4c-1 18/18, C1 63/63, B7 20/20 (celá kapitola, skóre **1010**), B6 32/32, B5 21/21, B4b 26/26, B4a 20/20, B3b 25/25 (aj staré uloženia), texty 37/37, B3a 65/65, kresba kľúča 54/54, nápovedy 37/37.
+- **V prehliadači:**
+  - B4c-2 (3D, `?bez3d`) OK,
+  - B4c-1 (3D, vypnuté animácie, `?bez3d`) OK,
+  - B4b (3D, vypnuté animácie, `?bez3d`) OK,
+  - B5 (obrazovka fotografie) OK.
+- **Úprava starých testov B4c-1 a B4b:** na otvorenie čakajú najviac 8 s namiesto pevných 2,6 s, lebo 3D animácia je dlhšia.
+
+Snímky: pred vložením (zelené zámky bez koliesok), kľúč pri dierke, otočený kľúč, zdvíhanie veka so svetlom, otvorená truhlica s útržkom, po F5.
+
+**Výkon (produkčný build):**
+- úvodná stránka 205,9 kB (predtým 204,6 kB, +1,3 kB),
+- pri vstupe na truhlicu pribudne 242,3 kB: 234,4 kB three.js, **7,9 kB truhlica** (predtým 6,5 kB).
+
+**Chyby počas práce:**
+- Pri svetle z truhlice som najprv použil metódu, ktorú svetlo v three.js nemá. Odhalila to kontrola typov ešte pred spustením, opravené.
+- Regex v novom teste nepoznal zápis s typom (`TEETH: [number, number][] = …`). Opravený test.
+- Útržok bol na prvých snímkach malý a nízko, takmer v truhlici. Zväčšený a zdvihnutý vyššie.
+- Staré testy B4c-1 a B4b čakali na otvorenie príliš krátko (pozri vyššie).
+- **Lint celého projektu:** ostávajú staré chyby a upozornenia v súboroch, ktoré sa v tomto kroku nemenili (rovnaké ako v B4c-2).
+
+**Zmenené súbory:**
+- `types/game.ts`, `data/chapter-one/finale.ts`
+- `components/finale/chest3d/Chest3DView.tsx`, `ChestModel3D.tsx`, `chestZoom.ts`
+- `components/finale/chest3d/ChestKey3D.tsx`, `PhotoFragment3D.tsx` (nové)
+- `components/finale/photoPieces.ts` (nový), `components/finale/FinalePhotoViewer.tsx`
+- `components/screens/FinaleChestScreen.tsx`
+- `docs/KONTROLA-PRED-VYDANIM.md`, `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** nové a zmenené súbory bez chýb.
+
+**Ďalší krok:** malý krok s opravou zbytočného kreslenia pri 3D predmetoch v okne „Prezrieť“, alebo ďalší krok podľa plánu, až po potvrdení.

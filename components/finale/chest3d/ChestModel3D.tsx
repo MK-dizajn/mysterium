@@ -2,10 +2,18 @@
 
 import { type ThreeEvent, useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
-import type { Group } from "three";
+import {
+  AdditiveBlending,
+  DoubleSide,
+  type Group,
+  type MeshBasicMaterial,
+  type PointLight,
+} from "three";
 import { CornerPlate, MysteriumEmblem, Rivet } from "../../ui/chest-3d/ChestParts";
-import { getShakeOffset, SHAKE_SEC, stepToward } from "./chestZoom";
+import { ChestKey3D } from "./ChestKey3D";
+import { getShakeOffset, type OpeningFrame, SHAKE_SEC, stepToward } from "./chestZoom";
 import { LockDials3D } from "./LockDials3D";
+import { PhotoFragment3D } from "./PhotoFragment3D";
 
 export type ChestLockState = "closed" | "next" | "open";
 
@@ -152,8 +160,8 @@ function Lock3D({
         />
       </mesh>
 
-      {/* Tri kolieska číselníka */}
-      <LockDials3D digits={digits} reducedMotion={reducedMotion} />
+      {/* Tri kolieska číselníka – odomknutý zámok ich neukazuje (ani po F5) */}
+      {state !== "open" && <LockDials3D digits={digits} reducedMotion={reducedMotion} />}
 
       {/* Oblúk zámku – po odomknutí sa vysunie hore (poloha v snímke) */}
       <group ref={shackleRef}>
@@ -171,18 +179,77 @@ function Lock3D({
   );
 }
 
-/** Zlatý kľúč zasunutý do dierky (zobrazí sa po vložení). */
-function InsertedKey() {
+/** Veko sa otáča okolo zadnej hornej hrany; uhol podľa priebehu otvárania. */
+const LID_OPEN_ANGLE = -1.25;
+
+function ChestLid3D({ readOpening }: { readOpening: () => OpeningFrame }) {
+  const lidRef = useRef<Group>(null);
+
+  useFrame(() => {
+    lidRef.current?.rotation.set(readOpening().lid * LID_OPEN_ANGLE, 0, 0);
+  });
+
   return (
-    <group position={[0, -0.6, 1.16]}>
-      <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 0, 0.17]}>
-        <cylinderGeometry args={[0.035, 0.035, 0.34, 16]} />
-        <meshStandardMaterial color="#e2b54f" roughness={0.25} metalness={0.95} />
+    <group ref={lidRef} position={[0, 0.54, -1.04]}>
+      <mesh position={[0, 0.21, 1.04]}>
+        <boxGeometry args={[3.48, 0.42, 2.08]} />
+        <meshStandardMaterial color={WOOD_RIM} roughness={0.8} metalness={0.05} />
       </mesh>
-      <mesh position={[0, 0, 0.42]}>
-        <torusGeometry args={[0.12, 0.035, 12, 28]} />
-        <meshStandardMaterial color="#e2b54f" roughness={0.25} metalness={0.95} />
+      <mesh position={[0, 0.44, 1.04]}>
+        <boxGeometry args={[3.3, 0.05, 1.9]} />
+        <meshStandardMaterial color={WOOD} roughness={0.85} metalness={0.05} />
       </mesh>
+      <mesh position={[0, 0.03, 2.1]}>
+        <boxGeometry args={[3.5, 0.08, 0.06]} />
+        <meshStandardMaterial color={BRASS} roughness={0.36} metalness={0.82} />
+      </mesh>
+      <MysteriumEmblem position={[0, 0.21, 2.12]} />
+    </group>
+  );
+}
+
+/** Teplé svetlo z otvorenej truhlice: žiariace dno, lúč a svetlo vnútri. */
+function ChestGlow3D({ readOpening }: { readOpening: () => OpeningFrame }) {
+  const groupRef = useRef<Group>(null);
+  const floorRef = useRef<MeshBasicMaterial>(null);
+  const beamRef = useRef<MeshBasicMaterial>(null);
+  const lightRef = useRef<PointLight>(null);
+
+  useFrame(() => {
+    const { light } = readOpening();
+
+    if (groupRef.current) {
+      groupRef.current.visible = light > 0;
+    }
+
+    floorRef.current?.setValues({ opacity: 0.9 * light });
+    beamRef.current?.setValues({ opacity: 0.16 * light });
+
+    if (lightRef.current) {
+      lightRef.current.intensity = 6 * light;
+    }
+  });
+
+  return (
+    <group ref={groupRef} visible={false}>
+      <mesh position={[0, 0.56, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[3.2, 1.85]} />
+        <meshBasicMaterial ref={floorRef} color="#ffd27a" transparent opacity={0} toneMapped={false} />
+      </mesh>
+      <mesh position={[0, 1.35, 0]}>
+        <cylinderGeometry args={[1.5, 1.25, 1.6, 32, 1, true]} />
+        <meshBasicMaterial
+          ref={beamRef}
+          color="#ffe6a8"
+          transparent
+          opacity={0}
+          blending={AdditiveBlending}
+          depthWrite={false}
+          side={DoubleSide}
+          toneMapped={false}
+        />
+      </mesh>
+      <pointLight ref={lightRef} position={[0, 1.1, 0.6]} color="#ffcf70" intensity={0} distance={6} />
     </group>
   );
 }
@@ -195,8 +262,11 @@ type ChestModel3DProps = {
   shakeKeys: number[];
   selectedIndex: number | null;
   onSelectLock: (index: number) => void;
-  isKeyInserted: boolean;
-  isLidOpen: boolean;
+  /** Priebeh vkladania kľúča a otvárania veka (číta sa v snímke). */
+  readOpening: () => OpeningFrame;
+  /** Historická fotografia z dát a ktorý útržok je v truhlici. */
+  fragmentImageSrc: string | undefined;
+  fragmentPieceIndex: number;
   reducedMotion: boolean;
 };
 
@@ -210,8 +280,9 @@ export function ChestModel3D({
   shakeKeys,
   selectedIndex,
   onSelectLock,
-  isKeyInserted,
-  isLidOpen,
+  readOpening,
+  fragmentImageSrc,
+  fragmentPieceIndex,
   reducedMotion,
 }: ChestModel3DProps) {
   return (
@@ -267,7 +338,7 @@ export function ChestModel3D({
         </mesh>
       </group>
 
-      {isKeyInserted && <InsertedKey />}
+      <ChestKey3D readOpening={readOpening} />
 
       {/* Tri zámky */}
       {LOCK_PLACEMENTS.map((placement, index) => (
@@ -287,22 +358,14 @@ export function ChestModel3D({
         </group>
       ))}
 
-      {/* Veko: otáča sa okolo zadnej hornej hrany */}
-      <group position={[0, 0.54, -1.04]} rotation={[isLidOpen ? -1.25 : 0, 0, 0]}>
-        <mesh position={[0, 0.21, 1.04]}>
-          <boxGeometry args={[3.48, 0.42, 2.08]} />
-          <meshStandardMaterial color={WOOD_RIM} roughness={0.8} metalness={0.05} />
-        </mesh>
-        <mesh position={[0, 0.44, 1.04]}>
-          <boxGeometry args={[3.3, 0.05, 1.9]} />
-          <meshStandardMaterial color={WOOD} roughness={0.85} metalness={0.05} />
-        </mesh>
-        <mesh position={[0, 0.03, 2.1]}>
-          <boxGeometry args={[3.5, 0.08, 0.06]} />
-          <meshStandardMaterial color={BRASS} roughness={0.36} metalness={0.82} />
-        </mesh>
-        <MysteriumEmblem position={[0, 0.21, 2.12]} />
-      </group>
+      {/* Veko, svetlo z truhlice a štvrtý útržok */}
+      <ChestLid3D readOpening={readOpening} />
+      <ChestGlow3D readOpening={readOpening} />
+      <PhotoFragment3D
+        imageSrc={fragmentImageSrc}
+        pieceIndex={fragmentPieceIndex}
+        readOpening={readOpening}
+      />
     </group>
   );
 }

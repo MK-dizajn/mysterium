@@ -12,6 +12,7 @@ import {
 import { soundManager } from "../../lib/soundManager";
 import type { ActId, Chapter, GameState } from "../../types/game";
 import { getGoldenKeySvg } from "../items/art/keyToothArt";
+import { OPENING_LID_START_SEC } from "../finale/chest3d/chestZoom";
 import { InspectErrorBoundary } from "../items/InspectErrorBoundary";
 import { canUse3D } from "../items/supportsWebGL";
 import { useReducedMotion } from "../items/useReducedMotion";
@@ -83,6 +84,7 @@ export function FinaleChestScreen({
   // Priblížený zámok v 3D – pod obrázkom je vtedy pokyn ku kolieskam.
   const [isZoomed, setIsZoomed] = useState(false);
   const timersRef = useRef<number[]>([]);
+  const hasInsertedKeyRef = useRef(false);
 
   useEffect(
     () => () => timersRef.current.forEach((timer) => window.clearTimeout(timer)),
@@ -139,8 +141,31 @@ export function FinaleChestScreen({
   }
 
   function insertKey() {
+    // Opakované ťuknutie nič nepridá (engine je tiež bezpečný proti opakovaniu).
+    if (hasInsertedKeyRef.current) {
+      return;
+    }
+
+    hasInsertedKeyRef.current = true;
     setMessage(null);
     onOpenChest();
+
+    // 3D: animáciu vedie truhlica a na konci ohlási onOpenSettled.
+    if (mode === "3d") {
+      if (reducedMotion) {
+        setSequence("done");
+        return;
+      }
+
+      setSequence("inserting");
+      timersRef.current.push(
+        window.setTimeout(
+          () => soundManager.play("artifact-unlock"),
+          OPENING_LID_START_SEC * 1000
+        )
+      );
+      return;
+    }
 
     if (reducedMotion) {
       setSequence("done");
@@ -227,6 +252,16 @@ export function FinaleChestScreen({
     );
   });
 
+  const insertKeyButton = areAllLocksOpen && !isKeyInserted && sequence === "idle" && (
+    <ActionButton onClick={insertKey} className={STILL_BUTTON}>
+      {chest.insertKeyLabel}
+    </ActionButton>
+  );
+
+  // Ktorý zo štyroch útržkov fotografie leží v truhlici (pre 3D útržok).
+  const fragmentIndex = chapter.finale?.photo.fragmentIds.indexOf(chest.reward.id) ?? -1;
+  const fragmentPieceIndex = fragmentIndex === -1 ? 3 : fragmentIndex;
+
   const messages = (
     <div aria-live="polite" className="mt-4">
       {message === "wrong" && (
@@ -276,6 +311,7 @@ export function FinaleChestScreen({
                     backLabel: chest.backLabel,
                     unlockLabel: chest.unlockLabel,
                     dialWheelLabel: chest.dialWheelLabel,
+                    insertKeyLabel: chest.insertKeyLabel,
                   }}
                   selectedIndex={selectedLockIndex}
                   onSelectLock={setSelectedLockIndex}
@@ -289,15 +325,27 @@ export function FinaleChestScreen({
                   }}
                   onUnlockSettled={() => setMessage("opened")}
                   onZoomChange={setIsZoomed}
-                  isKeyInserted={isKeyVisible}
-                  isLidOpen={isLidOpen}
+                  isChestOpened={isChestOpened}
+                  onInsertKey={insertKey}
+                  onOpenSettled={() => setSequence("done")}
+                  fragmentImageSrc={chapter.finale?.photo.imageSrc}
+                  fragmentPieceIndex={fragmentPieceIndex}
                   reducedMotion={reducedMotion}
                   onFailure={() => setMode("2d")}
                 />
               </InspectErrorBoundary>
             </div>
-            <p className="mt-3 text-center text-[15px] leading-6 text-slate-400">
-              {isZoomed ? chest.dialHint : chest.rotateHint}
+            <p
+              aria-live="polite"
+              className="mt-3 text-center text-[15px] leading-6 text-slate-400"
+            >
+              {sequence === "inserting"
+                ? chest.keyTurningText
+                : isRewardVisible
+                  ? chest.openedHint
+                  : isZoomed
+                    ? chest.dialHint
+                    : chest.rotateHint}
             </p>
 
             {messages}
@@ -314,7 +362,10 @@ export function FinaleChestScreen({
                     ▾
                   </span>
                 </summary>
-                <div className="space-y-4 px-3 pb-4">{lockRows}</div>
+                <div className="space-y-4 px-3 pb-4">
+                  {lockRows}
+                  {insertKeyButton}
+                </div>
               </details>
             )}
           </div>
@@ -380,13 +431,8 @@ export function FinaleChestScreen({
           </>
         )}
 
-        {areAllLocksOpen && !isKeyInserted && sequence === "idle" && (
-          <div className="mt-6">
-            <ActionButton onClick={insertKey} className={STILL_BUTTON}>
-              {chest.insertKeyLabel}
-            </ActionButton>
-          </div>
-        )}
+        {/* Pri 2D zálohe tlačidlo kľúča pod zámkami (pri 3D je nad scénou a v bloku). */}
+        {mode === "2d" && insertKeyButton && <div className="mt-6">{insertKeyButton}</div>}
 
         {isRewardVisible && (
           <div className="mt-6 space-y-5">

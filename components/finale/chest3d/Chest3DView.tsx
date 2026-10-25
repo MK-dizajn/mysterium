@@ -41,10 +41,16 @@ import {
 import {
   blendTransform,
   type ChestTransform,
+  CLOSED_FRAME,
   easeZoom,
   getDragSteps,
+  getOpeningFrame,
+  getOpeningTransform,
   getTapStep,
   getZoomTransform,
+  OPEN_FRAME,
+  type OpeningFrame,
+  OPENING_SEC,
   OVERVIEW_TRANSFORM,
   stepZoom,
 } from "./chestZoom";
@@ -73,6 +79,10 @@ class ChestController {
   zoomTransform: ChestTransform = OVERVIEW_TRANSFORM;
   /** Od priblíženia, kým sa pohľad celý nevráti späť. */
   isZoomActive = false;
+  /** Vkladanie kľúča a otváranie veka: čas od ťuknutia (null = ešte nezačalo). */
+  private openingElapsed: number | null = null;
+  private isOpeningDone: boolean;
+  private openingFrame: OpeningFrame;
   private facing: boolean[] = [];
   private drag: {
     pointerId: number;
@@ -85,8 +95,57 @@ class ChestController {
   } | null = null;
   private invalidate: (() => void) | null = null;
 
-  constructor(initialYaw: number) {
+  /** Po F5 s otvorenou truhlicou je hneď konečný stav (bez animácie). */
+  constructor(initialYaw: number, isChestOpened: boolean) {
     this.state = { ...createRotationState(), yaw: initialYaw };
+    this.isOpeningDone = isChestOpened;
+    this.openingFrame = isChestOpened ? OPEN_FRAME : CLOSED_FRAME;
+  }
+
+  getOpeningFrame() {
+    return this.openingFrame;
+  }
+
+  isOpeningRunning() {
+    return this.openingElapsed !== null && !this.isOpeningDone;
+  }
+
+  /** Pred vložením kľúča – platí bežný pohľad a priblíženie na zámky. */
+  isClosedView() {
+    return this.openingElapsed === null && !this.isOpeningDone;
+  }
+
+  startOpening() {
+    if (this.openingElapsed !== null || this.isOpeningDone) {
+      return;
+    }
+
+    this.openingElapsed = 0;
+    this.invalidate?.();
+  }
+
+  /** Ťuknutie počas animácie: hneď konečný stav. */
+  finishOpening() {
+    if (this.isOpeningRunning()) {
+      this.openingElapsed = OPENING_SEC;
+      this.invalidate?.();
+    }
+  }
+
+  /** Krok otvárania v snímke; finished je true práve v snímke, keď skončilo. */
+  advanceOpening(dtSec: number, reducedMotion: boolean) {
+    if (this.openingElapsed === null || this.isOpeningDone) {
+      return { isMoving: false, finished: false };
+    }
+
+    this.openingElapsed = reducedMotion
+      ? OPENING_SEC
+      : Math.min(OPENING_SEC, this.openingElapsed + dtSec);
+    this.openingFrame = getOpeningFrame(this.openingElapsed);
+    this.isOpeningDone = this.openingElapsed >= OPENING_SEC;
+
+    // Aj v poslednej snímke ešte jedna ďalšia, aby ju videli všetky časti truhlice.
+    return { isMoving: true, finished: this.isOpeningDone };
   }
 
   setInvalidate(invalidate: (() => void) | null) {
@@ -198,6 +257,7 @@ function ChestRotation({
   reducedMotion,
   onFacingChange,
   onZoomedOut,
+  onOpeningDone,
   children,
 }: {
   controller: ChestController;
@@ -205,15 +265,19 @@ function ChestRotation({
   onFacingChange: (facing: boolean[]) => void;
   /** Pohľad sa po priblížení celý vrátil na truhlicu. */
   onZoomedOut: () => void;
+  /** Kľúč je otočený, veko otvorené a útržok nad truhlicou. */
+  onOpeningDone: () => void;
   children: ReactNode;
 }) {
   const positionRef = useRef<Group>(null);
   const groupRef = useRef<Group>(null);
   const invalidate = useThree((state) => state.invalidate);
   const onZoomedOutRef = useRef(onZoomedOut);
+  const onOpeningDoneRef = useRef(onOpeningDone);
 
   useEffect(() => {
     onZoomedOutRef.current = onZoomedOut;
+    onOpeningDoneRef.current = onOpeningDone;
   });
 
   useEffect(() => {
@@ -228,13 +292,21 @@ function ChestRotation({
 
     controller.advance((state) => stepRotation(state, dtSec, reducedMotion));
     const zoomAmount = controller.advanceZoom(dtSec, reducedMotion);
+    const opening = controller.advanceOpening(dtSec, reducedMotion);
 
     const { yaw, tilt } = controller.state;
-    const view = blendTransform(OVERVIEW_TRANSFORM, controller.zoomTransform, zoomAmount);
+    // Pred kľúčom bežný pohľad (a priblíženie na zámok), potom pohľad podľa otvárania.
+    const view = controller.isClosedView()
+      ? blendTransform(OVERVIEW_TRANSFORM, controller.zoomTransform, zoomAmount)
+      : getOpeningTransform(controller.getOpeningFrame());
 
-    positionRef.current?.position.set(0, view.y, view.z);
+    positionRef.current?.position.set(view.x, view.y, view.z);
     groupRef.current?.scale.setScalar(view.scale);
-    groupRef.current?.rotation.set(view.tilt + tilt, yaw, 0);
+    groupRef.current?.rotation.set(view.tilt + tilt, yaw + view.yaw, 0);
+
+    if (opening.finished) {
+      onOpeningDoneRef.current();
+    }
 
     const facing = LOCK_PLACEMENTS.map((_placement, index) =>
       isLockFacing(yaw, tilt, index)
@@ -249,7 +321,7 @@ function ChestRotation({
     }
 
     // Ďalšiu snímku iba vtedy, keď sa truhlica hýbe.
-    if (!isRotationAtRest(controller.state) || controller.isZoomMoving()) {
+    if (!isRotationAtRest(controller.state) || controller.isZoomMoving() || opening.isMoving) {
       invalidate();
     }
   });
@@ -362,7 +434,12 @@ type Chest3DViewProps = {
   /** Číslice na kolieskach každého zámku (spoločné s 2D ovládaním). */
   lockDigits: number[][];
   stateLabels: { open: string; closed: string; next: string };
-  texts: { backLabel: string; unlockLabel: string; dialWheelLabel: string };
+  texts: {
+    backLabel: string;
+    unlockLabel: string;
+    dialWheelLabel: string;
+    insertKeyLabel: string;
+  };
   selectedIndex: number | null;
   onSelectLock: (index: number) => void;
   /** Pootočí koliesko o delta (+1 hore, −1 dole). */
@@ -372,8 +449,14 @@ type Chest3DViewProps = {
   /** Po správnom kóde sa pohľad oddialil – čas na hlášku. */
   onUnlockSettled: (lockIndex: number) => void;
   onZoomChange: (isZoomed: boolean) => void;
-  isKeyInserted: boolean;
-  isLidOpen: boolean;
+  /** Kľúč vložený a truhlica otvorená (v engine) – spustí animáciu. */
+  isChestOpened: boolean;
+  /** „Vložiť Zlatý kľúč“ (engine zapíše kľúč aj otvorenie naraz). */
+  onInsertKey: () => void;
+  /** Animácia otvárania skončila (alebo bola preskočená). */
+  onOpenSettled: () => void;
+  fragmentImageSrc: string | undefined;
+  fragmentPieceIndex: number;
   reducedMotion: boolean;
   onFailure: () => void;
 };
@@ -411,15 +494,19 @@ export default function Chest3DView({
   onUnlockLock,
   onUnlockSettled,
   onZoomChange,
-  isKeyInserted,
-  isLidOpen,
+  isChestOpened,
+  onInsertKey,
+  onOpenSettled,
+  fragmentImageSrc,
+  fragmentPieceIndex,
   reducedMotion,
   onFailure,
 }: Chest3DViewProps) {
-  // Pri vstupe je truhlica natočená k zámku na rade.
+  // Pri vstupe je truhlica natočená k zámku na rade (po F5 s otvorenou truhlicou otvorená).
   const [controller] = useState(
-    () => new ChestController(getFacingYawForLocks(locks))
+    () => new ChestController(getFacingYawForLocks(locks), isChestOpened)
   );
+  const areAllLocksOpen = locks.length > 0 && locks.every((lock) => lock.isOpen);
   const [facing, setFacing] = useState<boolean[]>([]);
   const [zoomedIndex, setZoomedIndex] = useState<number | null>(null);
   const [isZoomActive, setIsZoomActive] = useState(false);
@@ -432,7 +519,7 @@ export default function Chest3DView({
   const lastFacingYawRef = useRef(facingYaw);
   // Kolieska nad scénou iba pri zámku, ktorý je stále na rade.
   const overlayIndex =
-    zoomedIndex !== null && locks[zoomedIndex]?.isNext && !isKeyInserted
+    zoomedIndex !== null && locks[zoomedIndex]?.isNext && !isChestOpened
       ? zoomedIndex
       : null;
 
@@ -460,6 +547,19 @@ export default function Chest3DView({
       controller.zoomOut();
     }
   }, [controller, zoomedIndex, overlayIndex]);
+
+  // Engine zapísal kľúč a otvorenie – truhlica sa natočí dopredu a začne animácia
+  // (po F5 s otvorenou truhlicou sa nespustí, je hneď otvorená).
+  useEffect(() => {
+    if (!isChestOpened) {
+      return;
+    }
+
+    controller.update((state) =>
+      snapToYaw(state, getNearestYaw(state.yaw, 0), reducedMotion)
+    );
+    controller.startOpening();
+  }, [controller, isChestOpened, reducedMotion]);
 
   // Po priblížení dostane fokus prvé koliesko (čítačka ho hneď prečíta).
   useEffect(() => {
@@ -491,7 +591,7 @@ export default function Chest3DView({
   function handleSelectLock(index: number) {
     onSelectLock(index);
 
-    if (!isZoomActive && locks[index]?.isNext && !isKeyInserted) {
+    if (!isZoomActive && locks[index]?.isNext && !isChestOpened) {
       zoomIn(index);
     }
   }
@@ -557,6 +657,12 @@ export default function Chest3DView({
   }
 
   function handlePointerDown(event: PointerEvent<HTMLDivElement>) {
+    // Ťuknutie na scénu počas otvárania ho hneď dokončí.
+    if (controller.isOpeningRunning()) {
+      controller.finishOpening();
+      return;
+    }
+
     if (isZoomActive || (event.target as HTMLElement).closest("button")) {
       return;
     }
@@ -579,6 +685,13 @@ export default function Chest3DView({
     if (event.key === "Escape" && overlayIndex !== null) {
       event.preventDefault();
       zoomBack();
+      return;
+    }
+
+    // Klávesnica: Esc, Enter alebo medzerník počas otvárania ho hneď dokončí.
+    if (controller.isOpeningRunning() && ["Escape", "Enter", " "].includes(event.key)) {
+      event.preventDefault();
+      controller.finishOpening();
       return;
     }
 
@@ -639,6 +752,7 @@ export default function Chest3DView({
           reducedMotion={reducedMotion}
           onFacingChange={setFacing}
           onZoomedOut={handleZoomedOut}
+          onOpeningDone={onOpenSettled}
         >
           <ChestModel3D
             lockStates={lockStates}
@@ -646,13 +760,15 @@ export default function Chest3DView({
             shakeKeys={shakeKeys}
             selectedIndex={selectedIndex}
             onSelectLock={handleSelectLock}
-            isKeyInserted={isKeyInserted}
-            isLidOpen={isLidOpen}
+            readOpening={() => controller.getOpeningFrame()}
+            fragmentImageSrc={fragmentImageSrc}
+            fragmentPieceIndex={fragmentPieceIndex}
             reducedMotion={reducedMotion}
           />
 
+          {/* Po otvorení sa štítky zámkov skryjú (nad truhlicou je útržok). */}
           {locks.map((lock, index) =>
-            facing[index] && !isZoomActive ? (
+            facing[index] && !isZoomActive && !isChestOpened ? (
               <Html key={lock.lockLabel} position={getLabelPosition(index)} center>
                 <button
                   type="button"
@@ -681,6 +797,18 @@ export default function Chest3DView({
           )}
         </ChestRotation>
       </InspectStage>
+
+      {/* Po troch zámkoch: vloženie Zlatého kľúča nad scénou. */}
+      {areAllLocksOpen && !isChestOpened && !isZoomActive && (
+        <div className="absolute inset-x-0 bottom-0 p-2">
+          <ActionButton
+            onClick={onInsertKey}
+            className={`h-[54px] px-3 py-0 tracking-[0.06em]! ${STILL_BUTTON}`}
+          >
+            {texts.insertKeyLabel}
+          </ActionButton>
+        </div>
+      )}
 
       {/* Priblížený zámok: kolieska v tretinách šírky, pod nimi tlačidlá. */}
       {overlayIndex !== null && overlayLock && (

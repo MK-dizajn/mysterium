@@ -38,20 +38,35 @@ const FOLLOW_SPEED = 12;
 const FOLLOW_EPSILON = 0.002;
 
 export type ChestTransform = {
-  /** Posun truhlice hore a dole a ku kamere. */
+  /** Posun truhlice do strán, hore a dole a ku kamere. */
+  x: number;
   y: number;
   z: number;
   scale: number;
-  /** Náklon, aby bolo vidieť aj veko (pri priblížení nula). */
+  /** Náklon, aby bolo vidieť aj veko (pri priblížení na zámok nula). */
   tilt: number;
+  /** Pootočenie navyše (pri kľúčovej dierke trochu zboku). */
+  yaw: number;
 };
 
 /** Celý pohľad na truhlicu. */
 export const OVERVIEW_TRANSFORM: ChestTransform = {
+  x: 0,
   y: -0.12,
   z: 0,
   scale: 0.55,
   tilt: 0.32,
+  yaw: 0,
+};
+
+/** Otvorená truhlica: trochu menšia a nižšie, aby sa nad ňu zmestil útržok. */
+export const OPEN_TRANSFORM: ChestTransform = {
+  x: 0,
+  y: -0.42,
+  z: 0,
+  scale: 0.46,
+  tilt: 0.32,
+  yaw: 0,
 };
 
 /**
@@ -64,11 +79,124 @@ export function getZoomTransform(lockY: number, lockDepth: number): ChestTransfo
   const scale = visibleWidth / 3 / DIAL_SPACING;
 
   return {
+    x: 0,
     y: (0.5 - DIAL_AREA_CENTER) * visibleHeight - scale * (lockY + DIAL_CENTER_Y),
     z: CAMERA_Z - ZOOM_DISTANCE - scale * (lockDepth + DIAL_FRONT_Z),
     scale,
     tilt: 0,
+    yaw: 0,
   };
+}
+
+/** Kľúčová dierka (vstup kľúča) v súradniciach truhlice. */
+export const KEYHOLE_POSITION: [number, number, number] = [0, -0.55, 1.11];
+/** Na ktorý bod sa pri vkladaní kľúča pozerá (kúsok pred dierkou, aby bol vidieť aj kľúč). */
+export const KEYHOLE_VIEW_POINT: [number, number, number] = [0, -0.58, 1.3];
+const KEYHOLE_YAW = 0.55;
+const KEYHOLE_TILT = 0.3;
+const KEYHOLE_SCALE = 1.05;
+const KEYHOLE_DISTANCE = 1.45;
+
+/** Priblíženie ku kľúčovej dierke: trochu zboku a zhora, dierka v strede obrázka. */
+export function getKeyholeTransform(): ChestTransform {
+  const [px, py, pz] = KEYHOLE_VIEW_POINT;
+  // Otočenie okolo zvislej osi, potom náklon (rovnako ako skupina truhlice).
+  const turnedX = pz * Math.sin(KEYHOLE_YAW) + px * Math.cos(KEYHOLE_YAW);
+  const turnedZ = pz * Math.cos(KEYHOLE_YAW) - px * Math.sin(KEYHOLE_YAW);
+  const tiltedY = py * Math.cos(KEYHOLE_TILT) - turnedZ * Math.sin(KEYHOLE_TILT);
+  const tiltedZ = py * Math.sin(KEYHOLE_TILT) + turnedZ * Math.cos(KEYHOLE_TILT);
+
+  return {
+    x: -KEYHOLE_SCALE * turnedX,
+    y: -KEYHOLE_SCALE * tiltedY,
+    z: CAMERA_Z - KEYHOLE_DISTANCE - KEYHOLE_SCALE * tiltedZ,
+    scale: KEYHOLE_SCALE,
+    tilt: KEYHOLE_TILT,
+    yaw: KEYHOLE_YAW,
+  };
+}
+
+/** Okamih otvárania: všetko od 0 do 1 (okrem keyVisible). */
+export type OpeningFrame = {
+  /** Priblíženie ku kľúčovej dierke. */
+  zoomIn: number;
+  /** Oddialenie na otvorenú truhlicu. */
+  zoomOut: number;
+  keyVisible: boolean;
+  /** 1 = kľúč pred dierkou, 0 = zasunutý. */
+  keyDepth: number;
+  /** Otočenie kľúča o štvrť otáčky. */
+  keyTurn: number;
+  lid: number;
+  light: number;
+  /** Vystúpenie útržku nad truhlicu. */
+  fragment: number;
+};
+
+/** Časy jednotlivých častí otvárania (v sekundách od ťuknutia). */
+const OPENING_TIMES = {
+  zoomIn: [0, 0.7],
+  keyIn: [0.7, 1.4],
+  keyTurn: [1.4, 2.0],
+  zoomOut: [2.0, 2.8],
+  lid: [2.0, 3.4],
+  light: [2.3, 3.2],
+  fragment: [2.6, 3.6],
+} as const;
+
+export const OPENING_SEC = 3.6;
+/** Kedy sa začne dvíhať veko (zvuk). */
+export const OPENING_LID_START_SEC = OPENING_TIMES.lid[0];
+
+export const CLOSED_FRAME: OpeningFrame = {
+  zoomIn: 0,
+  zoomOut: 0,
+  keyVisible: false,
+  keyDepth: 1,
+  keyTurn: 0,
+  lid: 0,
+  light: 0,
+  fragment: 0,
+};
+
+export const OPEN_FRAME: OpeningFrame = {
+  zoomIn: 1,
+  zoomOut: 1,
+  keyVisible: true,
+  keyDepth: 0,
+  keyTurn: 1,
+  lid: 1,
+  light: 1,
+  fragment: 1,
+};
+
+function phase(elapsedSec: number, [start, end]: readonly [number, number]) {
+  return Math.max(0, Math.min(1, (elapsedSec - start) / (end - start)));
+}
+
+/** Stav otvárania v danom okamihu (po OPENING_SEC presne konečný stav). */
+export function getOpeningFrame(elapsedSec: number): OpeningFrame {
+  if (elapsedSec >= OPENING_SEC) {
+    return OPEN_FRAME;
+  }
+
+  return {
+    zoomIn: phase(elapsedSec, OPENING_TIMES.zoomIn),
+    zoomOut: phase(elapsedSec, OPENING_TIMES.zoomOut),
+    keyVisible: elapsedSec >= OPENING_TIMES.keyIn[0],
+    keyDepth: 1 - easeZoom(phase(elapsedSec, OPENING_TIMES.keyIn)),
+    keyTurn: easeZoom(phase(elapsedSec, OPENING_TIMES.keyTurn)),
+    lid: easeZoom(phase(elapsedSec, OPENING_TIMES.lid)),
+    light: phase(elapsedSec, OPENING_TIMES.light),
+    fragment: easeZoom(phase(elapsedSec, OPENING_TIMES.fragment)),
+  };
+}
+
+/** Pohľad počas otvárania: celá truhlica → kľúčová dierka → otvorená truhlica. */
+export function getOpeningTransform(frame: OpeningFrame): ChestTransform {
+  return frame.zoomOut > 0
+    ? blendTransform(getKeyholeTransform(), OPEN_TRANSFORM, easeZoom(frame.zoomOut))
+    : blendTransform(OVERVIEW_TRANSFORM, getKeyholeTransform(), easeZoom(frame.zoomIn));
 }
 
 export function blendTransform(
@@ -79,10 +207,12 @@ export function blendTransform(
   const mix = (a: number, b: number) => a + (b - a) * amount;
 
   return {
+    x: mix(from.x, to.x),
     y: mix(from.y, to.y),
     z: mix(from.z, to.z),
     scale: mix(from.scale, to.scale),
     tilt: mix(from.tilt, to.tilt),
+    yaw: mix(from.yaw, to.yaw),
   };
 }
 

@@ -34,6 +34,8 @@ export const chapterOneFinale: ChapterFinale = {
     dialWheelLabel: "Koliesko {index} z {count}",
     accessibleControlsTitle: "Ovládanie pre klávesnicu a čítačku",
     insertKeyLabel: "Vložiť Zlatý kľúč",
+    keyTurningText: "Kľúč zapadol. Pomaly ho otáčaš…",
+    openedHint: "Štvrtý útržok sa vznáša nad truhlicou.",
     openedText:
       "Veko sa pomaly dvíha. Vnútri leží posledný útržok fotografie.",
     continueLabel: "Prijať útržok a pokračovať",

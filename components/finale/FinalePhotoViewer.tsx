@@ -8,6 +8,7 @@ import {
 } from "react";
 import type { FinalePhoto } from "../../types/game";
 import { ActionButton } from "../ui/ActionButton";
+import { PHOTO_PIECE_POINTS, type PhotoPoint } from "./photoPieces";
 
 type FinalePhotoViewerProps = {
   photo: FinalePhoto;
@@ -29,44 +30,12 @@ const TAP_SLOP = 6;
 
 type Point = [number, number];
 
-/**
- * Roztrhnuté hrany: zvislá a vodorovná trhlina cez stred fotografie
- * (v percentách). Susedné útržky zdieľajú tie isté body, takže do seba
- * presne zapadnú.
- */
-const VERTICAL_TOP: Point[] = [
-  [51.5, 0], [49, 5], [52, 10], [50.5, 15], [48, 20], [51, 25],
-  [49.5, 30], [52.5, 35], [49, 40], [51, 45], [50, 50],
-];
-const VERTICAL_BOTTOM: Point[] = [
-  [50, 50], [48.5, 55], [51.5, 60], [49, 65], [52, 70], [50, 75],
-  [47.5, 80], [51, 85], [49, 90], [52, 95], [50.5, 100],
-];
-const HORIZONTAL_LEFT: Point[] = [
-  [0, 48.5], [5, 51.5], [10, 49], [15, 52], [20, 50], [25, 47.5],
-  [30, 51], [35, 49], [40, 52.5], [45, 49.5], [50, 50],
-];
-const HORIZONTAL_RIGHT: Point[] = [
-  [50, 50], [55, 52], [60, 49], [65, 51.5], [70, 48], [75, 51],
-  [80, 49.5], [85, 52], [90, 48.5], [95, 51], [100, 49.5],
-];
-
-const reversed = (points: Point[]) => [...points].reverse();
-
-function toClipPath(points: Point[]) {
+function toClipPath(points: PhotoPoint[]) {
   return `polygon(${points.map(([x, y]) => `${x}% ${y}%`).join(", ")})`;
 }
 
-const PIECE_SHAPES = [
-  // 1: vľavo hore
-  [[0, 0] as Point, ...VERTICAL_TOP, ...reversed(HORIZONTAL_LEFT)],
-  // 2: vpravo hore
-  [...reversed(VERTICAL_TOP), [100, 0] as Point, ...reversed(HORIZONTAL_RIGHT)],
-  // 3: vľavo dole
-  [...HORIZONTAL_LEFT, ...VERTICAL_BOTTOM, [0, 100] as Point],
-  // 4: vpravo dole
-  [...HORIZONTAL_RIGHT, [100, 100] as Point, ...reversed(VERTICAL_BOTTOM)],
-].map(toClipPath);
+/** Roztrhnuté útržky (tvar je spoločný s 3D útržkom v truhlici). */
+const PIECE_SHAPES = PHOTO_PIECE_POINTS.map(toClipPath);
 
 /** Kam sú útržky rozhodené pred zložením. */
 const SCATTER = [
