@@ -41,14 +41,11 @@ Pri každej časti je krátka poznámka **Dnes v hre**, aby bolo jasné, čo už
   4. kamera plynulo priblíži zámok a ukáže mechanizmus,
   5. **tri zámky**, pre každý akt jeden,
   6. po odomknutí všetkých troch sa truhlica otvorí.
-- Pre tri zámky sa použijú **existujúce tri sady kódov** z dôkazov:
-  - akt I: `00-15-58`
-  - akt II: `65-70-09`
-  - akt III: `72-81-05`
+- Kódy troch zámkov tvoria **ukryté číslice z predmetov úloh** daného aktu. Hráč ich zbiera do Zápisníka kódov (pôvodne sa tu počítalo so starými dvojcifernými kódmi z dôkazov; tie sa už nepoužívajú, pozri `docs/KARTY-USLOH.md`).
 
-**Dnes v hre:** dve truhlice, po akte I a po akte II, každá s jedným zámkom. 3D truhlica, priblíženie a mechanizmus kódu už existujú. Kódy aktu III sú v dátach, ale hra ich nepoužíva. Video so Strážcom neexistuje. Strážca Michalskej brány už v hre je ako postava v prvej scéne.
+**Dnes v hre (25. 10. 2026):** jedna truhlica vo finále s tromi zámkami (I, II, III), kolieskami s číslicami v 3D, priblížením na zámok a Zlatým kľúčom, ktorý po troch zámkoch otvorí veko. Konce aktov sú bez truhlice. Video so Strážcom zatiaľ neexistuje; Strážca prinesie truhlicu na obrazovke „Strážca prichádza“ a ako postava je už aj v prvej scéne.
 
-**Pozor:** toto mení pravidlo v `docs/KONCEPT-KAPITOL.md`, kde je zatiaľ zapísané „truhlica po každom akte“. Ten dokument treba neskôr zosúladiť s týmto.
+**Zosúladené:** pravidlo v `docs/KONCEPT-KAPITOL.md` je zmenené na „jedna truhlica na konci kapitoly“. Pôvodné pravidlo „truhlica po každom akte“ je zapísané v jeho časti „Zmeny konceptu“.
 
 ## D. Zložená historická fotografia
 
@@ -86,7 +83,7 @@ Pri každej časti je krátka poznámka **Dnes v hre**, aby bolo jasné, čo už
   - nová informácia o veľkej záhade.
 - Moment má byť krátky a nesmie zdržiavať pátranie.
 
-**Dnes v hre:** na konci aktu I a II je prechodová obrazovka (`ActTransitionScreen`) a truhlica.
+**Dnes v hre (25. 10. 2026):** konce aktov sú bez truhlice. Akt I končí hlasom Strážcu, akt II pečaťou a akt III zložením Zlatého kľúča; po každom dostane hráč útržok fotografie (prechodová obrazovka `ActTransitionScreen`). Pôvodne bola na konci aktu I a II truhlica, pozri časť „Zmeny konceptu“ v `docs/KONCEPT-KAPITOL.md`.
 
 ## G. Úlohy spojené s miestom
 
@@ -110,5 +107,5 @@ Pri každej časti je krátka poznámka **Dnes v hre**, aby bolo jasné, čo už
 
 ## Súvisiace dokumenty
 
-- `docs/KONCEPT-KAPITOL.md` – rozsah a pravidlá kapitol (treba zosúladiť pravidlo o truhliciach, pozri časť C).
+- `docs/KONCEPT-KAPITOL.md` – rozsah a pravidlá kapitol (pravidlo o truhlici je zosúladené s časťou C; pôvodné pravidlo je v časti „Zmeny konceptu“).
 - `docs/MEDIA-LICENCIE.md` – každé video, hlas a zvuk z tohto konceptu sa musí zapísať do evidencie médií.

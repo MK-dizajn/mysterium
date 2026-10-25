@@ -1,6 +1,6 @@
 # Karty úloh – odmeny, kódy a truhlica (kapitola I)
 
-Návrh odmien po úlohách pre kapitolu I. Zatiaľ ide iba o návrh: nič z toho ešte nie je naprogramované.
+Návrh odmien po úlohách pre kapitolu I. Pôvodne išlo iba o návrh; k 25. 10. 2026 je naprogramovaný (pozri poznámky „Dnes v hre“).
 
 Súvisí s `docs/KONCEPT-ZAZITKU.md` (časti B, C, D a F).
 
@@ -16,12 +16,12 @@ Súvisí s `docs/KONCEPT-ZAZITKU.md` (časti B, C, D a F).
 | II | 4 až 6 | **6 – 0 – 4** |
 | III | 7 až 9 | **9 – 2 – 7** |
 
-**Starý dvojciferný systém sa nahrádza:** `00-15-58`, `65-70-09`, `72-81-05`.
+**Starý dvojciferný systém sa nahradil** (pôvodne niesol každý dôkaz dvojicu číslic; krok B1a).
 
-**Dnes v hre:**
-- dôkazy nesú dvojciferné kódy (`secretCode`: 00, 15, 58, 65, 70, 09, 72, 81, 05),
-- truhlice sú dve, po akte I a II.
-- Kódy zámku sa už odvodzujú z dát scén (funkcia `getActLockCodes`, kroky A1 a A2), takže zmena číslic sa urobí v dátach scén, nie v engine.
+**Dnes v hre (25. 10. 2026):**
+- každý predmet nesie jednu ukrytú číslicu, ktorú hráč objaví v okne „Prezrieť“ a ktorá sa zapíše do Zápisníka kódov,
+- truhlica je jedna, vo finále, s tromi zámkami a Zlatým kľúčom; konce aktov sú bez truhlice (pôvodne boli dve truhlice, po akte I a II – pozri časť „Zmeny konceptu“ v `docs/KONCEPT-KAPITOL.md`),
+- kódy zámkov sa odvodzujú z dát scén (kroky A1 a A2) a kontroluje ich iba engine (`engine/finale.ts`).
 
 ## 2. Odmeny po úlohách
 
@@ -100,7 +100,7 @@ Konce aktov sú ľahké momenty **bez truhlice**:
 | akt III | zloženie kľúča | tretí útržok |
 | truhlica (finále) | – | **štvrtý útržok s adresou** |
 
-**Dnes v hre:** po akte I a II je obrazovka prechodu aktu a truhlica s útržkom fotografie (`torn-photo-fragment-act-1` a `-act-2`). Po akte III nie je nič.
+**Dnes v hre (25. 10. 2026):** podľa tabuľky – po každom akte obrazovka prechodu aktu bez truhlice (hlas Strážcu, pečať, zloženie kľúča) s útržkom fotografie (`torn-photo-fragment-act-1`, `-act-2`, `-act-3`); štvrtý útržok je v truhlici vo finále. Pôvodne bola po akte I a II truhlica a po akte III nič.
 
 ## 4. Truhlica na konci kapitoly
 
@@ -109,7 +109,7 @@ Konce aktov sú ľahké momenty **bez truhlice**:
 - Po zadaní všetkých troch kódov hráč **vloží Zlatý kľúč do stredného zámku** a **veko sa otvorí**.
 - V truhlici je štvrtý útržok fotografie s adresou ďalšieho miesta.
 
-**Dnes v hre:** dve truhlice po akte I a II, každá s jedným zámkom na tri **dvojciferné** dvojice (kolieska pre dve číslice). 3D truhlica, priblíženie a mechanizmus už existujú.
+**Dnes v hre (25. 10. 2026):** jedna truhlica vo finále s tromi zámkami (kolieska 0 až 9, tri číslice na zámok, v 3D s priblížením na zámok), po nich vloženie Zlatého kľúča a otvorenie veka; vo vnútri štvrtý útržok fotografie. Pôvodne boli dve truhlice po akte I a II, každá s jedným zámkom na dvojciferné dvojice.
 
 ## 5. Staré uložené hry
 
@@ -130,6 +130,8 @@ Poznámka k realizácii: je to zámerná výnimka z doterajšieho pravidla „ul
 
 ## Na zosúladenie s ostatnými dokumentmi
 
-- `docs/KONCEPT-ZAZITKU.md`, časť C, ešte uvádza staré kódy `00-15-58`, `65-70-09`, `72-81-05`.
-- `docs/KONCEPT-KAPITOL.md` ešte uvádza „truhlica po každom akte“.
-- Zápisy krokov A1 a A2 v `docs/PRACOVNY-DENNIK.md` overovali staré dvojciferné kódy. Pri zmene na jednociferné kódy sa test dát upraví na 3-8-1, 6-0-4, 9-2-7.
+Stav k 25. 10. 2026 (krok C4) – všetky body sú vyriešené:
+
+- ~~`docs/KONCEPT-ZAZITKU.md`, časť C, ešte uvádza staré dvojciferné kódy.~~ Vyriešené: časť C odkazuje na ukryté číslice z predmetov úloh, staré kódy v nej už nie sú.
+- ~~`docs/KONCEPT-KAPITOL.md` ešte uvádza „truhlica po každom akte“.~~ Vyriešené: platí „jedna truhlica na konci kapitoly“ a konce aktov sú bez truhlice. Pôvodné pravidlo je v časti „Zmeny konceptu“ v `docs/KONCEPT-KAPITOL.md`.
+- ~~Zápisy krokov A1 a A2 v `docs/PRACOVNY-DENNIK.md` overovali staré dvojciferné kódy.~~ Vyriešené: pri prechode na jednociferné kódy (krok B1a) sa test dát upravil na nové kódy.

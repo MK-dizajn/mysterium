@@ -2921,3 +2921,50 @@ Snímky: pred vložením (zelené zámky bez koliesok), kľúč pri dierke, oto�
 **Lint:** `CodeNotebook.tsx` bez chýb.
 
 **Ďalší krok:** podľa plánu, až po potvrdení (napríklad starý test B1b-1 a poznámky v `KARTY-USLOH.md` a `KONCEPT-ZAZITKU.md`).
+
+## 25. 10. 2026 – Krok 69 (krok C4): Test zápisníka B1b-1 a zmienky o truhliciach v dokumentoch
+
+**1. Test zápisníka B1b-1 (mimo projektu, necommitnutý)**, aktualizovaný podľa dnešného pravidla: číslica sa zapíše až po objavení v okne „Prezrieť“.
+- **Pred úpravou 10 zo 16** (6 starých chýb), **po úprave 17 zo 17**.
+- Nové alebo zmenené kontroly:
+  - každý z 9 predmetov s číslicou má okno „Prezrieť“,
+  - bez prezerania je zápisník prázdny (po scénach 1 a 2 aj po celej kapitole),
+  - po objavení číslice na žetóne a na mape sa vyplnia prvé dve miesta zámku I,
+  - po objavení všetkých 9 je zápisník celý vyplnený,
+  - staré uloženie bez zoznamu nájdených číslic má prázdny zápisník,
+  - starý kód v uloženom inventári sa neuplatní, platí číslica z dát.
+- Ostali kontroly: zápis iba raz, predmet, ktorý hráč nemá, útržok bez číslice, „Ukáž číslicu“, F5, poškodené zoznamy.
+- Test nevypisuje číslice kódov (pri plnom zápisníku iba znaky #).
+- **Stále spúšťané testy** sú po novom aj B1b-1 a B1b-3b.
+
+**2. Zmienky o „truhlici po každom akte“ v dokumentoch:**
+- `docs/KONCEPT-ZAZITKU.md`:
+  - **časť C:** poznámka „Dnes v hre“ opisuje jednu truhlicu vo finále s tromi zámkami, kolieskami v 3D a Zlatým kľúčom,
+  - **časť C:** upozornenie „treba zosúladiť“ je nahradené poznámkou „Zosúladené“ s odkazom na „Zmeny konceptu“ v `docs/KONCEPT-KAPITOL.md`,
+  - **časť C:** tri staré dvojciferné kódy (už neplatné) sú nahradené popisom „ukryté číslice z predmetov úloh“,
+  - **časť F:** „Dnes v hre“ je po novom „konce aktov bez truhlice“ (hlas Strážcu, pečať, zloženie kľúča, vždy útržok), s poznámkou o pôvodných truhliciach,
+  - **„Súvisiace dokumenty“:** odkaz upravený.
+- `docs/KARTY-USLOH.md`:
+  - úvod: návrh je k 25. 10. 2026 naprogramovaný,
+  - **časť 1:** „Dnes v hre“ opisuje dnešný stav (jedna ukrytá číslica na predmet, jedna truhlica vo finále, konce aktov bez truhlice, kódy kontroluje iba engine); starý dvojciferný systém je opísaný bez čísel,
+  - **časti 3 a 4:** „Dnes v hre“ opisuje dnešný stav, s poznámkou, ako to bolo pôvodne,
+  - **„Na zosúladenie“:** všetky tri body sú označené ako vyriešené s odkazom na „Zmeny konceptu“.
+- **Nič sa nezmazalo bez náhrady:** pôvodný stav je vždy uvedený ako „pôvodne“ alebo prečiarknutý s odkazom.
+- **V upravených častiach nie sú žiadne kódy zámkov** (ani staré, ani dnešné).
+
+**Mimo zadania, nemenené (rozhodnutie autora):** `docs/KARTY-USLOH.md` obsahuje v tabuľke kódov (časť 1), v tabuľke odmien (časť 2) a v pláne kroku B1a dnešné číslice kódov. Je to pôvodný návrhový dokument s kartami úloh, preto ich bez rozhodnutia nemažem. Kódy sú aj v historických záznamoch tohto denníka. V `docs/KONCEPT-ZAZITKU.md` sú v častiach D a E zastarané poznámky „Dnes v hre“ (fotografia a ďalšie miesto už existujú). Netýkajú sa truhlice, preto som ich nemenil.
+
+**Testy:** všetkých 17 stále spúšťaných testov OK:
+- B1b-1 17/17, B1b-3b 45/45,
+- fyzika otáčania 25/25,
+- B4c-3 24/24, B4c-2 34/34, B4c-1 18/18,
+- C1 63/63, B7 20/20 (celá kapitola, skóre **1010**), B6 32/32, B5 21/21, B4b 26/26, B4a 20/20, B3b 25/25 (aj staré uloženia),
+- texty 37/37, B3a 65/65, kresba kľúča 54/54, nápovedy 37/37.
+
+**Zmenené súbory:** `docs/KONCEPT-ZAZITKU.md`, `docs/KARTY-USLOH.md`, `docs/PRACOVNY-DENNIK.md` (kód hry sa nemenil).
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** kód sa nemenil. V celom projekte ostávajú staré nálezy v nemenených súboroch.
+
+**Ďalší krok:** podľa plánu, až po potvrdení.
