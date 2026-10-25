@@ -80,6 +80,8 @@ export function FinaleChestScreen({
     canUse3D() ? "3d" : "2d"
   );
   const [selectedLockIndex, setSelectedLockIndex] = useState<number | null>(null);
+  // Priblížený zámok v 3D – pod obrázkom je vtedy pokyn ku kolieskam.
+  const [isZoomed, setIsZoomed] = useState(false);
   const timersRef = useRef<number[]>([]);
 
   useEffect(
@@ -108,15 +110,32 @@ export function FinaleChestScreen({
     setMessage(null);
   }
 
-  function tryUnlock(actId: ActId, length: number) {
+  /** Koliesko v 3D: o delta ďalej (z aktuálneho stavu, aj pri rýchlom ťahaní). */
+  function stepDigit(actId: ActId, length: number, index: number, delta: number) {
+    setDigits((current) => {
+      const next = [...(current[actId] ?? Array.from({ length }, () => "0"))];
+      next[index] = String((((Number(next[index]) + delta) % 10) + 10) % 10);
+
+      return { ...current, [actId]: next };
+    });
+    setMessage(null);
+  }
+
+  /**
+   * Skúsi kód. Pri 3D sa hláška o otvorení ukáže až po oddialení pohľadu
+   * (showOpenedMessage = false), zlý kód hneď.
+   */
+  function tryUnlock(actId: ActId, length: number, showOpenedMessage = true) {
     const result = onUnlock(actId, getDigits(actId, length));
 
     if (result === "opened") {
       soundManager.play("chest-unlock");
-      setMessage("opened");
+      setMessage(showOpenedMessage ? "opened" : null);
     } else if (result === "wrong") {
       setMessage("wrong");
     }
+
+    return result;
   }
 
   function insertKey() {
@@ -138,6 +157,98 @@ export function FinaleChestScreen({
     );
   }
 
+  /* Zámky v poradí I, II, III (2D ovládanie, pri 3D v rozbaľovacom bloku). */
+  const lockRows = locks.map((lock, lockIndex) => {
+    const lockDigits = getDigits(lock.actId, lock.code.length);
+
+    return (
+      <div
+        key={lock.actId}
+        role="group"
+        aria-label={`Zámok ${lock.lockLabel} – ${
+          lock.isOpen
+            ? chest.lockOpenLabel
+            : lock.isNext
+              ? chest.lockNextLabel
+              : chest.lockClosedLabel
+        }`}
+        className={`rounded-2xl border p-4 ${
+          lock.isOpen
+            ? "border-emerald-300/40 bg-emerald-400/5"
+            : lock.isNext
+              ? "border-amber-300/40 bg-amber-400/5"
+              : "border-slate-700 bg-slate-950/60 opacity-60"
+        } ${
+          // Zámok vybraný ťuknutím v 3D truhlici.
+          selectedLockIndex === lockIndex ? "ring-4 ring-amber-200/70" : ""
+        }`}
+      >
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-sm font-black uppercase tracking-[0.15em] text-amber-200">
+            Zámok {lock.lockLabel}
+          </p>
+
+          <div className="flex gap-1.5">
+            {lock.isOpen
+              ? lock.code.map((_, index) => (
+                  <span
+                    key={index}
+                    aria-hidden="true"
+                    className="flex h-[136px] w-11 items-center justify-center rounded-md border border-emerald-300/40 bg-emerald-400/10 text-xl text-emerald-200"
+                  >
+                    ✓
+                  </span>
+                ))
+              : lockDigits.map((digit, index) => (
+                  <ChestDial
+                    key={index}
+                    value={Number(digit)}
+                    label={`Zámok ${lock.lockLabel}, číslica ${index + 1}`}
+                    disabled={!lock.isNext}
+                    onChange={(value) =>
+                      changeDigit(lock.actId, lock.code.length, index, value)
+                    }
+                  />
+                ))}
+          </div>
+        </div>
+
+        {lock.isNext && (
+          <div className="mt-4">
+            <ActionButton
+              onClick={() => tryUnlock(lock.actId, lock.code.length)}
+              className={STILL_BUTTON}
+            >
+              {chest.unlockLabel}
+            </ActionButton>
+          </div>
+        )}
+      </div>
+    );
+  });
+
+  const messages = (
+    <div aria-live="polite" className="mt-4">
+      {message === "wrong" && (
+        <p className="rounded-2xl border border-red-400/40 bg-red-500/10 px-4 py-3 text-[15px] leading-6 text-red-100">
+          {chest.wrongCodeText}
+        </p>
+      )}
+
+      {message === "opened" && (
+        <p className="rounded-2xl border border-emerald-300/40 bg-emerald-400/10 px-4 py-3 text-[15px] leading-6 text-emerald-100">
+          {areAllLocksOpen ? chest.lastLockOpenedText : chest.lockOpenedText}
+        </p>
+      )}
+
+      {isRewardVisible && (
+        <p className="rounded-2xl border border-amber-300/30 bg-amber-400/10 px-4 py-3 text-[15px] leading-6 text-amber-100">
+          {chest.openedText}
+        </p>
+      )}
+    </div>
+  );
+
   return (
     <ScreenContainer>
       <div className="mx-auto w-full max-w-md pb-8">
@@ -153,13 +264,31 @@ export function FinaleChestScreen({
               <InspectErrorBoundary onError={() => setMode("2d")}>
                 <Chest3DView
                   locks={locks}
+                  lockDigits={locks.map((lock) =>
+                    getDigits(lock.actId, lock.code.length).map(Number)
+                  )}
                   stateLabels={{
                     open: chest.lockOpenLabel,
                     closed: chest.lockClosedLabel,
                     next: chest.lockNextLabel,
                   }}
+                  texts={{
+                    backLabel: chest.backLabel,
+                    unlockLabel: chest.unlockLabel,
+                    dialWheelLabel: chest.dialWheelLabel,
+                  }}
                   selectedIndex={selectedLockIndex}
                   onSelectLock={setSelectedLockIndex}
+                  onStepDigit={(lockIndex, digitIndex, delta) => {
+                    const lock = locks[lockIndex];
+                    stepDigit(lock.actId, lock.code.length, digitIndex, delta);
+                  }}
+                  onUnlockLock={(lockIndex) => {
+                    const lock = locks[lockIndex];
+                    return tryUnlock(lock.actId, lock.code.length, false);
+                  }}
+                  onUnlockSettled={() => setMessage("opened")}
+                  onZoomChange={setIsZoomed}
                   isKeyInserted={isKeyVisible}
                   isLidOpen={isLidOpen}
                   reducedMotion={reducedMotion}
@@ -168,8 +297,26 @@ export function FinaleChestScreen({
               </InspectErrorBoundary>
             </div>
             <p className="mt-3 text-center text-[15px] leading-6 text-slate-400">
-              {chest.rotateHint}
+              {isZoomed ? chest.dialHint : chest.rotateHint}
             </p>
+
+            {messages}
+
+            {/* 2D ovládanie pre klávesnicu a čítačku – zbalené, vždy po ruke. */}
+            {!isChestOpened && (
+              <details className="group mt-6 rounded-2xl border border-slate-700 bg-slate-950/60">
+                <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 rounded-2xl px-4 py-3 text-[15px] font-bold text-slate-200 outline-none focus-visible:ring-4 focus-visible:ring-amber-300/60 [&::-webkit-details-marker]:hidden">
+                  {chest.accessibleControlsTitle}
+                  <span
+                    aria-hidden="true"
+                    className="text-amber-200 transition-transform group-open:rotate-180 motion-reduce:transition-none"
+                  >
+                    ▾
+                  </span>
+                </summary>
+                <div className="space-y-4 px-3 pb-4">{lockRows}</div>
+              </details>
+            )}
           </div>
         ) : (
         /* Truhlica (2D záloha) – pri vypnutých animáciách sa nič nehýbe (globals.css). */
@@ -225,99 +372,13 @@ export function FinaleChestScreen({
         </div>
         )}
 
-        {/* Zámky v poradí I, II, III */}
-        {!isChestOpened && (
-          <div className="mt-8 space-y-4">
-            {locks.map((lock, lockIndex) => {
-              const lockDigits = getDigits(lock.actId, lock.code.length);
-
-              return (
-                <div
-                  key={lock.actId}
-                  role="group"
-                  aria-label={`Zámok ${lock.lockLabel} – ${
-                    lock.isOpen
-                      ? chest.lockOpenLabel
-                      : lock.isNext
-                        ? chest.lockNextLabel
-                        : chest.lockClosedLabel
-                  }`}
-                  className={`rounded-2xl border p-4 ${
-                    lock.isOpen
-                      ? "border-emerald-300/40 bg-emerald-400/5"
-                      : lock.isNext
-                        ? "border-amber-300/40 bg-amber-400/5"
-                        : "border-slate-700 bg-slate-950/60 opacity-60"
-                  } ${
-                    // Zámok vybraný ťuknutím v 3D truhlici.
-                    selectedLockIndex === lockIndex ? "ring-4 ring-amber-200/70" : ""
-                  }`}
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="text-sm font-black uppercase tracking-[0.15em] text-amber-200">
-                      Zámok {lock.lockLabel}
-                    </p>
-
-                    <div className="flex gap-1.5">
-                      {lock.isOpen
-                        ? lock.code.map((_, index) => (
-                            <span
-                              key={index}
-                              aria-hidden="true"
-                              className="flex h-[136px] w-11 items-center justify-center rounded-md border border-emerald-300/40 bg-emerald-400/10 text-xl text-emerald-200"
-                            >
-                              ✓
-                            </span>
-                          ))
-                        : lockDigits.map((digit, index) => (
-                            <ChestDial
-                              key={index}
-                              value={Number(digit)}
-                              label={`Zámok ${lock.lockLabel}, číslica ${index + 1}`}
-                              disabled={!lock.isNext}
-                              onChange={(value) =>
-                                changeDigit(lock.actId, lock.code.length, index, value)
-                              }
-                            />
-                          ))}
-                    </div>
-                  </div>
-
-                  {lock.isNext && (
-                    <div className="mt-4">
-                      <ActionButton
-                        onClick={() => tryUnlock(lock.actId, lock.code.length)}
-                        className={STILL_BUTTON}
-                      >
-                        {chest.unlockLabel}
-                      </ActionButton>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+        {/* Pri 2D zálohe sú zámky a hlášky stále viditeľné pod truhlicou. */}
+        {mode === "2d" && (
+          <>
+            {!isChestOpened && <div className="mt-8 space-y-4">{lockRows}</div>}
+            {messages}
+          </>
         )}
-
-        <div aria-live="polite" className="mt-4">
-          {message === "wrong" && (
-            <p className="rounded-2xl border border-red-400/40 bg-red-500/10 px-4 py-3 text-[15px] leading-6 text-red-100">
-              {chest.wrongCodeText}
-            </p>
-          )}
-
-          {message === "opened" && (
-            <p className="rounded-2xl border border-emerald-300/40 bg-emerald-400/10 px-4 py-3 text-[15px] leading-6 text-emerald-100">
-              {chest.lockOpenedText}
-            </p>
-          )}
-
-          {isRewardVisible && (
-            <p className="rounded-2xl border border-amber-300/30 bg-amber-400/10 px-4 py-3 text-[15px] leading-6 text-amber-100">
-              {chest.openedText}
-            </p>
-          )}
-        </div>
 
         {areAllLocksOpen && !isKeyInserted && sequence === "idle" && (
           <div className="mt-6">

@@ -1,7 +1,11 @@
 "use client";
 
-import type { ThreeEvent } from "@react-three/fiber";
+import { type ThreeEvent, useFrame, useThree } from "@react-three/fiber";
+import { useEffect, useRef } from "react";
+import type { Group } from "three";
 import { CornerPlate, MysteriumEmblem, Rivet } from "../../ui/chest-3d/ChestParts";
+import { getShakeOffset, SHAKE_SEC, stepToward } from "./chestZoom";
+import { LockDials3D } from "./LockDials3D";
 
 export type ChestLockState = "closed" | "next" | "open";
 
@@ -26,16 +30,79 @@ const BRASS_LIGHT = "#d6a451";
 
 /** Pri ťahaní nemá ťuknutie na zámok vybrať zámok. */
 const CLICK_SLOP_PX = 6;
+/** Oblúk zámku: zasunutý a po odomknutí vysunutý hore (pomaly, aby to bolo vidieť). */
+const SHACKLE_CLOSED_Y = 0.14;
+const SHACKLE_OPEN_Y = 0.25;
+const SHACKLE_SPEED = 5;
+const MAX_FRAME_SECONDS = 0.05;
 
 function Lock3D({
   state,
   isSelected,
   onSelect,
+  digits,
+  shakeKey,
+  reducedMotion,
 }: {
   state: ChestLockState;
   isSelected: boolean;
   onSelect: () => void;
+  digits: number[];
+  /** Zvýšenie spustí krátke zatrasenie (pri vypnutých animáciách sa nemení). */
+  shakeKey: number;
+  reducedMotion: boolean;
 }) {
+  const invalidate = useThree((three) => three.invalidate);
+  const shakeRef = useRef<Group>(null);
+  const shackleRef = useRef<Group>(null);
+  const shackleTarget = state === "open" ? SHACKLE_OPEN_Y : SHACKLE_CLOSED_Y;
+  // Po F5 je odomknutý zámok hneď otvorený, bez vysúvania.
+  const shackleYRef = useRef(shackleTarget);
+  const shakeStartRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    invalidate();
+  }, [shackleTarget, invalidate]);
+
+  useEffect(() => {
+    if (shakeKey === 0) {
+      return;
+    }
+
+    shakeStartRef.current = performance.now();
+    invalidate();
+  }, [shakeKey, invalidate]);
+
+  useFrame((_, delta) => {
+    const dtSec = Math.min(delta, MAX_FRAME_SECONDS);
+
+    shackleYRef.current = stepToward(
+      shackleYRef.current,
+      shackleTarget,
+      dtSec,
+      reducedMotion,
+      SHACKLE_SPEED
+    );
+    shackleRef.current?.position.set(0, shackleYRef.current, 0.09);
+
+    let shake = 0;
+
+    if (shakeStartRef.current !== null) {
+      const elapsedSec = (performance.now() - shakeStartRef.current) / 1000;
+      shake = getShakeOffset(elapsedSec);
+
+      if (elapsedSec >= SHAKE_SEC) {
+        shakeStartRef.current = null;
+      }
+    }
+
+    shakeRef.current?.position.set(shake, 0, 0);
+
+    if (shackleYRef.current !== shackleTarget || shakeStartRef.current !== null) {
+      invalidate();
+    }
+  });
+
   const glow =
     state === "next"
       ? { emissive: "#ffb347", emissiveIntensity: 0.45 }
@@ -53,7 +120,7 @@ function Lock3D({
   }
 
   return (
-    <group onClick={handleClick}>
+    <group ref={shakeRef} onClick={handleClick}>
       {/* Platnička zámku */}
       <mesh>
         <boxGeometry args={[0.66, 0.76, 0.06]} />
@@ -85,22 +152,16 @@ function Lock3D({
         />
       </mesh>
 
-      {/* Tri okienka číselníka */}
-      {[-0.13, 0, 0.13].map((x) => (
-        <mesh key={x} position={[x, -0.06, 0.165]}>
-          <boxGeometry args={[0.09, 0.13, 0.02]} />
-          <meshStandardMaterial color="#120a05" roughness={0.8} metalness={0.1} />
-        </mesh>
-      ))}
+      {/* Tri kolieska číselníka */}
+      <LockDials3D digits={digits} reducedMotion={reducedMotion} />
 
-      {/* Oblúk zámku – po odomknutí vysunutý hore */}
-      <mesh
-        position={[0, state === "open" ? 0.25 : 0.14, 0.09]}
-        rotation={[0, 0, 0]}
-      >
-        <torusGeometry args={[0.15, 0.035, 12, 24, Math.PI]} />
-        <meshStandardMaterial color={BRASS_LIGHT} roughness={0.28} metalness={0.9} />
-      </mesh>
+      {/* Oblúk zámku – po odomknutí sa vysunie hore (poloha v snímke) */}
+      <group ref={shackleRef}>
+        <mesh>
+          <torusGeometry args={[0.15, 0.035, 12, 24, Math.PI]} />
+          <meshStandardMaterial color={BRASS_LIGHT} roughness={0.28} metalness={0.9} />
+        </mesh>
+      </group>
 
       <Rivet position={[-0.25, 0.3, 0.04]} scale={0.6} />
       <Rivet position={[0.25, 0.3, 0.04]} scale={0.6} />
@@ -128,10 +189,15 @@ function InsertedKey() {
 
 type ChestModel3DProps = {
   lockStates: ChestLockState[];
+  /** Číslice na kolieskach každého zámku. */
+  lockDigits: number[][];
+  /** Počítadlo zatrasení každého zámku (zlý kód). */
+  shakeKeys: number[];
   selectedIndex: number | null;
   onSelectLock: (index: number) => void;
   isKeyInserted: boolean;
   isLidOpen: boolean;
+  reducedMotion: boolean;
 };
 
 /**
@@ -140,10 +206,13 @@ type ChestModel3DProps = {
  */
 export function ChestModel3D({
   lockStates,
+  lockDigits,
+  shakeKeys,
   selectedIndex,
   onSelectLock,
   isKeyInserted,
   isLidOpen,
+  reducedMotion,
 }: ChestModel3DProps) {
   return (
     <group>
@@ -211,6 +280,9 @@ export function ChestModel3D({
             state={lockStates[index] ?? "closed"}
             isSelected={selectedIndex === index}
             onSelect={() => onSelectLock(index)}
+            digits={lockDigits[index] ?? [0, 0, 0]}
+            shakeKey={shakeKeys[index] ?? 0}
+            reducedMotion={reducedMotion}
           />
         </group>
       ))}

@@ -11,6 +11,7 @@ import {
   useState,
 } from "react";
 import type { Group } from "three";
+import type { UnlockFinaleLockResult } from "../../../engine";
 import { InspectStage } from "../../items/3d/InspectStage";
 import {
   applyDrag,
@@ -24,10 +25,12 @@ import {
   stepRotation,
   tiltByStep,
 } from "../../items/3d/rotationPhysics";
+import { ActionButton } from "../../ui/ActionButton";
 import {
   getFacingYawForLocks,
   getNearestYaw,
   isLockFacing,
+  LOCK_FACE_YAWS,
 } from "./chestFacing";
 import {
   type ChestLockState,
@@ -35,14 +38,25 @@ import {
   LOCK_LABEL_OFFSET,
   LOCK_PLACEMENTS,
 } from "./ChestModel3D";
+import {
+  blendTransform,
+  type ChestTransform,
+  easeZoom,
+  getDragSteps,
+  getTapStep,
+  getZoomTransform,
+  OVERVIEW_TRANSFORM,
+  stepZoom,
+} from "./chestZoom";
 
 /** Najdlhší krok jednej snímky – po prepnutí karty prehliadača neskočí truhlica. */
 const MAX_FRAME_SECONDS = 0.05;
-/** Truhlica je mierne naklonená, aby bolo vidieť aj veko. */
-const BASE_TILT = 0.32;
-const CHEST_SCALE = 0.55;
 /** Posun ukazovateľa, od ktorého ide o ťahanie (nie ťuknutie). */
 const DRAG_SLOP_PX = 6;
+/** Po správnom kóde chvíľu ostane priblížené, aby bolo vidieť zelený zámok. */
+const UNLOCK_ZOOM_OUT_DELAY_MS = 350;
+
+const STILL_BUTTON = "motion-reduce:transition-none motion-reduce:active:scale-100";
 
 type LockView = {
   lockLabel: string;
@@ -50,9 +64,15 @@ type LockView = {
   isNext: boolean;
 };
 
-/** Premenlivý stav otáčania mimo Reactu (ako pri 3D predmetoch). */
+/** Premenlivý stav otáčania a priblíženia mimo Reactu (ako pri 3D predmetoch). */
 class ChestController {
   state: RotationState;
+  /** Priebeh priblíženia 0 (celá truhlica) až 1 (zámok). */
+  zoom = 0;
+  zoomTarget = 0;
+  zoomTransform: ChestTransform = OVERVIEW_TRANSFORM;
+  /** Od priblíženia, kým sa pohľad celý nevráti späť. */
+  isZoomActive = false;
   private facing: boolean[] = [];
   private drag: {
     pointerId: number;
@@ -82,6 +102,39 @@ class ChestController {
   /** Krok v snímke – ďalšiu snímku si nevyžiada (o nej rozhodne pokoj truhlice). */
   advance(change: (state: RotationState) => RotationState) {
     this.state = change(this.state);
+  }
+
+  zoomIn(transform: ChestTransform) {
+    this.zoomTransform = transform;
+    this.zoomTarget = 1;
+    this.isZoomActive = true;
+    this.invalidate?.();
+  }
+
+  zoomOut() {
+    this.zoomTarget = 0;
+    this.invalidate?.();
+  }
+
+  /** Krok priblíženia v snímke; vráti, ako veľmi je priblížené (0 až 1). */
+  advanceZoom(dtSec: number, reducedMotion: boolean) {
+    this.zoom = stepZoom(this.zoom, this.zoomTarget, dtSec, reducedMotion);
+
+    return easeZoom(this.zoom);
+  }
+
+  isZoomMoving() {
+    return this.zoom !== this.zoomTarget;
+  }
+
+  /** Vráti true práve raz, keď sa pohľad po priblížení celý vrátil na truhlicu. */
+  takeZoomedOut() {
+    if (this.isZoomActive && this.zoomTarget === 0 && this.zoom === 0) {
+      this.isZoomActive = false;
+      return true;
+    }
+
+    return false;
   }
 
   /** Zapamätá, ktoré zámky sú natočené k hráčovi; vráti true pri zmene. */
@@ -144,15 +197,24 @@ function ChestRotation({
   controller,
   reducedMotion,
   onFacingChange,
+  onZoomedOut,
   children,
 }: {
   controller: ChestController;
   reducedMotion: boolean;
   onFacingChange: (facing: boolean[]) => void;
+  /** Pohľad sa po priblížení celý vrátil na truhlicu. */
+  onZoomedOut: () => void;
   children: ReactNode;
 }) {
+  const positionRef = useRef<Group>(null);
   const groupRef = useRef<Group>(null);
   const invalidate = useThree((state) => state.invalidate);
+  const onZoomedOutRef = useRef(onZoomedOut);
+
+  useEffect(() => {
+    onZoomedOutRef.current = onZoomedOut;
+  });
 
   useEffect(() => {
     controller.setInvalidate(invalidate);
@@ -165,9 +227,14 @@ function ChestRotation({
     const dtSec = Math.min(delta, MAX_FRAME_SECONDS);
 
     controller.advance((state) => stepRotation(state, dtSec, reducedMotion));
+    const zoomAmount = controller.advanceZoom(dtSec, reducedMotion);
 
     const { yaw, tilt } = controller.state;
-    groupRef.current?.rotation.set(BASE_TILT + tilt, yaw, 0);
+    const view = blendTransform(OVERVIEW_TRANSFORM, controller.zoomTransform, zoomAmount);
+
+    positionRef.current?.position.set(0, view.y, view.z);
+    groupRef.current?.scale.setScalar(view.scale);
+    groupRef.current?.rotation.set(view.tilt + tilt, yaw, 0);
 
     const facing = LOCK_PLACEMENTS.map((_placement, index) =>
       isLockFacing(yaw, tilt, index)
@@ -177,26 +244,134 @@ function ChestRotation({
       onFacingChange(facing);
     }
 
+    if (controller.takeZoomedOut()) {
+      onZoomedOutRef.current();
+    }
+
     // Ďalšiu snímku iba vtedy, keď sa truhlica hýbe.
-    if (!isRotationAtRest(controller.state)) {
+    if (!isRotationAtRest(controller.state) || controller.isZoomMoving()) {
       invalidate();
     }
   });
 
   return (
-    <group position={[0, -0.12, 0]}>
-      <group ref={groupRef} scale={CHEST_SCALE}>
-        {children}
-      </group>
+    <group ref={positionRef}>
+      <group ref={groupRef}>{children}</group>
     </group>
+  );
+}
+
+/** Jedno koliesko nad scénou: ťuknutie hore/dole, ťahanie prstom, šípky. */
+function DialWheelControl({
+  value,
+  label,
+  onStep,
+  wheelRef,
+}: {
+  value: number;
+  label: string;
+  onStep: (delta: number) => void;
+  wheelRef?: (element: HTMLDivElement | null) => void;
+}) {
+  const dragRef = useRef<{
+    pointerId: number;
+    startY: number;
+    appliedSteps: number;
+    isDragging: boolean;
+  } | null>(null);
+
+  function handlePointerDown(event: PointerEvent<HTMLDivElement>) {
+    event.currentTarget.setPointerCapture(event.pointerId);
+    dragRef.current = {
+      pointerId: event.pointerId,
+      startY: event.clientY,
+      appliedSteps: 0,
+      isDragging: false,
+    };
+  }
+
+  function handlePointerMove(event: PointerEvent<HTMLDivElement>) {
+    const drag = dragRef.current;
+
+    if (!drag || drag.pointerId !== event.pointerId) {
+      return;
+    }
+
+    const deltaY = event.clientY - drag.startY;
+    drag.isDragging ||= Math.abs(deltaY) > DRAG_SLOP_PX;
+
+    const steps = getDragSteps(deltaY);
+
+    if (drag.isDragging && steps !== drag.appliedSteps) {
+      onStep(steps - drag.appliedSteps);
+      drag.appliedSteps = steps;
+    }
+  }
+
+  function handlePointerUp(event: PointerEvent<HTMLDivElement>) {
+    const drag = dragRef.current;
+    dragRef.current = null;
+
+    if (!drag || drag.pointerId !== event.pointerId || drag.isDragging) {
+      return;
+    }
+
+    const rect = event.currentTarget.getBoundingClientRect();
+    onStep(getTapStep(event.clientY - rect.top, rect.height));
+  }
+
+  function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+    if (event.key === "ArrowUp") {
+      onStep(1);
+    } else if (event.key === "ArrowDown") {
+      onStep(-1);
+    } else {
+      return;
+    }
+
+    event.preventDefault();
+  }
+
+  return (
+    <div
+      ref={wheelRef}
+      role="spinbutton"
+      tabIndex={0}
+      aria-label={label}
+      aria-valuemin={0}
+      aria-valuemax={9}
+      aria-valuenow={value}
+      aria-valuetext={`číslica ${value}`}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={() => {
+        dragRef.current = null;
+      }}
+      onKeyDown={handleKeyDown}
+      className="flex min-h-11 min-w-11 flex-1 cursor-ns-resize touch-none select-none flex-col items-center justify-between rounded-xl py-1 text-lg text-amber-100/80 outline-none [text-shadow:0_1px_3px_rgba(0,0,0,0.9)] focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-amber-300"
+    >
+      <span aria-hidden="true">▲</span>
+      <span aria-hidden="true">▼</span>
+    </div>
   );
 }
 
 type Chest3DViewProps = {
   locks: LockView[];
+  /** Číslice na kolieskach každého zámku (spoločné s 2D ovládaním). */
+  lockDigits: number[][];
   stateLabels: { open: string; closed: string; next: string };
+  texts: { backLabel: string; unlockLabel: string; dialWheelLabel: string };
   selectedIndex: number | null;
   onSelectLock: (index: number) => void;
+  /** Pootočí koliesko o delta (+1 hore, −1 dole). */
+  onStepDigit: (lockIndex: number, digitIndex: number, delta: number) => void;
+  /** Skúsi kód priblíženého zámku (kontrola je iba v engine). */
+  onUnlockLock: (lockIndex: number) => UnlockFinaleLockResult;
+  /** Po správnom kóde sa pohľad oddialil – čas na hlášku. */
+  onUnlockSettled: (lockIndex: number) => void;
+  onZoomChange: (isZoomed: boolean) => void;
   isKeyInserted: boolean;
   isLidOpen: boolean;
   reducedMotion: boolean;
@@ -215,12 +390,27 @@ function getLabelPosition(index: number): [number, number, number] {
   ];
 }
 
+/** „Koliesko {index} z {count}“ → „koliesko 1 z 3“ (pokračuje za názvom zámku). */
+function formatWheelLabel(template: string, index: number, count: number) {
+  const label = template
+    .replace("{index}", String(index))
+    .replace("{count}", String(count));
+
+  return label.charAt(0).toLowerCase() + label.slice(1);
+}
+
 /** 3D truhlica vo finále (načítava sa až na obrazovke truhlice). */
 export default function Chest3DView({
   locks,
+  lockDigits,
   stateLabels,
+  texts,
   selectedIndex,
   onSelectLock,
+  onStepDigit,
+  onUnlockLock,
+  onUnlockSettled,
+  onZoomChange,
   isKeyInserted,
   isLidOpen,
   reducedMotion,
@@ -231,12 +421,30 @@ export default function Chest3DView({
     () => new ChestController(getFacingYawForLocks(locks))
   );
   const [facing, setFacing] = useState<boolean[]>([]);
+  const [zoomedIndex, setZoomedIndex] = useState<number | null>(null);
+  const [isZoomActive, setIsZoomActive] = useState(false);
+  const [shakeKeys, setShakeKeys] = useState(() => locks.map(() => 0));
+  const rootRef = useRef<HTMLDivElement>(null);
+  const firstWheelRef = useRef<HTMLDivElement | null>(null);
+  const pendingSettleRef = useRef<number | null>(null);
+  const timersRef = useRef<number[]>([]);
   const facingYaw = getFacingYawForLocks(locks);
   const lastFacingYawRef = useRef(facingYaw);
+  // Kolieska nad scénou iba pri zámku, ktorý je stále na rade.
+  const overlayIndex =
+    zoomedIndex !== null && locks[zoomedIndex]?.isNext && !isKeyInserted
+      ? zoomedIndex
+      : null;
 
-  // Po odomknutí sa truhlica natočí k ďalšiemu zámku (pri vypnutých animáciách hneď).
+  useEffect(
+    () => () => timersRef.current.forEach((timer) => window.clearTimeout(timer)),
+    []
+  );
+
+  // Po odomknutí sa truhlica natočí k ďalšiemu zámku – až keď sa pohľad oddiali
+  // (pri vypnutých animáciách hneď).
   useEffect(() => {
-    if (facingYaw === lastFacingYawRef.current) {
+    if (isZoomActive || facingYaw === lastFacingYawRef.current) {
       return;
     }
 
@@ -244,14 +452,112 @@ export default function Chest3DView({
     controller.update((state) =>
       snapToYaw(state, getNearestYaw(state.yaw, facingYaw), reducedMotion)
     );
-  }, [controller, facingYaw, reducedMotion]);
+  }, [controller, facingYaw, isZoomActive, reducedMotion]);
+
+  // Zámok sa odomkol inak (2D ovládaním) počas priblíženia – oddialiť.
+  useEffect(() => {
+    if (zoomedIndex !== null && overlayIndex === null && pendingSettleRef.current === null) {
+      controller.zoomOut();
+    }
+  }, [controller, zoomedIndex, overlayIndex]);
+
+  // Po priblížení dostane fokus prvé koliesko (čítačka ho hneď prečíta).
+  useEffect(() => {
+    if (overlayIndex !== null) {
+      firstWheelRef.current?.focus({ preventScroll: true });
+    }
+  }, [overlayIndex]);
 
   const lockStates: ChestLockState[] = locks.map((lock) =>
     lock.isOpen ? "open" : lock.isNext ? "next" : "closed"
   );
 
+  function zoomIn(index: number) {
+    const [x, y, z] = LOCK_PLACEMENTS[index].position;
+
+    controller.zoomIn(getZoomTransform(y, Math.hypot(x, z)));
+    controller.update((state) =>
+      snapToYaw(state, getNearestYaw(state.yaw, LOCK_FACE_YAWS[index] ?? 0), reducedMotion)
+    );
+    setZoomedIndex(index);
+    setIsZoomActive(true);
+    onZoomChange(true);
+    rootRef.current?.scrollIntoView({
+      block: "nearest",
+      behavior: reducedMotion ? "auto" : "smooth",
+    });
+  }
+
+  function handleSelectLock(index: number) {
+    onSelectLock(index);
+
+    if (!isZoomActive && locks[index]?.isNext && !isKeyInserted) {
+      zoomIn(index);
+    }
+  }
+
+  /** Fokus z koliesok späť na truhlicu, kým kolieska zmiznú. */
+  function keepFocusOnChest() {
+    const root = rootRef.current;
+
+    if (root && root !== document.activeElement && root.contains(document.activeElement)) {
+      root.focus({ preventScroll: true });
+    }
+  }
+
+  function zoomBack() {
+    keepFocusOnChest();
+    setZoomedIndex(null);
+    controller.zoomOut();
+  }
+
+  function unlockZoomedLock() {
+    if (overlayIndex === null) {
+      return;
+    }
+
+    const index = overlayIndex;
+    const result = onUnlockLock(index);
+
+    if (result === "wrong") {
+      if (!reducedMotion) {
+        setShakeKeys((keys) => keys.map((key, i) => (i === index ? key + 1 : key)));
+      }
+
+      return;
+    }
+
+    if (result === "opened") {
+      // Zámok zozelenie a vysunie oblúk, potom sa pohľad oddiali.
+      // Kolieska a tlačidlá zmiznú – fokus prejde na truhlicu.
+      keepFocusOnChest();
+      pendingSettleRef.current = index;
+
+      if (reducedMotion) {
+        controller.zoomOut();
+      } else {
+        timersRef.current.push(
+          window.setTimeout(() => controller.zoomOut(), UNLOCK_ZOOM_OUT_DELAY_MS)
+        );
+      }
+    }
+  }
+
+  function handleZoomedOut() {
+    setZoomedIndex(null);
+    setIsZoomActive(false);
+    onZoomChange(false);
+
+    const settledIndex = pendingSettleRef.current;
+
+    if (settledIndex !== null) {
+      pendingSettleRef.current = null;
+      onUnlockSettled(settledIndex);
+    }
+  }
+
   function handlePointerDown(event: PointerEvent<HTMLDivElement>) {
-    if ((event.target as HTMLElement).closest("button")) {
+    if (isZoomActive || (event.target as HTMLElement).closest("button")) {
       return;
     }
 
@@ -270,7 +576,13 @@ export default function Chest3DView({
   }
 
   function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
-    if (event.target !== event.currentTarget) {
+    if (event.key === "Escape" && overlayIndex !== null) {
+      event.preventDefault();
+      zoomBack();
+      return;
+    }
+
+    if (event.target !== event.currentTarget || isZoomActive) {
       return;
     }
 
@@ -299,8 +611,12 @@ export default function Chest3DView({
     event.preventDefault();
   }
 
+  const overlayLock = overlayIndex === null ? null : locks[overlayIndex];
+  const overlayDigits = overlayIndex === null ? [] : (lockDigits[overlayIndex] ?? []);
+
   return (
     <div
+      ref={rootRef}
       role="group"
       tabIndex={0}
       aria-label="Truhlica – otáčaj ju ťahaním alebo šípkami doľava a doprava"
@@ -309,7 +625,10 @@ export default function Chest3DView({
       onPointerUp={handlePointerEnd}
       onPointerCancel={handlePointerEnd}
       onKeyDown={handleKeyDown}
-      className="relative h-full w-full cursor-grab touch-none select-none rounded-2xl outline-none focus-visible:ring-4 focus-visible:ring-amber-300/60 active:cursor-grabbing"
+      // scroll-mt: pri priblížení sa truhlica posunie celá pod pevnú hlavičku (161 px).
+      className={`relative h-full w-full scroll-mt-44 scroll-mb-4 touch-none select-none rounded-2xl outline-none focus-visible:ring-4 focus-visible:ring-amber-300/60 ${
+        isZoomActive ? "" : "cursor-grab active:cursor-grabbing"
+      }`}
     >
       <InspectStage onFailure={onFailure}>
         {/* Drevo je tmavé – trochu viac svetla ako pri predmetoch. */}
@@ -319,21 +638,25 @@ export default function Chest3DView({
           controller={controller}
           reducedMotion={reducedMotion}
           onFacingChange={setFacing}
+          onZoomedOut={handleZoomedOut}
         >
           <ChestModel3D
             lockStates={lockStates}
+            lockDigits={lockDigits}
+            shakeKeys={shakeKeys}
             selectedIndex={selectedIndex}
-            onSelectLock={onSelectLock}
+            onSelectLock={handleSelectLock}
             isKeyInserted={isKeyInserted}
             isLidOpen={isLidOpen}
+            reducedMotion={reducedMotion}
           />
 
           {locks.map((lock, index) =>
-            facing[index] ? (
+            facing[index] && !isZoomActive ? (
               <Html key={lock.lockLabel} position={getLabelPosition(index)} center>
                 <button
                   type="button"
-                  onClick={() => onSelectLock(index)}
+                  onClick={() => handleSelectLock(index)}
                   aria-pressed={selectedIndex === index}
                   aria-label={`Zámok ${lock.lockLabel} – ${
                     lock.isOpen
@@ -358,6 +681,51 @@ export default function Chest3DView({
           )}
         </ChestRotation>
       </InspectStage>
+
+      {/* Priblížený zámok: kolieska v tretinách šírky, pod nimi tlačidlá. */}
+      {overlayIndex !== null && overlayLock && (
+        <div className="absolute inset-0 flex flex-col">
+          <div className="flex min-h-0 flex-1">
+            {overlayDigits.map((digit, digitIndex) => (
+              <DialWheelControl
+                key={digitIndex}
+                value={digit}
+                label={`Zámok ${overlayLock.lockLabel}, ${formatWheelLabel(
+                  texts.dialWheelLabel,
+                  digitIndex + 1,
+                  overlayDigits.length
+                )}`}
+                onStep={(delta) => onStepDigit(overlayIndex, digitIndex, delta)}
+                wheelRef={
+                  digitIndex === 0
+                    ? (element) => {
+                        firstWheelRef.current = element;
+                      }
+                    : undefined
+                }
+              />
+            ))}
+          </div>
+
+          <div className="flex gap-2 p-2">
+            <ActionButton
+              variant="secondary"
+              fullWidth={false}
+              onClick={zoomBack}
+              className={`h-[54px] shrink-0 px-4 py-0 ${STILL_BUTTON}`}
+            >
+              {texts.backLabel}
+            </ActionButton>
+            <ActionButton
+              onClick={unlockZoomedLock}
+              // Užšie medzery medzi písmenami – nápis sa zmestí do riadku aj na 360 px.
+              className={`h-[54px] flex-1 px-3 py-0 tracking-[0.06em]! ${STILL_BUTTON}`}
+            >
+              {texts.unlockLabel}
+            </ActionButton>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

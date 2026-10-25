@@ -2605,3 +2605,112 @@ Snímky: vstup (zámok I), po otočení, natočená k II, natočená k III, otvo
 **Lint:** nové a zmenené súbory bez chýb (okrem starých chýb v nevyužívanom `ChestModel.tsx`).
 
 **Ďalší krok:** B4c-2 (zadávanie číslic v 3D s priblížením na zámok), až po potvrdení.
+
+## 25. 10. 2026 – Krok 65 (krok B4c-2): Zadávanie číslic v 3D s priblížením na zámok
+
+**Čo sa urobilo:**
+- **Priblíženie:**
+  - Ťuknutie na zámok na rade (na zámok alebo jeho štítok) natočí truhlicu rovno k hráčovi a plynulo ju priblíži, kým tri kolieska nevyplnia obrázok. Pri vypnutých animáciách sa priblíži hneď.
+  - Kamera stojí, truhlica sa posunie a zväčší. Kolieska sú presne v tretinách šírky, aby pod nimi sedeli dotykové stĺpce.
+  - Počas priblíženia sa truhlica neotáča a štítky zámkov sú skryté.
+  - Zamknutý zámok, ktorý nie je na rade, sa iba zvýrazní. Odomknutý zámok nereaguje.
+- **Tri kolieska v 3D** (nový `components/finale/chest3d/LockDials3D.tsx`):
+  - Valce s číslicami 0 až 9 dokola. Číslice sú nakreslené systémovým písmom do malej textúry, nič sa nesťahuje.
+  - Pri zmene sa koliesko plynulo pretočí najkratšou cestou (9 → 0 o jeden krok).
+  - Nahradili tri tmavé okienka na zámku.
+- **Ovládanie koliesok nad scénou:**
+  - Tri stĺpce, na 360 px každý 109 × 176 px. Ťuknutie do hornej polovice pridá 1, do dolnej uberie 1. Ťahanie prstom hore pridáva, dole uberá (32 px na číslicu).
+  - Šípky ▲ ▼ ukazujú, kam ťuknúť.
+  - Pre čítačku a klávesnicu je každé koliesko „otočné pole“ s popisom napríklad „Zámok I, koliesko 1 z 3“ a hodnotou „číslica 4“. Mení sa šípkami hore a dole.
+  - Po priblížení dostane fokus prvé koliesko.
+- **Tlačidlá nad scénou (54 px):**
+  - „Späť“ oddiali pohľad bez odomykania. Rovnako funguje klávesa Esc.
+  - „Odomknúť zámok“.
+  - Číslice ostanú nastavené, lebo 3D aj 2D ovládanie menia ten istý stav.
+- **Zlý kód:**
+  - Zobrazí sa text a zámok sa na 0,45 s zatrasie. Pri vypnutých animáciách iba text.
+  - Neprezradí, ktorá číslica je zlá, nič sa neuloží, priblíženie ostane a fokus ostane na tlačidle.
+- **Správny kód:**
+  - Zámok hneď zozelenie a plynulo vysunie oblúk. Kolieska a tlačidlá zmiznú.
+  - Po 0,35 s sa pohľad plynulo oddiali, potom sa ukáže hláška a truhlica sa natočí k ďalšiemu zámku.
+  - Po treťom zámku príde hláška o kľúči a tlačidlo „Vložiť Zlatý kľúč“ (kľúč a veko v 3D sú až v B4c-3).
+  - Pri vypnutých animáciách sa všetko stane naraz.
+- **2D ovládanie:**
+  - Pri 3D je v rozbaľovacom bloku `<details>` „Ovládanie pre klávesnicu a čítačku“, na začiatku zbalenom.
+  - Hlášky sú hneď pod obrázkom, mimo bloku, a čítačka ich prečíta pri oboch spôsoboch.
+  - Pri záložnej 2D truhlici (`?bez3d`, chyba WebGL) je ovládanie viditeľné stále ako doteraz.
+  - Ak sa zámok odomkne 2D ovládaním počas priblíženia, pohľad sa oddiali.
+- **Posun stránky:** pri priblížení sa stránka posunie tak, aby bola celá truhlica pod pevnou hlavičkou (161 px).
+- **Nové a zmenené schválené texty v dátach:**
+  - `lockOpenedText` (zmena, platí aj pre 2D): „Gratulujem, zámok sa otvoril. Pokračuj ďalším zámkom.“
+  - `lastLockOpenedText`: „Gratulujem, posledný zámok sa otvoril. Teraz vlož Zlatý kľúč.“
+  - `backLabel`: „Späť“
+  - `dialHint`: „Ťukni hore alebo dole na koliesko, alebo ním potiahni prstom.“
+  - `dialWheelLabel`: „Koliesko {index} z {count}“
+  - `accessibleControlsTitle`: „Ovládanie pre klávesnicu a čítačku“
+- **Výpočty bez kreslenia** sú v novom `components/finale/chest3d/chestZoom.ts` (priblíženie, kolieska, zatrasenie, dobiehanie), aby sa dali testovať.
+- **Engine (`engine/finale.ts`) ani uloženie sa nemenili.** Kódy kontroluje iba engine a v komponentoch nie sú.
+
+**Test (mimo projektu, necommitnutý):** pred zmenou 14 chýb, po zmene **33 z 33 OK**. Overuje:
+- texty,
+- kolieska (krok dokola, najkratšia cesta, ťuknutie, ťahanie),
+- priblíženie (plynulé do 1 s, okamžité pri vypnutých animáciách, kolieska v tretinách šírky a nad tlačidlami, zámok pred kamerou),
+- zatrasenie, dobiehanie,
+- rozbaľovací blok, kolieska pre čítačku, tlačidlá z dát,
+- písmo sa nesťahuje, kódy v komponentoch nie sú.
+
+**V prehliadači na dev serveri (360 px), nový test:** pred zmenou zlyhal (kolieska, blok a texty neexistovali).
+- **Po zmene 3D: 48 z 48.**
+  - zbalený blok (47 px),
+  - priblíženie: tri kolieska s popisom, štítky skryté, stĺpce 109 × 176 px, tlačidlá 54 px, pokyn ku kolieskam,
+  - plátno v pokoji nekreslí (aj priblížené),
+  - zlý kód: text, zatrasenie, nič sa neuloží, fokus ostane,
+  - ťuknutie hore a dole, ťahanie hore o 80 px (+2) a dole, šípky, rovnaký stav v 2D,
+  - „Späť“ aj Esc bez odomknutia,
+  - zámok I ťukaním 3-8-1: hláška až po oddialení, natočenie k II,
+  - F5, zámok II cez 2D blok, F5,
+  - zámok III klávesmi 9-2-7: hláška o kľúči, tlačidlo kľúča, natočenie dopredu,
+  - F5, bez chýb v prehliadači.
+- **Vypnuté animácie: 48 z 48** (bez trasenia, hláška hneď).
+- **`?bez3d` a nefunkčné WebGL:** všetko OK (2D bez bloku, nové hlášky).
+
+**Všetky doterajšie testy:** B4c-1 18/18, C1 63/63, B7 20/20 (celá kapitola, skóre **1010**), B6 32/32, B5 21/21, B4b 26/26, B4a 20/20, B3b 25/25 (aj staré uloženia), texty 37/37, B3a 65/65, kresba kľúča 54/54, nápovedy 37/37.
+- **Staré testy v prehliadači:** B4b (3D aj `?bez3d`) OK, B4c-1 (3D, vypnuté animácie, `?bez3d`, nefunkčné WebGL) OK.
+- Úpravy starých testov:
+  - test textov a B4b na nový schválený text hlášky,
+  - B4c-1: ťuknutie na zámok na rade ho teraz aj priblíži, test potom stlačí „Späť“.
+
+Snímky: priblíženie, zlý kód, po odomknutí, 2D blok, zámok III, všetko odomknuté.
+
+**Výkon (produkčný build):**
+- úvodná stránka bez zmeny (8 skriptov, 204,6 kB),
+- pri vstupe na truhlicu pribudne 240,9 kB: 234,4 kB three.js, **6,5 kB truhlica** (predtým 3,8 kB).
+
+**Chyby počas práce:**
+- **Ťuknutie na hornú časť kolieska nefungovalo.** Pevná hlavička (161 px) zakrývala hornú časť truhlice, keď bola stránka posunutá, a ťuknutie trafilo hlavičku. Opravené v hre: pri priblížení sa truhlica posunie celá pod hlavičku (`scroll-mt-44`).
+- **Po zlom kóde sa fokus presúval z tlačidla na truhlicu**, čo by používateľa klávesnice rušilo. Opravené: fokus sa presúva iba po správnom kóde, keď tlačidlá zmiznú.
+- **Nápis „ODOMKNÚŤ ZÁMOK“** sa nad scénou na 360 px zalomil do dvoch riadkov. Opravené užšími medzerami medzi písmenami.
+- **Lint:** tri chyby v nových súboroch (priama zmena ovládača v snímke, `useMemo` bez vnorenej funkcie). Opravené: zmeny cez metódy ovládača.
+- **Testy:**
+  - Overenie viditeľnosti v zbalenom bloku bolo zlé (Chrome hlási skryté prvky inak). Opravené na `checkVisibility()`.
+  - Testy čakali príliš krátko, lebo softvérové kreslenie v testovacom prehliadači je pomalé. Upravené tak, aby čakali na pokoj plátna a na hlášku najviac 5 s.
+  - Kontrola „bez trasenia“ započítala jedno prekreslenie hneď po ťuknutí. Spresnená na čas 0,1 až 0,35 s po ťuknutí.
+- **Porušenie pravidla o UTF-8:** dva pomocné súbory mimo projektu (ladiaci skript a spúšťací skript testu) som upravil alebo vytvoril cez PowerShell a pokazila sa v nich diakritika. Prepísané cez Write. Súbory projektu to nezasiahlo.
+- **Lint celého projektu:** ostávajú staré chyby a upozornenia v súboroch, ktoré sa v tomto kroku nemenili (napríklad `ActChestScreen.tsx`, `CodexBar.tsx`, `ChestCameraRig.tsx`, `ChestModel.tsx`, `useGameEngine.ts`).
+
+**Poznámka:** odomknutý zámok v 3D ukazuje na kolieskach číslice, ktoré hráč sám nastavil, až kým sa stránka neobnoví (po F5 ukazuje 0-0-0). 2D ovládanie ukazuje pri odomknutom zámku ✓.
+
+**Do kontroly pred vydaním** pribudlo: vyskúšať kolieska prstom a s čítačkou na skutočnom mobile.
+
+**Zmenené súbory:**
+- `types/game.ts`, `data/chapter-one/finale.ts`
+- `components/finale/chest3d/Chest3DView.tsx`, `ChestModel3D.tsx`
+- `components/finale/chest3d/chestZoom.ts`, `LockDials3D.tsx` (nové)
+- `components/screens/FinaleChestScreen.tsx`
+- `docs/KONTROLA-PRED-VYDANIM.md`, `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** nové a zmenené súbory bez chýb.
+
+**Ďalší krok:** B4c-3 (vloženie Zlatého kľúča a otvorenie veka v 3D), prípadne malý krok s opravou zbytočného kreslenia pri 3D predmetoch, až po potvrdení.

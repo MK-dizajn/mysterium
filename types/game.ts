@@ -370,6 +370,8 @@ export type FinaleChest = {
   keyItemId: string;
   wrongCodeText: string;
   lockOpenedText: string;
+  /** Hláška po odomknutí posledného zámku. */
+  lastLockOpenedText: string;
   /** Tlačidlo pod zámkom, ktorý je na rade. */
   unlockLabel: string;
   /** Stav zámku pre čítačku. */
@@ -378,6 +380,14 @@ export type FinaleChest = {
   lockNextLabel: string;
   /** Riadok pod 3D truhlicou. */
   rotateHint: string;
+  /** Oddialenie priblíženého zámku bez odomykania. */
+  backLabel: string;
+  /** Riadok pod 3D truhlicou pri priblíženom zámku. */
+  dialHint: string;
+  /** Popis kolieska pre čítačku, napríklad „Koliesko {index} z {count}“. */
+  dialWheelLabel: string;
+  /** Nadpis rozbaliteľného bloku s 2D ovládaním pod 3D truhlicou. */
+  accessibleControlsTitle: string;
   insertKeyLabel: string;
   openedText: string;
   /** Tlačidlo po prevzatí štvrtého útržku. */
