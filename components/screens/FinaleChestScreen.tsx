@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import {
   FINALE_CHEST_OPENED_FLAG,
@@ -11,6 +12,8 @@ import {
 import { soundManager } from "../../lib/soundManager";
 import type { ActId, Chapter, GameState } from "../../types/game";
 import { getGoldenKeySvg } from "../items/art/keyToothArt";
+import { InspectErrorBoundary } from "../items/InspectErrorBoundary";
+import { canUse3D } from "../items/supportsWebGL";
 import { useReducedMotion } from "../items/useReducedMotion";
 import { ActionButton } from "../ui/ActionButton";
 import { ChestBody } from "../ui/chest/ChestBody";
@@ -42,6 +45,17 @@ const LID_OPEN_MS = 1500;
 
 type Sequence = "idle" | "inserting" | "opening" | "done";
 
+/** 3D truhlica sa stiahne až pri vstupe na obrazovku truhlice. */
+const Chest3DView = dynamic(() => import("../finale/chest3d/Chest3DView"), {
+  ssr: false,
+  loading: () => (
+    <div
+      aria-hidden="true"
+      className="h-full w-full rounded-2xl bg-amber-200/5 motion-safe:animate-pulse"
+    />
+  ),
+});
+
 const STILL_BUTTON = "motion-reduce:transition-none motion-reduce:active:scale-100";
 
 export function FinaleChestScreen({
@@ -61,6 +75,11 @@ export function FinaleChestScreen({
   );
   const [digits, setDigits] = useState<Record<string, string[]>>({});
   const [message, setMessage] = useState<"wrong" | "opened" | null>(null);
+  // 3D, ak to prehliadač zvládne a nie je ?bez3d; pri chybe WebGL 2D záloha.
+  const [mode, setMode] = useState<"3d" | "2d">(() =>
+    canUse3D() ? "3d" : "2d"
+  );
+  const [selectedLockIndex, setSelectedLockIndex] = useState<number | null>(null);
   const timersRef = useRef<number[]>([]);
 
   useEffect(
@@ -128,7 +147,32 @@ export function FinaleChestScreen({
           <p className="mt-4 text-[16px] leading-7 text-slate-300">{chest.intro}</p>
         </header>
 
-        {/* Truhlica (2D) – pri vypnutých animáciách sa nič nehýbe (globals.css). */}
+        {mode === "3d" ? (
+          <div className="mt-8">
+            <div className="aspect-[4/3] w-full">
+              <InspectErrorBoundary onError={() => setMode("2d")}>
+                <Chest3DView
+                  locks={locks}
+                  stateLabels={{
+                    open: chest.lockOpenLabel,
+                    closed: chest.lockClosedLabel,
+                    next: chest.lockNextLabel,
+                  }}
+                  selectedIndex={selectedLockIndex}
+                  onSelectLock={setSelectedLockIndex}
+                  isKeyInserted={isKeyVisible}
+                  isLidOpen={isLidOpen}
+                  reducedMotion={reducedMotion}
+                  onFailure={() => setMode("2d")}
+                />
+              </InspectErrorBoundary>
+            </div>
+            <p className="mt-3 text-center text-[15px] leading-6 text-slate-400">
+              {chest.rotateHint}
+            </p>
+          </div>
+        ) : (
+        /* Truhlica (2D záloha) – pri vypnutých animáciách sa nič nehýbe (globals.css). */
         <div className="finale-chest relative mt-8">
           <ChestStage isUnlocked={isLidOpen}>
             <ChestLid isLidOpen={isLidOpen} />
@@ -179,11 +223,12 @@ export function FinaleChestScreen({
             </ChestBody>
           </ChestStage>
         </div>
+        )}
 
         {/* Zámky v poradí I, II, III */}
         {!isChestOpened && (
           <div className="mt-8 space-y-4">
-            {locks.map((lock) => {
+            {locks.map((lock, lockIndex) => {
               const lockDigits = getDigits(lock.actId, lock.code.length);
 
               return (
@@ -191,7 +236,11 @@ export function FinaleChestScreen({
                   key={lock.actId}
                   role="group"
                   aria-label={`Zámok ${lock.lockLabel} – ${
-                    lock.isOpen ? chest.lockOpenLabel : chest.lockClosedLabel
+                    lock.isOpen
+                      ? chest.lockOpenLabel
+                      : lock.isNext
+                        ? chest.lockNextLabel
+                        : chest.lockClosedLabel
                   }`}
                   className={`rounded-2xl border p-4 ${
                     lock.isOpen
@@ -199,6 +248,9 @@ export function FinaleChestScreen({
                       : lock.isNext
                         ? "border-amber-300/40 bg-amber-400/5"
                         : "border-slate-700 bg-slate-950/60 opacity-60"
+                  } ${
+                    // Zámok vybraný ťuknutím v 3D truhlici.
+                    selectedLockIndex === lockIndex ? "ring-4 ring-amber-200/70" : ""
                   }`}
                 >
                   <div className="flex items-center justify-between gap-3">

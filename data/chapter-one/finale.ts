@@ -25,6 +25,8 @@ export const chapterOneFinale: ChapterFinale = {
     unlockLabel: "Odomknúť zámok",
     lockOpenLabel: "odomknutý",
     lockClosedLabel: "zamknutý",
+    lockNextLabel: "na rade",
+    rotateHint: "Ťahaj a otáčaj truhlicu. Ťukni na zámok.",
     insertKeyLabel: "Vložiť Zlatý kľúč",
     openedText:
       "Veko sa pomaly dvíha. Vnútri leží posledný útržok fotografie.",

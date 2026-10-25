@@ -375,6 +375,9 @@ export type FinaleChest = {
   /** Stav zámku pre čítačku. */
   lockOpenLabel: string;
   lockClosedLabel: string;
+  lockNextLabel: string;
+  /** Riadok pod 3D truhlicou. */
+  rotateHint: string;
   insertKeyLabel: string;
   openedText: string;
   /** Tlačidlo po prevzatí štvrtého útržku. */

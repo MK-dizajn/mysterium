@@ -2531,3 +2531,77 @@ Celá kapitola je prejditeľná od začiatku po záver: scény 1–10 → koniec
 1. **B4c – 3D truhlica v troch krokoch:** zámky rozložené po truhlici, priblíženie (zoom) na zámok, hlásenie po odomknutí, 2D truhlica ostáva ako záloha. Návrh je v súbore `b4c-3d-truhlica.md` v projekte Mysterium (v priečinku projektu na disku zatiaľ nie je).
 2. **Terénna kontrola** ciest a vodidiel podľa `docs/KONTROLA-PRED-VYDANIM.md`.
 3. **Video a zvuky** (video Strážcu, zvukové súbory hry sú zatiaľ prázdne).
+
+---
+
+## 25. 10. 2026 – Krok 64 (krok B4c-1): 3D truhlica – scéna, otáčanie, tri zámky
+
+**Čo sa urobilo:**
+- **Nová odľahčená 3D truhlica:**
+  - `components/finale/chest3d/ChestModel3D.tsx`: telo, veko, kovanie, tri zámky, kľúčová dierka, kľúč,
+  - `components/finale/chest3d/Chest3DView.tsx`: plátno, otáčanie a štítky,
+  - `components/finale/chest3d/chestFacing.ts`: matematika natočenia.
+  - **Vzhľad** (nity, rohové kovanie, rúčka, emblém) je prevzatý z pôvodného modelu. Tieto časti sú presunuté do `components/ui/chest-3d/ChestParts.tsx` a pôvodný (nevyužívaný) `ChestModel.tsx` ich importuje.
+  - Bez tieňov, spoločné plátno `InspectStage`, ktoré kreslí iba pri pohybe.
+- **Rozloženie zámkov:** Zámok I na ľavom boku, Zámok II vpredu nad kľúčovou dierkou, Zámok III na pravom boku, kľúčová dierka v strede prednej strany.
+- **Stav zámku:**
+  - zamknutý: tmavá mosadz,
+  - na rade: teplé svetlo a zlatý štítok, ktorý jemne pulzuje (iba pri zapnutých animáciách),
+  - odomknutý: zelený nádych a vysunutý oblúk.
+  - Po vložení kľúča je kľúč v dierke, po otvorení je veko otvorené. Zatiaľ bez animácie, tá príde v B4c-3.
+- **Štítky „Zámok I/II/III“:** tlačidlá s textom 16 px a výškou 44 px. Sú viditeľné, iba keď je strana zámku natočená k hráčovi. Popis pre čítačku je napríklad „Zámok II – na rade“.
+- **Výber zámku:** ťuknutie na štítok alebo na zámok ho vyberie a zvýrazní (rám v 3D) a zvýrazní aj jeho 2D riadok s číselníkmi. Ťahanie sa za ťuknutie nepočíta.
+- **Otáčanie:** prstom alebo myšou so zotrvačnosťou (fyzika ako pri žetóne), šípky na klávesnici.
+- **Natočenie k zámku:**
+  - pri vstupe je truhlica natočená k zámku na rade,
+  - po odomknutí sa plynulo natočí k ďalšiemu, pri vypnutých animáciách okamžite,
+  - po troch zámkoch sa natočí dopredu ku kľúčovej dierke.
+- **Odomykanie** ide ďalej cez dnešné 2D ovládanie pod 3D scénou (číselníky, „Odomknúť zámok“, hlásenia, „Vložiť Zlatý kľúč“, Zápisník kódov), bez prepínača. Engine (`engine/finale.ts`) ani uloženie sa nemenili.
+- **Záloha:** 2D truhlica z B4b sa ukáže iba pri `?bez3d` a pri chybe WebGL. Pri vypnutých animáciách ostáva 3D, vypne sa iba pulzovanie a plynulé natáčanie.
+- **Nové schválené texty v dátach:** „Ťahaj a otáčaj truhlicu. Ťukni na zámok.“ (riadok pod 3D) a „na rade“ (stav zámku pre čítačku, aj v 2D riadkoch).
+
+**Test (mimo projektu, necommitnutý):** pred zmenou 10 chýb, po zmene **18 z 18 OK**. Overuje:
+- nové texty,
+- rozloženie a natočenie zámkov (viditeľnosť pri 0°, ±90°, celej otáčke; najbližšie natočenie; natočenie k zámku na rade aj ku kľúčovej dierke),
+- načítanie 3D až na truhlici, zálohu, 2D ovládanie, 3D pri vypnutých animáciách,
+- plátno `InspectStage`, štítky s výberom, natáčanie, vzhľad z `ChestParts`.
+
+**Všetky doterajšie testy:** C1 63/63, B7 20/20, B6 32/32, B5 21/21, B4b 26/26, B4a 20/20, B3b 25/25, texty 37/37, B3a 65/65, kresba kľúča 54/54, nápovedy 37/37. Skóre 1010.
+
+**V prehliadači na dev serveri (360 px):**
+- **3D (17 z 17):**
+  - pri vstupe je viditeľný štítok „Zámok I – na rade“, 44 px a 16 px, pulzuje,
+  - výber zámku zvýrazní aj 2D riadok,
+  - **plátno v pokoji nekreslí (0 kreslení za 1 s)**,
+  - ťahanie otočí truhlicu,
+  - po odomknutí I natočenie k II, F5 (I odomknutý, natočenie k II), po II natočenie k III, po III dopredu,
+  - kľúč a otvorenie cez 2D, F5 po otvorení,
+  - bez chýb v prehliadači.
+- **`?bez3d` a nefunkčné WebGL:** 2D truhlica, odomykanie funguje.
+- **Vypnuté animácie:** 3D ostáva, štítok nepulzuje, plátno v pokoji nekreslí.
+- **Starý test truhlice v prehliadači (B4b)** v 3D aj `?bez3d`: všetko OK po úprave na stav „na rade“ a na pokračovanie na fotografiu (od B5).
+
+Snímky: vstup (zámok I), po otočení, natočená k II, natočená k III, otvorená.
+
+**Výkon (produkčný build):**
+- úvodná stránka 8 skriptov, 204 kB (komprimované),
+- na obrazovke Strážcu sa 3D nenačíta,
+- pri vstupe na truhlicu pribudne 238 kB: 234 kB je spoločný 3D základ (three.js), 3,8 kB samotná truhlica.
+
+**Chyby počas práce:**
+- Prvé meranie ukázalo, že plátno kreslí nepretržite (asi 1 260 kreslení za sekundu). Ovládač otáčania si pri každom kroku snímky vyžiadal ďalšiu snímku. Opravené: krok v snímke ďalšiu snímku nevyžiada, vyžiada ju iba ťahanie, šípky a natáčanie.
+- **Rovnaký vzor je v 3D predmetoch v okne „Prezrieť“** (`Token3DView.tsx`, `Item3DView.tsx`), takže tam plátno pravdepodobne tiež kreslí nepretržite. Zistené čítaním kódu, neoverené meraním a nemenené. Navrhujem samostatný malý krok.
+- Lint: v nevyužívanom pôvodnom `ChestModel.tsx` je ďalej stará chyba (`setState` v efekte) a dve staré upozornenia. Boli tam aj pred zmenou (overené na verzii z gitu), teraz je o jedno upozornenie menej. Nové súbory sú bez chýb.
+
+**Zmenené súbory:**
+- `types/game.ts`, `data/chapter-one/finale.ts`
+- `components/finale/chest3d/Chest3DView.tsx`, `ChestModel3D.tsx`, `chestFacing.ts` (nové)
+- `components/ui/chest-3d/ChestParts.tsx` (nový), `components/ui/chest-3d/ChestModel.tsx`
+- `components/screens/FinaleChestScreen.tsx`
+- `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** nové a zmenené súbory bez chýb (okrem starých chýb v nevyužívanom `ChestModel.tsx`).
+
+**Ďalší krok:** B4c-2 (zadávanie číslic v 3D s priblížením na zámok), až po potvrdení.
