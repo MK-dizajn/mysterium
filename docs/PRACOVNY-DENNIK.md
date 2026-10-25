@@ -2968,3 +2968,19 @@ Snímky: pred vložením (zelené zámky bez koliesok), kľúč pri dierke, oto�
 **Lint:** kód sa nemenil. V celom projekte ostávajú staré nálezy v nemenených súboroch.
 
 **Ďalší krok:** podľa plánu, až po potvrdení.
+
+## 25. 10. 2026 – Záver dňa
+
+**Hotové dnes (popoludní):**
+- **C2** – 3D predmety v okne „Prezrieť“ v pokoji nekreslia (0 snímok za sekundu).
+- **C3** – opravený test B1b-3b, rovnaké rozostupy v Zápisníku kódov pri truhlici, `docs/KONCEPT-KAPITOL.md` zosúladený s dnešným stavom.
+- **C4** – aktualizovaný test zápisníka B1b-1, zmienky o truhliciach v `docs/KARTY-USLOH.md` a `docs/KONCEPT-ZAZITKU.md` zosúladené.
+
+Vývojový server je zastavený. Kód sa v závere dňa nemenil.
+
+**Najbližšie:**
+1. Opraviť v `docs/KONCEPT-ZAZITKU.md` poznámky „Dnes v hre“ v častiach D a E (skladanie fotografie a karta „Ďalšie miesto“ už existujú).
+2. Pred zverejnením repozitára odstrániť kódy zámkov z `docs/KARTY-USLOH.md` a zo starých záznamov tohto denníka.
+3. Terénna kontrola (vodidlá, cesty, dĺžka trasy – pozri `docs/KONTROLA-PRED-VYDANIM.md`).
+4. Príprava na beta test: verzia uloženia z v2 na v3, kontrola `isPlaceholder` v dátach.
+5. Video a zvuky.
