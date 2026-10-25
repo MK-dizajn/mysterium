@@ -42,10 +42,17 @@ export function CodeNotebook({ locks, onInspectItem }: CodeNotebookProps) {
               {lock.slots.map((slot, slotIndex) => (
                 <div
                   key={slot.itemId}
-                  className="flex flex-col items-center gap-1.5"
+                  // Pri truhlici (s tlačidlami „Prezrieť“) má každé miesto rovnako široký
+                  // stĺpec, aby okienka číslic mali rovnaké rozostupy.
+                  className={`flex flex-col items-center gap-1.5 ${
+                    onInspectItem ? "w-16" : ""
+                  }`}
                 >
                   <span
-                    className={`flex h-12 w-10 items-center justify-center rounded-xl border font-mono text-2xl font-black ${
+                    className={`flex h-12 ${
+                      // Pri truhlici okienko vyplní stĺpec – začína presne pod štítkom zámku.
+                      onInspectItem ? "w-full" : "w-10"
+                    } items-center justify-center rounded-xl border font-mono text-2xl font-black ${
                       slot.digit === null
                         ? "border-dashed border-slate-600 bg-slate-950/60 text-slate-600"
                         : "border-amber-300/40 bg-amber-400/10 text-amber-100"
@@ -69,7 +76,7 @@ export function CodeNotebook({ locks, onInspectItem }: CodeNotebookProps) {
                         type="button"
                         onClick={() => onInspectItem(slot.itemId)}
                         aria-label={`Prezrieť: ${slot.itemTitle}`}
-                        className="min-h-11 rounded-xl border border-amber-300/30 bg-slate-950/70 px-2 text-xs font-bold text-amber-100 transition hover:border-amber-300/60 motion-reduce:transition-none"
+                        className="min-h-11 w-full rounded-xl border border-amber-300/30 bg-slate-950/70 px-1 text-xs font-bold text-amber-100 transition hover:border-amber-300/60 motion-reduce:transition-none"
                       >
                         Prezrieť
                       </button>
