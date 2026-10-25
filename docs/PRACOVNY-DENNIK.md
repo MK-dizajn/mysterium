@@ -2804,3 +2804,65 @@ Snímky: pred vložením (zelené zámky bez koliesok), kľúč pri dierke, oto�
 **Lint:** nové a zmenené súbory bez chýb.
 
 **Ďalší krok:** malý krok s opravou zbytočného kreslenia pri 3D predmetoch v okne „Prezrieť“, alebo ďalší krok podľa plánu, až po potvrdení.
+
+## 25. 10. 2026 – Krok 67 (krok C2): 3D predmety v okne „Prezrieť“ v pokoji nekreslia
+
+**Meranie pred zmenou** (okno „Prezrieť“, predmet sa nehýbe, 360 px, testovací prehliadač): **všetkých 8 predmetov v 3D kreslilo nepretržite**, aj pri vypnutých animáciách.
+
+| Predmet | Snímky za sekundu v pokoji (zapnuté / vypnuté animácie) |
+|---|---|
+| Žetón nultého kilometra | 49 / 43 |
+| Kus mapy: staré mesto | 50 / 51 |
+| Pátračova strana z denníka | 49 / 49 |
+| Pečať vzdelanosti | 48 / 47 |
+| Kus mapy: námestie | 51 / 44 |
+| Prvý, druhý, tretí zub kľúča | 45 až 50 / 40 až 50 |
+| Nahrávka Strážcu | bez 3D |
+
+- V testovacom prehliadači sa kreslí softvérovo, preto okolo 50. Na mobile by to bolo toľko, koľko zvláda displej (60 až 120).
+- **Príčina:** rovnaký vzor ako pri truhlici pred B4c-1. Krok pohybu v každej snímke išiel cez funkciu, ktorá si vždy vyžiadala ďalšiu snímku. Kontrola „v pokoji netreba ďalšiu snímku“ preto nemala účinok.
+
+**Čo sa urobilo:**
+- `components/items/3d/Token3DView.tsx` (žetón) a `components/items/3d/Item3DView.tsx` (list, mapa, pečať, zuby):
+  - do ovládačov pribudla metóda `advance()`, krok v snímke ide cez ňu a ďalšiu snímku si nevyžiada,
+  - ďalšiu snímku vyžiada iba existujúca kontrola na konci snímky: keď sa predmet hýbe (ťahanie, zotrvačnosť, natočenie, „Obrátiť“, návrat náklonu) alebo beží odpočet automatického zápisu,
+  - ťahanie, šípky, „Otočiť na hranu“ a „Obrátiť“ si snímku vyžiadajú ako doteraz.
+- Výpočty pohybu (`rotationPhysics.ts`), kresby ani správanie sa nemenili.
+
+**Meranie po zmene:** všetkých 8 predmetov **v pokoji 0 snímok za sekundu**, so zapnutými aj vypnutými animáciami. Po otvorení sa predmet nakreslí (2 až 3 snímky) a ďalej plátno stojí.
+- Jedno osamotené prekreslenie po zmene v okne je v poriadku a očakávané, napríklad keď príde nová textúra so zapísanou číslicou alebo sa v okne zmení prvok. Plátno sa potom znova zastaví.
+
+**Nový test v prehliadači (mimo projektu, necommitnutý):**
+- Pred zmenou 15 chýb (zapnuté animácie) a 15 chýb (vypnuté animácie).
+- Po zmene **23 z 23** (zapnuté) a **21 z 21** (vypnuté).
+- Overuje:
+  - každý 3D predmet: nakreslený po otvorení a v pokoji 0 snímok,
+  - žetón: po pustení sa točí so zotrvačnosťou a potom stojí, automatický zápis po natočení (nie hneď, po 1,7 až 2,1 s), potom pokoj,
+  - strana z denníka: „Obrátiť“ kreslí počas otočenia, automatický zápis, potom pokoj,
+  - mapa: šípka nakloní, náklon sa vráti, potom pokoj,
+  - pečať: značky sa dajú označiť, pokoj aj po náklone ťahaním,
+  - zub kľúča: značky na ťuknutie, pokoj,
+  - vypnuté animácie: bez zotrvačnosti a bez automatického zápisu ako doteraz, v pokoji 0 snímok,
+  - bez chýb v prehliadači.
+
+**Staré testy:**
+- **Staré skripty 3D predmetov v prehliadači** (produkčný build): predmety, zuby kľúča, počítanie, ťukanie, časovanie nápovedy a zápisu. **Výsledky pred zmenou a po nej sú zhodné.**
+- **`?bez3d`:** 2D obrázky a nájdenie číslic fungujú ako doteraz.
+- **Node:** fyzika otáčania 25/25, B4c-3 24/24, B4c-2 34/34, B4c-1 18/18, C1 63/63, B7 20/20 (celá kapitola, skóre **1010**), B6 32/32, B5 21/21, B4b 26/26, B4a 20/20, B3b 25/25 (aj staré uloženia), texty 37/37, B3a 65/65, kresba kľúča 54/54, nápovedy 37/37.
+- **Starý test predmetov z B1b-3b: 40 z 45.** Rovnakých 5 chýb je aj na stave pred touto zmenou (aj pred B4c-3), takže ich zmena nespôsobila. Test počíta prvky kresby zubov a máp podľa starého označenia. Kresby sa zmenili v kroku 7 a odvtedy ich overuje test kresby kľúča (54/54). Test B1b-3b je zastaraný, v tomto kroku som ho neupravoval.
+
+**Chyby počas práce:**
+- V novom teste:
+  - test hľadal tlačidlo „Otočiť na hranu“, ktoré sa pri žetóne ukáže až s nápovedou; upravené na šípky (Home a 6 × doľava), ako v starom skripte,
+  - test čakal na pokoj príliš krátko a započítal jedno osamotené prekreslenie; upravené na 2 s pokoja pred meraním.
+- Jeden beh testu pri vypnutých animáciách sa zasekol na spojení s testovacím prehliadačom (chyba prostredia). Ďalšie behy prebehli normálne.
+
+**Zmenené súbory:**
+- `components/items/3d/Token3DView.tsx`, `components/items/3d/Item3DView.tsx`
+- `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** zmenené súbory bez chýb. V celom projekte ostávajú staré nálezy v súboroch, ktoré sa nemenili.
+
+**Ďalší krok:** podľa plánu, až po potvrdení.

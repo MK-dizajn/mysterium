@@ -60,9 +60,15 @@ class FlatController {
     this.invalidate = invalidate;
   }
 
+  /** Zmena zvonku (ťahanie, šípky, „Obrátiť“) – vyžiada si novú snímku. */
   update(change: (state: FlatState) => FlatState) {
     this.state = change(this.state);
     this.invalidate?.();
+  }
+
+  /** Krok v snímke – ďalšiu snímku si nevyžiada (o nej rozhodne pokoj predmetu). */
+  advance(change: (state: FlatState) => FlatState) {
+    this.state = change(this.state);
   }
 
   setFacing(isFacing: boolean) {
@@ -391,7 +397,7 @@ function ControllerView({
   useFrame((_, delta) => {
     const dtSec = Math.min(delta, MAX_FRAME_SECONDS);
 
-    controller.update((state) => stepFlat(state, dtSec, reducedMotion));
+    controller.advance((state) => stepFlat(state, dtSec, reducedMotion));
 
     const { yaw, tilt } = controller.state;
     groupRef.current?.rotation.set(tilt, yaw, 0);

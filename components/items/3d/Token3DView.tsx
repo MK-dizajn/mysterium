@@ -51,9 +51,15 @@ class RotationController {
     this.invalidate = invalidate;
   }
 
+  /** Zmena zvonku (ťahanie, šípky, natočenie) – vyžiada si novú snímku. */
   update(change: (state: RotationState) => RotationState) {
     this.state = change(this.state);
     this.invalidate?.();
+  }
+
+  /** Krok v snímke – ďalšiu snímku si nevyžiada (o nej rozhodne pokoj žetónu). */
+  advance(change: (state: RotationState) => RotationState) {
+    this.state = change(this.state);
   }
 
   requestFrame() {
@@ -135,7 +141,7 @@ function TokenController({
   useFrame((_, delta) => {
     const dtSec = Math.min(delta, MAX_FRAME_SECONDS);
 
-    controller.update((state) => stepRotation(state, dtSec, reducedMotion));
+    controller.advance((state) => stepRotation(state, dtSec, reducedMotion));
 
     const { yaw, tilt } = controller.state;
     groupRef.current?.rotation.set(tilt, yaw, 0);
