@@ -61,7 +61,7 @@ export function FinaleGuardianScreen({
           </video>
         )}
 
-        <p className="mt-6 text-left text-[16px] leading-8 text-slate-200">
+        <p className="mt-6 text-left text-[16px] leading-normal text-slate-200">
           {guardian.text}
         </p>
 

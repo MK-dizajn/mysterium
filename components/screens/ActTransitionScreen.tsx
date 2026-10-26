@@ -123,7 +123,7 @@ export function ActTransitionScreen({
           icon={<DetectiveIcon className="h-9 w-9" />}
           title="Vyhodnotenie prípadu"
         >
-          <p className="text-[15px] leading-8 text-slate-300">
+          <p className="text-[15px] leading-normal text-slate-300">
             V tejto etape si získal {evidenceCount} dôkazy. Každý z nich
             ukrýva časť tajnej kombinácie.
           </p>

@@ -43,7 +43,8 @@ export function FinishScreen({
   return (
     <ScreenContainer>
       <StoryCard label={ending.label} title={ending.title}>
-        <div className="space-y-4 text-[16px] leading-8 text-slate-300">
+        {/* Riadkovanie 1,5 a medzi odsekmi asi polovica riadku. */}
+        <div className="space-y-3 text-[16px] leading-normal text-slate-300">
           {ending.paragraphs.map((paragraph) => (
             <p key={paragraph}>{paragraph}</p>
           ))}
@@ -72,7 +73,7 @@ export function FinishScreen({
           }
           title={ending.continuationTitle}
         >
-          <p className="text-[16px] leading-8 text-slate-300">
+          <p className="text-[16px] leading-normal text-slate-300">
             {ending.continuationText}
           </p>
         </SectionCard>

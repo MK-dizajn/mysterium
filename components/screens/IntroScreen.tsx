@@ -28,11 +28,12 @@ export function IntroScreen({
             icon={<DetectiveIcon className="h-9 w-9" />}
             title="Pátračov denník"
           >
-           <div className="space-y-5">
+           {/* Riadkovanie 1,5 a medzi odsekmi asi polovica riadku. */}
+           <div className="space-y-3">
               {chapter.introLines.map((line) => (
                 <p
                   key={line}
-                  className="text-[15px] leading-8 text-slate-300"
+                  className="text-[15px] leading-normal text-slate-300"
                >
                  {line}
                </p>
@@ -47,7 +48,7 @@ export function IntroScreen({
            title="Prvá stopa"
            variant="gold"
          >
-            <p className="text-sm leading-7 text-amber-100">
+            <p className="text-sm leading-normal text-amber-100">
               Podľa posledných svedkov ho videli tam, kadiaľ do mesta vstupovali
                králi. Presuň sa pod <strong>Michalskú bránu</strong> a začni svoje
               vyšetrovanie.

@@ -3077,3 +3077,41 @@ Snímky: `c6-po-320.png`, `c6-po-360.png`, `c6-po-390.png`, `c6-po-768.png`.
 **Lint:** `LandingScreen.tsx` bez chýb.
 
 **Ďalší krok:** podľa plánu, až po potvrdení.
+
+## 26. 10. 2026 – Krok 72: Riadkovanie a medzery medzi odsekmi v kartách s dlhším textom
+
+**Zistenie:** riadkovanie nie je nastavené spoločne. Každá obrazovka ho má vo vlastných triedach. Dlhšie texty mali výšku riadku 32 px pri písme 15 až 16 px (riadkovanie 2,0 až 2,13) a „Pátračov denník“ k tomu 20 px medzi odsekmi. Odseky preto pôsobili, akoby medzi nimi boli prázdne riadky. Úvod scény („Hlas pátrača“, „Tvoja úloha“) má riadkovanie 1,625 a v dátach nie sú dvojité zalomenia, takže tam problém nebol.
+
+**Čo sa urobilo:** riadkovanie 1,5 (`leading-normal`) a medzi odsekmi 12 px (asi polovica riadku), veľkosť písma bez zmeny:
+- `components/screens/IntroScreen.tsx` – „Pátračov denník“ (aj medzera medzi odsekmi) a „Prvá stopa“ (na tej istej obrazovke, mala riadkovanie 2,0),
+- `components/screens/HistoryScreen.tsx` – „Pátračov zápis“ (história scény),
+- `components/screens/ActTransitionScreen.tsx` – „Vyhodnotenie prípadu“ (koniec aktu),
+- `components/screens/FinaleGuardianScreen.tsx` – text Strážcu,
+- `components/screens/FinishScreen.tsx` – záverečné odseky (aj medzera medzi nimi) a karta pokračovania,
+- `components/screens/ArtifactScreen.tsx` – „Historický príbeh“ artefaktu.
+
+**Test v prehliadači (360 px, nový, mimo projektu):** pred zmenou 5 chýb, po zmene **12 z 12**.
+
+| Obrazovka | Pred | Po |
+|---|---|---|
+| Úvod kapitoly („Pátračov denník“) | 15 px / riadok 32 px (2,13), medzera 20 px | 15 px / 22,5 px (1,5), medzera 12 px |
+| História scény | 15 / 32 (2,13) | 15 / 22,5 (1,5) |
+| Koniec aktu | 15 / 32 (2,13) | 15 / 22,5 (1,5) |
+| Strážca | 16 / 32 (2,0) | 16 / 24 (1,5) |
+| Záverečná obrazovka | 16 / 32 (2,0) | 16 / 24 (1,5) |
+
+- Na všetkých obrazovkách písmo aspoň 15 px a bez vodorovného posúvania.
+- Snímky pred a po: `c7-pred-*.png`, `c7-po-*.png`.
+- Test úvodnej obrazovky zo C5 (štítok) OK.
+
+**Nemenené (kratšie texty alebo zámerne iný vzhľad):** rozhovor so Strážcom v prvej scéne (17 px / 32 px), papierová poznámka pátrača (`DetectiveNote`), prepis nahrávky v okne „Prezrieť“, „Ukáž cestu“, karta „Ďalšie miesto“, úvody obrazoviek truhlice a fotografie (16 px / 28 px, 1,75), krátke texty na úvodnej obrazovke, v dialógoch a v odmene (14 px / 28 px). Ak chceš, zjednotíme ich v ďalšom kroku.
+
+**Lint:** zmenené súbory bez chýb. V `HistoryScreen.tsx` ostáva staré upozornenie na nepoužitú ikonu `LightbulbIcon` (bolo tam už predtým).
+
+**Chyby počas práce:** žiadne.
+
+**Zmenené súbory:** `components/screens/IntroScreen.tsx`, `HistoryScreen.tsx`, `ActTransitionScreen.tsx`, `FinaleGuardianScreen.tsx`, `FinishScreen.tsx`, `ArtifactScreen.tsx`, `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Ďalší krok:** podľa plánu, až po potvrdení.

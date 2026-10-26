@@ -48,7 +48,7 @@ export function HistoryScreen({
           icon={<DetectiveIcon className="h-9 w-9" />}
           title="Pátračov zápis"
         >
-          <p className="text-[15px] leading-8 text-slate-300">
+          <p className="text-[15px] leading-normal text-slate-300">
             {scene.history.fullText}
           </p>
         </SectionCard>

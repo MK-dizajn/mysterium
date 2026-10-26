@@ -50,7 +50,7 @@ export function ArtifactScreen({
                 icon={<DetectiveIcon className="h-9 w-9" />}
                 title="Historický príbeh"
               >
-                <p className="text-[15px] leading-8 text-slate-300">
+                <p className="text-[15px] leading-normal text-slate-300">
                   {artifact.fullText}
                 </p>
               </SectionCard>
