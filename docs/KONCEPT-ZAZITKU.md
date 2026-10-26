@@ -55,7 +55,7 @@ Pri každej časti je krátka poznámka **Dnes v hre**, aby bolo jasné, čo už
   - **miesto**, kde sa začína **ďalšia kapitola**,
   - nápoveda k **veľkej záhade** celej hry.
 
-**Dnes v hre:** z otvorenej truhlice vyletia samostatné útržky fotografie. Skladanie ani otáčanie fotografie neexistuje (overené v histórii Gitu, krok 13 v `docs/PRACOVNY-DENNIK.md`).
+**Dnes v hre (26. 10. 2026):** štyri útržky (tri z koncov aktov, štvrtý z truhlice vo finále) sa na obrazovke „Historická fotografia“ samy zložia do jednej fotografie. Fotografia sa dá priblížiť (tlačidlá, ťuknutie, štipnutie), posúvať a otočiť; na zadnej strane je poznámka pátrača s miestom, kde pátranie pokračuje. Obrázok je zatiaľ dočasná kresba (pozri `docs/KONTROLA-PRED-VYDANIM.md`) a nápoveda k veľkej záhade je zatiaľ jedna veta na rube. Pôvodne z truhlice vyleteli samostatné útržky a skladanie ani otáčanie neexistovalo (krok 13 v `docs/PRACOVNY-DENNIK.md`).
 
 ## E. Odomknutie ďalšej kapitoly
 
@@ -73,7 +73,7 @@ Pri každej časti je krátka poznámka **Dnes v hre**, aby bolo jasné, čo už
 - Karta musí stačiť aj človeku, ktorý Bratislavu nepozná.
 - Tlačidlo „Otvoriť v mapách“ iba otvorí mapovú aplikáciu s adresou. Hra sama polohu hráča nezisťuje ani neukladá.
 
-**Dnes v hre:** neexistuje. Hra po finále zobrazí záverečnú obrazovku (`FinishScreen`) a ponúkne iba hru od začiatku. Odpúšťanie diakritiky a veľkých a malých písmen už hra vie pri hádankách. Odpúšťanie preklepov zatiaľ nevie.
+**Dnes v hre (26. 10. 2026):** po fotografii hráč zadá názov miesta ručne, bez GPS. Hra odpustí diakritiku, veľké a malé písmená, interpunkciu aj drobné preklepy a prijme aj skrátený názov. Po správnej odpovedi sa vždy zobrazí karta „Ďalšie miesto“ s názvom, celou adresou, tlačidlom „Otvoriť v mapách“ (otvorí mapy s adresou, hra polohu nezisťuje ani neukladá) a popisom cesty. Tlačidlo „Dokončiť kapitolu“ vedie na záverečnú obrazovku so skóre. Ďalšia kapitola zatiaľ neexistuje, takže sa nič neodomyká. Ďalšie miesto a cesta k nemu sú zatiaľ dočasné (pozri `docs/KONTROLA-PRED-VYDANIM.md`). Pôvodne hra po finále ukázala iba záverečnú obrazovku.
 
 ## F. Konce aktov bez truhlice
 
