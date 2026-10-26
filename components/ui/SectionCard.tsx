@@ -56,7 +56,8 @@ export function SectionCard({
         </p>
       </div>
 
-      <div className="mt-4 px-1 text-left leading-7">
+      {/* Predvolené riadkovanie textu v kartách 1,5. */}
+      <div className="mt-4 px-1 text-left leading-normal">
         {children}
       </div>
     </section>

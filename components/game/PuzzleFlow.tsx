@@ -84,7 +84,8 @@ export function PuzzleFlow({
             {npcGate.title}
           </h1>
 
-          <div className="mt-4 space-y-4 leading-relaxed text-stone-300">
+          {/* Riadkovanie 1,5 a medzi odsekmi asi polovica riadku. */}
+          <div className="mt-4 space-y-3 leading-normal text-stone-300">
             {npcGate.paragraphs.map((paragraph) => (
               <p key={paragraph}>{paragraph}</p>
             ))}

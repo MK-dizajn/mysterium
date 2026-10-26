@@ -70,7 +70,7 @@ function TranscriptView({
   onFound,
 }: TranscriptViewProps) {
   return (
-    <div className="w-full rounded-2xl border border-amber-200/20 bg-[#f1e4c3] p-5 text-left font-serif text-[15px] leading-8 text-[#3b2a12] shadow-inner">
+    <div className="w-full rounded-2xl border border-amber-200/20 bg-[#f1e4c3] p-5 text-left font-serif text-[15px] leading-normal text-[#3b2a12] shadow-inner">
       <p className="text-xs font-bold uppercase tracking-[0.25em] text-[#7a5418]">
         Prepis nahrávky
       </p>
@@ -82,7 +82,9 @@ function TranscriptView({
           onClick={onFound}
           disabled={isFound}
           aria-label={isFound ? `${transcript.highlight} (${digit})` : hotspotLabel}
-          className={`inline-flex min-h-11 items-center rounded-lg px-1.5 align-middle font-bold underline decoration-2 underline-offset-4 outline-none focus-visible:ring-4 focus-visible:ring-amber-500 ${
+          // Plocha na ťuknutie ostáva 44 px, záporný okraj zabráni roztiahnutiu riadku
+          // a z-10 ju dá nad susedné riadky, aby sa dalo ťuknúť na celú plochu.
+          className={`relative z-10 -my-[11px] inline-flex min-h-11 items-center rounded-lg px-1.5 align-middle font-bold underline decoration-2 underline-offset-4 outline-none focus-visible:ring-4 focus-visible:ring-amber-500 ${
             isFound
               ? "bg-emerald-300/50 text-[#1f3d1a] decoration-emerald-700"
               : "bg-amber-300/40 decoration-[#7a5418]"

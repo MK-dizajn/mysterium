@@ -48,7 +48,7 @@ export function NextPlaceCard({
       <h3 className="mt-6 text-xs font-bold uppercase tracking-[0.2em] text-amber-300/80">
         {nextPlace.addressLabel}
       </h3>
-      <p className="mt-1 text-[16px] leading-7 text-slate-100">
+      <p className="mt-1 text-[16px] leading-normal text-slate-100">
         {nextPlace.address}
       </p>
 
@@ -64,7 +64,7 @@ export function NextPlaceCard({
       <h3 className="mt-6 text-xs font-bold uppercase tracking-[0.2em] text-amber-300/80">
         {nextPlace.directionsLabel}
       </h3>
-      <p className="mt-1 text-[16px] leading-7 text-slate-100">
+      <p className="mt-1 text-[16px] leading-normal text-slate-100">
         {nextPlace.directions}
       </p>
 

@@ -84,7 +84,7 @@ export function FinalePhotoScreen({
             isTogether={isTogether}
             isReady={isReady}
             caption={
-              <p className="mt-6 text-[16px] leading-7 text-slate-300">
+              <p className="mt-6 text-[16px] leading-normal text-slate-300">
                 {photo.frontDescription}
               </p>
             }

@@ -89,12 +89,12 @@ export function LandingScreen({
 
           <div className="mx-auto mt-7 h-px w-24 bg-gradient-to-r from-transparent via-amber-300/60 to-transparent" />
 
-          <p className="mx-auto mt-7 max-w-md text-sm leading-7 text-slate-300 sm:text-base">
+          <p className="mx-auto mt-7 max-w-md text-sm leading-normal text-slate-300 sm:text-base">
             Mestské dobrodružstvo ukryté v histórii. Objav stopy, ktoré starý
             Prešporok skrýval celé stáročia.
           </p>
 
-          <p className="mx-auto mt-4 max-w-md text-sm leading-7 text-slate-500">
+          <p className="mx-auto mt-4 max-w-md text-sm leading-normal text-slate-500">
             Nájsť miesto má byť jednoduché. Objaviť odpoveď má byť zaujímavé.
           </p>
 

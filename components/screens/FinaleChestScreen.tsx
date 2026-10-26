@@ -290,7 +290,7 @@ export function FinaleChestScreen({
         <header className="px-1 text-center">
           <h1 className="text-3xl font-black text-amber-100">{chest.title}</h1>
           <div className="mx-auto mt-4 h-px w-24 bg-gradient-to-r from-transparent via-amber-300/60 to-transparent" />
-          <p className="mt-4 text-[16px] leading-7 text-slate-300">{chest.intro}</p>
+          <p className="mt-4 text-[16px] leading-normal text-slate-300">{chest.intro}</p>
         </header>
 
         {mode === "3d" ? (

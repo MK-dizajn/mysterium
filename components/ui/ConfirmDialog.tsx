@@ -56,7 +56,7 @@ export function ConfirmDialog({
 
         <p
           id="confirm-dialog-message"
-          className="mt-4 text-sm leading-7 text-slate-300"
+          className="mt-4 text-sm leading-normal text-slate-300"
         >
           {message}
         </p>

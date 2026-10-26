@@ -3115,3 +3115,65 @@ Snímky: `c6-po-320.png`, `c6-po-360.png`, `c6-po-390.png`, `c6-po-768.png`.
 **Build:** prešiel (`npm run build`, bez chýb).
 
 **Ďalší krok:** podľa plánu, až po potvrdení.
+
+## 26. 10. 2026 – Krok 73: Riadkovanie 1,5 zjednotené aj na ostatných obrazovkách
+
+**Čo sa urobilo:** riadkovanie 1,5 (`leading-normal`) a medzi odsekmi 12 px (asi polovica riadku), veľkosť písma bez zmeny:
+- **rozhovor so Strážcom:**
+  - `components/screens/NpcScreen.tsx`,
+  - `components/ui/Typewriter.tsx` – samotný text rozhovoru mal vlastné riadkovanie 1,625, ktoré prepísalo obal,
+- **„Brána mlčí“** pred rozhovorom (`components/game/PuzzleFlow.tsx`): dva odseky s rovnakým štýlom (riadkovanie 1,625, medzera 16 px), zjednotené aj s medzerou,
+- **prepis nahrávky** v okne „Prezrieť“ (`components/items/ItemInspector.tsx`),
+- **„Ukáž cestu“** (`components/ui/RouteHint.tsx`),
+- **karta „Ďalšie miesto“**, adresa a cesta (`components/finale/NextPlaceCard.tsx`),
+- **úvody truhlice a fotografie** (`components/screens/FinaleChestScreen.tsx`, `FinalePhotoScreen.tsx`),
+- **krátke texty a dialógy:**
+  - úvodná obrazovka, dve vety (`components/screens/LandingScreen.tsx`),
+  - dialóg „Začať odznova?“ (`components/ui/ConfirmDialog.tsx`),
+- **predvolené riadkovanie textu v kartách** (`components/ui/SectionCard.tsx`, predtým 28 px).
+
+**Ťukacie slovo v prepise nahrávky:** pri menšom riadkovaní roztiahlo tlačidlo vysoké 44 px svoj riadok, takže okolo neho vznikla väčšia medzera. Opravené:
+- záporný zvislý okraj, tlačidlo ostáva 44 px a riadok sa neroztiahne,
+- `relative z-10`, lebo dolnú časť plochy prekrýval nasledujúci riadok a ťuknutie tam netrafilo slovo.
+
+**Výnimky (zámerne nemenené):**
+- **rub historickej fotografie a náhradný text pri chybe obrázka** (`FinalePhotoViewer.tsx`, 16 px kurzívou, riadkovanie 1,75): ručne písaná poznámka na zadnej strane fotky v pevnom rámčeku 4 : 3, väčšie riadkovanie je súčasť jej vzhľadu,
+- **nepoužívané v hre:** papierová poznámka `DetectiveNote` a staré obrazovky truhlice po akte (`ActChestScreen`, `ChestIntroScreen`, `RewardReveal`); hráč ich neuvidí, preto sa nemenili,
+- **riadkovanie 1,625** (`leading-relaxed`) pri krátkych textoch v kartách (úvod scény, odmeny, artefakty, správy) ostáva; je blízko 1,5 a nebolo v zadaní.
+
+**Test v prehliadači (360 px, nový, mimo projektu):** pred zmenou 12 chýb, po zmene **29 z 29**.
+- **Riadkovanie 1,5 na všetkých meraných miestach:**
+  - úvodná obrazovka 14 / 21 px,
+  - dialóg 14 / 21 px,
+  - „Brána mlčí“ 16 / 24 px s medzerou 12 px,
+  - rozhovor 17 / 25,5 px,
+  - „Ukáž cestu“ 15 / 22,5 px,
+  - prepis nahrávky 15 / 22,5 px,
+  - úvod truhlice 16 / 24 px,
+  - úvod fotografie 16 / 24 px,
+  - karta „Ďalšie miesto“ 16 / 24 px.
+- Rub fotografie ostal 1,75 (výnimka).
+- Prepis nahrávky: slovo „štyri“ má 47 × 44 px, ťuknutie ho trafí hore, v strede aj dole, riadky sú rovnomerné (22 až 23 px).
+- Bez vodorovného posúvania, bez chýb v prehliadači.
+- Snímky pred a po: `c8-pred-*.png`, `c8-po-*.png`.
+
+**Ďalšie testy:**
+- testy z krokov 71 a 72 a zo C5 OK (riadkovanie dlhých textov, nadpis, štítok),
+- test okna „Prezrieť“ zo C2 OK,
+- všetkých 18 stále spúšťaných Node testov OK (celá kapitola, skóre **1010**).
+
+**Lint:** zmenené riadky bez nových chýb. Ostávajú staré nálezy v zmenených súboroch, ktoré tam boli už predtým: `Typewriter.tsx` (`setState` v efekte) a `NpcScreen.tsx` (nepoužitá premenná `onChooseNode`).
+
+**Chyby počas práce:**
+- Test najprv nenašiel rozhovor. Rozhovor sa nedá otvoriť iba uložením obrazovky (chýba, s kým hráč hovorí); test ho teraz otvorí cez novú hru, úvod, „Som pri Michalskej bráne“ a „Osloviť Strážcu“.
+- Ťukacie slovo v prepise roztiahlo riadok a jeho dolná časť sa nedala ťuknúť (opravené, pozri vyššie).
+
+**Zmenené súbory:**
+- `components/screens/NpcScreen.tsx`, `LandingScreen.tsx`, `FinaleChestScreen.tsx`, `FinalePhotoScreen.tsx`
+- `components/ui/Typewriter.tsx`, `ConfirmDialog.tsx`, `RouteHint.tsx`, `SectionCard.tsx`
+- `components/game/PuzzleFlow.tsx`, `components/items/ItemInspector.tsx`, `components/finale/NextPlaceCard.tsx`
+- `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Ďalší krok:** podľa plánu, až po potvrdení.

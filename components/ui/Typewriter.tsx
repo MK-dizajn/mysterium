@@ -59,7 +59,7 @@ export function Typewriter({
       className="w-full text-left"
       aria-label="Zobraziť celý text"
     >
-      <p className="whitespace-pre-line leading-relaxed">
+      <p className="whitespace-pre-line leading-normal">
         {displayed}
         {!isComplete && <span className="animate-pulse">|</span>}
       </p>

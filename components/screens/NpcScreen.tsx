@@ -57,7 +57,7 @@ export function NpcScreen({
           title={activeNode.speaker}
           variant="gold"
         >
-          <div className="min-h-24 text-[17px] leading-8 text-amber-50">
+          <div className="min-h-24 text-[17px] leading-normal text-amber-50">
             <Typewriter
               key={activeNode.id}
               text={activeNode.text}

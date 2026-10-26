@@ -30,7 +30,7 @@ export function RouteHint({ route, showLabel, hideLabel }: RouteHintProps) {
 
       <div id={routeId} aria-live="polite">
         {isOpen && (
-          <p className="mt-3 rounded-2xl border border-sky-300/20 bg-slate-950/70 px-4 py-3 text-[15px] leading-7 text-slate-200">
+          <p className="mt-3 rounded-2xl border border-sky-300/20 bg-slate-950/70 px-4 py-3 text-[15px] leading-normal text-slate-200">
             {route}
           </p>
         )}
