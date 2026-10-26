@@ -90,7 +90,8 @@ export function NpcScreen({
         <button
           type="button"
           onClick={onClose}
-          className="mx-auto block text-sm text-slate-400 underline decoration-slate-600 underline-offset-4 transition hover:text-slate-200"
+          // Vyzerá ako odkaz, plocha na ťuknutie má aspoň 44 px.
+          className="mx-auto flex min-h-11 items-center px-4 text-sm text-slate-400 underline decoration-slate-600 underline-offset-4 transition hover:text-slate-200"
         >
           Späť k pátraniu
         </button>

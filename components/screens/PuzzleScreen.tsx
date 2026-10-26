@@ -1,17 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import type { ChapterGuidance, Scene } from "../../types/game";
 import { ActionButton } from "../ui/ActionButton";
 import { RouteHint } from "../ui/RouteHint";
 import { TextInput } from "../ui/TextInput";
 import { ScreenContainer } from "../ui/ScreenContainer";
-import { MessageBox } from "../ui/MessageBox";
-import {
-  DetectiveIcon,
-  LightbulbIcon,
-  SearchIcon,
-} from "../ui/MysteriumIcons";
+import { LightbulbIcon, SearchIcon } from "../ui/MysteriumIcons";
 import { SectionCard } from "../ui/SectionCard";
 import { StoryCard } from "../ui/StoryCard";
 
@@ -44,6 +39,8 @@ export function PuzzleScreen({
   const [answer, setAnswer] = useState("");
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const answerLabelId = useId();
+  const feedbackId = useId();
 
   const visibleHints = scene.puzzle.hints.slice(0, hintsUsed);
   const hasMoreHints = hintsUsed < scene.puzzle.hints.length;
@@ -106,97 +103,37 @@ export function PuzzleScreen({
 
         <p className="text-amber-200">{scene.cinematicText}</p>
 
-        <SectionCard
-          icon={<DetectiveIcon className="h-9 w-9" />}
-          title="Hlas pátrača"
-        >
-          <p className="italic leading-relaxed text-slate-300">
+        {/* Hlas pátrača ako krátky citát (bez veľkej karty), aby bola úloha bližšie. */}
+        <figure className="border-l-2 border-amber-300/50 pl-4">
+          <figcaption className="text-xs font-bold uppercase tracking-[0.22em] text-amber-300/80">
+            Hlas pátrača
+          </figcaption>
+          <blockquote className="mt-2 italic leading-normal text-slate-300">
             „{scene.voiceLine}“
-          </p>
-        </SectionCard>
+          </blockquote>
+        </figure>
 
         <SectionCard
           icon={<SearchIcon className="h-9 w-9" />}
           title="Tvoja úloha"
           variant="gold"
         >
-          <div className="space-y-5">
-            <p className="whitespace-pre-line text-left text-sm leading-relaxed text-amber-100">
-              {investigationObjective}
-            </p>
-
-            <div className="border-t border-amber-300/15 pt-5">
-              <p className="text-center text-xs font-bold uppercase tracking-[0.22em] text-amber-400">
-                Výsledok pátrania
+          {/* Odseky zadania s polriadkovou medzerou (nie prázdny riadok). */}
+          <div className="space-y-3 text-left text-sm leading-normal text-amber-100">
+            {investigationObjective.split(/\n\s*\n/).map((paragraph) => (
+              <p key={paragraph} className="whitespace-pre-line">
+                {paragraph.trim()}
               </p>
-
-              <p className="mx-auto mt-2 max-w-sm text-center text-sm leading-relaxed text-slate-300">
-                {answerLabel}
-              </p>
-
-              <div className="mt-5">
-                <TextInput
-                  value={answer}
-                  onChange={(event) => {
-                    setAnswer(event.target.value);
-
-                    if (error) {
-                      setError("");
-                    }
-                  }}
-                  onKeyDown={(event) => {
-                    if (
-                      event.key !== "Enter" ||
-                      event.nativeEvent.isComposing ||
-                      !answer.trim() ||
-                      successMessage
-                    ) {
-                      return;
-                    }
-
-                    event.preventDefault();
-                    checkAnswer();
-                  }}
-                  placeholder="Tvoja odpoveď"
-                  aria-label={answerLabel}
-                  autoComplete="off"
-                  autoCorrect="off"
-                  autoCapitalize="none"
-                  spellCheck={false}
-                  enterKeyHint="done"
-                />
-              </div>
-
-              <div className="mt-4">
-                <ActionButton
-                  onClick={checkAnswer}
-                  disabled={!answer.trim() || Boolean(successMessage)}
-                >
-                  {successMessage ? "Stopa potvrdená" : "Overiť odpoveď"}
-                </ActionButton>
-              </div>
-            </div>
+            ))}
           </div>
         </SectionCard>
-
-        {error && (
-          <MessageBox variant="danger" title="Nesprávna stopa">
-            {error}
-          </MessageBox>
-        )}
-
-        {successMessage && (
-          <MessageBox variant="success" title="Stopa potvrdená">
-            {successMessage}
-          </MessageBox>
-        )}
 
         <SectionCard
           icon={<LightbulbIcon className="h-9 w-9" />}
           title="Pátračove poznámky"
         >
           <div className="space-y-3">
-            <p className="text-center text-sm text-slate-500">
+            <p className="text-center text-sm text-slate-400">
               {visibleHints.length === 0
                 ? "Zatiaľ si neprečítal žiadnu poznámku."
                 : `Prečítané poznámky: ${visibleHints.length}`}
@@ -215,7 +152,7 @@ export function PuzzleScreen({
               </ActionButton>
 
               {visibleHints.length === 0 && (
-                <p className="mt-3 text-center text-sm leading-relaxed text-slate-500">
+                <p className="mt-3 text-center text-sm leading-relaxed text-slate-400">
                   Každá prečítaná poznámka zníži výsledné skóre.
                 </p>
               )}
@@ -235,6 +172,80 @@ export function PuzzleScreen({
             )}
           </div>
         </SectionCard>
+
+        {/*
+          Lišta s odpoveďou: prilepená k spodku obrazovky (sticky, nie fixed),
+          kým hráč číta obsah nad ňou; na konci obsahu leží pod ním. Výška je
+          obmedzená v dvh, aby sa pri otvorenej klávesnici zmestila.
+        */}
+        <div className="sticky bottom-0 z-20 -mx-6 max-h-[60dvh] overflow-y-auto rounded-t-3xl border-t border-amber-300/25 bg-slate-950/95 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 shadow-[0_-12px_30px_rgba(0,0,0,0.6)] backdrop-blur">
+          <p id={answerLabelId} className="text-center text-sm leading-normal text-slate-300">
+            {answerLabel}
+          </p>
+
+          <div aria-live="polite">
+            {error && (
+              <p
+                id={feedbackId}
+                className="mt-2 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm leading-normal text-red-100"
+              >
+                {error}
+              </p>
+            )}
+
+            {successMessage && (
+              <p className="mt-2 rounded-xl border border-emerald-400/30 bg-emerald-400/10 px-3 py-2 text-sm leading-normal text-emerald-100">
+                {successMessage}
+              </p>
+            )}
+          </div>
+
+          <div className="mt-2 flex items-stretch gap-2">
+            <div className="min-w-0 flex-1">
+              <TextInput
+                value={answer}
+                onChange={(event) => {
+                  setAnswer(event.target.value);
+
+                  if (error) {
+                    setError("");
+                  }
+                }}
+                onKeyDown={(event) => {
+                  if (
+                    event.key !== "Enter" ||
+                    event.nativeEvent.isComposing ||
+                    !answer.trim() ||
+                    successMessage
+                  ) {
+                    return;
+                  }
+
+                  event.preventDefault();
+                  checkAnswer();
+                }}
+                className="h-[52px] py-0!"
+                placeholder="Tvoja odpoveď"
+                aria-labelledby={answerLabelId}
+                aria-describedby={error ? feedbackId : undefined}
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="none"
+                spellCheck={false}
+                enterKeyHint="done"
+              />
+            </div>
+
+            <ActionButton
+              onClick={checkAnswer}
+              disabled={!answer.trim() || Boolean(successMessage)}
+              fullWidth={false}
+              className="h-[52px] shrink-0 px-4 py-0 tracking-[0.12em]!"
+            >
+              Overiť
+            </ActionButton>
+          </div>
+        </div>
       </StoryCard>
     </ScreenContainer>
   );

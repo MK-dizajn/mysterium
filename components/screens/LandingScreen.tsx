@@ -94,7 +94,7 @@ export function LandingScreen({
             Prešporok skrýval celé stáročia.
           </p>
 
-          <p className="mx-auto mt-4 max-w-md text-sm leading-normal text-slate-500">
+          <p className="mx-auto mt-4 max-w-md text-sm leading-normal text-slate-400">
             Nájsť miesto má byť jednoduché. Objaviť odpoveď má byť zaujímavé.
           </p>
 
@@ -115,7 +115,7 @@ export function LandingScreen({
 
           {/* Počas beta testu štítok ukážkovej verzie, inak veta o zvuku. */}
           <div className="mt-8 rounded-2xl border border-white/5 bg-black/20 px-4 py-3 backdrop-blur-sm">
-            <p className="text-xs leading-5 text-slate-500">
+            <p className="text-xs leading-5 text-slate-400">
               {previewNotice ?? SOUND_TIP}
             </p>
           </div>

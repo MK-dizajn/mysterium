@@ -26,7 +26,7 @@ export function MessageBox({
     success: "text-emerald-300/70",
     danger: "text-red-300/70",
     warning: "text-amber-300/70",
-    info: "text-slate-500",
+    info: "text-slate-400",
   };
 
   return (

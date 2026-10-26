@@ -95,7 +95,7 @@ export function QuestScreen({
         <button
           type="button"
           onClick={onBack}
-          className="mb-6 rounded-full border border-slate-700 px-4 py-2 text-sm text-slate-300 transition hover:border-emerald-300/50 hover:text-emerald-100"
+          className="mb-6 inline-flex min-h-11 items-center rounded-full border border-slate-700 px-4 text-sm text-slate-300 transition hover:border-emerald-300/50 hover:text-emerald-100"
         >
           ← Späť k pátraniu
         </button>

@@ -32,7 +32,8 @@ export function SectionCard({
   };
 
   const titleStyles = {
-    default: "text-slate-500",
+    // Svetlejšia sivá: kontrast asi 7 : 1 (predtým 4,1 : 1).
+    default: "text-slate-400",
     gold: "text-amber-300/70",
     success: "text-emerald-300/70",
     danger: "text-red-300/70",

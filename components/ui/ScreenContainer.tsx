@@ -12,7 +12,8 @@ export function ScreenContainer({
   return (
     <main
       className={[
-        "min-h-screen bg-[#05070d] px-4 pb-10 pt-10 text-white sm:px-6",
+        // dvh: výška podľa skutočne viditeľnej plochy (aj pri otvorenej klávesnici).
+        "min-h-dvh bg-[#05070d] px-4 pb-10 pt-10 text-white sm:px-6",
         className,
       ].join(" ")}
     >

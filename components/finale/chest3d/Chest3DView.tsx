@@ -738,8 +738,8 @@ export default function Chest3DView({
       onPointerUp={handlePointerEnd}
       onPointerCancel={handlePointerEnd}
       onKeyDown={handleKeyDown}
-      // scroll-mt: pri priblížení sa truhlica posunie celá pod pevnú hlavičku (161 px).
-      className={`relative h-full w-full scroll-mt-44 scroll-mb-4 touch-none select-none rounded-2xl outline-none focus-visible:ring-4 focus-visible:ring-amber-300/60 ${
+      // scroll-mt: pri priblížení sa truhlica posunie celá pod pevnú hlavičku (56 px).
+      className={`relative h-full w-full scroll-mt-20 scroll-mb-4 touch-none select-none rounded-2xl outline-none focus-visible:ring-4 focus-visible:ring-amber-300/60 ${
         isZoomActive ? "" : "cursor-grab active:cursor-grabbing"
       }`}
     >

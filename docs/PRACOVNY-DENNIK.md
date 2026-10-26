@@ -3210,3 +3210,78 @@ Snímky: `c6-po-320.png`, `c6-po-360.png`, `c6-po-390.png`, `c6-po-768.png`.
 **Zmenené súbory:** iba `docs/PRACOVNY-DENNIK.md` (kód sa nemenil).
 
 **Ďalší krok:** výber opráv z auditu, až po potvrdení.
+
+## 26. 10. 2026 – Krok 75 (krok D2): Nálezy P1 z auditu – hlavička, obrazovka úlohy, dotykové plochy, kontrast
+
+**1. Hlavička na jeden riadok** (`components/ui/CodexBar.tsx`): 161 px → **57 px**.
+- Úlohy, Inventár a Artefakty sú tlačidlá 44 px vysoké s ikonou, nápisom 12 px a malým odznakom:
+  - Úlohy: počet aktívnych, „✓“ keď sú splnené, bez odznaku keď žiadne nie sú,
+  - Inventár: počet predmetov,
+  - Artefakty: počet objavených.
+- Skóre ostáva ako zlatá pilulka, zvuk je 44 × 44 px.
+- Pre čítačku ostáva všetko celé, napríklad „Inventár – 14 predmetov“, „Artefakty – 10 z 10 objavených“, „Úlohy – splnené“, „Skóre: 1010“.
+- Nápis „Denník pátrača“ je vizuálne skrytý a slúži ako názov hlavičky pre čítačku.
+- 3D truhlica sa pri priblížení posúva pod novú hlavičku (`components/finale/chest3d/Chest3DView.tsx`, odsadenie 80 px namiesto 176 px).
+
+**2. Obrazovka úlohy** (`components/screens/PuzzleScreen.tsx`):
+- **Lišta s odpoveďou** (popis odpovede, hlásenie, pole a „Overiť“):
+  - prilepená k spodku obrazovky cez `position: sticky`, kým hráč číta obsah nad ňou; na konci obsahu leží pod kartou poznámok,
+  - výška obmedzená na 60 `dvh`,
+  - hlásenie o zlej aj správnej odpovedi je priamo v lište nad poľom,
+  - nápis na tlačidle je skrátený na „Overiť“.
+- **„Hlas pátrača“** je krátky citát so zlatou čiarou namiesto veľkej karty s ikonou.
+- **Zadanie** v karte „Tvoja úloha“ sa delí na odseky s polriadkovou medzerou (zmizol prázdny riadok).
+- Príbeh aj „Hlas pátrača“ ostali celé a v rovnakom poradí.
+- `components/ui/ScreenContainer.tsx`: výška stránky v `dvh` (podľa skutočne viditeľnej plochy).
+
+**3. Dotykové plochy:**
+- zvuk 44 × 44 px,
+- „Späť k pátraniu“ v rozhovore 128 × 44 px (vyzerá ďalej ako odkaz) – `components/screens/NpcScreen.tsx`,
+- „← Späť k pátraniu“ na obrazovke Úlohy 147 × 44 px – `components/screens/QuestScreen.tsx`.
+
+**4. Kontrast:** šedá `slate-500` (4,14 : 1) zmenená na `slate-400`, nameraných **7,5 až 7,8 : 1**:
+- nadpisy bežných kariet (`SectionCard.tsx`),
+- pomocné texty pri poznámkach (`PuzzleScreen.tsx`),
+- druhá veta a štítok ukážky na úvodnej obrazovke (`LandingScreen.tsx`),
+- popis nad poľom (`TextInput.tsx`),
+- nadpis informačnej správy (`MessageBox.tsx`).
+- Zástupný text v poli je posunutý zo `slate-600` na `slate-500`, ostáva odlíšený od napísaného textu.
+
+**Test v prehliadači (nový, mimo projektu)** pri 320 × 568, 360 × 740, 390 × 844 a 768 × 1024 px: pred zmenou **46 chýb**, po zmene **všetko OK** (48 kontrol). Overuje:
+- hlavička najviac 60 px (57) a v jednom riadku,
+- všetky tlačidlá v nej aspoň 44 × 44 px (aj pri 320 px), nápisy 12 px,
+- odznaky (14, 10, ✓) a celé popisy pre čítačku, „Denník pátrača“ nie je vidieť,
+- pole aj „Overiť“ viditeľné hneď po načítaní pri všetkých šírkach, aj na 320 × 568,
+- hlásenie o zlej odpovedi viditeľné v lište,
+- na konci stránky leží lišta pod kartou poznámok,
+- kontrast 7,5 : 1 (karty a pomocné texty) a 7,75 až 7,8 : 1 (úvodná obrazovka),
+- správna odpoveď vedie na históriu scény,
+- „Späť k pátraniu“ v rozhovore a na Úlohách aspoň 44 px,
+- bez vodorovného posúvania a bez chýb v prehliadači.
+
+Snímky pred a po: `d2-pred-*.png`, `d2-po-*.png`.
+
+**Staré testy:**
+- v prehliadači: B4b, B4c-2, B4c-3, C1, C2, C5, C6, C7, C8, B6 – všetko OK,
+- 18 stále spúšťaných Node testov OK (celá kapitola, skóre **1010**).
+
+**Chyby počas práce:**
+- Pri 320 px sa tlačidlo zvuku zúžilo na 43 px. Opravené: zvuk sa nezmenšuje a skóre má o 2 px užší okraj.
+- V teste:
+  - nápisy v hlavičke hľadal iba mimo prvkov skrytých pre čítačku,
+  - nadpis „Pátračov zápis“ hľadal malými písmenami, hoci je zobrazený veľkými.
+  - Opravené.
+
+**Lint:** zmenené riadky bez nových chýb. Ostávajú staré nálezy: `CodexBar.tsx` (stav zvuku sa pri štarte načíta v efekte, prevzaté bez zmeny) a `NpcScreen.tsx` (nepoužitá premenná).
+
+**Do kontroly pred vydaním** pribudlo: lišta s odpoveďou pri otvorenej klávesnici na iPhone a Androide.
+
+**Zmenené súbory:**
+- `components/ui/CodexBar.tsx`, `SectionCard.tsx`, `TextInput.tsx`, `MessageBox.tsx`, `ScreenContainer.tsx`
+- `components/screens/PuzzleScreen.tsx`, `LandingScreen.tsx`, `NpcScreen.tsx`, `QuestScreen.tsx`
+- `components/finale/chest3d/Chest3DView.tsx`
+- `docs/KONTROLA-PRED-VYDANIM.md`, `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Ďalší krok:** nálezy P2 z auditu, až po potvrdení.
