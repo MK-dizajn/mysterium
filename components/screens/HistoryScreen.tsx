@@ -6,7 +6,6 @@ import { ScreenContainer } from "../ui/ScreenContainer";
 import { MessageBox } from "../ui/MessageBox";
 import {
   DetectiveIcon,
-  LightbulbIcon,
   SearchIcon,
 } from "../ui/MysteriumIcons";
 import { SectionCard } from "../ui/SectionCard";

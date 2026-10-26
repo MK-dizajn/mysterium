@@ -15,7 +15,6 @@ type NpcScreenProps = {
   dialogue: Dialogue;
   activeNodeId: string;
   visibleChoices: DialogueChoice[];
-  onChooseNode: (nodeId: string) => void;
   onChooseChoice: (choiceId: string) => void;
   onClose: () => void;
 };
@@ -25,7 +24,6 @@ export function NpcScreen({
   dialogue,
   activeNodeId,
   visibleChoices,
-  onChooseNode,
   onChooseChoice,
   onClose,
 }: NpcScreenProps) {

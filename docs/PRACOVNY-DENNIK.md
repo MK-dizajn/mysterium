@@ -3627,3 +3627,51 @@ Snímky: `d5-pred-*.png`, `d5-po2-*.png`, `d5-po-red-*.png`.
 **Lint:** zmenené súbory bez chýb. Ostalo staršie upozornenie (nepoužitý `onChooseNode` v `NpcScreen.tsx`). Stará chyba v `Typewriter.tsx` zmizla, lebo prepísaný komponent už nenastavuje stav priamo v efekte.
 
 **Ďalší krok:** podľa plánu, až po potvrdení.
+
+---
+
+## 26. 10. 2026 – Krok 80 (krok C6): Upratovanie – test B3b a lint
+
+**Čo sa urobilo:**
+- **Test B3b v prehliadači** (mimo projektu) zodpovedá dnešnému poradiu obrazoviek:
+  - po konci aktu III a „Prijať útržok“ overuje obrazovku „Strážca prichádza“ (nie hneď záverečnú obrazovku),
+  - overuje, že bez videa je tam iba „Otvoriť truhlicu“ a že uložená hra je na obrazovke Strážcu,
+  - celé ďalšie poradie (truhlica, fotografia, zadanie miesta, záver) overuje Node test B7,
+  - test je teraz **medzi stále spúšťanými** (výsledok: všetko OK, aj pri vypnutých animáciách).
+- **Lint v súboroch z krokov C až D**, bez zmeny správania:
+  - `NpcScreen.tsx`: odstránená nepoužitá vlastnosť `onChooseNode` (aj z odovzdania v `NpcFlow.tsx`; rozhovor ju naďalej používa vo vlastnej logike),
+  - `HistoryScreen.tsx`: odstránený nepoužitý import ikony `LightbulbIcon`,
+  - `CodexBar.tsx`: stav zvuku sa už nenastavuje v efekte. Hlavička ho číta zo správcu zvuku a prihlási sa na jeho udalosť zmeny (`useSyncExternalStore`, rovnaký spôsob ako pri vypnutých animáciách).
+
+**Ponechané (iba vypísané):**
+- `hooks/useGameEngine.ts` (2 chyby): načítanie uloženej hry pri štarte a zápis „naposledy uloženej hry“ po každej zmene.
+  - Oprava by znamenala zmeniť spôsob, ako hra pri štarte zisťuje uložený postup a ako ho obnoví po „Pokračovať v pátraní“.
+  - Je to najcitlivejšie miesto hry, preto ostáva bez zmeny.
+- 12 nálezov v starých súboroch truhlice po aktoch:
+  - `ActChestScreen.tsx`, `ChestIntroScreen.tsx` a ich pomocné súbory (`chest-3d/ChestCameraRig.tsx`, `ChestModel.tsx`, `chest/ChestRevealOverlay.tsx`, `useChestUnlockSequence.ts`, `reward/RewardReveal.tsx`),
+  - aplikácia tieto obrazovky už nikde nenačítava (hra od B3 používa ľahké konce aktov),
+  - z `chest-3d` sa používa iba `ChestParts.tsx` (ozdoby 3D truhlice vo finále), ten nálezy nemá,
+  - návrh na neskôr: staré súbory odstrániť v samostatnom kroku.
+
+**Lint celkovo:** zo 17 nálezov (14 chýb, 3 upozornenia) na **14 (12 chýb, 2 upozornenia)**. Všetky zvyšné sú v nepoužívaných súboroch alebo v `useGameEngine.ts`.
+
+**Test správania (nový, mimo projektu):** pred zmenou aj po nej **všetko OK**. Overuje:
+- prepínač zvuku: stav, uloženie, zapamätanie po F5 aj po návrate z Inventára, popis pre čítačku,
+- voľbu v rozhovore,
+- históriu scény.
+
+**Všetky testy:**
+- Node: 22 testov OK (20 stálych, D4 a D5; celá kapitola, skóre **1010**),
+- prehliadač: B3b (nový v zozname), B4b, B4c-1, B4c-2, B4c-3, C1, D2, D3a, D3b, D4, D5 – všetko OK.
+
+**Chyby počas práce:**
+- Test D3b raz zlyhal: prehliadač pri vytváraní testovacieho videa nahral iba 148 bajtov, takže video nebolo čo prehrať. Dva ďalšie behy prešli celé; hry sa to netýka.
+- Nový test som nazval `c6-browser.mjs` a tým v pracovnom priečinku prepísal starší pomocný test s rovnakým názvom (nebol medzi stále spúšťanými).
+
+**Zmenené súbory:**
+- `components/ui/CodexBar.tsx`, `components/screens/HistoryScreen.tsx`, `components/screens/NpcScreen.tsx`, `components/game/NpcFlow.tsx`
+- `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Ďalší krok:** podľa plánu, až po potvrdení.

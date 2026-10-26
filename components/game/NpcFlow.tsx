@@ -115,7 +115,6 @@ export function NpcFlow({
       dialogue={activeDialogue}
       activeNodeId={gameState.activeDialogueNodeId}
       visibleChoices={visibleChoices}
-      onChooseNode={onChooseNode}
       onChooseChoice={chooseDialogueChoice}
       onClose={onClose}
     />

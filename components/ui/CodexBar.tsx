@@ -1,13 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import type {
   Artifact,
   InventoryItem,
   QuestProgress,
 } from "../../types/game";
 import { formatItemCount } from "../../lib/itemCount";
-import { soundManager } from "../../lib/soundManager";
+import { SOUND_SETTING_EVENT, soundManager } from "../../lib/soundManager";
+
+/** Hlavička sa prekreslí, keď sa zmení nastavenie zvuku (aj z iného miesta). */
+function subscribeToSoundSetting(onChange: () => void) {
+  window.addEventListener(SOUND_SETTING_EVENT, onChange);
+
+  return () => window.removeEventListener(SOUND_SETTING_EVENT, onChange);
+}
 
 type CodexBarProps = {
   artifacts: Artifact[];
@@ -78,7 +85,11 @@ export function CodexBar({
   onOpenArtifacts,
   onOpenQuests,
 }: CodexBarProps) {
-  const [isMuted, setIsMuted] = useState(false);
+  const isMuted = useSyncExternalStore(
+    subscribeToSoundSetting,
+    () => soundManager.isMuted(),
+    () => false
+  );
 
   const activeQuests = quests.filter(
     (quest) => quest.status === "active"
@@ -88,15 +99,9 @@ export function CodexBar({
     (quest) => quest.status === "completed"
   ).length;
 
-  useEffect(() => {
-    setIsMuted(soundManager.isMuted());
-  }, []);
-
   function toggleSound() {
-    const nextMutedState = !isMuted;
-
-    soundManager.setMuted(nextMutedState);
-    setIsMuted(nextMutedState);
+    // setMuted pošle udalosť a hlavička sa prekreslí cez useSyncExternalStore.
+    soundManager.setMuted(!isMuted);
   }
 
   const questState =
