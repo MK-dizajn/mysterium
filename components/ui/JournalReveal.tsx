@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { DetectiveNote as DetectiveNoteData } from "../../types/game";
 import { ActionButton } from "./ActionButton";
+import { DetectiveNote } from "./DetectiveNote";
 
 type JournalRevealProps = {
-  imageSrc: string;
-  imageAlt: string;
-  introText?: string;
+  note: DetectiveNoteData;
   continueLabel?: string;
   onContinue: () => void;
 };
@@ -24,10 +24,12 @@ const DUST_PARTICLES = [
   { left: "93%", top: "79%", delay: "3.4s", duration: "7.6s" },
 ];
 
+/**
+ * Strážca podáva zápis od pátrača: papier padne na stôl (text v HTML),
+ * pod ním tlačidlo na pokračovanie. Dlhší zápis sa dá posúvať.
+ */
 export function JournalReveal({
-  imageSrc,
-  imageAlt,
-  introText,
+  note,
   continueLabel = "Preskúmať nultý bod",
   onContinue,
 }: JournalRevealProps) {
@@ -75,36 +77,39 @@ export function JournalReveal({
         isSceneVisible ? "journal-reveal-visible" : "",
         isLeaving ? "journal-reveal-leaving" : "",
       ].join(" ")}
-      aria-label="Odhalenie pátračovho zápisu"
+      aria-label={`Pátračov zápis č. ${note.number}: ${note.title}`}
     >
-      <div className="journal-reveal-desk" aria-hidden="true" />
-      <div className="journal-reveal-light" aria-hidden="true" />
-      <div className="journal-reveal-vignette" aria-hidden="true" />
+      {/* Stôl, svetlo a prach: pevná vrstva pod posúvaným obsahom. */}
+      <div className="journal-reveal-backdrop" aria-hidden="true">
+        <div className="journal-reveal-desk" />
+        <div className="journal-reveal-light" />
+        <div className="journal-reveal-vignette" />
 
-      <div className="journal-reveal-dust" aria-hidden="true">
-        {DUST_PARTICLES.map((particle, index) => (
-          <span
-            key={`journal-dust-${index}`}
-            className="journal-reveal-dust-particle"
-            style={{
-              left: particle.left,
-              top: particle.top,
-              animationDelay: particle.delay,
-              animationDuration: particle.duration,
-            }}
-          />
-        ))}
+        <div className="journal-reveal-dust">
+          {DUST_PARTICLES.map((particle, index) => (
+            <span
+              key={`journal-dust-${index}`}
+              className="journal-reveal-dust-particle"
+              style={{
+                left: particle.left,
+                top: particle.top,
+                animationDelay: particle.delay,
+                animationDuration: particle.duration,
+              }}
+            />
+          ))}
+        </div>
       </div>
 
       <div className="journal-reveal-stage">
-        {introText && (
+        {note.introText && (
           <p
             className={[
               "journal-reveal-intro",
               isSceneVisible ? "journal-reveal-intro-visible" : "",
             ].join(" ")}
           >
-            {introText}
+            {note.introText}
           </p>
         )}
 
@@ -114,13 +119,12 @@ export function JournalReveal({
             isPaperVisible ? "journal-reveal-paper-visible" : "",
           ].join(" ")}
         >
-          <div className="journal-reveal-paper-shadow" aria-hidden="true" />
-
-          <img
-            src={imageSrc}
-            alt={imageAlt}
-            className="journal-reveal-paper-image"
-            draggable={false}
+          <DetectiveNote
+            number={note.number}
+            title={note.title}
+            paragraphs={note.paragraphs}
+            signature={note.signature}
+            imageSrc={note.paperImageSrc}
           />
         </figure>
 

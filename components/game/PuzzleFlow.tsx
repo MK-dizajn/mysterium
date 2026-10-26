@@ -101,12 +101,7 @@ export function PuzzleFlow({
         </section>
       ) : shouldShowDetectiveNote && detectiveNote ? (
         <JournalReveal
-          imageSrc={detectiveNote.imageSrc}
-          imageAlt={
-            detectiveNote.imageAlt ??
-            `Pátračov zápis č. ${detectiveNote.number}: ${detectiveNote.title}`
-          }
-          introText={detectiveNote.introText}
+          note={detectiveNote}
           continueLabel={
             detectiveNote.continueLabel ??
             "Pokračovať vo vyšetrovaní"

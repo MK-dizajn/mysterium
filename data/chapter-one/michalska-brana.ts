@@ -35,10 +35,15 @@ Pátračovo pravidlo znie: „Prvá stopa patrí mestu, ku ktorému vedie najkra
 
   detectiveNote: {
     number: 1,
-    title: "Nultý bod",
-    imageSrc: "/images/journal/detective-note-entry-1.png",
-    imageAlt:
-      "Odtrhnutý list zo starého pátračovho denníka s prvým zápisom.",
+    title: "Brána je iba začiatok",
+    paragraphs: [
+      "Ak toto čítaš, znamená to, že som zlyhal. Zlyhal som chrániť tajomstvo, ktoré by nikdy nemalo byť nájdené nesprávnymi rukami. No možno práve ty si ten, kto pochopí jeho význam.",
+      "Brána je iba začiatok. Nultý bod ti ukáže smer, nie odpoveď. Hľadaj to, čo je najbližšie, nie to, čo je najväčšie.",
+      "Mesto si pamätá. Počúvaj ticho medzi kameňmi. Ďalšiu stopu hľadaj v dome, ktorý mal medzi susedmi sotva miesto.",
+      "Hľadal som kľúč, ktorý mesto ukrylo po kúskoch. Nestihol som ho zložiť. Všetko, čo nájdeš, nesie v sebe číslo. Nehľadaj ho na papieri, skrýva sa v predmetoch. Zapíš si ich: raz ti otvoria to, čo som pre teba zamkol.",
+    ],
+    signature: "Starý pátrač",
+    itemId: "detective-note-nulty-bod",
     introText:
       "Strážca ti podáva zažltnutý list. Papier neukrýva hotovú odpoveď — iba pravidlo, podľa ktorého starý pátrač začínal svoje vyšetrovania.",
     continueLabel: "Preskúmať nultý bod",
@@ -138,10 +143,10 @@ Pátračovo pravidlo znie: „Prvá stopa patrí mestu, ku ktorému vedie najkra
                   type: "addInventoryItem",
                   item: {
                     id: "detective-note-nulty-bod",
-                    title: "Pátračov zápis č. 1 – Nultý bod",
+                    title: "Pátračov zápis č. 1 – Brána je iba začiatok",
                     icon: "📜",
                     description:
-                      "Zažltnutá strana zo strateného denníka. Neobsahuje hotovú odpoveď, ale pravidlo: z množstva ciest vybrať tú najkratšiu.",
+                      "Zažltnutá strana zo strateného denníka. Neobsahuje hotovú odpoveď, ale pravidlo: hľadať to, čo je najbližšie, nie to, čo je najväčšie.",
                     evidenceKind: "document",
                     actId: "act-1",
                   },

@@ -14,7 +14,9 @@ Sem sa zapisuje každý obrázok, zvuk, hudba, hlas a video použité v hre. Hra
 
 | Súbor | Nástroj | Plán | Dátum | Zadanie |
 |---|---|---|---|---|
-| `public/images/journal/detective-note-entry-1.png` | neznáme – doplniť | neznáme – doplniť | súbor zo dňa 24. 7. 2026 | neznáme – doplniť |
+| ~~`public/images/journal/detective-note-entry-1.png`~~ | neznáme | neznáme | súbor zo dňa 24. 7. 2026 | **odstránený 26. 10. 2026 (krok D3a)** – obrázok zápisu č. 1 s textom vpísaným do obrázka a neznámym pôvodom. Nahradil ho papier nakreslený v kóde (CSS a SVG, vlastná práca projektu) a skutočný text v HTML. |
+| Písmo **Patrick Hand** (rukopis pátrača v zápisoch) | Google Fonts (autor Patrick Wagesreiter), pripojené cez `next/font/google` – súbor písma je uložený v projekte pri builde, prehliadač hráča si ho nepýta od Googlu | **SIL Open Font License 1.1** – komerčné použitie a vloženie do hry povolené, písmo sa nesmie predávať samostatne | 26. 10. 2026 | `app/layout.tsx`, premenná `--font-handwriting`, podmnožiny latin a latin-ext (slovenské znaky) |
+| Papier zápisu od pátrača (`components/ui/DetectiveNote.tsx`, štýly `.detective-paper` v `app/globals.css`) | vlastná kresba v kóde (CSS prechody, SVG šum) | vlastná práca projektu, bez licencie tretej strany | 26. 10. 2026 | pergamen s roztrhaným okrajom; ak sa neskôr dodá obrázok čistého papiera (pole `paperImageSrc`), zapísať ho sem |
 | `public/sounds/artifact-unlock.mp3` | – (súbor je prázdny, 0 B) | – | – | treba vytvoriť |
 | `public/sounds/chest-unlock.mp3` | – (súbor je prázdny, 0 B) | – | – | treba vytvoriť |
 | `public/sounds/city-ambient.mp3` | – (súbor je prázdny, 0 B) | – | – | treba vytvoriť |

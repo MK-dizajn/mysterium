@@ -3,7 +3,7 @@ import type {
   Chapter,
   GameState,
 } from "../../types/game";
-import { getCodeNotebook, getItemClue } from "../../engine";
+import { getChapterItem, getCodeNotebook, getItemClue } from "../../engine";
 import { InventoryScreen } from "../screens/InventoryScreen";
 import { ArtifactsScreen } from "../screens/ArtifactsScreen";
 import { QuestScreen } from "../screens/QuestScreen";
@@ -30,6 +30,12 @@ export function CollectionFlow({
         codeNotebook={getCodeNotebook(chapter, gameState)}
         guidance={chapter.guidance}
         getClue={(itemId) => getItemClue(chapter, itemId)}
+        getItemData={(itemId) => getChapterItem(chapter, itemId)}
+        getDetectiveNote={(itemId) =>
+          chapter.scenes
+            .map((scene) => scene.detectiveNote)
+            .find((note) => note?.itemId === itemId)
+        }
         onInspectItem={onInspectItem}
         onBack={onBack}
       />

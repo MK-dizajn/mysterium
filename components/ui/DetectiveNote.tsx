@@ -1,89 +1,158 @@
 "use client";
 
+import { type PointerEvent, useRef } from "react";
+import { useReducedMotion } from "../items/useReducedMotion";
+
 type DetectiveNoteProps = {
-  number: number;
+  number: number | string;
   title: string;
-  children: React.ReactNode;
-  signature?: string;
-  symbol?: string;
+  paragraphs: string[];
+  signature: string;
+  /** Nepovinný obrázok čistého papiera s priehľadným pozadím (nahradí papier v kóde). */
+  imageSrc?: string;
   className?: string;
 };
 
+/** Najväčší náklon papiera pri ťahaní (stupne). */
+const MAX_TILT_DEG = 8;
+
+/**
+ * Roztrhaný okraj papiera ako obrys (v percentách). Body sú pevné
+ * (rovnaký papier pri každom zobrazení), rohy sú mierne odtrhnuté.
+ */
+const TORN_EDGE = (() => {
+  // jednoduchý pevný generátor, aby bol okraj vždy rovnaký
+  let seed = 7;
+  const next = () => {
+    seed = (seed * 9301 + 49297) % 233280;
+    return seed / 233280;
+  };
+  const points: string[] = [];
+  const steps = 22;
+
+  for (let i = 0; i <= steps; i++) points.push(`${(i / steps) * 100}% ${(next() * 1.6).toFixed(2)}%`);
+  for (let i = 1; i <= steps; i++) points.push(`${(100 - next() * 1.8).toFixed(2)}% ${(i / steps) * 100}%`);
+  for (let i = steps - 1; i >= 0; i--) points.push(`${(i / steps) * 100}% ${(100 - next() * 1.6).toFixed(2)}%`);
+  for (let i = steps - 1; i >= 1; i--) points.push(`${(next() * 1.8).toFixed(2)}% ${(i / steps) * 100}%`);
+
+  return `polygon(${points.join(", ")})`;
+})();
+
+/**
+ * Zápis od pátrača ako starý papier: skutočný text v rukopisnom písme,
+ * papier nakreslený v kóde (alebo obrázok papiera), mäkký tieň a jemný
+ * 3D náklon pri ťahaní (iba pri pohybe; pri vypnutých animáciách nehybný).
+ */
 export function DetectiveNote({
   number,
   title,
-  children,
-  signature = "Starý pátrač",
-  symbol = "✦",
+  paragraphs,
+  signature,
+  imageSrc,
   className = "",
 }: DetectiveNoteProps) {
+  const reducedMotion = useReducedMotion();
+  const tiltRef = useRef<HTMLDivElement>(null);
+  const dragRef = useRef<{ pointerId: number; x: number; y: number } | null>(null);
+
+  function setTilt(x: number, y: number, isDragging: boolean) {
+    const tilt = tiltRef.current;
+
+    if (!tilt) {
+      return;
+    }
+
+    tilt.style.setProperty("--tilt-x", x.toFixed(2));
+    tilt.style.setProperty("--tilt-y", y.toFixed(2));
+    tilt.toggleAttribute("data-dragging", isDragging);
+    // Tieň (na obale papiera) sa posunie opačne ako náklon.
+    tilt.parentElement?.style.setProperty("--shadow-x", (-y * 1.5).toFixed(1));
+  }
+
+  function handlePointerDown(event: PointerEvent<HTMLDivElement>) {
+    // Ťahanie myšou nemá označovať text (dotyk a posúvanie prstom ostávajú).
+    if (event.pointerType === "mouse") {
+      event.preventDefault();
+    }
+
+    if (reducedMotion) {
+      return;
+    }
+
+    // Ťah ostane papieru aj mimo jeho okraja; zvislé posúvanie prstom rieši prehliadač (pan-y).
+    event.currentTarget.setPointerCapture(event.pointerId);
+    dragRef.current = { pointerId: event.pointerId, x: event.clientX, y: event.clientY };
+  }
+
+  function handlePointerMove(event: PointerEvent<HTMLDivElement>) {
+    const drag = dragRef.current;
+
+    if (!drag || drag.pointerId !== event.pointerId) {
+      return;
+    }
+
+    const rect = event.currentTarget.getBoundingClientRect();
+    const clamp = (value: number) => Math.max(-MAX_TILT_DEG, Math.min(MAX_TILT_DEG, value));
+    // Ťahanie doprava nakloní papier doprava, ťahanie dole jeho spodok k hráčovi.
+    const tiltY = clamp(((event.clientX - drag.x) / (rect.width / 2)) * MAX_TILT_DEG);
+    const tiltX = clamp((-(event.clientY - drag.y) / (rect.height / 2)) * MAX_TILT_DEG * 2);
+
+    setTilt(tiltX, tiltY, true);
+  }
+
+  function handlePointerEnd(event: PointerEvent<HTMLDivElement>) {
+    if (dragRef.current?.pointerId !== event.pointerId) {
+      return;
+    }
+
+    dragRef.current = null;
+    setTilt(0, 0, false);
+  }
+
   return (
-    <article
-      className={[
-        "relative mx-auto w-full max-w-xl overflow-hidden",
-        "rounded-[28px] border border-amber-900/35",
-        "bg-[#d8bc82] px-6 py-8 text-[#352313]",
-        "shadow-[0_28px_70px_rgba(0,0,0,0.45)]",
-        "sm:px-9 sm:py-10",
-        className,
-      ].join(" ")}
-    >
-      {/* Starý papier – jemné svetlo v strede */}
+    <div data-detective-paper className={`detective-paper ${className}`}>
       <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,245,200,0.35),transparent_68%)]"
-      />
+        ref={tiltRef}
+        data-paper-tilt
+        className="detective-paper-tilt"
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerEnd}
+        onPointerCancel={handlePointerEnd}
+      >
+        <article
+          className={`detective-paper-sheet ${imageSrc ? "detective-paper-sheet-image" : ""}`}
+          style={
+            imageSrc
+              ? { backgroundImage: `url(${JSON.stringify(imageSrc)})` }
+              : { clipPath: TORN_EDGE }
+          }
+        >
+          <div aria-hidden="true" className="detective-paper-gloss" />
 
-      {/* Tmavšie a opotrebované okraje */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 shadow-[inset_0_0_55px_rgba(72,38,10,0.4)]"
-      />
+          <header className="relative text-center">
+            <p className="text-[1.15rem] leading-none text-[#4a3018]">
+              Zápis č. {number}
+            </p>
+            <div aria-hidden="true" className="mx-auto mt-2 flex items-center justify-center gap-2 text-[#5a3a1c]">
+              <span className="h-px w-12 bg-[#5a3a1c]/50" />
+              <span className="text-sm">✦</span>
+              <span className="h-px w-12 bg-[#5a3a1c]/50" />
+            </div>
+            <h2 className="mt-3 text-[1.6rem] leading-tight underline decoration-[#5a3a1c]/60 decoration-1 underline-offset-[6px]">
+              {title}
+            </h2>
+          </header>
 
-      {/* Jemná papierová štruktúra */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-[0.13] [background-image:repeating-linear-gradient(0deg,transparent,transparent_3px,rgba(75,43,15,0.35)_4px)]"
-      />
-
-      {/* Rohové škvrny */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -left-8 -top-8 h-24 w-24 rounded-full bg-amber-950/15 blur-xl"
-      />
-
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -bottom-8 -right-8 h-28 w-28 rounded-full bg-amber-950/20 blur-2xl"
-      />
-
-      <div className="relative z-10">
-        <header className="text-center">
-          <p className="text-xs font-bold uppercase tracking-[0.32em] text-amber-950/65">
-            Zápis č. {number}
-          </p>
-
-          <div className="mx-auto mt-4 flex items-center justify-center gap-3">
-            <span className="h-px w-12 bg-amber-950/35" />
-            <span className="text-lg text-amber-950/70">{symbol}</span>
-            <span className="h-px w-12 bg-amber-950/35" />
+          <div className="relative mt-5 space-y-3">
+            {paragraphs.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
           </div>
 
-          <h2 className="mt-4 font-serif text-2xl font-bold tracking-wide text-[#2b1b0d] sm:text-3xl">
-            {title}
-          </h2>
-        </header>
-
-        <div className="mt-7 space-y-4 whitespace-pre-line text-center font-serif text-lg leading-8 text-[#3d2917]">
-          {children}
-        </div>
-
-        <footer className="mt-9 border-t border-amber-950/25 pt-5">
-          <p className="text-right font-serif text-sm italic text-amber-950/65">
-            — {signature}
-          </p>
-        </footer>
+          <p className="relative mt-5 text-right text-[1.35rem]">– {signature}</p>
+        </article>
       </div>
-    </article>
+    </div>
   );
 }

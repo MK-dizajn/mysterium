@@ -960,10 +960,20 @@ body {
   position: fixed;
   inset: 0;
   z-index: 90;
-  overflow: hidden;
+  /* Dlhší zápis sa dá posúvať; stôl, svetlo a prach sú v pevnej vrstve pod ním. */
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   background: #050403;
   opacity: 0;
   transition: opacity 700ms ease-out;
+}
+
+.journal-reveal-backdrop {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
 }
 
 .journal-reveal-visible {
@@ -999,7 +1009,8 @@ body {
     linear-gradient(180deg, #2f180c, #160b06);
   filter: blur(2px) saturate(0.78);
   transform: scale(1.08);
-  animation: journal-desk-camera 13s ease-in-out infinite alternate;
+  /* Jeden pomalý pohyb kamery, potom pokoj (scéna v pokoji nič nekreslí). */
+  animation: journal-desk-camera 13s ease-in-out 1 both;
 }
 
 .journal-reveal-light {
@@ -1044,12 +1055,21 @@ body {
   width: 100%;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  /* Centrovanie cez okraje: pri dlhom zápise sa vrch neodreže (dá sa posúvať). */
+  justify-content: flex-start;
   padding:
     max(24px, env(safe-area-inset-top))
     16px
     max(24px, env(safe-area-inset-bottom));
   perspective: 1300px;
+}
+
+.journal-reveal-stage > :first-child {
+  margin-top: auto;
+}
+
+.journal-reveal-stage > :last-child {
+  margin-bottom: auto;
 }
 
 .journal-reveal-intro {
@@ -1078,7 +1098,6 @@ body {
   position: relative;
   z-index: 5;
   width: min(94vw, 470px);
-  max-height: min(71svh, 720px);
   margin: 0;
   opacity: 0;
   transform:
@@ -1111,17 +1130,6 @@ body {
   animation: journal-paper-shadow 1650ms ease-out both;
 }
 
-.journal-reveal-paper-image {
-  display: block;
-  max-height: min(71svh, 720px);
-  width: 100%;
-  object-fit: contain;
-  user-select: none;
-  filter:
-    drop-shadow(0 34px 42px rgba(0, 0, 0, 0.74))
-    sepia(0.05)
-    saturate(0.94);
-}
 
 .journal-reveal-controls {
   position: relative;
@@ -1157,7 +1165,8 @@ body {
   opacity: 0;
   animation-name: journal-dust-float;
   animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
+  /* Prach preletí dvakrát a zastaví sa. */
+  animation-iteration-count: 2;
 }
 
 .journal-reveal-dust-particle:nth-child(3n) {
@@ -1299,13 +1308,90 @@ body {
     display: none;
   }
 
-  .journal-reveal-paper,
-  .journal-reveal-paper-image {
-    max-height: 74svh;
-  }
-
   .journal-reveal-controls {
     margin-top: 6px;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Zápis od pátrača – papier nakreslený v kóde                                 */
+/* -------------------------------------------------------------------------- */
+
+.detective-paper {
+  width: 100%;
+  perspective: 1100px;
+  /* Mäkký tieň priamo na pozadí; s náklonom sa mierne posunie. */
+  filter:
+    drop-shadow(calc(var(--shadow-x, 0) * 1px) 22px 26px rgba(0, 0, 0, 0.55))
+    drop-shadow(0 3px 5px rgba(0, 0, 0, 0.35));
+}
+
+.detective-paper-tilt {
+  transform:
+    rotateX(calc(var(--tilt-x, 0) * 1deg))
+    rotateY(calc(var(--tilt-y, 0) * 1deg));
+  transform-style: preserve-3d;
+  transition: transform 450ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* Zvislé posúvanie prstom ostáva prehliadaču. */
+  touch-action: pan-y;
+  cursor: grab;
+  /* Ťahanie nakláňa papier, neoznačuje text (text ostáva skutočný pre čítačku). */
+  user-select: none;
+}
+
+.detective-paper-tilt[data-dragging] {
+  transition: transform 80ms linear;
+  cursor: grabbing;
+}
+
+.detective-paper-sheet {
+  position: relative;
+  padding: 34px 24px 30px;
+  color: #2a1a0b;
+  font-family: var(--font-handwriting), "Segoe Print", "Bradley Hand", cursive;
+  font-size: 1.3rem;
+  line-height: 1.45;
+  /* Pergamen: teplý základ, svetlo v strede, škvrny, ohyb a zrno papiera. */
+  background-color: #e6d09d;
+  background-image:
+    radial-gradient(ellipse at 32% 22%, rgba(255, 248, 225, 0.55), transparent 55%),
+    radial-gradient(ellipse at 78% 88%, rgba(122, 74, 26, 0.2), transparent 50%),
+    radial-gradient(circle at 86% 9%, rgba(112, 66, 20, 0.16) 0 5%, transparent 6%),
+    radial-gradient(circle at 9% 78%, rgba(112, 66, 20, 0.12) 0 4%, transparent 5%),
+    linear-gradient(100deg, transparent 47%, rgba(92, 56, 20, 0.1) 50%, transparent 53%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.36 0 0 0 0 0.22 0 0 0 0 0.08 0 0 0 0.2 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  /* Stmavnuté, opotrebované okraje. */
+  box-shadow:
+    inset 0 0 46px rgba(96, 56, 16, 0.5),
+    inset 0 0 10px rgba(70, 40, 10, 0.45);
+}
+
+/* Dodaný obrázok čistého papiera (s priehľadným pozadím) nahradí papier v kóde. */
+.detective-paper-sheet-image {
+  background-color: transparent;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  box-shadow: none;
+  padding: 48px 34px 42px;
+}
+
+.detective-paper-gloss {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    115deg,
+    transparent 30%,
+    rgba(255, 250, 235, 0.16) calc(45% + var(--tilt-y, 0) * 2%),
+    transparent 62%
+  );
+  mix-blend-mode: soft-light;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .detective-paper-tilt {
+    transform: none !important;
+    cursor: default;
   }
 }
 

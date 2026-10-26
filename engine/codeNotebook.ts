@@ -124,6 +124,34 @@ export function getSceneClue(scene: Scene): string | undefined {
 }
 
 /**
+ * Predmet podľa dát kapitoly (z odmien scén aj z rozhovorov). Uložená
+ * kópia v starej hre môže mať starší názov alebo popis.
+ */
+export function getChapterItem(
+  chapter: Chapter,
+  itemId: string
+): InventoryItem | undefined {
+  for (const scene of chapter.scenes) {
+    const dialogueItems = (scene.dialogues ?? [])
+      .flatMap((dialogue) => dialogue.nodes)
+      .flatMap((node) => node.choices ?? [])
+      .flatMap((choice) => choice.actions ?? [])
+      .flatMap((action) =>
+        action.type === "addInventoryItem" ? [action.item] : []
+      );
+    const item = [...getSceneRewardItems(scene), ...dialogueItems].find(
+      (candidate) => candidate.id === itemId
+    );
+
+    if (item) {
+      return item;
+    }
+  }
+
+  return undefined;
+}
+
+/**
  * Vodidlo predmetu podľa dát kapitoly – uložená kópia predmetu
  * zo staršej hry ho nemusí mať.
  */

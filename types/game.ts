@@ -145,8 +145,17 @@ export type Puzzle = {
 export type DetectiveNote = {
   number: number | string;
   title: string;
-  imageSrc: string;
-  imageAlt?: string;
+  /** Odseky zápisu – skutočný text (číta ho aj čítačka), nie obrázok. */
+  paragraphs: string[];
+  /** Podpis pod zápisom (zobrazí sa s pomlčkou). */
+  signature: string;
+  /**
+   * Nepovinný obrázok čistého papiera s priehľadným pozadím; ak je,
+   * nahradí papier nakreslený v kóde (text ostáva v HTML).
+   */
+  paperImageSrc?: string;
+  /** Predmet v Inventári, pri ktorom je tlačidlo „Prečítať zápis“. */
+  itemId?: string;
   introText?: string;
   continueLabel?: string;
   unlockFlagId?: string;

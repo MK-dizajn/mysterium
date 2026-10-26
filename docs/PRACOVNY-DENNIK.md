@@ -3285,3 +3285,93 @@ Snímky pred a po: `d2-pred-*.png`, `d2-po-*.png`.
 **Build:** prešiel (`npm run build`, bez chýb).
 
 **Ďalší krok:** nálezy P2 z auditu, až po potvrdení.
+
+## 26. 10. 2026 – Krok 76 (krok D3a): Zápis od pátrača ako papier s rukopisom
+
+**Ako to bolo:**
+- Zápis č. 1 (Strážca podáva zažltnutý list) bol obrázok `public/images/journal/detective-note-entry-1.png` (3,4 MB, bez priehľadnosti, s tmavým pozadím a s textom vpísaným do obrázka).
+- Čítačka prečítala iba popis obrázka.
+- Posledný odsek ešte hovoril o „dvoch číslach“.
+- Pôvod obrázka nebol známy.
+
+**Čo sa urobilo:**
+- **Papier nakreslený v kóde** (`components/ui/DetectiveNote.tsx`, štýly `.detective-paper` v `app/globals.css`):
+  - pergamen so zrnom (SVG šum), svetlom, škvrnami, ohybom, stmavnutými okrajmi a roztrhaným okrajom,
+  - leží priamo na pozadí scény s mäkkým tieňom, bez tmavého obdĺžnika,
+  - nepovinné pole `paperImageSrc` v dátach: ak sa dodá obrázok čistého papiera s priehľadným pozadím, nahradí papier v kóde (text ostane v HTML).
+- **Jemný 3D náklon:**
+  - pri ťahaní prstom alebo myšou sa papier nakloní najviac o 8°, tieň sa posunie opačne a po papieri prejde slabý lesk,
+  - po pustení sa vráti,
+  - iba CSS, mení sa len pri pohybe,
+  - pri vypnutých animáciách je papier nehybný,
+  - zvislé posúvanie prstom ostáva prehliadaču,
+  - ťahanie myšou neoznačuje text.
+- **Text v HTML, rukopisné písmo:**
+  - Patrick Hand cez `next/font/google` (`app/layout.tsx`, podmnožiny latin a latin-ext); súbor písma je v projekte, prehliadač hráča si ho nepýta od Googlu,
+  - overené, že všetkých 32 slovenských znakov (ľ, ť, ď, ň, ô, ŕ, ĺ, č, š, ž, ý, á, í, é, ú, ä aj veľké) sa vykreslí týmto písmom,
+  - písmo 18,4 px, kontrast atramentu **8 : 1**.
+- **Nový text zápisu v dátach** (`data/chapter-one/michalska-brana.ts`) presne podľa zadania:
+  - nadpis „Brána je iba začiatok“,
+  - štyri odseky,
+  - podpis „Starý pátrač“.
+- **Scéna zápisu** (`components/ui/JournalReveal.tsx`, `components/game/PuzzleFlow.tsx`):
+  - dlhší zápis sa dá posúvať a tlačidlo „Preskúmať nultý bod“ je pod papierom,
+  - stôl, svetlo a prach sú v pevnej vrstve pod obsahom,
+  - **obmedzené animácie:** stôl sa pohne raz, prach preletí dvakrát, potom scéna nič nekreslí.
+- **Inventár** (`components/screens/InventoryScreen.tsx`, `components/game/CollectionFlow.tsx`):
+  - karta „Pátračov zápis č. 1 – Brána je iba začiatok“ s novým popisom,
+  - nové tlačidlo „Prečítať zápis“ otvorí ten istý papier v okne so „Zavrieť“ (aj klávesa Esc).
+- **Názov a popis predmetov v Inventári sa berú z dát kapitoly**, aj pri starom uložení:
+  - nová funkcia `getChapterItem` v `engine/codeNotebook.ts` nájde predmet v odmenách scén aj v rozhovoroch,
+  - zápis sa pridáva z rozhovoru, preto ho staršie hľadanie nenašlo.
+- **Starý obrázok** `detective-note-entry-1.png` je zmazaný (aj prázdny priečinok `public/images/journal`).
+- **`docs/MEDIA-LICENCIE.md`:**
+  - starý obrázok je označený ako odstránený,
+  - pribudlo písmo Patrick Hand (SIL Open Font License 1.1) a papier v kóde (vlastná práca).
+
+**Test (Node, nový, mimo projektu):** pred zmenou 15 chýb, po zmene **16 z 16**. Overuje:
+- texty v dátach, kartu v Inventári,
+- zmazaný obrázok,
+- licencie, písmo cez `next/font`,
+- nepovinný obrázok papiera, náklon najviac 8°,
+- žiadne nekonečné animácie, tlačidlo „Prečítať zápis“.
+
+**Test v prehliadači (nový)** pri 320 × 568, 360 × 740 a 768 × 1024 px: pred zmenou **20 chýb**, po zmene **všetko OK**, aj pri vypnutých animáciách. Overuje:
+- papier v kóde bez obrázka,
+- skutočný text so všetkými odsekmi a podpisom,
+- bez vodorovného posúvania, papier sa zmestí, obal má priehľadné pozadie,
+- úvodná veta nad papierom viditeľná (nie odrezaná),
+- písmo so všetkými slovenskými znakmi, 18,4 px, kontrast 8 : 1,
+- náklon pri ťahaní (asi 6°, najviac 8°) a návrat; pri vypnutých animáciách bez náklonu,
+- ťahanie neoznačí text,
+- po dobehnutí úvodu bežia 0 animácií,
+- tlačidlo dosiahnuteľné (54 px), pokračovanie na úlohu, F5,
+- Inventár: karta s novým názvom a popisom, „Prečítať zápis“ a „Zavrieť“.
+
+Snímky: `d3a-pred-*.png`, `d3a-po-*.png`.
+
+**Staré testy:**
+- v prehliadači: D2, C1, C7, C8, C2, B4b – všetko OK,
+- 18 stále spúšťaných Node testov OK (celá kapitola, skóre **1010**).
+
+**Chyby počas práce:**
+- Úvodná veta nad papierom sa pri dlhom zápise odrezala: obsah bol centrovaný zvislo a vrch pretiekol mimo posúvania. Opravené centrovaním cez okraje.
+- Ťahanie myšou po papieri označovalo text. Samotné CSS (`user-select: none`) nestačilo; opravené zrušením predvoleného správania pri stlačení myši na papieri.
+- Karta v Inventári ukazovala starý názov z uloženej hry. Opravené čítaním názvu a popisu z dát (`getChapterItem`).
+- V teste:
+  - chyba v regulárnom výraze pri kontrole pozadia obalu,
+  - porovnanie názvu bez ohľadu na veľké písmená.
+- Test C2 raz zlyhal na časovaní (pri obrátení strany nenameral snímky); pri dvoch ďalších behoch prešiel celý, okno „Prezrieť“ sa v tomto kroku nemenilo.
+
+**Zmenené súbory:**
+- `app/layout.tsx`, `app/globals.css`
+- `types/game.ts`, `data/chapter-one/michalska-brana.ts`, `engine/codeNotebook.ts`
+- `components/ui/DetectiveNote.tsx`, `components/ui/JournalReveal.tsx`, `components/game/PuzzleFlow.tsx`, `components/game/CollectionFlow.tsx`, `components/screens/InventoryScreen.tsx`
+- `docs/MEDIA-LICENCIE.md`, `docs/PRACOVNY-DENNIK.md`
+- zmazaný `public/images/journal/detective-note-entry-1.png`
+
+**Build:** prešiel (`npm run build`, bez chýb; písmo sa pri builde stiahne a uloží do projektu).
+
+**Lint:** zmenené súbory bez chýb.
+
+**Ďalší krok:** D3b (tlačidlo „Prezrieť zápis“ po videu), až po potvrdení.
