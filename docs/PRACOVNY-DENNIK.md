@@ -3675,3 +3675,24 @@ Snímky: `d5-pred-*.png`, `d5-po2-*.png`, `d5-po-red-*.png`.
 **Build:** prešiel (`npm run build`, bez chýb).
 
 **Ďalší krok:** podľa plánu, až po potvrdení.
+
+---
+
+## 26. 10. 2026 – Záver dňa
+
+**Hotové:**
+- C5,
+- D1 až D5 (audit a opravy vzhľadu),
+- D3a (zápis ako papier),
+- D3b (miesto pre video),
+- C6 (upratovanie).
+
+**Najbližšie:**
+1. Terénna kontrola ciest, vodidiel a hádaniek (`docs/KONTROLA-PRED-VYDANIM.md`).
+2. Médiá: video so Strážcom podľa scenára, hlas, zvuky.
+3. Pred prvým testerom: verzia uloženia v3, kontrola `isPlaceholder`.
+4. Malé upratovanie:
+   - test B3b je už hotový (krok C6),
+   - ostávajú staré lintové upozornenia (2 v `useGameEngine.ts`, 12 v nepoužívaných súboroch starej truhlice po aktoch).
+
+Vývojový server je zastavený.
