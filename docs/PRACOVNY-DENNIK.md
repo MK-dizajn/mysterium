@@ -2984,3 +2984,56 @@ Vývojový server je zastavený. Kód sa v závere dňa nemenil.
 3. Terénna kontrola (vodidlá, cesty, dĺžka trasy – pozri `docs/KONTROLA-PRED-VYDANIM.md`).
 4. Príprava na beta test: verzia uloženia z v2 na v3, kontrola `isPlaceholder` v dátach.
 5. Video a zvuky.
+
+## 26. 10. 2026 – Krok 70 (krok C5): Príprava na beta test – koncept zážitku, súpis dočasných údajov, štítok ukážkovej verzie
+
+**1. `docs/KONCEPT-ZAZITKU.md`, časti D a E** (commit `f802387`): poznámky „Dnes v hre“ opisujú dnešný stav.
+- **D:** štyri útržky sa samy zložia, fotografia sa dá priblížiť, posúvať a otočiť, na rube je poznámka s miestom; obrázok je dočasná kresba.
+- **E:** názov miesta sa zadáva ručne, bez GPS, s odpustením diakritiky, veľkých a malých písmen, interpunkcie a drobných preklepov; potom karta „Ďalšie miesto“ s adresou, „Otvoriť v mapách“ a cestou, „Dokončiť kapitolu“ vedie na záver; ďalšia kapitola zatiaľ neexistuje; miesto a cesta sú dočasné.
+- Pôvodný stav je uvedený ako „pôvodne“. Kódy v dokumente nie sú.
+
+**2. Verzia uloženia (v2 na v3) – podľa rozhodnutia sa teraz nerobí.** Zapísaná do `docs/KONTROLA-PRED-VYDANIM.md` ako krok „tesne pred prvým testerom“:
+- zmena `SAVE_KEY` v `engine/constants.ts`,
+- bez prevodu, všetci začnú odznova,
+- staré kľúče v2 a ich zálohy ostanú v prehliadači nedotknuté,
+- úprava kľúča v stále spúšťaných testoch a nový test.
+- `engine/constants.ts` ostáva `mysterium-progress-v2` (overené testom).
+
+**3. Súpis dočasných údajov a štítok ukážkovej verzie:**
+- **Kontrola `isPlaceholder`:** v dátach je iba raz, pri ďalšom mieste (`data/chapter-one/finale.ts`). Ostatné dočasné veci sú označené komentárom alebo chýbajúcim súborom.
+- **Nové riadky v `docs/KONTROLA-PRED-VYDANIM.md`:**
+  - zmena ďalšieho miesta naraz na 4 miestach dát (názov a adresa, prijaté odpovede, cesta, riadok „Miesto:“ na rube fotografie), potom odstrániť `isPlaceholder`,
+  - cesta k ďalšiemu miestu overiť pešo,
+  - video Strážcu pridať alebo vedome vynechať (v dátach dnes nie je),
+  - zvuky: 5 súborov v `public/sounds` má 0 bajtov a 2 súbory (`digit-found.mp3`, `button-click.mp3`) chýbajú, hra je dnes úplne tichá,
+  - štítok ukážkovej verzie pred vydaním odstrániť,
+  - kódy zámkov z `docs/KARTY-USLOH.md` a starých záznamov denníka pred zverejnením repozitára,
+  - verzia uloženia v3 tesne pred prvým testerom (pozri bod 2).
+  - Fotografia, vodidlá a cesty v teréne a kolieska na mobile tam už boli.
+- **Štítok ukážkovej verzie:**
+  - nové nepovinné pole `previewNotice` v type hry (`types/game.ts`) a v dátach (`data/mysterium-game.ts`): „Ukážková verzia 0.1 – niektoré obrázky, zvuky a údaje sú zatiaľ dočasné.“,
+  - úvodná obrazovka (`components/screens/LandingScreen.tsx`) ho ukáže namiesto vety „Najlepší zážitok dosiahneš so zapnutým zvukom.“; keď sa pole z dát odstráni, vráti sa pôvodná veta,
+  - `app/page.tsx` odovzdá štítok z dát.
+
+**Testy:**
+- **Nový test (Node):** pred zmenou 13 chýb, po zmene **15 z 15** (štítok v dátach a v úvodnej obrazovke, návrat vety o zvuku bez štítku, časti D a E, všetky nové riadky kontroly, verzia uloženia nezmenená, žiadne kódy v upravených dokumentoch).
+- **Prehliadač (360 px), úvodná obrazovka:** pred zmenou 3 chyby, po zmene **5 z 5** (štítok viditeľný, veta o zvuku nahradená, zmestí sa bez vodorovného posúvania, tlačidlo „Začať pátranie“, bez chýb).
+- **Všetky stále spúšťané testy OK:**
+  - B1b-1 17/17, B1b-3b 45/45, fyzika otáčania 25/25,
+  - B4c-3 24/24, B4c-2 34/34, B4c-1 18/18,
+  - C1 63/63, B7 20/20 (celá kapitola, skóre **1010**), B6 32/32, B5 21/21, B4b 26/26, B4a 20/20, B3b 25/25 (aj staré uloženia),
+  - texty 37/37, B3a 65/65, kresba kľúča 54/54, nápovedy 37/37.
+
+**Zistené, nemenené:** na úvodnej obrazovke je na 360 px nápis „MYSTERIUM“ orezaný na pravom okraji (veľké písmo s rozostupmi). Nadpis sa v tomto kroku nemenil; navrhujem malú opravu v samostatnom kroku.
+
+**Chyby počas práce:** žiadne.
+
+**Zmenené súbory:**
+- commit 1: `docs/KONCEPT-ZAZITKU.md`
+- commit 2: `types/game.ts`, `data/mysterium-game.ts`, `components/screens/LandingScreen.tsx`, `app/page.tsx`, `docs/KONTROLA-PRED-VYDANIM.md`, `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** zmenené súbory bez chýb.
+
+**Ďalší krok:** podľa plánu, až po potvrdení.

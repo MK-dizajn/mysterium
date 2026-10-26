@@ -500,6 +500,11 @@ export type Game = {
   subtitle?: string;
   defaultCity: string;
   chapters: Chapter[];
+  /**
+   * Štítok ukážkovej verzie na úvodnej obrazovke (počas beta testu namiesto
+   * vety o zvuku). Pred vydaním sa odstráni a vráti sa pôvodná veta.
+   */
+  previewNotice?: string;
 };
 
 export type GameState = {

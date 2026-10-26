@@ -8,12 +8,17 @@ type LandingScreenProps = {
   hasSavedProgress: boolean;
   onStartNewGame: () => void;
   onContinueGame: () => void;
+  /** Štítok ukážkovej verzie z dát; bez neho sa ukáže veta o zvuku. */
+  previewNotice?: string;
 };
+
+const SOUND_TIP = "Najlepší zážitok dosiahneš so zapnutým zvukom.";
 
 export function LandingScreen({
   hasSavedProgress,
   onStartNewGame,
   onContinueGame,
+  previewNotice,
 }: LandingScreenProps) {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
@@ -102,9 +107,10 @@ export function LandingScreen({
             </ActionButton>
           </div>
 
+          {/* Počas beta testu štítok ukážkovej verzie, inak veta o zvuku. */}
           <div className="mt-8 rounded-2xl border border-white/5 bg-black/20 px-4 py-3 backdrop-blur-sm">
             <p className="text-xs leading-5 text-slate-500">
-              Najlepší zážitok dosiahneš so zapnutým zvukom.
+              {previewNotice ?? SOUND_TIP}
             </p>
           </div>
         </div>

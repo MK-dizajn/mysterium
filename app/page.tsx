@@ -589,6 +589,7 @@ export default function Home() {
         hasSavedProgress={hasSavedProgress}
         onContinueGame={continueSavedGame}
         onStartNewGame={startNewGame}
+        previewNotice={mysteriumGame.previewNotice}
       />
     );
   }
