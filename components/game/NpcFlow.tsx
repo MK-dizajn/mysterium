@@ -67,7 +67,7 @@ export function NpcFlow({
           <button
             type="button"
             onClick={onClose}
-            className="mt-4 block rounded-xl border border-red-300/40 px-4 py-2"
+            className="mt-4 block min-h-11 rounded-xl border border-red-300/40 px-4 py-2"
           >
             Späť
           </button>

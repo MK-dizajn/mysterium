@@ -1,5 +1,5 @@
 import type { Artifact } from "../../types/game";
-import { ActionButton } from "../ui/ActionButton";
+import { BackBar } from "../ui/BackBar";
 import { CodexPageTransition } from "../ui/CodexPageTransition";
 import { DetectiveIcon } from "../ui/MysteriumIcons";
 import { Reveal } from "../ui/Reveal";
@@ -18,7 +18,7 @@ export function ArtifactScreen({
   onBack,
 }: ArtifactScreenProps) {
   return (
-    <ScreenContainer>
+    <ScreenContainer className="flex flex-col">
       <ScreenTransition>
         <CodexPageTransition>
           <StoryCard
@@ -55,15 +55,12 @@ export function ArtifactScreen({
                 </p>
               </SectionCard>
             </Reveal>
-
-            <Reveal delay={1500}>
-              <ActionButton onClick={onBack}>
-                Späť
-              </ActionButton>
-            </Reveal>
           </StoryCard>
         </CodexPageTransition>
       </ScreenTransition>
+
+      {/* Mimo prechodov: lišta je tam hneď, nie až po animácii. */}
+      <BackBar label="Späť na artefakty" onBack={onBack} />
     </ScreenContainer>
   );
 }

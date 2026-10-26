@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { Dialogue, DialogueChoice, Npc } from "../../types/game";
 import { ActionButton } from "../ui/ActionButton";
+import { BackBar } from "../ui/BackBar";
 import { DetectiveIcon } from "../ui/MysteriumIcons";
 import { ScreenContainer } from "../ui/ScreenContainer";
 import { SectionCard } from "../ui/SectionCard";
@@ -44,7 +45,7 @@ export function NpcScreen({
   }
 
   return (
-    <ScreenContainer>
+    <ScreenContainer className="flex flex-col">
       <StoryCard label="Rozhovor" title={npc.name}>
         {npc.role && (
           <p className="text-sm uppercase tracking-[0.2em] text-amber-300/60">
@@ -86,16 +87,10 @@ export function NpcScreen({
             )}
           </div>
         )}
-
-        <button
-          type="button"
-          onClick={onClose}
-          // Vyzerá ako odkaz, plocha na ťuknutie má aspoň 44 px.
-          className="mx-auto flex min-h-11 items-center px-4 text-sm text-slate-400 underline decoration-slate-600 underline-offset-4 transition hover:text-slate-200"
-        >
-          Späť k pátraniu
-        </button>
       </StoryCard>
+
+      {/* Nevýrazná, aby nesúperila s voľbami rozhovoru. */}
+      <BackBar label="Späť k pátraniu" onBack={onClose} variant="secondary" />
     </ScreenContainer>
   );
 }

@@ -1,5 +1,5 @@
 import type { Artifact } from "../../types/game";
-import { ActionButton } from "../ui/ActionButton";
+import { BackBar } from "../ui/BackBar";
 import { DetectiveIcon } from "../ui/MysteriumIcons";
 import { ScreenContainer } from "../ui/ScreenContainer";
 import { SectionCard } from "../ui/SectionCard";
@@ -17,7 +17,7 @@ export function ArtifactsScreen({
   onOpenArtifact,
 }: ArtifactsScreenProps) {
   return (
-    <ScreenContainer>
+    <ScreenContainer className="flex flex-col">
       <StoryCard
         label="Objavené miesta a príbehy"
         title="Artefakty"
@@ -59,7 +59,7 @@ export function ArtifactsScreen({
                     </p>
 
                     <p className="mt-3 text-xs font-bold uppercase tracking-widest text-amber-400/70">
-                      Otvoriť historický záznam
+                      Prečítať príbeh miesta
                     </p>
                   </div>
                 </div>
@@ -67,14 +67,9 @@ export function ArtifactsScreen({
             ))}
           </div>
         )}
-
-        <ActionButton
-          onClick={onBack}
-          variant="secondary"
-        >
-          Späť k pátraniu
-        </ActionButton>
       </StoryCard>
+
+      <BackBar label="Späť k pátraniu" onBack={onBack} />
     </ScreenContainer>
   );
 }

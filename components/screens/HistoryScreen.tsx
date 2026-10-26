@@ -14,7 +14,7 @@ import { StoryCard } from "../ui/StoryCard";
 
 type HistoryScreenProps = {
   scene: Scene;
-  /** Nová odmena s ukrytou číslicou (iba predmet s obrazovkou „Prezrieť“). */
+  /** Nový predmet s ukrytou číslicou (iba predmet s obrazovkou „Prezrieť“). */
   codeItem?: CodeItemInfo | null;
   /** Vodidlo na ďalšie miesto z odmeny scény. */
   clue?: string;
@@ -53,13 +53,14 @@ export function HistoryScreen({
           </p>
         </SectionCard>
 
+        {/* Ikony kariet podľa hlavičky: 📖 Artefakty, 🔎 Inventár (predmety); vlastná ikona pri názve. */}
         <SectionCard
           icon={
             <span
               className="text-3xl"
               aria-hidden="true"
             >
-              {scene.artifact.icon}
+              📖
             </span>
           }
           title="Získaný artefakt"
@@ -67,6 +68,7 @@ export function HistoryScreen({
         >
           <div>
             <h3 className="font-bold text-white">
+              <span aria-hidden="true">{scene.artifact.icon} </span>
               {scene.artifact.title}
             </h3>
 
@@ -83,13 +85,14 @@ export function HistoryScreen({
                 className="text-3xl"
                 aria-hidden="true"
               >
-                {codeItem.item.icon}
+                🔎
               </span>
             }
-            title="Nová odmena"
+            title="Nový predmet"
             variant="gold"
           >
             <h3 className="font-bold text-white">
+              <span aria-hidden="true">{codeItem.item.icon} </span>
               {codeItem.item.title}
             </h3>
 

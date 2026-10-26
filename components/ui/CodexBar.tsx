@@ -6,6 +6,7 @@ import type {
   InventoryItem,
   QuestProgress,
 } from "../../types/game";
+import { formatItemCount } from "../../lib/itemCount";
 import { soundManager } from "../../lib/soundManager";
 
 type CodexBarProps = {
@@ -18,12 +19,6 @@ type CodexBarProps = {
   onOpenArtifacts: () => void;
   onOpenQuests: () => void;
 };
-
-function getInventoryLabel(count: number) {
-  if (count === 1) return "1 predmet";
-  if (count > 1 && count < 5) return `${count} predmety`;
-  return `${count} predmetov`;
-}
 
 function getActiveQuestsLabel(count: number) {
   if (count === 1) return "1 aktívna";
@@ -136,7 +131,7 @@ export function CodexBar({
           icon="🔎"
           label="Inventár"
           badge={inventory.length > 0 ? String(inventory.length) : undefined}
-          ariaLabel={`Inventár – ${getInventoryLabel(inventory.length)}`}
+          ariaLabel={`Inventár – ${formatItemCount(inventory.length)}`}
           tone="border-sky-300/20 bg-sky-400/10 text-sky-100 hover:border-sky-300/40 hover:bg-sky-400/20"
           onClick={onOpenInventory}
         />

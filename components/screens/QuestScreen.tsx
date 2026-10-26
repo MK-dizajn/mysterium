@@ -1,4 +1,5 @@
 import type { Quest, QuestProgress } from "../../types/game";
+import { BackBar } from "../ui/BackBar";
 
 type QuestScreenProps = {
   questProgress: QuestProgress[];
@@ -90,16 +91,8 @@ export function QuestScreen({
   }
 
   return (
-    <main className="min-h-screen bg-slate-950 px-4 py-8 text-slate-100">
-      <div className="mx-auto max-w-md">
-        <button
-          type="button"
-          onClick={onBack}
-          className="mb-6 inline-flex min-h-11 items-center rounded-full border border-slate-700 px-4 text-sm text-slate-300 transition hover:border-emerald-300/50 hover:text-emerald-100"
-        >
-          ← Späť k pátraniu
-        </button>
-
+    <main className="flex min-h-dvh flex-col bg-slate-950 px-4 pb-10 pt-8 text-slate-100 sm:px-6">
+      <div className="mx-auto w-full max-w-md">
         <p className="text-xs font-bold uppercase tracking-[0.35em] text-emerald-400/80">
           Vyšetrovací spis
         </p>
@@ -157,6 +150,8 @@ export function QuestScreen({
           </div>
         )}
       </div>
+
+      <BackBar label="Späť k pátraniu" onBack={onBack} />
     </main>
   );
 }

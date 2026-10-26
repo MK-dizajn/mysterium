@@ -8,6 +8,7 @@ import type {
   InventoryItem,
 } from "../../types/game";
 import { ActionButton } from "../ui/ActionButton";
+import { BackBar } from "../ui/BackBar";
 import { CodeNotebook } from "../ui/CodeNotebook";
 import { DetectiveNote } from "../ui/DetectiveNote";
 import { DetectiveIcon } from "../ui/MysteriumIcons";
@@ -83,12 +84,15 @@ function getEvidenceKindLabel(item: InventoryItem) {
     return "Útržok";
   }
 
-  if (item.evidenceKind === "object") {
-    return "Predmet";
-  }
-
-  return "Dôkaz";
+  return "Predmet";
 }
+
+const INVENTORY_INTRO =
+  "Počas pátrania budeš nachádzať predmety. Prezri si ich pozorne, niektoré skrývajú viac, než sa zdá.";
+
+/** Malé tlačidlo v riadku predmetu (aspoň 44 px na výšku). */
+const ROW_BUTTON =
+  "min-h-11 max-w-[5.5rem] shrink-0 rounded-xl border border-amber-300/30 bg-slate-900 px-2.5 text-xs font-bold leading-tight text-amber-100 transition hover:border-amber-300/60 motion-reduce:transition-none";
 
 export function InventoryScreen({
   inventory,
@@ -101,7 +105,12 @@ export function InventoryScreen({
   onBack,
 }: InventoryScreenProps) {
   const [openNote, setOpenNote] = useState<DetectiveNoteData | null>(null);
+  const [expandedIds, setExpandedIds] = useState<Record<string, boolean>>({});
   const notebookSlots = codeNotebook.flatMap((lock) => lock.slots);
+
+  function toggleItem(itemId: string) {
+    setExpandedIds((current) => ({ ...current, [itemId]: !current[itemId] }));
+  }
 
   // Názov a popis z dát kapitoly (uložená kópia môže byť zo staršej verzie).
   const sortedInventory = inventory.map((item) => {
@@ -118,8 +127,8 @@ export function InventoryScreen({
   });
 
   return (
-    <ScreenContainer>
-      <StoryCard label="Zhromaždené stopy" title="Inventár">
+    <ScreenContainer className="flex flex-col">
+      <StoryCard label="Nájdené predmety" title="Inventár">
         <CodeNotebook locks={codeNotebook} />
 
         {sortedInventory.length === 0 ? (
@@ -127,112 +136,124 @@ export function InventoryScreen({
             icon={<DetectiveIcon className="h-9 w-9" />}
             title="Zatiaľ nemáš žiadne predmety"
           >
-            <p className="text-sm leading-relaxed text-slate-400">
-              Počas vyšetrovania budeš nachádzať predmety, dokumenty a
-              fragmenty, ktoré ti pomôžu odhaliť súvislosti a odomknúť
-              finálnu časť prípadu.
+            <p className="text-sm leading-normal text-slate-400">
+              {INVENTORY_INTRO}
             </p>
           </SectionCard>
         ) : (
-          <div className="space-y-4">
-            {sortedInventory.map((item) => (
-              <SectionCard
-                key={item.id}
-                icon={
-                  <span className="text-3xl" aria-hidden="true">
-                    {item.icon}
-                  </span>
-                }
-                title={item.title}
-              >
-                <div className="space-y-4">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="rounded-full border border-sky-300/20 bg-sky-400/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-sky-200">
-                      {getEvidenceKindLabel(item)}
-                    </span>
+          <div className="space-y-3">
+            <p className="text-sm leading-normal text-slate-300">
+              {INVENTORY_INTRO}
+            </p>
 
-                    {item.evidenceOrder !== undefined && (
-                      <span className="rounded-full border border-slate-600/50 bg-slate-900/70 px-3 py-1 text-[11px] font-semibold text-slate-300">
-                        Dôkaz {item.evidenceOrder}
+            {/* Kompaktný zoznam: podrobnosti až po ťuknutí na riadok. */}
+            <ul className="space-y-1.5">
+              {sortedInventory.map((item) => {
+                const slot = notebookSlots.find(
+                  (notebookSlot) => notebookSlot.itemId === item.id
+                );
+                // Číslica z dát kapitoly; pri predmete bez miesta v zápisníku zostáva uložená.
+                const digit = slot ? slot.digit : item.secretCode ?? null;
+                // Stav iba pri nájdenej číslici, aby hra neprezradila, že predmet niečo skrýva.
+                const isDigitFound = Boolean(item.secretCode) && digit !== null;
+                const note = getDetectiveNote(item.id);
+                const clue = getClue(item.id);
+                const isExpanded = Boolean(expandedIds[item.id]);
+                const detailsId = `inventory-item-${item.id}`;
+
+                return (
+                  <li
+                    key={item.id}
+                    data-inventory-row={item.id}
+                    className="rounded-2xl border border-slate-700/70 bg-slate-950/60"
+                  >
+                    <div className="flex items-center gap-1.5 p-1.5">
+                      <button
+                        type="button"
+                        aria-expanded={isExpanded}
+                        aria-controls={detailsId}
+                        onClick={() => toggleItem(item.id)}
+                        className="flex min-h-11 min-w-0 flex-1 items-center gap-2 rounded-xl px-1.5 py-1 text-left transition hover:bg-slate-900/80 motion-reduce:transition-none"
+                      >
+                        <span className="w-7 shrink-0 text-center text-xl" aria-hidden="true">
+                          {item.icon}
+                        </span>
+
+                        <span className="min-w-0 flex-1">
+                          <span className="block text-sm font-bold leading-snug text-amber-100">
+                            {item.title}
+                          </span>
+
+                          {isDigitFound && (
+                            <span className="mt-1 inline-block whitespace-nowrap rounded-full border border-amber-300/30 bg-amber-400/10 px-2 py-0.5 text-xs font-semibold leading-4 text-amber-200">
+                              Číslica nájdená
+                            </span>
+                          )}
+                        </span>
+
+                        <span
+                          aria-hidden="true"
+                          className={`shrink-0 text-xs text-slate-400 transition motion-reduce:transition-none ${
+                            isExpanded ? "rotate-180" : ""
+                          }`}
+                        >
+                          ▾
+                        </span>
+                      </button>
+
+                      {slot?.isInspectable && (
+                        <button
+                          type="button"
+                          onClick={() => onInspectItem(item.id)}
+                          aria-label={`Prezrieť: ${item.title}`}
+                          className={ROW_BUTTON}
+                        >
+                          Prezrieť
+                        </button>
+                      )}
+
+                      {note && (
+                        <button
+                          type="button"
+                          onClick={() => setOpenNote(note)}
+                          className={ROW_BUTTON}
+                        >
+                          Prečítať zápis
+                        </button>
+                      )}
+                    </div>
+
+                    <div
+                      id={detailsId}
+                      hidden={!isExpanded}
+                      className="space-y-3 border-t border-slate-700/60 px-4 pb-4 pt-3"
+                    >
+                      <span className="inline-block rounded-full border border-sky-300/20 bg-sky-400/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] text-sky-200">
+                        {getEvidenceKindLabel(item)}
                       </span>
-                    )}
-                  </div>
 
-                  <p className="text-sm leading-6 text-slate-300">
-                    {item.description}
-                  </p>
+                      <p className="text-sm leading-normal text-slate-300">
+                        {item.description}
+                      </p>
 
-                  {(() => {
-                    const note = getDetectiveNote(item.id);
-
-                    return note ? (
-                      <ActionButton variant="secondary" onClick={() => setOpenNote(note)}>
-                        Prečítať zápis
-                      </ActionButton>
-                    ) : null;
-                  })()}
-
-                  {getClue(item.id) && (
-                    <p className="border-l-2 border-amber-300/50 pl-4 text-sm leading-6 text-amber-100">
-                      <span className="font-bold">
-                        {guidance.inventoryClueLabel}:
-                      </span>{" "}
-                      <span className="font-serif italic">{getClue(item.id)}</span>
-                    </p>
-                  )}
-
-                  {item.secretCode && (() => {
-                    const slot = notebookSlots.find(
-                      (notebookSlot) => notebookSlot.itemId === item.id
-                    );
-                    // Číslica z dát kapitoly; pri predmete bez miesta v zápisníku zostáva uložená.
-                    const digit = slot ? slot.digit : item.secretCode;
-
-                    return (
-                      <div className="rounded-2xl border border-amber-300/20 bg-amber-400/10 p-4">
-                        <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-amber-400/80">
-                          Tajný údaj
+                      {clue && (
+                        <p className="border-l-2 border-amber-300/50 pl-4 text-sm leading-normal text-amber-100">
+                          <span className="font-bold">
+                            {guidance.inventoryClueLabel}:
+                          </span>{" "}
+                          <span className="font-serif italic">{clue}</span>
                         </p>
-
-                        {digit !== null ? (
-                          <>
-                            <p className="mt-2 font-mono text-3xl font-black tracking-[0.35em] text-amber-100">
-                              {digit}
-                            </p>
-
-                            <p className="mt-3 text-xs leading-5 text-slate-400">
-                              Tento údaj si zapamätaj. Vo finálnej časti prípadu
-                              môže byť súčasťou kombinácie zámku.
-                            </p>
-                          </>
-                        ) : (
-                          <p className="mt-2 text-sm leading-6 text-slate-300">
-                            Preskúmaj predmet zblízka.
-                          </p>
-                        )}
-
-                        {slot?.isInspectable && (
-                          <ActionButton
-                            variant="secondary"
-                            className="mt-4"
-                            onClick={() => onInspectItem(item.id)}
-                          >
-                            Prezrieť
-                          </ActionButton>
-                        )}
-                      </div>
-                    );
-                  })()}
-                </div>
-              </SectionCard>
-            ))}
+                      )}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
           </div>
         )}
-
-        <ActionButton onClick={onBack} variant="secondary">
-          Späť k pátraniu
-        </ActionButton>
       </StoryCard>
+
+      <BackBar label="Späť k pátraniu" onBack={onBack} />
 
       {openNote && <NoteDialog note={openNote} onClose={() => setOpenNote(null)} />}
     </ScreenContainer>

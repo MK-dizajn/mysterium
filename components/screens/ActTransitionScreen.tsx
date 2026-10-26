@@ -1,4 +1,5 @@
 import type { ActEnding, InspectCountPoint } from "../../types/game";
+import { formatItemCount } from "../../lib/itemCount";
 import { getGoldenKeySvg } from "../items/art/keyToothArt";
 import { useReducedMotion } from "../items/useReducedMotion";
 import { ActionButton } from "../ui/ActionButton";
@@ -76,9 +77,9 @@ export function ActTransitionScreen({
       >
         <MessageBox
           variant="success"
-          title="Dôkazy zhromaždené"
+          title="Predmety zhromaždené"
         >
-          Dokončil si ďalšiu časť prípadu. Stopy, ktoré si získal, začínajú
+          Dokončil si ďalšiu časť prípadu. Predmety, ktoré si našiel, začínajú
           vytvárať spoločný obraz.
         </MessageBox>
 
@@ -124,8 +125,8 @@ export function ActTransitionScreen({
           title="Vyhodnotenie prípadu"
         >
           <p className="text-[15px] leading-normal text-slate-300">
-            V tejto etape si získal {evidenceCount} dôkazy. Každý z nich
-            ukrýva časť tajnej kombinácie.
+            V tejto etape si našiel {formatItemCount(evidenceCount)}.{" "}
+            Každý z nich ukrýva jednu číslicu kódu.
           </p>
         </SectionCard>
 

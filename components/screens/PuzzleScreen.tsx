@@ -68,13 +68,13 @@ export function PuzzleScreen({
     if (!isCorrect) {
       setSuccessMessage("");
       setError(
-        "Táto stopa zatiaľ nesedí. Vráť sa pohľadom k detailu pred sebou a skús nájsť niečo, čo si si predtým nevšimol."
+        "Táto odpoveď zatiaľ nesedí. Vráť sa pohľadom k detailu pred sebou a skús nájsť niečo, čo si si predtým nevšimol."
       );
       return;
     }
 
     setError("");
-    setSuccessMessage("Stopa potvrdená. Pátračov záznam sa otvára.");
+    setSuccessMessage("Odpoveď potvrdená. Pátračov záznam sa otvára.");
 
     window.setTimeout(() => {
       onSolved();

@@ -125,7 +125,7 @@ export function LandingScreen({
       {isConfirmOpen && (
         <ConfirmDialog
           title="Začať odznova?"
-          message="Tvoj doterajší postup sa vymaže: body, dôkazy, artefakty aj vyriešené úlohy. Túto akciu nemožno vrátiť."
+          message="Tvoj doterajší postup sa vymaže: body, predmety, artefakty aj vyriešené úlohy. Túto akciu nemožno vrátiť."
           confirmLabel="Áno, začať odznova"
           onConfirm={() => {
             setIsConfirmOpen(false);

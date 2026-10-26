@@ -3454,3 +3454,91 @@ Snímky: `d3b-po2-*.png`.
 **Lint:** zmenené súbory bez chýb (celý projekt má staršie chyby v iných súboroch, tento krok ich nemenil).
 
 **Ďalší krok:** podľa plánu, až po potvrdení.
+
+---
+
+## 26. 10. 2026 – Krok 78 (krok D4): Prilepená lišta „Späť“, kompaktný Inventár, pojmy predmet a artefakt
+
+**Ako to bolo (nálezy 7, 8, 9 z auditu D1):**
+- Inventár mal pri 360 px asi 7 000 px: 14 veľkých kariet a pri každej rámček „Tajný údaj – Preskúmaj predmet zblízka“.
+- „Späť k pátraniu“:
+  - v Inventári a Artefaktoch iba na konci dlhého zoznamu,
+  - v Úlohách iba hore,
+  - v detaile artefaktu („Späť“) sa ukázalo až po 1,5 s,
+  - v rozhovore ako odkaz pod voľbami.
+- Hra miešala slová dôkaz, predmet, odmena, stopa a tajný údaj.
+- Na konci etapy bola pri jednom predmete gramatická chyba („získal 1 dôkazy“).
+
+**Čo sa urobilo:**
+- **Lišta „Späť“** (nový `components/ui/BackBar.tsx`):
+  - prilepená k spodku obrazovky (sticky, výška v dvh) na obrazovkách Inventár, Artefakty a Úlohy („Späť k pátraniu“) a v detaile artefaktu („Späť na artefakty“),
+  - zlaté hlavné tlačidlo 54 px,
+  - na krátkej obrazovke stojí tiež dole, nie v polovici,
+  - staré tlačidlá zlúčené do lišty, takže každé je iba raz (horná „← Späť“ v Úlohách zmizla),
+  - v detaile artefaktu je lišta hneď, bez čakania na animáciu.
+- **Rozhovor:** rovnaká lišta dole, v nevýraznom štýle, aby nesúperila s voľbami.
+- **Chyba načítania rozhovoru:** tlačidlo „Späť“ má aspoň 44 px.
+- **Kompaktný Inventár** (`components/screens/InventoryScreen.tsx`):
+  - zápisník kódov ostal hore, pod ním veta „Počas pátrania budeš nachádzať predmety. Prezri si ich pozorne, niektoré skrývajú viac, než sa zdá.“ (rovnaká aj pri prázdnom Inventári),
+  - jeden riadok na predmet: ikona, názov, štítok „Číslica nájdená“ (iba pri nájdenej číslici, inak nič), malé tlačidlo „Prezrieť“ alebo „Prečítať zápis“ (44 px),
+  - ťuknutie na riadok rozbalí podrobnosti (druh predmetu, popis, „Stopa: …“); dá sa to aj klávesnicou a čítačka hlási, či je riadok rozbalený,
+  - zmizli rámčeky „Tajný údaj“, veta „Tento údaj si zapamätaj…“ aj štítky „Dôkaz 1 až 9“,
+  - výška pri 360 px: **z 7 022 na 1 958 px** (pri 320 px z 7 790 na 2 155, pri 768 px z 6 228 na 1 710).
+- **Pojmy (schválené texty):**
+  - Inventár: nadpis „Nájdené predmety“, druh „Predmet“ namiesto „Dôkaz“,
+  - história scény: „Nový predmet“ namiesto „Nová odmena“; ikony kariet 📖 (Získaný artefakt) a 🔎 (Nový predmet) ako v hlavičke, vlastná ikona je pred názvom,
+  - koniec etapy: „Predmety zhromaždené“, „Predmety, ktoré si našiel, začínajú…“, „V tejto etape si našiel 3 predmety. Každý z nich ukrýva jednu číslicu kódu.“ (správny tvar: 1 predmet, 3 predmety, 5 predmetov; funkcia presunutá z hlavičky do `lib/itemCount.ts`),
+  - úvod, „Začať odznova?“: „…body, predmety, artefakty aj vyriešené úlohy…“,
+  - Artefakty: „Prečítať príbeh miesta“,
+  - úloha: „Táto odpoveď zatiaľ nesedí…“ a „Odpoveď potvrdená. Pátračov záznam sa otvára.“
+
+**Test (Node, nový, mimo projektu):** pred zmenou 23 chýb, po zmene **23 z 23**. Overuje:
+- lištu na všetkých obrazovkách, každé „Späť“ iba raz,
+- texty z tabuľky,
+- že v Inventári nie je „Tajný údaj“, „Dôkaz“ ani „Číslica skrytá“,
+- rozbaľovacie riadky.
+
+**Test v prehliadači (nový)** pri 320, 360 a 768 px aj pri vypnutých animáciách: pred zmenou **30 chýb**, po zmene **všetko OK**. Overuje:
+- lištu dole hneď aj na konci zoznamu, aspoň 44 px, návrat na úlohu,
+- výšku Inventára pod 2 000 px,
+- „Číslica nájdená“ pri nájdených číslicach a nič pri nenájdenej,
+- rozbalenie a zbalenie ťuknutím aj klávesou Enter, „Stopa: …“ v podrobnostiach,
+- „Prezrieť“ a „Prečítať zápis“, detail artefaktu a návrat na zoznam,
+- Úlohy bez hornej šípky, nevýraznú lištu v rozhovore,
+- ikony v histórii, „1 predmet“ a „3 predmety“ na konci etapy, nové hlásenie v úlohe,
+- bez vodorovného posúvania.
+
+Snímky: `d4-pred-*.png`, `d4-po3-*.png`.
+
+**Staré testy:**
+- 20 stále spúšťaných Node testov OK (celá kapitola, skóre **1010**),
+- v prehliadači: C1, D2, B4b, D3a, D3b – všetko OK,
+- upravené, lebo zámerne čítajú zmenené miesta:
+  - D2 (nové hlásenia v úlohe),
+  - C1 a D3a (pred čítaním popisu v Inventári ťuknú na riadok).
+
+**Chyby počas práce:**
+- Na krátkych obrazovkách (Úlohy, rozhovor) stála lišta hneď pod obsahom, nie pri spodku. Opravené rozložením obrazovky (lišta sa pri krátkom obsahu stlačí dole).
+- Inventár prvý raz vyšiel 2 303 px: názvy mali úzky stĺpec a štítok sa lámal na dva riadky. Zúžené ikony, šípka a tlačidlá v riadku, štítok na jednom riadku.
+- V novom teste:
+  - testovacie uloženie nemalo nájdené číslice,
+  - druh predmetu je napísaný veľkými písmenami,
+  - kláves Enter potreboval znak; opravené.
+- Test prvý raz spadol pred zmenou (chýbajúce riadky); doplnené, aby pokračoval a zapísal chybu.
+
+**Známy nález mimo D4:** detail artefaktu je pri 360 px široký 369 px (audit D1 nameral 374 px). Žiadny prvok nepresahuje; presah robí 3D prechod pri otváraní stránky (`codex-page-perspective`). Bol tam už pred zmenou a ostáva na samostatný krok.
+
+**Zmenené súbory:**
+- `lib/itemCount.ts` (nový), `components/ui/BackBar.tsx` (nový), `components/ui/CodexBar.tsx`
+- `components/screens/InventoryScreen.tsx`, `ArtifactsScreen.tsx`, `ArtifactScreen.tsx`, `QuestScreen.tsx`, `NpcScreen.tsx`, `HistoryScreen.tsx`, `ActTransitionScreen.tsx`, `LandingScreen.tsx`, `PuzzleScreen.tsx`
+- `components/game/NpcFlow.tsx`
+- `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** nové a zmenené riadky bez chýb. V dotknutých súboroch ostali 3 staršie nálezy, ktoré tento krok nemenil:
+- `CodexBar.tsx`: nastavenie zvuku v efekte,
+- `HistoryScreen.tsx`: nepoužitá ikona `LightbulbIcon`,
+- `NpcScreen.tsx`: nepoužitý `onChooseNode`.
+
+**Ďalší krok:** podľa plánu, až po potvrdení.
