@@ -64,7 +64,7 @@ export const zlatyPresporskyKlucScene: Scene = {
 
   // Bez cesty: ďalej nasleduje finále na tom istom mieste.
   nextReflection:
-  "Zlatý prešporský kľúč sa pred tebou konečne odhalil. Neotvára obyčajné dvere — odhaľuje pamäť mesta.\n\nNa poslednej strane však zostala veta: „Kľúč otvára viac, než si myslíš.“ Prvý prípad sa skončil. Pátranie pokračuje v ďalšej kapitole.",
+  "Zlatý prešporský kľúč sa pred tebou konečne odhalil. Neotvára obyčajné dvere — odhaľuje pamäť mesta.\n\nNa poslednej strane však zostala veta: „Kľúč otvára viac, než si myslíš.“ Kľúč máš. Zostáva otvoriť to, čo pátrač zamkol.",
 
   events: [
     {

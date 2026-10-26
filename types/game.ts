@@ -397,6 +397,10 @@ export type FinaleGuardian = {
 export type FinaleChest = {
   title: string;
   intro: string;
+  /** Úvod, keď sú všetky zámky otvorené (kľúč ešte nie). */
+  introAllOpen: string;
+  /** Úvod po otvorení veka. */
+  introOpened: string;
   /** Zámky v poradí odomykania; kódy sa berú z dôkazov scén aktu. */
   lockActIds: ActId[];
   /** Predmet, ktorý sa po troch zámkoch vloží do stredného zámku. */
@@ -413,6 +417,8 @@ export type FinaleChest = {
   lockNextLabel: string;
   /** Riadok pod 3D truhlicou. */
   rotateHint: string;
+  /** Riadok pod 3D truhlicou, keď sú všetky zámky otvorené. */
+  rotateHintAllOpen: string;
   /** Oddialenie priblíženého zámku bez odomykania. */
   backLabel: string;
   /** Riadok pod 3D truhlicou pri priblíženom zámku. */

@@ -506,30 +506,33 @@ body {
     filter: blur(6px);
   }
 
+  /*
+    Bez zväčšenia nad 100 % a bez náklonu dozadu: inak karta na chvíľu
+    presiahla šírku obrazovky a stránka sa dala posúvať do strany (krok D5).
+  */
   60% {
     opacity: 1;
     transform:
       perspective(1000px)
-      rotateX(-1deg)
-      translateY(-3px)
-      scale(1.01);
+      rotateX(1deg)
+      translateY(4px)
+      scale(0.995);
     filter: blur(0);
   }
 
+  /* Na konci žiadny 3D posun ani filter. */
   100% {
     opacity: 1;
-    transform:
-      perspective(1000px)
-      rotateX(0)
-      translateY(0)
-      scale(1);
-    filter: blur(0);
+    transform: none;
+    filter: none;
   }
 }
 
 .codex-page-perspective {
   width: 100%;
   perspective: 1000px;
+  /* Poistka: nič nepresiahne do strany (clip nevytvára posúvanie). */
+  overflow-x: clip;
 }
 
 .codex-page-transition {

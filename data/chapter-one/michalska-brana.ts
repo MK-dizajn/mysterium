@@ -127,7 +127,7 @@ Pátračovo pravidlo znie: „Prvá stopa patrí mestu, ku ktorému vedie najkra
 
   // Prvá veta denníka je vodidlo pri odmene (clue).
   nextReflection:
-    "Keď vyslovíš meno najbližšieho mesta, v denníku sa odkryje prvá veta.",
+    "Meno najbližšieho mesta odkrylo prvú vetu denníka.",
 
   // Overiť v teréne (docs/KONTROLA-PRED-VYDANIM.md).
   route:

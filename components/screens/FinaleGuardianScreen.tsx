@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import type { FinaleGuardian } from "../../types/game";
 import { ActionButton } from "../ui/ActionButton";
 import { ScreenContainer } from "../ui/ScreenContainer";
@@ -21,6 +22,9 @@ export function FinaleGuardianScreen({
   guardian,
   onContinue,
 }: FinaleGuardianScreenProps) {
+  // „Preskočiť“ iba pri videu; bez videa (alebo keď sa nenačíta) by robilo to isté čo pokračovanie.
+  const [hasVideo, setHasVideo] = useState(Boolean(guardian.videoSrc));
+
   return (
     <ScreenContainer>
       <section
@@ -41,6 +45,7 @@ export function FinaleGuardianScreen({
             src={guardian.videoSrc}
             posterSrc={guardian.posterSrc}
             captionsSrc={guardian.captionsSrc}
+            onUnavailable={() => setHasVideo(false)}
             className="mt-6"
           />
         )}
@@ -54,13 +59,15 @@ export function FinaleGuardianScreen({
             {guardian.continueLabel}
           </ActionButton>
 
-          <ActionButton
-            variant="secondary"
-            onClick={onContinue}
-            className={STILL_BUTTON}
-          >
-            {guardian.skipLabel}
-          </ActionButton>
+          {hasVideo && (
+            <ActionButton
+              variant="secondary"
+              onClick={onContinue}
+              className={STILL_BUTTON}
+            >
+              {guardian.skipLabel}
+            </ActionButton>
+          )}
         </div>
       </section>
     </ScreenContainer>

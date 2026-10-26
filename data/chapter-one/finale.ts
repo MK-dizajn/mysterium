@@ -18,6 +18,8 @@ export const chapterOneFinale: ChapterFinale = {
     title: "Truhlica starého pátrača",
     intro:
       "Tri zámky, tri trojice číslic. Otváraj ich v poradí, v akom si získaval stopy.",
+    introAllOpen: "Všetky tri zámky povolili. Zostáva posledný krok: Zlatý kľúč.",
+    introOpened: "Truhlica je otvorená. Pátrač ti v nej nechal posledný útržok.",
     lockActIds: ["act-1", "act-2", "act-3"],
     keyItemId: "golden-pressburg-key-complete",
     wrongCodeText: "Zámok sa ani nepohol. Niektorá číslica nesedí.",
@@ -29,6 +31,7 @@ export const chapterOneFinale: ChapterFinale = {
     lockClosedLabel: "zamknutý",
     lockNextLabel: "na rade",
     rotateHint: "Ťahaj a otáčaj truhlicu. Ťukni na zámok.",
+    rotateHintAllOpen: "Ťahaj a otáčaj truhlicu.",
     backLabel: "Späť",
     dialHint: "Ťukni hore alebo dole na koliesko, alebo ním potiahni prstom.",
     dialWheelLabel: "Koliesko {index} z {count}",
@@ -38,7 +41,7 @@ export const chapterOneFinale: ChapterFinale = {
     openedHint: "Štvrtý útržok sa vznáša nad truhlicou.",
     openedText:
       "Veko sa pomaly dvíha. Vnútri leží posledný útržok fotografie.",
-    continueLabel: "Prijať útržok a pokračovať",
+    continueLabel: "Prijať útržok",
     reward: {
       id: "torn-photo-fragment-chest",
       title: "Štvrtý útržok fotografie",

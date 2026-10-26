@@ -3542,3 +3542,88 @@ Snímky: `d4-pred-*.png`, `d4-po3-*.png`.
 - `NpcScreen.tsx`: nepoužitý `onChooseNode`.
 
 **Ďalší krok:** podľa plánu, až po potvrdení.
+
+---
+
+## 26. 10. 2026 – Krok 79 (krok D5): Zvyšné nálezy z auditu D1
+
+**Stav nálezov z auditu:**
+- vyriešené skôr:
+  - D2: 1 až 5 a 14,
+  - D4: 7, 8 a 9,
+- vyriešené teraz: 6, 10, 11, 12, 15, 16, 17,
+- iba zhodnotené: 13 (ikony).
+
+**Čo sa urobilo:**
+- **Detail artefaktu bol pri 360 px široký 369 px** (nález 11):
+  - príčina overená pokusom: animácia otvárania stránky (`codex-page-open`) v polovici kartu naklonila a zväčšila na 101 %, prehliadač si väčšiu šírku pamätal aj po skončení,
+  - animácia sa teraz iba dvíha bez zväčšenia nad 100 % a na konci nezostane 3D posun,
+  - poistka `overflow-x: clip` na obale,
+  - platí aj pre úvod kapitoly (`app/globals.css`).
+- **Rozhovor a nápisy** (nález 6):
+  - otázky v rozhovore bežnými písmenami bez rozostupov (nová voľba `textCase="sentence"` v `ActionButton`),
+  - rozostupy písmen na tlačidlách zmenšené (0,18 → 0,1 em),
+  - kratšie nápisy „Som pri bráne“ a „Prijať útržok“ (konce aktov I až III a truhlica); pri 360 px sú na jednom riadku.
+- **Texty podľa stavu** (nález 10):
+  - truhlica: nové polia v dátach `introAllOpen`, `introOpened`, `rotateHintAllOpen` („Všetky tri zámky povolili. Zostáva posledný krok: Zlatý kľúč.“, „Truhlica je otvorená. Pátrač ti v nej nechal posledný útržok.“, „Ťahaj a otáčaj truhlicu.“),
+  - Strážca vo finále: „Preskočiť“ iba pri videu, bez videa len „Otvoriť truhlicu“,
+  - „Ďalšia stopa“: scéna 1 „Meno najbližšieho mesta odkrylo prvú vetu denníka.“, scéna 10 končí „Kľúč máš. Zostáva otvoriť to, čo pátrač zamkol.“
+- **3D truhlica** (nález 12, `components/finale/chest3d/chestZoom.ts`):
+  - celkový pohľad: zmenšenie 0,55 → 0,64 a vyššie (y −0,12 → 0,20); truhlica zaberá **69 % šírky** rámčeka (predtým 55 %), hore je 12 % voľna (predtým 26 %) a už nemá odrezaný spodok,
+  - otvorená truhlica s útržkom: 0,46 → 0,48 (viac sa nezmestí, útržok nad ňou potrebuje miesto),
+  - pri nakláňaní ťahaním sa truhlica mierne oddiali (najviac o 22 % pri 35°) a po pustení sa vráti; inak by sa pri náklone veko odrezalo (nová funkcia `getTiltFitScale`),
+  - rámček ostáva 4 : 3, výpočet priblíženia na kolieska sa nemenil.
+- **Vypnuté tlačidlo** (nález 15): bez priesvitnosti, tmavosivé so svetlým písmom a viditeľným okrajom.
+  - Kontrast okraja sa zlepšil z 2,87 : 1 nad 3 : 1, písmo má aspoň 4,5 : 1.
+  - Tlačidlo ostáva vypnuté a zjavne sa líši od zlatého aktívneho.
+- **Rozhovor** (nález 16, `components/ui/Typewriter.tsx`):
+  - počas vypisovania pokyn „Ťukni na text a zobrazí sa celý.“, po dopísaní zmizne,
+  - pri vypnutých animáciách je celý text hneď,
+  - **oprava pre čítačku:** predtým čítačka namiesto textu Strážcu prečítala iba „Zobraziť celý text“; teraz dostane celý text naraz.
+- **Artefakty** (nález 17): „Prečítať príbeh miesta“ bežnými písmenami; pri 360 px na jednom riadku (pri 320 px sa ešte zalomí, stĺpec má asi 136 px).
+- **Ikony** (nález 13), iba zhodnotenie, bez zmeny:
+  - dnes sa miešajú emoji a kreslené ikony,
+  - najmenší krok neskôr: jeden súbor so zoznamom ikon podľa významu, ktoré sa potom vymenia na jednom mieste.
+
+**Test (Node, nový, mimo projektu):** pred zmenou 22 chýb, po zmene **všetko OK**.
+- Hranice veľkosti truhlice som po meraní upravil: návrh počítal so zmenšením 0,72 a 0,58, no nízky rámček 4 : 3 dovolí iba 0,64 a 0,48.
+
+**Test v prehliadači (nový)** pri 320, 360 a 768 px aj pri vypnutých animáciách: pred zmenou **27 chýb**, po zmene **všetko OK**. Overuje:
+- šírku detailu artefaktu a úvodu,
+- nápisy na jednom riadku,
+- otázky bežnými písmenami,
+- pokyn a celý text pre čítačku,
+- kontrast vypnutého „Overiť“,
+- texty „Ďalšia stopa“,
+- Strážcu bez „Preskočiť“,
+- texty truhlice podľa stavu,
+- veľkosť truhlice nameranú zo snímky (aj pri najväčšom náklone oboma smermi a po otvorení).
+
+Snímky: `d5-pred-*.png`, `d5-po2-*.png`, `d5-po-red-*.png`.
+
+**Staré testy:**
+- 20 stále spúšťaných Node testov OK (celá kapitola, skóre **1010**),
+- v prehliadači: B4b, B4c-1, B4c-2, B4c-3, C1, D2, D3a, D3b, D4 – všetko OK,
+- upravené na schválené nové znenie: B3b, B4b, B4c-3, texty (Node); B4b, B4c-3, C1, D2 (prehliadač).
+
+**Chyby počas práce:**
+- V novom teste:
+  - výrez snímky truhlice sa najprv počítal od viditeľnej časti namiesto od začiatku stránky,
+  - skrátený beh iba pre truhlicu preskočil nastavenie šírky obrazovky,
+  - pri 320 px test chcel jeden riadok, hoci návrh sľuboval jeden riadok od 360 px.
+- Prvé meranie príčiny presahu bolo nepresné, lebo vrátenie štýlov znova spustilo animácie; zopakované po jednom pravidle.
+- Väčšia truhlica sa pri náklone ťahaním nadol odrezávala hore aj dole; pridané mierne oddialenie pri náklone.
+
+**Zmenené súbory:**
+- `app/globals.css`, `types/game.ts`
+- `components/ui/ActionButton.tsx`, `components/ui/Typewriter.tsx`
+- `components/screens/NpcScreen.tsx`, `IntroScreen.tsx`, `ArtifactsScreen.tsx`, `FinaleChestScreen.tsx`, `FinaleGuardianScreen.tsx`
+- `components/finale/chest3d/chestZoom.ts`, `Chest3DView.tsx`
+- `data/chapter-one/acts.ts`, `finale.ts`, `michalska-brana.ts`, `zlaty-presporsky-kluc.ts`
+- `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** zmenené súbory bez chýb. Ostalo staršie upozornenie (nepoužitý `onChooseNode` v `NpcScreen.tsx`). Stará chyba v `Typewriter.tsx` zmizla, lebo prepísaný komponent už nenastavuje stav priamo v efekte.
+
+**Ďalší krok:** podľa plánu, až po potvrdení.

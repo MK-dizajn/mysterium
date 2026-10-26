@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useReducedMotion } from "../items/useReducedMotion";
 
 type TypewriterProps = {
   text: string;
@@ -8,61 +9,68 @@ type TypewriterProps = {
   onComplete?: () => void;
 };
 
+const TAP_HINT = "Ťukni na text a zobrazí sa celý.";
+
+/**
+ * Text sa vypisuje postupne; ťuknutie ho ukáže celý. Pri vypnutých
+ * animáciách je celý hneď. Čítačka dostane vždy celý text naraz
+ * (vypisovaná časť je pre ňu skrytá). Pri zmene textu treba nový key.
+ */
 export function Typewriter({
   text,
   speed = 22,
   onComplete,
 }: TypewriterProps) {
-  const [displayed, setDisplayed] = useState("");
-  const [isComplete, setIsComplete] = useState(false);
+  const reducedMotion = useReducedMotion();
+  const [count, setCount] = useState(0);
+  const [isSkipped, setIsSkipped] = useState(false);
   const onCompleteRef = useRef(onComplete);
+  const hasCompletedRef = useRef(false);
+
+  const isComplete = reducedMotion || isSkipped || count >= text.length;
+  const displayed = isComplete ? text : text.slice(0, count);
 
   useEffect(() => {
     onCompleteRef.current = onComplete;
   }, [onComplete]);
 
   useEffect(() => {
-    let index = 0;
-    let hasCompleted = false;
-
-    setDisplayed("");
-    setIsComplete(false);
+    if (isComplete) {
+      return;
+    }
 
     const interval = window.setInterval(() => {
-      index += 1;
-
-      setDisplayed(text.slice(0, index));
-
-      if (index >= text.length && !hasCompleted) {
-        hasCompleted = true;
-        window.clearInterval(interval);
-        setIsComplete(true);
-        onCompleteRef.current?.();
-      }
+      setCount((current) => current + 1);
     }, speed);
 
     return () => window.clearInterval(interval);
-  }, [text, speed]);
+  }, [isComplete, speed]);
 
-  function completeImmediately() {
-    if (isComplete) return;
-
-    setDisplayed(text);
-    setIsComplete(true);
-    onCompleteRef.current?.();
-  }
+  useEffect(() => {
+    if (isComplete && !hasCompletedRef.current) {
+      hasCompletedRef.current = true;
+      onCompleteRef.current?.();
+    }
+  }, [isComplete]);
 
   return (
     <button
       type="button"
-      onClick={completeImmediately}
+      onClick={() => setIsSkipped(true)}
       className="w-full text-left"
-      aria-label="Zobraziť celý text"
     >
-      <p className="whitespace-pre-line leading-normal">
+      <span className="sr-only">{text}</span>
+
+      <span aria-hidden="true" className="block whitespace-pre-line leading-normal">
         {displayed}
         {!isComplete && <span className="animate-pulse">|</span>}
-      </p>
+      </span>
+
+      {!isComplete && (
+        <span aria-hidden="true" className="mt-2 block text-xs leading-normal text-slate-400">
+          {TAP_HINT}
+        </span>
+      )}
     </button>
   );
 }

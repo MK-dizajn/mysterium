@@ -290,7 +290,14 @@ export function FinaleChestScreen({
         <header className="px-1 text-center">
           <h1 className="text-3xl font-black text-amber-100">{chest.title}</h1>
           <div className="mx-auto mt-4 h-px w-24 bg-gradient-to-r from-transparent via-amber-300/60 to-transparent" />
-          <p className="mt-4 text-[16px] leading-normal text-slate-300">{chest.intro}</p>
+          {/* Úvod podľa stavu: zámky na rade, všetky otvorené, otvorené veko. */}
+          <p className="mt-4 text-[16px] leading-normal text-slate-300">
+            {isChestOpened
+              ? chest.introOpened
+              : areAllLocksOpen
+                ? chest.introAllOpen
+                : chest.intro}
+          </p>
         </header>
 
         {mode === "3d" ? (
@@ -345,7 +352,9 @@ export function FinaleChestScreen({
                   ? chest.openedHint
                   : isZoomed
                     ? chest.dialHint
-                    : chest.rotateHint}
+                    : areAllLocksOpen
+                      ? chest.rotateHintAllOpen
+                      : chest.rotateHint}
             </p>
 
             {messages}

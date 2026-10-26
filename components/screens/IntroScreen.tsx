@@ -58,7 +58,7 @@ export function IntroScreen({
 
         <Reveal delay={700}>
           <ActionButton onClick={onContinue}>
-            Som pri Michalskej bráne
+            Som pri bráne
           </ActionButton>
         </Reveal>
       </StoryCard>

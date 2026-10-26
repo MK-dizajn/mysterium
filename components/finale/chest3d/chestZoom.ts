@@ -52,19 +52,31 @@ export type ChestTransform = {
 /** Celý pohľad na truhlicu. */
 export const OVERVIEW_TRANSFORM: ChestTransform = {
   x: 0,
-  y: -0.12,
+  y: 0.2,
   z: 0,
-  scale: 0.55,
+  scale: 0.64,
   tilt: 0.32,
   yaw: 0,
 };
 
+/** Najväčší náklon ťahaním (ako MAX_TILT v rotationPhysics) a o koľko sa pri ňom truhlica oddiali. */
+const TILT_FIT_MAX_RAD = (35 * Math.PI) / 180;
+const TILT_FIT_SHRINK = 0.22;
+
+/**
+ * Pri nakláňaní ťahaním sa truhlica mierne oddiali, aby sa veko ani dno
+ * neodrezali o okraj rámčeka; bez náklonu je 1 (plná veľkosť).
+ */
+export function getTiltFitScale(tilt: number) {
+  return 1 - TILT_FIT_SHRINK * Math.min(1, Math.abs(tilt) / TILT_FIT_MAX_RAD);
+}
+
 /** Otvorená truhlica: trochu menšia a nižšie, aby sa nad ňu zmestil útržok. */
 export const OPEN_TRANSFORM: ChestTransform = {
   x: 0,
-  y: -0.42,
+  y: -0.36,
   z: 0,
-  scale: 0.46,
+  scale: 0.48,
   tilt: 0.32,
   yaw: 0,
 };

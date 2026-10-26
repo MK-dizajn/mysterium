@@ -23,7 +23,7 @@ export const chapterOneActs: Act[] = [
           "Útržok starej fotografie, ktorý ti odovzdal Strážca. Na zadnej strane je časť ručne napísanej správy, ktorá vedie k ďalším miestam vyšetrovania.",
         actId: "act-2",
       },
-      continueLabel: "Prijať útržok a pokračovať",
+      continueLabel: "Prijať útržok",
     },
   },
   {
@@ -48,7 +48,7 @@ export const chapterOneActs: Act[] = [
           "Druhý útržok starej fotografie, ktorý ti pripadol po pečati. Po spojení s prvou časťou odhaľuje, že všetky doterajšie stopy smerujú k poslednému tajomstvu pátračovho denníka.",
         actId: "act-3",
       },
-      continueLabel: "Prijať útržok a pokračovať",
+      continueLabel: "Prijať útržok",
     },
   },
   {
@@ -74,7 +74,7 @@ export const chapterOneActs: Act[] = [
           "Tretí útržok starej fotografie, ktorý sa objavil v okamihu, keď sa kľúč spojil.",
         actId: "act-3",
       },
-      continueLabel: "Prijať útržok a pokračovať",
+      continueLabel: "Prijať útržok",
     },
   },
 ];

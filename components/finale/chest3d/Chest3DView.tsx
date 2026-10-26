@@ -47,6 +47,7 @@ import {
   getOpeningFrame,
   getOpeningTransform,
   getTapStep,
+  getTiltFitScale,
   getZoomTransform,
   OPEN_FRAME,
   type OpeningFrame,
@@ -301,7 +302,7 @@ function ChestRotation({
       : getOpeningTransform(controller.getOpeningFrame());
 
     positionRef.current?.position.set(view.x, view.y, view.z);
-    groupRef.current?.scale.setScalar(view.scale);
+    groupRef.current?.scale.setScalar(view.scale * getTiltFitScale(tilt));
     groupRef.current?.rotation.set(view.tilt + tilt, yaw + view.yaw, 0);
 
     if (opening.finished) {

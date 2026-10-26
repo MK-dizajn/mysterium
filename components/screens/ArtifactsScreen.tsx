@@ -58,7 +58,8 @@ export function ArtifactsScreen({
                       {artifact.shortFact}
                     </p>
 
-                    <p className="mt-3 text-xs font-bold uppercase tracking-widest text-amber-400/70">
+                    {/* Bežnými písmenami, aby sa zmestil na jeden riadok. */}
+                    <p className="mt-3 text-sm font-bold text-amber-300">
                       Prečítať príbeh miesta
                     </p>
                   </div>

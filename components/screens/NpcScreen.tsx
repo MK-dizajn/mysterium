@@ -75,6 +75,7 @@ export function NpcScreen({
                   key={choice.id}
                   onClick={() => handleChoice(choice.id)}
                   variant="secondary"
+                  textCase="sentence"
                   className="justify-start text-left"
                 >
                   {choice.text}
