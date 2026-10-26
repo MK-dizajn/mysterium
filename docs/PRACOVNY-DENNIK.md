@@ -3177,3 +3177,36 @@ Snímky: `c6-po-320.png`, `c6-po-360.png`, `c6-po-390.png`, `c6-po-768.png`.
 **Build:** prešiel (`npm run build`, bez chýb).
 
 **Ďalší krok:** podľa plánu, až po potvrdení.
+
+## 26. 10. 2026 – Krok 74 (krok D1): Dizajnový audit celej hry (bez zmien v kóde)
+
+**Rozsah:**
+- 41 snímok celých obrazoviek pri 360 px a niekoľko kľúčových pri 390 a 768 px, od úvodnej obrazovky po záver,
+- obrazovky: úvod, rozhovor, úlohy, nápovedy, história, okno „Prezrieť“ v 3D aj 2D, Inventár so zápisníkom, Artefakty, Úlohy, konce aktov, Strážca, truhlica (3D, priblíženie, zlý kód, všetky zámky, otvorená, 2D), fotografia aj s rubom, zadanie miesta, karta „Ďalšie miesto“, záver, dialóg „Začať odznova?“.
+- Snímky: `shots/d1/d1-01` až `d1-41` v pracovnom priečinku.
+
+**Merania na každej obrazovke:** ovládacie prvky pod 44 px, kontrast textu podľa WCAG, vodorovné posúvanie.
+
+**Hlavné nálezy:**
+- **P1 (kazí dojem alebo použiteľnosť):**
+  - pevná hlavička zaberá 161 px (20 až 25 % výšky obrazovky),
+  - pole odpovede v úlohe je asi 1 400 px pod začiatkom stránky,
+  - tlačidlo zvuku 32 × 32 px a odkaz „Späť k pátraniu“ v rozhovore vysoký 20 px,
+  - nadpisy kariet a pomocné texty majú kontrast 4,14 : 1 (pod 4,5 : 1).
+- **P2 (zlepší kvalitu):**
+  - prázdny riadok v karte „Tvoja úloha“,
+  - verzálky s rozostupmi v otázkach rozhovoru,
+  - nejednotné pomenovania (dôkaz, predmet, odmena, artefakt, stopa) a emoji ikony,
+  - Inventár je dlhý asi 6 900 px,
+  - nejednotné ovládanie „Späť“ a hlavička,
+  - texty, ktoré nezodpovedajú stavu (truhlica, Strážca bez videa, „Ďalšia stopa“),
+  - detail artefaktu sa posúva do strany (374 px),
+  - 3D truhlica je v rámčeku malá.
+- **P3 (nice to have):** vypnuté tlačidlo „Overiť odpoveď“ je na slnku takmer neviditeľné, chýba pokyn k ťuknutiu na rozbiehajúci sa text, dlhé odkazy na Artefaktoch.
+- Celá správa je v odpovedi používateľovi.
+
+**Chyba počas práce:** prvé meranie kontrastu vynechalo väčšinu textov, lebo farby sú vo formáte `oklch` (Tailwind v4) a meranie čítalo iba `rgb`. Opravené prevodom farieb cez plátno a audit spustený znova.
+
+**Zmenené súbory:** iba `docs/PRACOVNY-DENNIK.md` (kód sa nemenil).
+
+**Ďalší krok:** výber opráv z auditu, až po potvrdení.
