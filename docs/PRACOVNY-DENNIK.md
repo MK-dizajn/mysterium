@@ -3024,7 +3024,7 @@ Vývojový server je zastavený. Kód sa v závere dňa nemenil.
   - C1 63/63, B7 20/20 (celá kapitola, skóre **1010**), B6 32/32, B5 21/21, B4b 26/26, B4a 20/20, B3b 25/25 (aj staré uloženia),
   - texty 37/37, B3a 65/65, kresba kľúča 54/54, nápovedy 37/37.
 
-**Zistené, nemenené:** na úvodnej obrazovke je na 360 px nápis „MYSTERIUM“ orezaný na pravom okraji (veľké písmo s rozostupmi). Nadpis sa v tomto kroku nemenil; navrhujem malú opravu v samostatnom kroku.
+**Zistené, nemenené:** na úvodnej obrazovke je na 360 px nápis „MYSTERIUM“ orezaný na pravom okraji (veľké písmo s rozostupmi). Nadpis sa v tomto kroku nemenil; opravený v kroku 71.
 
 **Chyby počas práce:** žiadne.
 
@@ -3035,5 +3035,45 @@ Vývojový server je zastavený. Kód sa v závere dňa nemenil.
 **Build:** prešiel (`npm run build`, bez chýb).
 
 **Lint:** zmenené súbory bez chýb.
+
+**Ďalší krok:** podľa plánu, až po potvrdení.
+
+## 26. 10. 2026 – Krok 71: Nadpis „MYSTERIUM“ na úvodnej obrazovke sa zmestí celý
+
+**Meranie pred zmenou** (skutočné hranice písmen nadpisu):
+
+| Šírka | Písmo | Písmená od – do | Stav |
+|---|---|---|---|
+| 320 px | 48 px | 24 – 384 px | **orezaný o 64 px** |
+| 360 px | 48 px | 24 – 384 px | **orezaný o 24 px** |
+| 390 px | 48 px | 24 – 384 px | celý, ale nie v strede (vľavo 24, vpravo 6 px) |
+| 768 px | 72 px | 128 – 669 px | celý, ale nie v strede (vľavo 128, vpravo 99 px) |
+
+- **Príčina:** nadpis je širší ako stĺpec stránky (na mobile šírka mínus 2 × 24 px, na širšej obrazovke 512 px), preto pretečie doprava. Na úzkom mobile ho stránka oreže, takže sa vodorovne neposúva, ale nápis nie je celý.
+
+**Čo sa urobilo** (`components/screens/LandingScreen.tsx`, iba nadpis):
+- na úzkych obrazovkách sa písmo prispôsobí šírke obrazovky, najviac na doterajších 48 px (pri 320 px asi 35 px, pri 360 px 40 px, pri 390 px asi 44 px),
+- od 640 px ostáva doterajších 72 px a nadpis má miesto o 64 px z každej strany širšie ako stĺpec, aby ostal v strede,
+- nadpis je vždy na jednom riadku,
+- malé odsadenie vľavo (rovnaké ako medzera medzi písmenami) vyrovná medzeru za posledným písmenom, takže nápis je presne v strede.
+
+**Test v prehliadači (nový, mimo projektu):** pred zmenou 6 chýb, po zmene **17 z 17**. Pri šírkach 320, 360, 390 a 768 px overuje:
+- nadpis celý viditeľný, na jednom riadku, v strede (rozdiel okrajov najviac 0,1 px),
+- aspoň 24 px od okraja,
+- bez vodorovného posúvania,
+- písmo na mobile 35 až 44 px, na 768 px 72 px ako doteraz,
+- bez chýb v prehliadači.
+
+Snímky: `c6-po-320.png`, `c6-po-360.png`, `c6-po-390.png`, `c6-po-768.png`.
+
+**Ďalšie testy:** test úvodnej obrazovky zo C5 (štítok ukážkovej verzie) 5/5, Node test C5 15/15.
+
+**Chyby počas práce:** žiadne. Meranie však ukázalo, že nadpis nebol v strede ani pri 390 a 768 px, preto je opravené aj to.
+
+**Zmenené súbory:** `components/screens/LandingScreen.tsx`, `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** `LandingScreen.tsx` bez chýb.
 
 **Ďalší krok:** podľa plánu, až po potvrdení.

@@ -73,7 +73,13 @@ export function LandingScreen({
             </svg>
           </div>
 
-          <h1 className="mt-7 text-5xl font-black tracking-[0.08em] text-amber-300 drop-shadow-[0_0_28px_rgba(252,211,77,0.18)] sm:text-7xl">
+          {/*
+            Na úzkom mobile sa písmo zmenší podľa šírky obrazovky (najviac 48 px),
+            aby sa nadpis zmestil celý. Od 640 px má 72 px a miesto širšie ako
+            stĺpec, aby ostal v strede. Odsadenie vľavo vyrovná medzeru písma
+            za posledným písmenom.
+          */}
+          <h1 className="mt-7 whitespace-nowrap pl-[0.08em] text-[length:min(3rem,calc((100vw_-_3rem)/7.8))] font-black tracking-[0.08em] text-amber-300 drop-shadow-[0_0_28px_rgba(252,211,77,0.18)] sm:-mx-16 sm:text-7xl">
             MYSTERIUM
           </h1>
 
