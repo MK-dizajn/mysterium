@@ -1,6 +1,8 @@
+import { useState } from "react";
 import type { ChapterGuidance, GameState, Scene } from "../../types/game";
 import { getHintsUsed } from "../../engine";
 import { GameLayout } from "../layout/GameLayout";
+import { NoteHandoverScreen } from "../screens/NoteHandoverScreen";
 import { PuzzleScreen } from "../screens/PuzzleScreen";
 import { JournalReveal } from "../ui/JournalReveal";
 
@@ -56,6 +58,12 @@ export function PuzzleFlow({
   const shouldShowDetectiveNote =
     isDetectiveNoteUnlocked && isDetectiveNoteUnread;
 
+  const noteHandover = scene.noteHandover;
+  // Pri odovzdaní (Strážca) sa papier otvára až na „Prezrieť zápis“.
+  const [isNoteOpen, setIsNoteOpen] = useState(false);
+  const continueLabel =
+    detectiveNote?.continueLabel ?? "Pokračovať vo vyšetrovaní";
+
   function openFirstSceneNpc() {
     const npc = scene.npcs?.[0];
 
@@ -99,16 +107,24 @@ export function PuzzleFlow({
             {npcGate.buttonLabel}
           </button>
         </section>
+      ) : shouldShowDetectiveNote && detectiveNote && noteHandover && !isNoteOpen ? (
+        <NoteHandoverScreen
+          handover={noteHandover}
+          continueLabel={continueLabel}
+          isVideoSeen={Boolean(gameState.flags[noteHandover.seenFlagId])}
+          onVideoSeen={() => onReadDetectiveNote(noteHandover.seenFlagId)}
+          onViewNote={() => setIsNoteOpen(true)}
+          onContinue={() => onReadDetectiveNote(detectiveNote.readFlagId)}
+        />
       ) : shouldShowDetectiveNote && detectiveNote ? (
         <JournalReveal
           note={detectiveNote}
-          continueLabel={
-            detectiveNote.continueLabel ??
-            "Pokračovať vo vyšetrovaní"
-          }
+          continueLabel={continueLabel}
           onContinue={() =>
             onReadDetectiveNote(detectiveNote.readFlagId)
           }
+          onClose={noteHandover ? () => setIsNoteOpen(false) : undefined}
+          closeLabel={noteHandover?.closeNoteLabel}
         />
       ) : (
         <PuzzleScreen

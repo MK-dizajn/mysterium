@@ -9,6 +9,9 @@ type JournalRevealProps = {
   note: DetectiveNoteData;
   continueLabel?: string;
   onContinue: () => void;
+  /** Nepovinné „Zavrieť“: návrat späť bez označenia zápisu ako prečítaného. */
+  closeLabel?: string;
+  onClose?: () => void;
 };
 
 const DUST_PARTICLES = [
@@ -32,6 +35,8 @@ export function JournalReveal({
   note,
   continueLabel = "Preskúmať nultý bod",
   onContinue,
+  closeLabel = "Zavrieť",
+  onClose,
 }: JournalRevealProps) {
   const [isSceneVisible, setIsSceneVisible] = useState(false);
   const [isPaperVisible, setIsPaperVisible] = useState(false);
@@ -137,6 +142,16 @@ export function JournalReveal({
           <ActionButton onClick={handleContinue}>
             {continueLabel}
           </ActionButton>
+
+          {onClose && (
+            <ActionButton
+              variant="secondary"
+              onClick={onClose}
+              className="mt-3"
+            >
+              {closeLabel}
+            </ActionButton>
+          )}
         </div>
       </div>
     </section>

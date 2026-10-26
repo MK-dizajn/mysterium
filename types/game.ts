@@ -162,6 +162,29 @@ export type DetectiveNote = {
   readFlagId: string;
 };
 
+/**
+ * Strážca odovzdá zápis (video je voliteľné, bez neho sa ukáže text).
+ * Ukáže sa po rozhovore, kým hráč zápis neprečíta.
+ */
+export type NoteHandover = {
+  title: string;
+  /** Text Strážcu; ukáže sa bez videa, keď sa video nenačíta alebo po jeho skončení. */
+  text: string;
+  /** Video (napríklad /videos/strazca-michalska-brana.mp4); nikdy sa nespustí samo. */
+  videoSrc?: string;
+  /** Obrázok pred spustením videa. */
+  posterSrc?: string;
+  /** Titulky k videu (súbor .vtt). */
+  captionsSrc?: string;
+  /** Krátky popis deja videa pre čítačku obrazovky. */
+  videoDescription: string;
+  skipLabel: string;
+  viewNoteLabel: string;
+  closeNoteLabel: string;
+  /** Príznak, že hráč video videl alebo preskočil (po F5 sa neopakuje). */
+  seenFlagId: string;
+};
+
 export type NpcGate = {
   requiredFlagId: string;
   eyebrow: string;
@@ -310,6 +333,7 @@ export type Scene = {
 
   investigation?: Investigation;
   detectiveNote?: DetectiveNote;
+  noteHandover?: NoteHandover;
   npcGate?: NpcGate;
 
   puzzle: Puzzle;

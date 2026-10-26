@@ -3375,3 +3375,82 @@ Snímky: `d3a-pred-*.png`, `d3a-po-*.png`.
 **Lint:** zmenené súbory bez chýb.
 
 **Ďalší krok:** D3b (tlačidlo „Prezrieť zápis“ po videu), až po potvrdení.
+
+---
+
+## 26. 10. 2026 – Krok 77 (krok D3b): Miesto pre video Strážcu na začiatku hry
+
+**Ako to bolo:**
+- Po otázke Strážcovi nasledoval ešte jeden krok rozhovoru s textom odovzdania a tlačidlom „Prijať Pátračov zápis“.
+- Potom sa hneď ukázal papier so zápisom. Pre video nebolo miesto.
+
+**Čo sa urobilo:**
+- **Rozhovor** (`data/chapter-one/michalska-brana.ts`):
+  - otázky „Čo ti tu pátrač zanechal?“ a „Ukáž mi jeho pravidlo.“ hneď odovzdajú zápis: zapíšu rozhovor, pridajú zápis do Inventára, spustia úlohu a vedú na novú obrazovku,
+  - starý krok rozhovoru s „Prijať Pátračov zápis“ ostal iba pre staré uloženia uprostred rozhovoru,
+  - akcie odovzdania aj text Strážcu sú v dátach iba raz a používajú ich obe cesty.
+- **Nová obrazovka „Strážca Michalskej brány“** (`components/screens/NoteHandoverScreen.tsx`, nové pole `noteHandover` v dátach scény a typ `NoteHandover` v `types/game.ts`):
+  - s videom: prehrávač a vždy viditeľné „Preskočiť“; po konci videa alebo po „Preskočiť“ sa ukáže text Strážcu a dve tlačidlá,
+  - bez videa (dnes) alebo keď súbor chýba: hneď text Strážcu a dve tlačidlá „Prezrieť zápis“ a „Preskúmať nultý bod“,
+  - „Prezrieť zápis“ otvorí papier z D3a; pri ňom „Preskúmať nultý bod“ (pokračuje na úlohu) a nové „Zavrieť“ (návrat na obrazovku Strážcu, zápis sa ešte neoznačí ako prečítaný),
+  - „Preskúmať nultý bod“ na obrazovke Strážcu vedie rovno na úlohu,
+  - nový uložený príznak `seen_guardian_handover_video`: po skončení alebo preskočení videa sa po F5 video neopakuje.
+- **Spoločný prehrávač** (`components/ui/StoryVideo.tsx`):
+  - nikdy sa nespustí sám, nič nesťahuje vopred, má obrázok pred spustením,
+  - slovenské titulky sú predvolene zapnuté,
+  - krátky popis deja videa pre čítačku obrazovky,
+  - najprv overí, či súbor existuje (iba hlavičku); ak nie, alebo sa video nenačíta, ukáže sa text.
+- **Finále** (`components/screens/FinaleGuardianScreen.tsx`) používa ten istý prehrávač, tlačidlá sú bez zmeny.
+- **Papier zápisu** (`components/ui/JournalReveal.tsx`): nepovinné druhé tlačidlo „Zavrieť“.
+- **Titulky** `public/videos/strazca-michalska-brana.sk.vtt`: text Strážcu v troch častiach; časy sú zatiaľ odhad.
+- **Video zatiaľ nie je v dátach.** Plánovaný súbor je `/videos/strazca-michalska-brana.mp4`; stačí ho doplniť do `noteHandover.videoSrc`.
+- **Dokumenty:**
+  - `docs/KONTROLA-PRED-VYDANIM.md`: nový riadok (doplniť video alebo vedome vynechať, upraviť časy titulkov podľa skutočného videa),
+  - `docs/MEDIA-LICENCIE.md`: titulky ako vlastný text projektu.
+
+**Test (Node, nový, mimo projektu):** pred zmenou 17 chýb, po zmene **19 z 19**. Overuje:
+- texty obrazovky v dátach a to, že video ešte nie je zapísané,
+- obe otázky pridajú zápis a vedú na novú obrazovku, starý krok rozhovoru ostal,
+- titulky: tri časti, text zhodný s textom Strážcu v dátach,
+- prehrávač bez automatického spustenia, s titulkami a kontrolou súboru, finále ho používa,
+- riadky v kontrole pred vydaním a v licenciách.
+
+**Test v prehliadači (nový, 360 × 740 px):** pred zmenou **26 chýb**, po zmene **všetko OK** (aj pri vypnutých animáciách). Overuje:
+- **bez videa:**
+  - obe cesty rozhovorom vedú na obrazovku Strážcu,
+  - text a dve tlačidlá (54 px), bez vodorovného posúvania,
+  - zápis je v Inventári hneď po otázke,
+  - „Prezrieť zápis“ → papier, „Zavrieť“ → späť, „Preskúmať nultý bod“ → úloha,
+  - staré uloženie uprostred rozhovoru („Prijať Pátračov zápis“) stále funguje,
+- **video v dátach, ale súbor chýba (404):** text a dve tlačidlá,
+- **testovacie video** (vyrobené v prehliadači, do dát podstrčené iba počas testu):
+  - prehrávač sa nespustí sám,
+  - titulky sú slovenské, zapnuté a načítané (3 časti),
+  - popis pre čítačku,
+  - „Preskočiť“ je viditeľné,
+  - po konci videa aj po „Preskočiť“ sa ukážu dve tlačidlá a uloží sa príznak,
+  - zápis je v Inventári,
+  - po F5 sa video neopakuje.
+
+Snímky: `d3b-po2-*.png`.
+
+**Staré testy:**
+- 19 stále spúšťaných Node testov OK (celá kapitola, skóre **1010**),
+- v prehliadači: B4b, C1, D2, D3a (aj pri vypnutých animáciách) – všetko OK,
+- test D3a v prehliadači je upravený: pred papierom najprv ťukne na „Prezrieť zápis“, lebo pred papierom je teraz obrazovka Strážcu,
+- starý test B3b v prehliadači hlási 2 známe rozdiely z kroku B4a (čaká záverečnú obrazovku hneď po akte III, no odvtedy je pred ňou Strážca). So zmenou D3b nesúvisia.
+
+**Chyby počas práce:**
+- V novom teste sa titulky merali až po konci videa, keď už prehrávač zmizol. Opravené meraním v okamihu konca videa. Hra bola v poriadku.
+
+**Zmenené súbory:**
+- `types/game.ts`, `data/chapter-one/michalska-brana.ts`
+- `components/ui/StoryVideo.tsx` (nový), `components/screens/NoteHandoverScreen.tsx` (nový), `components/screens/FinaleGuardianScreen.tsx`, `components/ui/JournalReveal.tsx`, `components/game/PuzzleFlow.tsx`
+- `public/videos/strazca-michalska-brana.sk.vtt` (nový)
+- `docs/KONTROLA-PRED-VYDANIM.md`, `docs/MEDIA-LICENCIE.md`, `docs/PRACOVNY-DENNIK.md`
+
+**Build:** prešiel (`npm run build`, bez chýb).
+
+**Lint:** zmenené súbory bez chýb (celý projekt má staršie chyby v iných súboroch, tento krok ich nemenil).
+
+**Ďalší krok:** podľa plánu, až po potvrdení.

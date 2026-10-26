@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import type { FinaleGuardian } from "../../types/game";
 import { ActionButton } from "../ui/ActionButton";
 import { ScreenContainer } from "../ui/ScreenContainer";
+import { StoryVideo } from "../ui/StoryVideo";
 
 type FinaleGuardianScreenProps = {
   guardian: FinaleGuardian;
@@ -21,9 +21,6 @@ export function FinaleGuardianScreen({
   guardian,
   onContinue,
 }: FinaleGuardianScreenProps) {
-  const [hasVideoFailed, setHasVideoFailed] = useState(false);
-  const showVideo = Boolean(guardian.videoSrc) && !hasVideoFailed;
-
   return (
     <ScreenContainer>
       <section
@@ -39,26 +36,13 @@ export function FinaleGuardianScreen({
 
         <div className="mx-auto mt-5 h-px w-24 bg-gradient-to-r from-transparent via-amber-300/60 to-transparent" />
 
-        {showVideo && (
-          <video
-            controls
-            playsInline
-            preload="none"
-            poster={guardian.posterSrc}
+        {guardian.videoSrc && (
+          <StoryVideo
             src={guardian.videoSrc}
-            onError={() => setHasVideoFailed(true)}
-            className="mt-6 w-full rounded-2xl border border-amber-300/20 bg-black"
-          >
-            {guardian.captionsSrc && (
-              <track
-                kind="captions"
-                src={guardian.captionsSrc}
-                srcLang="sk"
-                label="Slovenčina"
-                default
-              />
-            )}
-          </video>
+            posterSrc={guardian.posterSrc}
+            captionsSrc={guardian.captionsSrc}
+            className="mt-6"
+          />
         )}
 
         <p className="mt-6 text-left text-[16px] leading-normal text-slate-200">

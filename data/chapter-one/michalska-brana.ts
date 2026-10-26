@@ -1,4 +1,35 @@
-import type { Scene } from "../../types/game";
+import type { GameAction, Scene } from "../../types/game";
+
+const GUARDIAN_HANDOVER_TEXT =
+  "Strážca sa na chvíľu odmlčí. Zo svojho kabáta vytiahne starý zažltnutý papier, opatrne ho rozloží a podá ti ho. „Pátrač mi povedal, že ak sa raz objaví niekto, kto bude pokračovať v jeho práci, mám mu odovzdať toto. Odpoveď v ňom nehľadaj. Naučí ťa iba to, ako rozmýšľal.“";
+
+/** Strážca odovzdá zápis: rozhovor je za nami, zápis v Inventári, ďalej obrazovka odovzdania. */
+const ACCEPT_NOTE_ACTIONS: GameAction[] = [
+  {
+    type: "setFlag",
+    flagId: "talked_to_michalska_guardian",
+  },
+  {
+    type: "addInventoryItem",
+    item: {
+      id: "detective-note-nulty-bod",
+      title: "Pátračov zápis č. 1 – Brána je iba začiatok",
+      icon: "📜",
+      description:
+        "Zažltnutá strana zo strateného denníka. Neobsahuje hotovú odpoveď, ale pravidlo: hľadať to, čo je najbližšie, nie to, čo je najväčšie.",
+      evidenceKind: "document",
+      actId: "act-1",
+    },
+  },
+  {
+    type: "startQuest",
+    questId: "quest-golden-key",
+  },
+  {
+    type: "setScreen",
+    screen: "puzzle",
+  },
+];
 
 export const michalskaBranaScene: Scene = {
   id: "michalska-brana",
@@ -49,6 +80,19 @@ Pátračovo pravidlo znie: „Prvá stopa patrí mestu, ku ktorému vedie najkra
     continueLabel: "Preskúmať nultý bod",
     unlockFlagId: "talked_to_michalska_guardian",
     readFlagId: "read_detective_note_nulty_bod",
+  },
+
+  // Video zatiaľ nie je (plánované /videos/strazca-michalska-brana.mp4); bez neho sa ukáže text.
+  noteHandover: {
+    title: "Strážca Michalskej brány",
+    text: GUARDIAN_HANDOVER_TEXT,
+    captionsSrc: "/videos/strazca-michalska-brana.sk.vtt",
+    videoDescription:
+      "Video: Strážca Michalskej brány vytiahne z kabáta starý zažltnutý papier a podá ti ho so slovami pátrača.",
+    skipLabel: "Preskočiť",
+    viewNoteLabel: "Prezrieť zápis",
+    closeNoteLabel: "Zavrieť",
+    seenFlagId: "seen_guardian_handover_video",
   },
 
   puzzle: {
@@ -108,7 +152,7 @@ Pátračovo pravidlo znie: „Prvá stopa patrí mestu, ku ktorému vedie najkra
             {
               id: "choice-ask-patrac",
               text: "Čo ti tu pátrač zanechal?",
-              nextDialogueNodeId: "handover-note",
+              actions: ACCEPT_NOTE_ACTIONS,
             },
           ],
         },
@@ -121,45 +165,20 @@ Pátračovo pravidlo znie: „Prvá stopa patrí mestu, ku ktorému vedie najkra
             {
               id: "choice-see-note",
               text: "Ukáž mi jeho pravidlo.",
-              nextDialogueNodeId: "handover-note",
+              actions: ACCEPT_NOTE_ACTIONS,
             },
           ],
         },
+        // Iba pre staré uloženia uprostred rozhovoru; nové hry sem nevedú.
         {
           id: "handover-note",
           speaker: "Strážca Michalskej brány",
-          text:
-            "Strážca sa na chvíľu odmlčí. Zo svojho kabáta vytiahne starý zažltnutý papier, opatrne ho rozloží a podá ti ho. „Pátrač mi povedal, že ak sa raz objaví niekto, kto bude pokračovať v jeho práci, mám mu odovzdať toto. Odpoveď v ňom nehľadaj. Naučí ťa iba to, ako rozmýšľal.“",
+          text: GUARDIAN_HANDOVER_TEXT,
           choices: [
             {
               id: "choice-accept-note",
               text: "Prijať Pátračov zápis",
-              actions: [
-                {
-                  type: "setFlag",
-                  flagId: "talked_to_michalska_guardian",
-                },
-                {
-                  type: "addInventoryItem",
-                  item: {
-                    id: "detective-note-nulty-bod",
-                    title: "Pátračov zápis č. 1 – Brána je iba začiatok",
-                    icon: "📜",
-                    description:
-                      "Zažltnutá strana zo strateného denníka. Neobsahuje hotovú odpoveď, ale pravidlo: hľadať to, čo je najbližšie, nie to, čo je najväčšie.",
-                    evidenceKind: "document",
-                    actId: "act-1",
-                  },
-                },
-                {
-                  type: "startQuest",
-                  questId: "quest-golden-key",
-                },
-                {
-                  type: "setScreen",
-                  screen: "puzzle",
-                },
-              ],
+              actions: ACCEPT_NOTE_ACTIONS,
             },
           ],
         },
