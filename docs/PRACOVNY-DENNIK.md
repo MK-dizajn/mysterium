@@ -3865,3 +3865,47 @@ Hlasy vo videách sa nemenia: vykanie vo videu A aj mužský rod vo videu B ost�
 **Build:** prešiel. **Lint:** bez zmeny, 14 starých problémov.
 
 **Ďalší krok:** nový úvod je hotový. Ďalej podľa plánu, až po potvrdení.
+
+---
+
+## 27. 10. 2026 – Odomykanie kódom, krok 1: úvodná obrazovka „Pokračovať“ / „Nová hra“
+
+**Schválený plán (3 kroky):**
+1. Úvodná obrazovka s výberom.
+2. Zoznam kódov a odomknutie aktu II a III, pričom preskočené akty dostanú plné body.
+3. Obrazovka „Mám kód“.
+
+Kódy sú uložené iba ako odtlačky. Čitateľné kódy sa nezapisujú nikam: ani do súborov, dokumentov, denníka či testov. Testy používajú vlastné skúšobné kódy.
+
+**Čo sa zmenilo:**
+- Na úvodnej obrazovke sú nové nápisy:
+  - **„Pokračovať“** (zlaté, iba s uloženou hrou),
+  - **„Nová hra“** (zlaté bez uloženej hry, inak tmavé).
+- Nahradili „Pokračovať v pátraní“ a „Začať pátranie“ / „Začať odznova“.
+- Potvrdenie „Začať odznova?“ pri uloženej hre ostáva.
+- Tlačidlo „Mám kód“ pribudne v kroku 3, spolu s obrazovkou, na ktorú vedie. Dovtedy by nemalo kam viesť.
+- Tlačidlo „Pokračovať v pátraní“ na obrazovke fotografie vo finále ostáva bez zmeny.
+
+**Súbory:** `components/screens/LandingScreen.tsx`.
+
+**Testy:**
+- **Nový test E4 v prehliadači** (320 a 360 px, zapnuté aj vypnuté animácie). Pred zmenou 13 chýb, po zmene všetko OK. Overuje:
+  - tlačidlá podľa uloženej hry a ich poradie a farbu,
+  - 44 px, jeden riadok, bez posúvania do strany,
+  - „Pokračovať“,
+  - „Nová hra“ s potvrdením a so „Zrušiť“,
+  - „Nová hra“ bez uloženej hry rovno na video A.
+- **Upravené stále testy v prehliadači:** B3b, B4b, B4c-1, B4c-2, B4c-3, C1, D2, D3a, D4, D5, c6, E2 a E3 (nové nápisy). Väčšina hľadá tlačidlo podľa časti textu „Pokračovať“, takže tlačidlo na fotografii vo finále nájdu ďalej.
+- **Node:** 22 testov OK (B7: celá kapitola, skóre **1010**).
+- **Prehliadač:** všetky stále testy OK, okrem jednej kontroly v D5 (pozri nižšie).
+
+**Chyby a otvorené veci:**
+- V teste E4 kontrola „bez starých nápisov“ pred zmenou falošne prešla, lebo nápis je zobrazený veľkými písmenami. Opravená, teraz kontroluje text bez úpravy písma.
+- **D5, truhlica:** kontrola „pri otáčaní opačným smerom sa nič neodreže o okraj“ zlyhala v 2 z posledných 3 behov (v kroku E3 aj teraz, pri opakovaní znova). Pri najväčšom naklonení sa truhlica dotkne horného okraja (0 px rezervy, test čaká aspoň 1 px).
+  - Kód truhlice sa od kroku D5 nezmenil, s úvodom ani s úvodnou obrazovkou nesúvisí.
+  - Môže ísť o hraničný prípad alebo o nestabilné meranie (testy bežali súbežne s lintom).
+  - **Treba preveriť samostatne:** buď mierne zmenšiť truhlicu pri naklonení, alebo upraviť meranie.
+
+**Build:** prešiel. **Lint:** bez zmeny, 14 starých problémov.
+
+**Ďalší krok:** krok 2, zoznam kódov a odomknutie aktov II a III, až po „pokračuj“.

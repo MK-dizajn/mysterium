@@ -101,7 +101,7 @@ export function LandingScreen({
           <div className="mx-auto mt-10 flex w-full max-w-sm flex-col gap-3">
             {hasSavedProgress && (
               <ActionButton onClick={onContinueGame}>
-                Pokračovať v pátraní
+                Pokračovať
               </ActionButton>
             )}
 
@@ -109,7 +109,7 @@ export function LandingScreen({
               onClick={handleStartNewGame}
               variant={hasSavedProgress ? "secondary" : "primary"}
             >
-              {hasSavedProgress ? "Začať odznova" : "Začať pátranie"}
+              Nová hra
             </ActionButton>
           </div>
 
