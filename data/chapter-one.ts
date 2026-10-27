@@ -26,6 +26,7 @@ export const chapterOne: Chapter = {
     videoDescription:
       "Video: prelet nad Bratislavou až k Michalskej bráne. Hlas rozpráva o zmiznutom pátračovi.",
     skipLabel: "Preskočiť",
+    endLabel: "Spustiť kapitolu",
     seenFlagId: "seen_intro_city_video",
   },
 

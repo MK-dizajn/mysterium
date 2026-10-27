@@ -15,15 +15,30 @@ type FinaleGuardianScreenProps = {
 const STILL_BUTTON = "motion-reduce:transition-none motion-reduce:active:scale-100";
 
 /**
- * Strážca prináša truhlicu. Video (ak je v dátach) sa nikdy nespustí samo;
+ * Strážca prináša truhlicu. Video (ak je v dátach) na celú obrazovku;
  * bez videa alebo keď sa nenačíta, ostane pokojné pozadie s textom.
  */
 export function FinaleGuardianScreen({
   guardian,
   onContinue,
 }: FinaleGuardianScreenProps) {
-  // „Preskočiť“ iba pri videu; bez videa (alebo keď sa nenačíta) by robilo to isté čo pokračovanie.
   const [hasVideo, setHasVideo] = useState(Boolean(guardian.videoSrc));
+
+  // S videom na celú obrazovku; po ňom (alebo „Preskočiť“) rovno truhlica.
+  if (hasVideo && guardian.videoSrc) {
+    return (
+      <StoryVideo
+        title={guardian.title}
+        src={guardian.videoSrc}
+        posterSrc={guardian.posterSrc}
+        captionsSrc={guardian.captionsSrc}
+        description={guardian.text}
+        skipLabel={guardian.skipLabel}
+        onDone={onContinue}
+        onUnavailable={() => setHasVideo(false)}
+      />
+    );
+  }
 
   return (
     <ScreenContainer>
@@ -40,16 +55,6 @@ export function FinaleGuardianScreen({
 
         <div className="mx-auto mt-5 h-px w-24 bg-gradient-to-r from-transparent via-amber-300/60 to-transparent" />
 
-        {guardian.videoSrc && (
-          <StoryVideo
-            src={guardian.videoSrc}
-            posterSrc={guardian.posterSrc}
-            captionsSrc={guardian.captionsSrc}
-            onUnavailable={() => setHasVideo(false)}
-            className="mt-6"
-          />
-        )}
-
         <p className="mt-6 text-left text-[16px] leading-normal text-slate-200">
           {guardian.text}
         </p>
@@ -58,16 +63,6 @@ export function FinaleGuardianScreen({
           <ActionButton onClick={onContinue} className={STILL_BUTTON}>
             {guardian.continueLabel}
           </ActionButton>
-
-          {hasVideo && (
-            <ActionButton
-              variant="secondary"
-              onClick={onContinue}
-              className={STILL_BUTTON}
-            >
-              {guardian.skipLabel}
-            </ActionButton>
-          )}
         </div>
       </section>
     </ScreenContainer>

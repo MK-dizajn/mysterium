@@ -95,6 +95,17 @@ export function PuzzleFlow({
     onOpenNpcDialogue(npc.id);
   }
 
+  // Video Strážcu na celú obrazovku, bez lišty hry.
+  if (shouldShowGuardianVideo && guardianVideo) {
+    return (
+      <StoryVideoScreen
+        video={guardianVideo}
+        onDone={() => onCompleteGuardianVideo(guardianVideo.completeActions)}
+        onUnavailable={() => setIsGuardianVideoUnavailable(true)}
+      />
+    );
+  }
+
   return (
     <GameLayout
       gameState={gameState}
@@ -103,13 +114,7 @@ export function PuzzleFlow({
       onOpenArtifacts={onOpenArtifacts}
       onOpenQuests={onOpenQuests}
     >
-      {shouldShowGuardianVideo && guardianVideo ? (
-        <StoryVideoScreen
-          video={guardianVideo}
-          onDone={() => onCompleteGuardianVideo(guardianVideo.completeActions)}
-          onUnavailable={() => setIsGuardianVideoUnavailable(true)}
-        />
-      ) : isNpcGateLocked && npcGate ? (
+      {isNpcGateLocked && npcGate ? (
         <section className="mx-auto mt-12 max-w-2xl rounded-3xl border border-amber-300/30 bg-stone-950/80 p-6 text-stone-100 shadow-2xl">
           <p className="mb-2 text-sm uppercase tracking-[0.3em] text-amber-200/60">
             {npcGate.eyebrow}

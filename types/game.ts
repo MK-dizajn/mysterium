@@ -519,7 +519,10 @@ export type ChapterGuidance = {
   inventoryClueLabel: string;
 };
 
-/** Video v príbehu na celú obrazovku (nikdy sa nespustí samo, dá sa preskočiť). */
+/**
+ * Video v príbehu na celú obrazovku. Spustí sa hneď po ťuknutí, ktoré naň
+ * viedlo; dá sa pozastaviť a preskočiť.
+ */
 export type StoryVideoContent = {
   title: string;
   videoSrc: string;
@@ -528,6 +531,8 @@ export type StoryVideoContent = {
   /** Krátky popis deja videa pre čítačku obrazovky. */
   videoDescription: string;
   skipLabel: string;
+  /** Tlačidlo po skončení videa (napríklad „Spustiť kapitolu“); bez neho hra pokračuje hneď. */
+  endLabel?: string;
   /** Príznak, že hráč video videl alebo preskočil. */
   seenFlagId: string;
 };

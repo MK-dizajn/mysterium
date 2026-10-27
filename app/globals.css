@@ -1442,3 +1442,63 @@ body {
     transition-delay: 0ms !important;
   }
 }
+
+/* ===== Video v príbehu na celú obrazovku („kino“, krok G1) ===== */
+
+/* Vynorenie z tmy a odchod do tmy. */
+@keyframes story-cinema-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes story-cinema-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+.story-cinema {
+  animation: story-cinema-in 0.6s ease-out both;
+}
+
+.story-cinema-leaving {
+  animation: story-cinema-out 0.5s ease-in both;
+}
+
+/* Zlatá pečať „Prehrať“ (ako znak na úvodnej obrazovke). */
+.story-play-seal {
+  display: block;
+  width: 96px;
+  height: 96px;
+  color: #fcd34d;
+  filter: drop-shadow(0 0 18px rgba(252, 211, 77, 0.35));
+}
+
+/* Filmové titulky: písmo s pätkami, svetlé, s tieňom na tmavom prechode. */
+.story-captions {
+  font-family: var(--font-story-serif), Georgia, "Times New Roman", serif;
+  font-size: 20px;
+  line-height: 1.35;
+  font-weight: 500;
+  color: #fff8e7;
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.95),
+    0 0 12px rgba(0, 0, 0, 0.8);
+  min-height: 2.7em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .story-cinema,
+  .story-cinema-leaving {
+    animation: none;
+  }
+}

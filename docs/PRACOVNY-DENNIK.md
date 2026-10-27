@@ -3951,3 +3951,95 @@ Kódy sú uložené iba ako odtlačky. Čitateľné kódy sa nezapisujú nikam: 
 **Súbory:** `docs/SUPIS-HLASOV.md` (nový), `docs/PRACOVNY-DENNIK.md`.
 
 **Build a lint:** nespúšťal som ich, kód sa nemenil.
+
+---
+
+## 27. 10. 2026 – G1: prehrávač videí „Kino“ (variant A)
+
+**Zvolený variant A „Kino“ s úpravami používateľa:**
+- Video sa spustí hneď so zvukom po ťuknutí, ktoré naň viedlo („Nová hra“ pre video A, „Som pri bráne“ pre video Strážcu).
+- Veľké zlaté „Prehrať“ sa ukáže iba vtedy, keď prehliadač prehrávanie zablokuje, alebo po pozastavení.
+- Po videu A (koniec alebo „Preskočiť“) ostane tlačidlo „Spustiť kapitolu“, ktoré vedie na „Vydaj sa k Michalskej bráne“.
+- Po videu Strážcu sa hneď otvorí zápis č. 1, bez medzikroku.
+
+**Čo hráč uvidí:**
+- **Celá obrazovka**, teplá tma, video vyplní obrazovku. Lišta hry (Inventár, Úlohy) sa počas videa Strážcu skryje.
+- **Ovládanie:**
+  - hore tenká zlatá čiara priebehu,
+  - vpravo hore zvuk (44 × 44 px) a „Preskočiť“ (výška 44 px),
+  - pod nimi nadpis videa na vlastnom riadku, aby sa neskracoval.
+- **Titulky** kreslí hra sama: dole v tmavom prechode, písmo s pätkami Source Serif 4, 20 px, svetlé s tieňom.
+- **Pozastavenie:** ťuknutie na obraz video pozastaví a ukáže zlatú pečať „Prehrať“ (rovnaký štýl ako znak na úvodnej obrazovke).
+- **Prelínanie:** vynorenie z tmy (0,6 s) a odchod do tmy (0,5 s). Pri vypnutých animáciách sa iba okamžite prepne.
+- **Koniec videa A:** stlmený plagát a zlaté „Spustiť kapitolu“ (zamerané pre klávesnicu a čítačku).
+- **Prístupnosť:**
+  - prehrávač je dialóg s nadpisom a popisom videa pre čítačku,
+  - tlačidlá majú popisy „Prehrať video“, „Pozastaviť video“, „Vypnúť zvuk“ / „Zapnúť zvuk“ (stav aj cez `aria-pressed`) a „Preskočiť video“,
+  - medzerník pozastaví video,
+  - titulky sú pre čítačku skryté, lebo popis videa ju informuje.
+- **Keď súbor chýba (chyba načítania):** ostáva náhrada ako doteraz, teda pri videu A text na „Vydaj sa…“ a pri videu Strážcu písaný rozhovor.
+- **Uloženie:**
+  - príznak videa A sa uloží až po „Spustiť kapitolu“,
+  - po F5 sa video ukáže znova; prehliadač bez ťuknutia zvuk nepovolí, preto sa ukáže zlaté „Prehrať“.
+
+**Ako je to v kóde:**
+- `components/ui/StoryVideo.tsx` je prepísaný na prehrávač na celú obrazovku:
+  - vlastné ovládanie,
+  - titulky zo súboru `.vtt` (stopa je skrytá, text sa berie z aktívnej časti),
+  - priebeh, prelínanie,
+  - zákaz posúvania stránky pod videom.
+- Odpadla kontrola súboru cez HEAD. Video sa načíta hneď, aby mohlo začať hrať, a chybu súboru zachytí udalosť `error`.
+- `StoryVideoScreen` iba odovzdá dáta prehrávaču.
+- `PuzzleFlow` ukáže video Strážcu mimo lišty hry.
+- `FinaleGuardianScreen` je pripravený na video 3: s videom ide po ňom rovno na truhlicu, bez videa ostáva text ako dnes.
+- Nové pole `endLabel` v dátach videa (pri videu A „Spustiť kapitolu“).
+- Písmo Source Serif 4 je pripojené cez `next/font` (licencia OFL, zapísaná v `docs/MEDIA-LICENCIE.md`).
+- Štýly sú v `app/globals.css`.
+
+**Súbory:**
+- `components/ui/StoryVideo.tsx`,
+- `components/screens/StoryVideoScreen.tsx`,
+- `components/screens/FinaleGuardianScreen.tsx`,
+- `components/game/PuzzleFlow.tsx`,
+- `app/globals.css`, `app/layout.tsx`,
+- `types/game.ts`, `data/chapter-one.ts`,
+- `docs/MEDIA-LICENCIE.md`.
+
+**Testy:**
+- **Nový test G1 v prehliadači** (360 px, zapnuté aj vypnuté animácie). Spúšťa sa v Chrome **bez** povolenia automatického prehrávania a ťuká ako skutočný používateľ.
+  - Pred zmenou zlyhal hneď na začiatku: starý prehrávač nebol na celú obrazovku a nespustil sa sám.
+  - Po zmene všetko OK. Overuje:
+    - spustenie so zvukom po ťuknutí,
+    - celú obrazovku, dialóg a popis,
+    - „Preskočiť“, zvuk a pečať aspoň 44 px,
+    - titulky dole, písmo s pätkami, 20 px,
+    - priebeh, zvuk, pozastavenie ťuknutím aj medzerníkom,
+    - zablokované prehrávanie po F5 a pečať „Prehrať“,
+    - koniec videa so „Spustiť kapitolu“,
+    - video Strážcu bez lišty hry a hneď zápis č. 1,
+    - „Preskočiť“, chýbajúce súbory (náhrady), staré uloženie,
+    - vypnuté animácie bez prelínania.
+- **G1 nahrádza testy E2 a E3 v prehliadači.** Ich platné kontroly sú teraz v G1, staré čakali prehrávač, ktorý sa nespustí sám.
+- **Upravené testy:**
+  - Node E2 (spoločný prehrávač, „Spustiť kapitolu“),
+  - Node E3 (video Strážcu mimo lišty hry, titulky kreslí hra, náhrada pri chybe súboru, bez tlačidla na konci),
+  - D2 v prehliadači (po „Preskočiť“ aj „Spustiť kapitolu“).
+- **Node:** 22 testov OK (B7: celá kapitola, skóre **1010**).
+
+**Chyby:**
+- Po dočasnom odložení zmien (`git stash`) kvôli testu pred zmenou posielal vývojový server staré štýly bez nových tried. Nepomohol ani reštart servera.
+  - Pomohla až malá úprava súboru `globals.css`, ktorá vynútila nové spracovanie.
+  - Test medzitým hlásil 2 chyby (písmo titulkov a prelínanie), v hre chyba nebola.
+- Prvá verzia skracovala nadpis „Strážca Michalskej brány“ na 360 px a koniec videa A bol takmer čierny. Opravené: nadpis na vlastnom riadku, na konci stlmený plagát.
+- D5: znova zlyhala známa kontrola truhlice pri otáčaní opačným smerom (0 px rezervy vpravo). Je to otvorená vec z F1, s prehrávačom nesúvisí.
+
+**Stále testy v prehliadači:** B3b, B4b, B4c-1, B4c-2, B4c-3, C1, D2, D3a, D4, c6, E4 a G1 (v oboch režimoch) sú OK. D5 je OK okrem kontroly truhlice.
+
+**Na mobile treba ešte overiť** (testovací prehliadač to neoverí):
+- či sa video na iPhone (Safari) po „Nová hra“ a „Som pri bráne“ spustí so zvukom, alebo sa ukáže zlaté „Prehrať“ (Safari povoľuje zvuk prísnejšie),
+- titulky a tlačidlá pri výreze obrazovky („notch“).
+Doplnené do riadkov o videách A a B v `docs/KONTROLA-PRED-VYDANIM.md`.
+
+**Build:** prešiel. **Lint:** bez zmeny, 14 starých problémov.
+
+**Ďalší krok:** kódy (krok 2), až po „pokračuj“.

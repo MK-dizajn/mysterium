@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Patrick_Hand } from "next/font/google";
+import { Geist, Geist_Mono, Patrick_Hand, Source_Serif_4 } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -20,6 +20,15 @@ const patrickHand = Patrick_Hand({
   display: "swap",
 });
 
+/** Titulky vo videách – písmo s pätkami (SIL Open Font License, uložené v projekte cez next/font). */
+const sourceSerif = Source_Serif_4({
+  variable: "--font-story-serif",
+  weight: ["500"],
+  subsets: ["latin", "latin-ext"],
+  display: "swap",
+  preload: false,
+});
+
 export const metadata: Metadata = {
   title: "Mysterium Bratislava",
   description: "Objav tajomstvá starého Prešporka.",
@@ -33,7 +42,7 @@ export default function RootLayout({
   return (
     <html
       lang="sk"
-      className={`${geistSans.variable} ${geistMono.variable} ${patrickHand.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${patrickHand.variable} ${sourceSerif.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
