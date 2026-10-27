@@ -520,12 +520,43 @@ export type ChapterGuidance = {
   inventoryClueLabel: string;
 };
 
+/**
+ * Úvodné video kapitoly po „Začať pátranie“. Nikdy sa nespustí samo
+ * a ukáže sa iba raz za hru (po „Začať odznova“ znova).
+ */
+export type ChapterIntroVideo = {
+  title: string;
+  videoSrc: string;
+  posterSrc?: string;
+  captionsSrc?: string;
+  /** Krátky popis deja videa pre čítačku obrazovky. */
+  videoDescription: string;
+  skipLabel: string;
+  /** Príznak, že hráč video videl alebo preskočil. */
+  seenFlagId: string;
+};
+
+/** Obrazovka „Vydaj sa k …“: kam má hráč ísť a potvrdenie, že tam je. */
+export type ChapterArrival = {
+  label: string;
+  title: string;
+  text: string;
+  /** Ukáže sa iba vtedy, keď sa úvodné video nedá prehrať (aby hráč nestratil príbeh). */
+  fallbackTitle: string;
+  fallbackText: string;
+  /** Miesto pre odkaz do máp. */
+  mapsQuery: string;
+  mapsLabel: string;
+  confirmLabel: string;
+};
+
 export type Chapter = {
   id: ChapterId;
   city: string;
   title: string;
   subtitle: string;
-  introLines: string[];
+  introVideo?: ChapterIntroVideo;
+  arrival: ChapterArrival;
   quests: Quest[];
   acts: Act[];
   scenes: Scene[];

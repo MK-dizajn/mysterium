@@ -18,11 +18,28 @@ export const chapterOne: Chapter = {
   city: "Bratislava",
   title: "Stratený denník starého pátrača",
   subtitle: "Kapitola I: Zlatý prešporský kľúč",
-  introLines: [
-    "Mesto si pamätá všetko.",
-    "Niektoré tajomstvá čakali celé stáročia.",
-    "Ak toto čítaš, znamená to, že som zlyhal.",
-  ],
+  introVideo: {
+    title: "Stratený denník starého pátrača",
+    videoSrc: "/videos/uvod-bratislava.mp4",
+    posterSrc: "/videos/uvod-bratislava.poster.jpg",
+    captionsSrc: "/videos/uvod-bratislava.sk.vtt",
+    videoDescription:
+      "Video: prelet nad Bratislavou až k Michalskej bráne. Hlas rozpráva o zmiznutom pátračovi.",
+    skipLabel: "Preskočiť",
+    seenFlagId: "seen_intro_city_video",
+  },
+
+  arrival: {
+    label: "Prvá stopa",
+    title: "Vydaj sa k Michalskej bráne",
+    text: "Posledná stopa pátrača sa končí pod Michalskou bránou. Postav sa pod jej oblúk a nájdi v dlažbe bronzový kruh.",
+    fallbackTitle: "Pátračov denník",
+    fallbackText:
+      "Kedysi tu žil pátrač, ktorý zbieral tajomstvá mesta. Jedného večera zmizol a jeho stopy sa stratili v uliciach starého mesta. Poslednú z nich nájdeš pod Michalskou bránou.",
+    mapsQuery: "Michalská brána, Michalská ulica, Bratislava",
+    mapsLabel: "Otvoriť v mapách",
+    confirmLabel: "Som pri bráne",
+  },
 
   quests: chapterOneQuests,
 

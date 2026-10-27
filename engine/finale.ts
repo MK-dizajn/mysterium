@@ -131,8 +131,13 @@ export function leaveFinalePlace(
 
 /** Odkaz, ktorý otvorí ďalšie miesto v Google Mapách (hra polohu nezisťuje). */
 export function getFinaleMapsUrl(nextPlace: FinaleNextPlace) {
+  return getMapsSearchUrl(`${nextPlace.name}, ${nextPlace.address}`);
+}
+
+/** Odkaz, ktorý otvorí hľadané miesto v Google Mapách. */
+export function getMapsSearchUrl(query: string) {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-    `${nextPlace.name}, ${nextPlace.address}`
+    query
   )}`;
 }
 

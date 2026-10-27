@@ -3730,3 +3730,60 @@ Hlasy vo videách sa nemenia: vykanie vo videu A aj mužský rod vo videu B ost�
 **Chyby:** žiadne.
 
 **Ďalší krok:** krok 2, video A a obrazovka „Vydaj sa k Michalskej bráne“, až po „pokračuj“.
+
+---
+
+## 27. 10. 2026 – Nový úvod, krok 2: video A a „Vydaj sa k Michalskej bráne“
+
+**Čo sa zmenilo pre hráča:**
+- Po „Začať pátranie“ sa ukáže **úvodné video A**:
+  - nadpis „Stratený denník starého pátrača“,
+  - video sa nespustí samo a nič sa nesťahuje vopred,
+  - slovenské titulky sú zapnuté, čítačka dostane popis videa,
+  - pod videom je „Preskočiť“.
+- Po skončení videa alebo „Preskočiť“ sa uloží príznak `seen_intro_city_video` a hra prejde na novú obrazovku **„Vydaj sa k Michalskej bráne“**:
+  - štítky „Úvodný prípad“ a „Prvá stopa“, pokyn s bronzovým kruhom,
+  - „Otvoriť v mapách“ (Google Mapy, nové okno),
+  - „Som pri bráne“, ktoré vedie na scénu pri bráne ako doteraz.
+- Tri staré vety úvodu („Mesto si pamätá všetko…“) sú preč, nahradilo ich video.
+- **Keď súbor videa chýba:** hra ide rovno na „Vydaj sa…“ a pridá kartu „Pátračov denník“ s príbehom v skratke. Príznak sa vtedy neuloží, takže keď súbor pribudne, video sa ukáže.
+- **Po F5:**
+  - počas videa sa video ukáže znova,
+  - na obrazovke „Vydaj sa…“ hráč ostane.
+- **Po „Začať odznova“** sa video A ukáže znova.
+- **Úprava navyše:** video je na výšku, takže pri šírke 360 px bolo „Preskočiť“ pod okrajom obrazovky. Výška videa je teraz obmedzená a tlačidlo vidno bez posúvania.
+
+**Rozhodnutie mimo návrhu:** horný štítok obrazovky ostal „Úvodný prípad“ (ako doteraz) a schválené „Prvá stopa“ je nad pokynom. Inak by sa „Prvá stopa“ ukázala dvakrát pod sebou.
+
+**Súbory:**
+- `components/screens/IntroVideoScreen.tsx` (nový),
+- `components/screens/IntroScreen.tsx` (prerobená),
+- `app/page.tsx`,
+- `types/game.ts` (nové `introVideo` a `arrival`, bez `introLines`),
+- `data/chapter-one.ts`,
+- `engine/finale.ts` (spoločný odkaz do máp `getMapsSearchUrl`),
+- `docs/MEDIA-LICENCIE.md` (video A, plagát, titulky; nástroj a plán treba doplniť),
+- `docs/KONTROLA-PRED-VYDANIM.md` (video A na skutočnom mobile).
+
+**Testy:**
+- **Nový test E2 v prehliadači** (360 px, zapnuté aj vypnuté animácie). Pred zmenou 22 chýb, po zmene všetko OK. Overuje:
+  - video so skutočným súborom: nespustí sa samo, 12 titulkov, prehrá sa,
+  - F5, koniec videa, „Preskočiť“, „Začať odznova“,
+  - chýbajúci súbor (404) a náhradný text,
+  - odkaz do máp, tlačidlá aspoň 44 px, bez posúvania do strany.
+- **Nový Node test E2:** dáta, súbory, rýchly štart videa, veľkosť pod 50 MB, 12 titulkov, odkaz do máp, nová hra bez príznaku. Všetko OK.
+- **Upravené testy:**
+  - D2 (po „Začať pátranie“ najprv „Preskočiť“),
+  - D5 v prehliadači (úvod s príznakom videného videa),
+  - D5 Node (nápis „Som pri bráne“ je teraz v dátach).
+- **Node:** 22 testov OK, celá kapitola so skóre **1010**, okrem D3b.
+- **Prehliadač:** B3b, B4b, B4c-1, B4c-2, B4c-3, C1, D2, D3a, D4, D5, c6 sú OK.
+
+**Chyby:**
+- Test pred zmenou som spustil s dočasne odloženými zmenami (`git stash`). Prvý pokus o ich vrátenie zlyhal na dočasnej chybe kontroly príkazov, preto prvý beh „po zmene“ bežal ešte na starom kóde. Po vrátení zmien prešiel.
+- D3b (Node aj prehliadač) hlási chybu v počte titulkov Strážcu: čaká 3, súbor má od kroku 1 nový monológ s 9 časťami. Test sa prepíše v kroku 3.
+- Pri prvom behu série D3b v prehliadači spadol bez výpisu. Opakovaný beh prebehol celý, s jedinou chybou titulkov.
+
+**Build:** prešiel. **Lint:** bez zmeny, 14 starých problémov.
+
+**Ďalší krok:** krok 3, video B Strážcu a písaný rozhovor ako náhrada, až po „pokračuj“.

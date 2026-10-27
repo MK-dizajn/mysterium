@@ -15,6 +15,7 @@ import { FinalePhotoScreen } from "../components/screens/FinalePhotoScreen";
 import { FinalePlaceScreen } from "../components/screens/FinalePlaceScreen";
 import { FinishScreen } from "../components/screens/FinishScreen";
 import { IntroScreen } from "../components/screens/IntroScreen";
+import { IntroVideoScreen } from "../components/screens/IntroVideoScreen";
 import { LandingScreen } from "../components/screens/LandingScreen";
 import { ItemInspector } from "../components/items/ItemInspector";
 import { ArtifactUnlock } from "../components/ui/ArtifactUnlock";
@@ -74,6 +75,11 @@ export default function Home() {
 
   const [artifactPreviousScreen, setArtifactPreviousScreen] =
     useState<GameScreen>("artifacts");
+
+  // Úvodné video sa nedá prehrať (súbor chýba): príznak sa neukladá,
+  // aby sa video ukázalo, keď súbor pribudne.
+  const [isIntroVideoUnavailable, setIsIntroVideoUnavailable] =
+    useState(false);
 
   const fallbackChapter = mysteriumGame.chapters[0];
 
@@ -295,9 +301,34 @@ export default function Home() {
     }
 
     if (gameState.screen === "intro") {
+      const introVideo = currentChapter.introVideo;
+
+      if (
+        introVideo &&
+        !isIntroVideoUnavailable &&
+        !gameState.flags[introVideo.seenFlagId]
+      ) {
+        return (
+          <IntroVideoScreen
+            video={introVideo}
+            onDone={() =>
+              setGameState((currentState) => ({
+                ...currentState,
+                flags: {
+                  ...currentState.flags,
+                  [introVideo.seenFlagId]: true,
+                },
+              }))
+            }
+            onUnavailable={() => setIsIntroVideoUnavailable(true)}
+          />
+        );
+      }
+
       return (
         <IntroScreen
-          chapter={currentChapter}
+          arrival={currentChapter.arrival}
+          showFallbackText={isIntroVideoUnavailable}
           onContinue={() => updateGameScreen("puzzle")}
         />
       );
