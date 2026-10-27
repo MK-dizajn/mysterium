@@ -3696,3 +3696,37 @@ Snímky: `d5-pred-*.png`, `d5-po2-*.png`, `d5-po-red-*.png`.
    - ostávajú staré lintové upozornenia (2 v `useGameEngine.ts`, 12 v nepoužívaných súboroch starej truhlice po aktoch).
 
 Vývojový server je zastavený.
+
+---
+
+## 27. 10. 2026 – Nový úvod, krok 1: videá v gite
+
+**Schválený nový úvod:**
+1. Video A „Prelet nad Bratislavou“.
+2. Obrazovka „Vydaj sa k Michalskej bráne“ s tlačidlom „Som pri bráne“.
+3. Video B so Strážcom, náhradou je písaný rozhovor.
+4. Zápis č. 1 a prvá úloha.
+
+Hlasy vo videách sa nemenia: vykanie vo videu A aj mužský rod vo videu B ostávajú.
+
+**Čo sa zmenilo v tomto kroku:**
+- Nový súbor `.gitattributes`. Videá, zvuky a obrázky sú pre git binárne súbory: neporovnáva ich po riadkoch a nemení v nich konce riadkov. Titulky (`.vtt`) sú text s jednotnými koncami riadkov.
+- Do gitu pribudlo všetkých 6 súborov videí z `public/videos/` (spolu asi 17,4 MB):
+  - video A: 11,8 MB, plagát, titulky,
+  - video B: 5,4 MB, plagát, titulky.
+- Titulky videa B sú nový text Strážcovho monológu. Nahradili tri pôvodné titulky z D3b.
+
+**Kontrola:**
+- Pred zmenou git pre videá nemal žiadne pravidlo.
+- Po zmene `git check-attr` ukazuje: `.mp4` a `.jpg` sú binárne, `.vtt` je text s koncami riadkov LF.
+- Obe videá sa začnú prehrávať ešte počas sťahovania. Hlavička je na začiatku súboru (faststart).
+
+**Git a nasadenie:**
+- Limit GitHubu je 100 MB na súbor, varovanie prichádza pri 50 MB. Nič z toho sa nás netýka.
+- Pravidlo: commitovať iba hotové verzie videí. Každá nová verzia ostane v histórii celá.
+
+**Build:** prešiel. **Lint:** bez zmeny, 14 starých problémov.
+
+**Chyby:** žiadne.
+
+**Ďalší krok:** krok 2, video A a obrazovka „Vydaj sa k Michalskej bráne“, až po „pokračuj“.

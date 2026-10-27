@@ -1,0 +1,12 @@
+# Médiá sú binárne: git ich nemá porovnávať po riadkoch ani meniť konce riadkov.
+*.mp4 binary
+*.webm binary
+*.mp3 binary
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.webp binary
+*.glb binary
+
+# Titulky ostávajú textové, s jednotnými koncami riadkov.
+*.vtt text eol=lf
