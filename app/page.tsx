@@ -15,13 +15,14 @@ import { FinalePhotoScreen } from "../components/screens/FinalePhotoScreen";
 import { FinalePlaceScreen } from "../components/screens/FinalePlaceScreen";
 import { FinishScreen } from "../components/screens/FinishScreen";
 import { IntroScreen } from "../components/screens/IntroScreen";
-import { IntroVideoScreen } from "../components/screens/IntroVideoScreen";
+import { StoryVideoScreen } from "../components/screens/StoryVideoScreen";
 import { LandingScreen } from "../components/screens/LandingScreen";
 import { ItemInspector } from "../components/items/ItemInspector";
 import { ArtifactUnlock } from "../components/ui/ArtifactUnlock";
 import { mysteriumGame } from "../data/mysterium-game";
 import {
   applyDialogueChoiceActions,
+  applyGameActions,
   clearGameState,
   completeActEnding,
   continueAfterHistory,
@@ -309,7 +310,7 @@ export default function Home() {
         !gameState.flags[introVideo.seenFlagId]
       ) {
         return (
-          <IntroVideoScreen
+          <StoryVideoScreen
             video={introVideo}
             onDone={() =>
               setGameState((currentState) => ({
@@ -348,6 +349,15 @@ export default function Home() {
           onOpenArtifacts={openArtifacts}
           onOpenQuests={openQuests}
           onOpenNpcDialogue={openNpcDialogue}
+          onCompleteGuardianVideo={(actions) => {
+            setGameState((currentState) =>
+              applyGameActions(
+                currentState,
+                actions,
+                currentChapter.quests
+              )
+            );
+          }}
           onReadDetectiveNote={(flagId) => {
             setGameState((currentState) => ({
               ...currentState,

@@ -3787,3 +3787,81 @@ Hlasy vo videách sa nemenia: vykanie vo videu A aj mužský rod vo videu B ost�
 **Build:** prešiel. **Lint:** bez zmeny, 14 starých problémov.
 
 **Ďalší krok:** krok 3, video B Strážcu a písaný rozhovor ako náhrada, až po „pokračuj“.
+
+---
+
+## 27. 10. 2026 – Nový úvod, krok 3: video B (Strážca) a písaný rozhovor ako náhrada
+
+**Čo sa zmenilo pre hráča:**
+- Po „Som pri bráne“ sa namiesto „Brána mlčí…“ ukáže **video B**:
+  - nadpis „Strážca Michalskej brány“,
+  - video sa nespustí samo,
+  - titulky obsahujú Strážcov monológ (9 častí),
+  - čítačka dostane popis videa,
+  - pod videom je „Preskočiť“.
+- **Po skončení videa alebo „Preskočiť“** sa vykonajú tie isté akcie ako doteraz po rozhovore: rozhovor sa zapíše, zápis č. 1 pribudne do Inventára a spustí sa úloha. Hneď potom sa otvorí papier zápisu č. 1 a „Preskúmať nultý bod“ vedie na prvú úlohu.
+- **Keď súbor videa chýba:** ostane doterajší písaný rozhovor („Brána mlčí…“, „Osloviť Strážcu“, rozhovor, obrazovka odovzdania s textom, „Prezrieť zápis“).
+- **Po F5:**
+  - počas videa sa video ukáže znova,
+  - po videu sa ukáže papier.
+- **Staré uloženia po rozhovore** pokračujú obrazovkou odovzdania ako doteraz.
+
+**Uložený stav:**
+- Nový príznak nepribudol.
+- Po videu sa nastaví doterajší `talked_to_michalska_guardian` a k nemu `seen_guardian_handover_video` (príznak z D3b, teraz znamená „video Strážcu videné“). Podľa neho sa po videu preskočí obrazovka odovzdania textom.
+- Bez videa sa tento príznak nenastaví.
+
+**Ako je to v kóde:**
+- Video Strážcu je v dátach scény ako `guardianVideo` s akciami po skončení.
+- Obrazovka odovzdania zápisu (`NoteHandoverScreen`) je už iba textová. Miesto pre video z D3b sa presunulo pred rozhovor.
+- Úvodné video aj video Strážcu používajú jednu spoločnú obrazovku `StoryVideoScreen` (premenovaná `IntroVideoScreen` z kroku 2).
+- Engine má novú funkciu `applyGameActions`. Rovnaké akcie teraz vykoná rozhovor aj video.
+- Výška videa je teraz obmedzená na 52 % obrazovky (predtým 58 %). Pri videu Strážcu je nad videom lišta hry a „Preskočiť“ bolo 22 px pod okrajom obrazovky.
+
+**Médiá (údaje od používateľa):**
+- `docs/MEDIA-LICENCIE.md`, videá A a B:
+  - obraz: Google Flow, Veo 3.1, Nano Banana, plán Google AI Pro,
+  - hlas: ElevenLabs, Eleven v4, „Peter“ pre A, „Andrej - Mild, Calm“ s rýchlosťou 0,9 pre B,
+  - zostavenie, prechody a titulky: vlastná práca (ffmpeg),
+  - komerčné podmienky obrazu aj hlasu: **NEOVERENÉ**,
+  - fotky z Wikimedie treba vypísať; fotka Michalskej ulice s vodoznakom stock služby sa nesmie použiť.
+- `docs/KONTROLA-PRED-VYDANIM.md`:
+  - tri nové úlohy pred verejným vydaním (podmienky obrazu, podmienky hlasu, východiskové fotky),
+  - nová kontrola videa B na skutočnom mobile,
+  - nahradila starú položku „video Strážcu pridané alebo vynechané“.
+
+**Súbory:**
+- `types/game.ts`,
+- `data/chapter-one/michalska-brana.ts`,
+- `engine/dialogueActions.ts`,
+- `components/game/PuzzleFlow.tsx`,
+- `components/screens/NoteHandoverScreen.tsx`,
+- `components/screens/StoryVideoScreen.tsx` (premenovaná),
+- `app/page.tsx`,
+- `docs/MEDIA-LICENCIE.md`, `docs/KONTROLA-PRED-VYDANIM.md`.
+
+**Testy:**
+- **Nový test E3 v prehliadači** (360 px, zapnuté aj vypnuté animácie). Pred zmenou 18 chýb, po zmene všetko OK. Overuje:
+  - video B so skutočným súborom: nespustí sa samo, 9 titulkov, prehrá sa,
+  - F5, koniec videa, papier, prvá úloha, „Preskočiť“,
+  - chýbajúci súbor: rozhovor, odovzdanie, „Prezrieť zápis“, „Zavrieť“,
+  - staré uloženie a celú cestu od novej hry.
+- **Nový Node test E3:** dáta, súbory, 9 titulkov, rovnaké akcie po videu ako po rozhovore, zápis v Inventári iba raz, náhrada, dokumenty. Všetko OK.
+- **Upravené testy:** E2 (po „Som pri bráne“ už prichádza video Strážcu) a Node test E2 (nový názov obrazovky).
+- **Test D3b** (Node aj prehliadač) som vyradil zo stálych testov. Overoval miesto pre video po rozhovore, ktoré už neexistuje. Jeho stále platné časti (rozhovor, odovzdanie, papier, „Zavrieť“, staré uloženia) teraz overuje E3.
+- **Node:** 22 testov OK (B7: celá kapitola, skóre **1010**).
+
+**Chyby:**
+- E3 po zmene najprv hlásil 2 chyby:
+  - „Preskočiť“ bolo pod okrajom obrazovky. Opravené menšou výškou videa.
+  - Test hľadal „Tvoja úloha“ malými písmenami, no na obrazovke je nápis veľkými. Chyba bola v teste, nie v hre.
+- E2 po zmene čakal po „Som pri bráne“ starú obrazovku „Osloviť Strážcu“. Test som upravil na video Strážcu.
+- **Stále testy v prehliadači, prvý beh:** D2 (1 chyba), D4 (4), D5 (5) a c6 (1). Tieto testy overujú písaný rozhovor so Strážcom, ktorý sa teraz ukáže iba vtedy, keď video chýba. V hre chyba nebola. Testy teraz súbor videa Strážcu odmietnu (404), takže hra ukáže rozhovor. Po úprave všetky prešli.
+- **D5, prvý beh:** jedna chyba pri okraji truhlice počas otáčania, ktorá s videom nesúvisí. Pri opakovanom behu prešiel celý test, išlo o jednorazovú odchýlku merania.
+- **Dlhé čakanie:** séria 11 stálych testov v prehliadači trvá viac ako 10 minút. Bežala na pozadí a medzitým som písal denník.
+
+**Stále testy v prehliadači (po úprave):** B3b, B4b, B4c-1, B4c-2, B4c-3, C1, D2, D3a, D4, D5, c6, E2 aj E3 v oboch režimoch – všetko OK.
+
+**Build:** prešiel. **Lint:** bez zmeny, 14 starých problémov.
+
+**Ďalší krok:** nový úvod je hotový. Ďalej podľa plánu, až po potvrdení.

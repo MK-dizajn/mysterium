@@ -163,26 +163,24 @@ export type DetectiveNote = {
 };
 
 /**
- * Strážca odovzdá zápis (video je voliteľné, bez neho sa ukáže text).
- * Ukáže sa po rozhovore, kým hráč zápis neprečíta.
+ * Strážca odovzdá zápis textom: ukáže sa po písanom rozhovore
+ * (keď video Strážcu chýba), kým hráč zápis neprečíta.
  */
 export type NoteHandover = {
   title: string;
-  /** Text Strážcu; ukáže sa bez videa, keď sa video nenačíta alebo po jeho skončení. */
+  /** Text Strážcu pri odovzdaní zápisu. */
   text: string;
-  /** Video (napríklad /videos/strazca-michalska-brana.mp4); nikdy sa nespustí samo. */
-  videoSrc?: string;
-  /** Obrázok pred spustením videa. */
-  posterSrc?: string;
-  /** Titulky k videu (súbor .vtt). */
-  captionsSrc?: string;
-  /** Krátky popis deja videa pre čítačku obrazovky. */
-  videoDescription: string;
-  skipLabel: string;
   viewNoteLabel: string;
   closeNoteLabel: string;
-  /** Príznak, že hráč video videl alebo preskočil (po F5 sa neopakuje). */
-  seenFlagId: string;
+};
+
+/**
+ * Video Strážcu namiesto písaného rozhovoru. Po skončení alebo „Preskočiť“
+ * sa vykonajú tie isté akcie ako po rozhovore a otvorí sa zápis.
+ * Keď súbor chýba, ostane rozhovor (npcGate).
+ */
+export type GuardianVideo = StoryVideoContent & {
+  completeActions: GameAction[];
 };
 
 export type NpcGate = {
@@ -334,6 +332,7 @@ export type Scene = {
   investigation?: Investigation;
   detectiveNote?: DetectiveNote;
   noteHandover?: NoteHandover;
+  guardianVideo?: GuardianVideo;
   npcGate?: NpcGate;
 
   puzzle: Puzzle;
@@ -520,11 +519,8 @@ export type ChapterGuidance = {
   inventoryClueLabel: string;
 };
 
-/**
- * Úvodné video kapitoly po „Začať pátranie“. Nikdy sa nespustí samo
- * a ukáže sa iba raz za hru (po „Začať odznova“ znova).
- */
-export type ChapterIntroVideo = {
+/** Video v príbehu na celú obrazovku (nikdy sa nespustí samo, dá sa preskočiť). */
+export type StoryVideoContent = {
   title: string;
   videoSrc: string;
   posterSrc?: string;
@@ -535,6 +531,12 @@ export type ChapterIntroVideo = {
   /** Príznak, že hráč video videl alebo preskočil. */
   seenFlagId: string;
 };
+
+/**
+ * Úvodné video kapitoly po „Začať pátranie“. Ukáže sa iba raz
+ * za hru (po „Začať odznova“ znova).
+ */
+export type ChapterIntroVideo = StoryVideoContent;
 
 /** Obrazovka „Vydaj sa k …“: kam má hráč ísť a potvrdenie, že tam je. */
 export type ChapterArrival = {

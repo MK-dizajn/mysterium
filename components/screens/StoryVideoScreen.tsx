@@ -1,12 +1,12 @@
 "use client";
 
-import type { ChapterIntroVideo } from "../../types/game";
+import type { StoryVideoContent } from "../../types/game";
 import { ActionButton } from "../ui/ActionButton";
 import { ScreenContainer } from "../ui/ScreenContainer";
 import { StoryVideo } from "../ui/StoryVideo";
 
-type IntroVideoScreenProps = {
-  video: ChapterIntroVideo;
+type StoryVideoScreenProps = {
+  video: StoryVideoContent;
   /** Video skončilo alebo ho hráč preskočil. */
   onDone: () => void;
   /** Súbor chýba alebo sa nenačíta. */
@@ -17,22 +17,22 @@ type IntroVideoScreenProps = {
 const STILL_BUTTON = "motion-reduce:transition-none motion-reduce:active:scale-100";
 
 /**
- * Úvodné video kapitoly. Nikdy sa nespustí samo; po skončení
- * alebo „Preskočiť“ hra pokračuje na obrazovku s prvým miestom.
+ * Video v príbehu (úvod kapitoly, Strážca pri bráne). Nikdy sa nespustí samo;
+ * po skončení alebo „Preskočiť“ hra pokračuje ďalej.
  */
-export function IntroVideoScreen({
+export function StoryVideoScreen({
   video,
   onDone,
   onUnavailable,
-}: IntroVideoScreenProps) {
+}: StoryVideoScreenProps) {
   return (
     <ScreenContainer>
       <section
-        aria-labelledby="intro-video-title"
+        aria-labelledby="story-video-title"
         className="relative mx-auto w-full max-w-md overflow-hidden rounded-3xl border border-amber-300/20 bg-[radial-gradient(circle_at_50%_30%,rgba(180,120,40,0.18),transparent_60%),linear-gradient(to_bottom,#0b0f1c,#050710)] px-5 py-8 text-center shadow-2xl shadow-black/60"
       >
         <h1
-          id="intro-video-title"
+          id="story-video-title"
           className="text-3xl font-black text-amber-100"
         >
           {video.title}
@@ -47,8 +47,9 @@ export function IntroVideoScreen({
           description={video.videoDescription}
           onUnavailable={onUnavailable}
           onEnded={onDone}
-          // Video je na výšku: na telefóne má byť „Preskočiť“ vidno bez posúvania.
-          className="mt-6 max-h-[58svh]"
+          // Video je na výšku: na telefóne má byť „Preskočiť“ vidno bez posúvania
+          // (aj pod lištou hry pri videu Strážcu).
+          className="mt-6 max-h-[52svh]"
         />
 
         <div className="mt-8 flex flex-col gap-3">

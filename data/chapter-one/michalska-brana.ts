@@ -82,17 +82,31 @@ Pátračovo pravidlo znie: „Prvá stopa patrí mestu, ku ktorému vedie najkra
     readFlagId: "read_detective_note_nulty_bod",
   },
 
-  // Video zatiaľ nie je (plánované /videos/strazca-michalska-brana.mp4); bez neho sa ukáže text.
+  // Strážca vo videu; keď súbor chýba, ostane písaný rozhovor (npcGate a noteHandover).
+  guardianVideo: {
+    title: "Strážca Michalskej brány",
+    videoSrc: "/videos/strazca-michalska-brana.mp4",
+    posterSrc: "/videos/strazca-michalska-brana.poster.jpg",
+    captionsSrc: "/videos/strazca-michalska-brana.sk.vtt",
+    videoDescription:
+      "Video: Strážca Michalskej brány ťa víta a podáva ti zažltnutý list od pátrača.",
+    skipLabel: "Preskočiť",
+    seenFlagId: "seen_guardian_handover_video",
+    completeActions: [
+      ...ACCEPT_NOTE_ACTIONS,
+      {
+        type: "setFlag",
+        flagId: "seen_guardian_handover_video",
+      },
+    ],
+  },
+
+  // Odovzdanie zápisu textom po písanom rozhovore (keď video chýba).
   noteHandover: {
     title: "Strážca Michalskej brány",
     text: GUARDIAN_HANDOVER_TEXT,
-    captionsSrc: "/videos/strazca-michalska-brana.sk.vtt",
-    videoDescription:
-      "Video: Strážca Michalskej brány vytiahne z kabáta starý zažltnutý papier a podá ti ho so slovami pátrača.",
-    skipLabel: "Preskočiť",
     viewNoteLabel: "Prezrieť zápis",
     closeNoteLabel: "Zavrieť",
-    seenFlagId: "seen_guardian_handover_video",
   },
 
   puzzle: {

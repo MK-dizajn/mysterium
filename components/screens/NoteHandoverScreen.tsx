@@ -1,17 +1,12 @@
 "use client";
 
-import { useState } from "react";
 import type { NoteHandover } from "../../types/game";
 import { ActionButton } from "../ui/ActionButton";
 import { ScreenContainer } from "../ui/ScreenContainer";
-import { StoryVideo } from "../ui/StoryVideo";
 
 type NoteHandoverScreenProps = {
   handover: NoteHandover;
   continueLabel: string;
-  /** Hráč už video videl alebo preskočil (po F5 sa neopakuje). */
-  isVideoSeen: boolean;
-  onVideoSeen: () => void;
   onViewNote: () => void;
   onContinue: () => void;
 };
@@ -20,27 +15,15 @@ type NoteHandoverScreenProps = {
 const STILL_BUTTON = "motion-reduce:transition-none motion-reduce:active:scale-100";
 
 /**
- * Strážca odovzdá zápis. Video (ak je v dátach) sa nikdy nespustí samo
- * a dá sa preskočiť; bez videa alebo keď sa nenačíta, ostane text.
- * Potom si hráč zápis prezrie alebo ide rovno k nultému bodu.
+ * Strážca odovzdá zápis textom (po písanom rozhovore, keď video Strážcu chýba).
+ * Hráč si zápis prezrie alebo ide rovno k nultému bodu.
  */
 export function NoteHandoverScreen({
   handover,
   continueLabel,
-  isVideoSeen,
-  onVideoSeen,
   onViewNote,
   onContinue,
 }: NoteHandoverScreenProps) {
-  const [isVideoDone, setIsVideoDone] = useState(
-    isVideoSeen || !handover.videoSrc
-  );
-
-  function finishVideo() {
-    setIsVideoDone(true);
-    onVideoSeen();
-  }
-
   return (
     <ScreenContainer>
       <section
@@ -56,49 +39,23 @@ export function NoteHandoverScreen({
 
         <div className="mx-auto mt-5 h-px w-24 bg-gradient-to-r from-transparent via-amber-300/60 to-transparent" />
 
-        {isVideoDone ? (
-          <>
-            <p className="mt-6 text-left text-[16px] leading-normal text-slate-200">
-              {handover.text}
-            </p>
+        <p className="mt-6 text-left text-[16px] leading-normal text-slate-200">
+          {handover.text}
+        </p>
 
-            <div className="mt-8 flex flex-col gap-3">
-              <ActionButton onClick={onViewNote} className={STILL_BUTTON}>
-                {handover.viewNoteLabel}
-              </ActionButton>
+        <div className="mt-8 flex flex-col gap-3">
+          <ActionButton onClick={onViewNote} className={STILL_BUTTON}>
+            {handover.viewNoteLabel}
+          </ActionButton>
 
-              <ActionButton
-                variant="secondary"
-                onClick={onContinue}
-                className={STILL_BUTTON}
-              >
-                {continueLabel}
-              </ActionButton>
-            </div>
-          </>
-        ) : (
-          <>
-            <StoryVideo
-              src={handover.videoSrc}
-              posterSrc={handover.posterSrc}
-              captionsSrc={handover.captionsSrc}
-              description={handover.videoDescription}
-              onUnavailable={() => setIsVideoDone(true)}
-              onEnded={finishVideo}
-              className="mt-6"
-            />
-
-            <div className="mt-8 flex flex-col gap-3">
-              <ActionButton
-                variant="secondary"
-                onClick={finishVideo}
-                className={STILL_BUTTON}
-              >
-                {handover.skipLabel}
-              </ActionButton>
-            </div>
-          </>
-        )}
+          <ActionButton
+            variant="secondary"
+            onClick={onContinue}
+            className={STILL_BUTTON}
+          >
+            {continueLabel}
+          </ActionButton>
+        </div>
       </section>
     </ScreenContainer>
   );

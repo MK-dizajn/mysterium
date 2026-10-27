@@ -1,5 +1,6 @@
 import type {
   DialogueChoice,
+  GameAction,
   GameState,
   Quest,
 } from "../types/game";
@@ -10,13 +11,22 @@ export function applyDialogueChoiceActions(
   choice: DialogueChoice,
   questDefinitions: Quest[]
 ): GameState {
-  if (!choice.actions || choice.actions.length === 0) {
+  return applyGameActions(gameState, choice.actions ?? [], questDefinitions);
+}
+
+/** Akcie z rozhovoru alebo z videa (napríklad Strážca odovzdá zápis). */
+export function applyGameActions(
+  gameState: GameState,
+  actions: GameAction[],
+  questDefinitions: Quest[]
+): GameState {
+  if (actions.length === 0) {
     return gameState;
   }
 
   let nextState = { ...gameState };
 
-  choice.actions.forEach((action) => {
+  actions.forEach((action) => {
     if (action.type === "setFlag") {
       nextState = {
         ...nextState,
