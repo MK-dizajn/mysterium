@@ -3909,3 +3909,45 @@ Kódy sú uložené iba ako odtlačky. Čitateľné kódy sa nezapisujú nikam: 
 **Build:** prešiel. **Lint:** bez zmeny, 14 starých problémov.
 
 **Ďalší krok:** krok 2, zoznam kódov a odomknutie aktov II a III, až po „pokračuj“.
+
+---
+
+## 27. 10. 2026 – Súpis textov bez hlasu (`docs/SUPIS-HLASOV.md`)
+
+**Úloha:** súpis všetkých miest v kapitole I s dlhším príbehovým textom, monológom alebo rozhovorom bez hlasu a bez videa. Iba dokument, kód ani hra sa nemenili.
+
+**Čo je v dokumente:**
+- Tabuľka 79 miest, pri každom:
+  - scéna,
+  - kto hovorí,
+  - presný text,
+  - počet znakov a slov,
+  - približná dĺžka hlasu (slová / 2,2 za sekundu),
+  - kde sa text zobrazuje,
+  - návrh (áno / nepovinne / nie) s dôvodom.
+- Zhrnutie, vysvetlivky, zoznam zámerne vynechaných textov a poznámky k nahrávaniu.
+- Text pre **video 3** (Strážca prináša truhlicu) je označený **[VIDEO 3]**.
+
+**Výsledok:**
+
+| Skupina | Miesta | Znaky | Hlas približne |
+|---|---|---|---|
+| áno, vrátane videa 3 | 25 | 5 411 | 6,5 min |
+| nepovinne | 24 | 5 205 | 5,7 min |
+| nie | 30 | 5 198 | 5,9 min |
+| spolu | **79** | **15 814** | asi 18 min |
+
+- **Video 3:** 1 miesto, 207 znakov, asi 17 s.
+
+**Ako vznikla tabuľka:**
+- Texty načítal skript priamo z dát hry, takže sú presné a čísla sedia.
+- Tabuľku som do dokumentu vložil cez Node (zápis UTF-8), aby sa texty pri prepisovaní nepomýlili.
+- Úvod, vysvetlivky a poznámky som napísal cez Write.
+
+**Chyby:**
+- Pri rube fotografie bol najprv dôvod „hlas by prezradil odpoveď“. Nesedel, lebo rub dnes miesto priamo uvádza.
+- Opravil som ho na „miesto je zatiaľ dočasné (`isPlaceholder`), nahrávať až po potvrdení“.
+
+**Súbory:** `docs/SUPIS-HLASOV.md` (nový), `docs/PRACOVNY-DENNIK.md`.
+
+**Build a lint:** nespúšťal som ich, kód sa nemenil.
