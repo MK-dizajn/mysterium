@@ -4043,3 +4043,33 @@ Doplnené do riadkov o videách A a B v `docs/KONTROLA-PRED-VYDANIM.md`.
 **Build:** prešiel. **Lint:** bez zmeny, 14 starých problémov.
 
 **Ďalší krok:** kódy (krok 2), až po „pokračuj“.
+
+---
+
+## 27. 10. 2026 – Záver dňa
+
+**Hotové:**
+- **Videá A a B sú v hre.**
+  - Video A „Prelet nad Bratislavou“ sa prehrá po „Nová hra“, potom príde „Spustiť kapitolu“ a obrazovka „Vydaj sa k Michalskej bráne“.
+  - Video B so Strážcom sa prehrá po „Som pri bráne“, hneď po ňom zápis č. 1.
+  - Keď súbor chýba, hra ukáže text a písaný rozhovor.
+  - Kroky E1 až E3.
+- **Prehrávač „Kino“** (krok G1): celá obrazovka, spustenie hneď po ťuknutí, zlatá pečať „Prehrať“, titulky dole písmom s pätkami, priebeh, zvuk, prelínanie.
+- **Nová úvodná obrazovka** (krok F1): „Pokračovať“ a „Nová hra“.
+- **Súpis hlasov** (`docs/SUPIS-HLASOV.md`):
+  - 79 miest, 15 814 znakov,
+  - na nahranie odporúčaných 25 miest, 5 411 znakov,
+  - text pre video 3 je označený.
+
+**Najbližšie:**
+1. Odomykanie kódom:
+   - krok 2: zoznam kódov (iba odtlačky) a odomknutie aktov II a III s plnými bodmi,
+   - krok 3: tlačidlo a obrazovka „Mám kód“.
+2. Menu kapitol.
+3. Hlasy podľa `docs/SUPIS-HLASOV.md`: vybrať hlas pátrača, nahrať, video 3 vo finále.
+
+**Otvorené:**
+- Kontrola truhlice v teste D5 (pri otáčaní 0 px rezervy) občas zlyháva, treba preveriť samostatne.
+- Prehrávač treba vyskúšať na iPhone (`docs/KONTROLA-PRED-VYDANIM.md`).
+
+Vývojový server je zastavený.
