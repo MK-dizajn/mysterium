@@ -4737,3 +4737,35 @@ Vývojový server je zastavený.
 - terénna skúška a dĺžka trasy kapitoly I (`isPlaceholder`),
 - kód pre testerov,
 - uloženie v3.
+
+---
+
+## 28. 10. 2026 – Záver dňa (pauza do 10. 11. 2026)
+
+**Hotové dnes:**
+- **Opatrenia proti zaseknutiu (M1 až M4):**
+  - bezpečné `npm run dev`, `npm run stop` a `npm run test:server`,
+  - strážca pamäte,
+  - testy proti hotovej verzii,
+  - mazanie testovacích profilov,
+  - stály postup na začiatku denníka.
+- **Odomykanie kódom aktov II a III** (kroky 2 a 3).
+- **Hlasy (H1 až H3):** 24 nahrávok s tlačidlom „Prečítať nahlas“.
+- **Video 3 vo finále (I1)** a nová verzia videa B.
+- **Menu kapitol (kroky K1 až K3) je hotové a v hre:**
+  - „Kapitoly“ na úvodnej obrazovke,
+  - dlaždice kapitol I až III (II a III „Čoskoro“),
+  - kód kapitoly I,
+  - spoločné „Mám kód“ cez jednu overovaciu funkciu (pripravenú na server),
+  - prevzatie starších hier,
+  - obchádzanie zámku iba pri vývoji.
+
+**Po návrate (od 10. 11. 2026):**
+1. Kapitoly II a III: mapa a príbeh.
+2. Skúška v teréne (trasa a dĺžka kapitoly I, vodidlá, videá a hlasy na mobile, `docs/KONTROLA-PRED-VYDANIM.md`).
+3. Licencie: overiť komerčné podmienky Google AI Pro, Flow, Veo, Nano Banana a ElevenLabs, vypísať východiskové fotky (`docs/MEDIA-LICENCIE.md`).
+4. Verzia uloženia v3 (pred prvým testerom) a jedno uloženie pre každú kapitolu, keď pribudne obsah kapitoly II.
+
+**Stav:**
+- Nebeží žiadny proces node ani testovací Chrome, port 3000 je voľný.
+- Na začiatku ďalšieho sedenia postupovať podľa stáleho postupu (kontrola procesov).
