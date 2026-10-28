@@ -2,6 +2,15 @@
 
 Sem sa po každom dokončenom kroku zapíše krátky záznam: čo sa urobilo, ktoré súbory sa zmenili, či prešiel build a čo nasleduje. Ak niečo zlyhá, zapíše sa aj chyba.
 
+## Stály postup: procesy a pamäť (od 28. 10. 2026)
+
+Zabudnutý vývojový server (Next, Turbopack) raz narástol asi na 15 GB pamäte a zasekol počítač. Preto platí:
+
+1. **Na začiatku každého sedenia** skontrolovať bežiace procesy node a testovacieho Chromu aj porty 3000 a vyššie. Čo ostalo z tohto projektu, ukončiť.
+2. **Na konci každého kroku** a po každej sérii testov zastaviť server.
+3. **Iba jeden server naraz**, na porte 3000.
+4. **Testy v prehliadači** bežia po jednom a prehliadač sa po každom teste zatvorí. Jeho testovací profil sa zmaže.
+
 ---
 
 ## 22. 10. 2026 – Krok 1: Audit projektu na novom notebooku
@@ -4073,3 +4082,37 @@ Doplnené do riadkov o videách A a B v `docs/KONTROLA-PRED-VYDANIM.md`.
 - Prehrávač treba vyskúšať na iPhone (`docs/KONTROLA-PRED-VYDANIM.md`).
 
 Vývojový server je zastavený.
+
+---
+
+## 28. 10. 2026 – Opatrenia proti zaseknutiu, krok M1: stály postup a zmazanie starých profilov
+
+**Prečo:** ráno sa počítač zasekol. Jeden proces node zabral asi 15 GB pamäte (počítač má 32 GB). Pravdepodobne to bol vývojový server, ktorý ostal bežať po nečakanom konci včerajšieho sedenia (uprostred kroku 2 kódov). Testy pri tom stránku obnovujú desiatky ráz a server si všetko drží v pamäti.
+
+**Zistený stav pred opatreniami:**
+- Nebežal žiadny proces node ani testovací Chrome, porty 3000 až 3003 boli voľné.
+- `.next` mal 1,7 GB (vyrovnávacia pamäť vývojového servera), `node_modules` 0,54 GB.
+- Pracovný priečinok testov mal 27,7 GB: 289 nezmazaných profilov testovacieho Chromu.
+
+**Schválené opatrenia:**
+- A: stály postup,
+- B: upratovací skript,
+- C: jeden server na porte 3000,
+- D: strážca pamäti,
+- G: testy proti hotovej verzii,
+- I: mazanie profilov,
+- E a F ako poistka (limit pamäte pre node a cieľová pamäť Turbopacku).
+- H (Webpack) nie.
+
+**Čo sa urobilo v kroku M1:**
+- **Stály postup (A)** je zapísaný na začiatku tohto denníka.
+- **Zmazaných 289 starých profilov testovacieho Chromu**, iba v pracovnom priečinku testov. Priečinok má teraz 287 MB namiesto 27,7 GB. Bežný Chrome ani projekt sa nemenili.
+
+**Chyby:**
+- Prvé mazanie cez PowerShell (`Remove-Item`) zmazalo iba časť (27,7 → 21,5 GB). Profily majú súbory s cestou dlhšou ako 260 znakov.
+- Príkaz `rmdir` s dlhou cestou zablokovala ochrana nástroja.
+- Zmazanie sa podarilo cez Node (`fs.rmSync` s dlhými cestami), pričom skript najprv overil, že každý priečinok je profil priamo v pracovnom priečinku testov.
+
+**Súbory:** `docs/PRACOVNY-DENNIK.md`.
+
+**Ďalší krok:** M2, skripty na bezpečné spustenie servera (B, C, D, E).
