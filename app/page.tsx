@@ -16,6 +16,7 @@ import { FinalePlaceScreen } from "../components/screens/FinalePlaceScreen";
 import { FinishScreen } from "../components/screens/FinishScreen";
 import { IntroScreen } from "../components/screens/IntroScreen";
 import { StoryVideoScreen } from "../components/screens/StoryVideoScreen";
+import { StoryVideo } from "../components/ui/StoryVideo";
 import { LandingScreen } from "../components/screens/LandingScreen";
 import { UnlockCodeScreen } from "../components/screens/UnlockCodeScreen";
 import { ItemInspector } from "../components/items/ItemInspector";
@@ -83,6 +84,10 @@ export default function Home() {
   // Úvodné video sa nedá prehrať (súbor chýba): príznak sa neukladá,
   // aby sa video ukázalo, keď súbor pribudne.
   const [isIntroVideoUnavailable, setIsIntroVideoUnavailable] =
+    useState(false);
+
+  // Video 3 vo finále sa nedá prehrať: ostane obrazovka s textom.
+  const [isFinaleVideoUnavailable, setIsFinaleVideoUnavailable] =
     useState(false);
 
   // Obrazovka „Mám kód“ (iba z úvodnej obrazovky, neukladá sa).
@@ -481,6 +486,28 @@ export default function Home() {
     }
 
     if (gameState.screen === "finaleGuardian" && currentChapter.finale) {
+      const guardian = currentChapter.finale.guardian;
+      const leaveGuardian = () =>
+        setGameState((currentState) =>
+          leaveFinaleGuardian(currentChapter, currentState)
+        );
+
+      // Video 3 na celú obrazovku (bez lišty hry); po ňom hneď truhlica.
+      if (guardian.videoSrc && !isFinaleVideoUnavailable) {
+        return (
+          <StoryVideo
+            title={guardian.title}
+            src={guardian.videoSrc}
+            posterSrc={guardian.posterSrc}
+            captionsSrc={guardian.captionsSrc}
+            description={guardian.text}
+            skipLabel={guardian.skipLabel}
+            onDone={leaveGuardian}
+            onUnavailable={() => setIsFinaleVideoUnavailable(true)}
+          />
+        );
+      }
+
       return (
         <GameLayout
           gameState={gameState}
@@ -490,12 +517,8 @@ export default function Home() {
           onOpenQuests={openQuests}
         >
           <FinaleGuardianScreen
-            guardian={currentChapter.finale.guardian}
-            onContinue={() =>
-              setGameState((currentState) =>
-                leaveFinaleGuardian(currentChapter, currentState)
-              )
-            }
+            guardian={guardian}
+            onContinue={leaveGuardian}
           />
         </GameLayout>
       );

@@ -1,10 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import type { FinaleGuardian } from "../../types/game";
 import { ActionButton } from "../ui/ActionButton";
 import { ScreenContainer } from "../ui/ScreenContainer";
-import { StoryVideo } from "../ui/StoryVideo";
 
 type FinaleGuardianScreenProps = {
   guardian: FinaleGuardian;
@@ -15,31 +13,13 @@ type FinaleGuardianScreenProps = {
 const STILL_BUTTON = "motion-reduce:transition-none motion-reduce:active:scale-100";
 
 /**
- * Strážca prináša truhlicu. Video (ak je v dátach) na celú obrazovku;
- * bez videa alebo keď sa nenačíta, ostane pokojné pozadie s textom.
+ * Strážca prináša truhlicu – textová záloha, keď video 3 chýba alebo sa
+ * nenačíta (samotné video ukazuje hra na celú obrazovku, app/page.tsx).
  */
 export function FinaleGuardianScreen({
   guardian,
   onContinue,
 }: FinaleGuardianScreenProps) {
-  const [hasVideo, setHasVideo] = useState(Boolean(guardian.videoSrc));
-
-  // S videom na celú obrazovku; po ňom (alebo „Preskočiť“) rovno truhlica.
-  if (hasVideo && guardian.videoSrc) {
-    return (
-      <StoryVideo
-        title={guardian.title}
-        src={guardian.videoSrc}
-        posterSrc={guardian.posterSrc}
-        captionsSrc={guardian.captionsSrc}
-        description={guardian.text}
-        skipLabel={guardian.skipLabel}
-        onDone={onContinue}
-        onUnavailable={() => setHasVideo(false)}
-      />
-    );
-  }
-
   return (
     <ScreenContainer>
       <section

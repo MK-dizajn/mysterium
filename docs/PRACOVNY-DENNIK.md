@@ -4498,3 +4498,58 @@ Vývojový server je zastavený.
 **Hlasy (kroky H1 až H3) sú hotové.**
 
 **Ďalší krok:** podľa plánu, až po potvrdení. V `public/videos/` čakajú nové súbory `strazca-truhlica.*` (video 3), zatiaľ nie sú v hre ani v gite.
+
+---
+
+## 28. 10. 2026 – I1: video 3 vo finále (Strážca prináša truhlicu)
+
+**Čo sa zmenilo pre hráča:**
+- Po „Prijať útržok“ na konci aktu III sa na obrazovke „Strážca prichádza“ hneď prehrá **video 3** na celú obrazovku so zvukom:
+  - prehrávač Kino,
+  - titulky so Strážcovými slovami,
+  - zvuk, pozastavenie, „Preskočiť“,
+  - bez lišty hry.
+- **Po skončení videa alebo „Preskočiť“ sa hneď otvorí truhlica.**
+- **Keď súbor chýba:** ostane dnešný text „Strážca prichádza“ s tlačidlom „Otvoriť truhlicu“.
+- **F5 počas videa:** video sa ukáže znova. Bez ťuknutia prehliadač zvuk nepustí, preto sa ukáže zlatá pečať „Prehrať“.
+- **Staré uloženia:**
+  - hra uložená na obrazovke Strážcu, aj dohratá hra spred finále (hra ju pri načítaní presunie do finále), dostane video,
+  - hra uložená pri truhlici alebo ďalej ho neuvidí.
+- **Bez tlačidla hlasu** (#72 rozprávač sa nenahrával, vo videu hovorí iba Strážca).
+- **Popis pre čítačku** je doterajší text Strážcu.
+
+**Ako je to v kóde:**
+- `data/chapter-one/finale.ts`: `videoSrc`, `posterSrc` a `captionsSrc` pri `guardian`.
+- `app/page.tsx` ukáže video 3 prehrávačom Kino mimo lišty hry, rovnako ako video B. Keď sa nedá prehrať, zobrazí textovú obrazovku.
+- `components/screens/FinaleGuardianScreen.tsx` je už iba textová záloha. Prehrávač z kroku G1 sa presunul do `page.tsx`.
+- 3 súbory videa 3 v `public/videos/` (4,3 MB, titulky so 4 časťami, plagát).
+
+**Dokumenty:**
+- `docs/MEDIA-LICENCIE.md`: video 3 vzniklo rovnako ako A a B. Google Flow, Veo 3.1 Lite, prvý snímok z Nano Banana, druhý klip nadväzuje na posledný záber prvého, hlas „Andrej - Mild, Calm“ (ElevenLabs, Eleven v4, rýchlosť 0,9), zostavenie ffmpeg, 28. 10. 2026. Podmienky **NEOVERENÉ**.
+- `docs/KONTROLA-PRED-VYDANIM.md`: riadok „Video Strážcu: pridané, alebo vedome vynechané“ nahradila kontrola videa 3 na mobile.
+- `docs/SUPIS-HLASOV.md`: #72 je hotové ako video 3.
+
+**Testy:**
+- **Nový test I1 v prehliadači** (proti hotovej verzii, 360 px, oba režimy, skutočné ťuknutia). Pred zmenou zlyhal (video nebolo), po zmene všetko OK. Overuje:
+  - po „Pokračovať“ video hneď na celú obrazovku so zvukom, dialóg, bez lišty hry,
+  - plagát, titulky, nadpis, popis, bez tlačidla hlasu,
+  - „Preskočiť“ a koniec videa → truhlica,
+  - F5 → zlatá pečať a „Prehrať“,
+  - staré uloženie dohratej hry → video,
+  - chýbajúci súbor → text, lišta a „Otvoriť truhlicu“ → truhlica.
+- **Upravené testy:**
+  - B3b v prehliadači: video 3 mu „chýba“, lebo overuje textovú zálohu,
+  - Node D5: „Preskočiť“ je teraz v prehrávači v `page.tsx`, textová záloha je bez neho.
+- **Ďalšie upravené testy** (správne nové správanie, v hre chyba nebola):
+  - B4b, B4c-1, B4c-2, B4c-3 a D5 v prehliadači sa k truhlici dostávajú ťuknutím na „Otvoriť truhlicu“. Teraz namiesto toho prichádza video 3, preto im video 3 „chýba“ (404). Pri prvom behu série mali 14, 6, 12, 10 a 4 chyby, po úprave všetko OK.
+  - Node B3a, B4a a C5 čakali finále bez videa (alebo starú vetu o `videoSrc` v kontrole pred vydaním). Teraz overujú video 3.
+- **Celá séria stálych testov v prehliadači proti hotovej verzii** (24 behov vrátane I1): všetko OK. Testy truhlice som po úprave spustil znova a prešli.
+  - Server najviac 101 MB.
+- **Node:** 24 testov OK (B7: celá kapitola, skóre **1010**).
+
+**Chyby:**
+- Test I1 najprv zlyhal pri „starom uložení“. Pripravená uložená hra už mala príznak „finále začaté“, preto ju hra správne poslala k truhlici. Skutočné staré uloženie ho nemá, test som opravil.
+
+**Build:** prešiel. **Lint:** bez zmeny, 14 starých problémov. **Server:** zastavený (žiadne zabudnuté procesy).
+
+**Ďalší krok:** podľa plánu, až po potvrdení.

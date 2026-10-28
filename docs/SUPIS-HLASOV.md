@@ -47,6 +47,7 @@ Stav dát: 27. 10. 2026 (po kroku F1). Texty sú prevzaté presne z dát hry (`d
 ## Poznámky k nahrávaniu
 
 - **Video 3 (riadok 72):** text obsahuje opis deja („Z tmy pod bránou sa ozvú kroky…“) aj Strážcove slová v jednoduchých úvodzovkách. Do videa patrí Strážcov hlas iba pre jeho slová. Opis deja ukáže obraz, prípadne ho prečíta rozprávač.
+  - **Hotové 28. 10. 2026:** video 3 (`public/videos/strazca-truhlica.mp4`) je v hre. Hovorí v ňom iba Strážca, rozprávač sa nenahrával. Text ostáva ako záloha, keď video chýba, a ako popis pre čítačku.
 - **Hlas Strážcu** pri konci aktu I (riadok 69) by mal byť ten istý ako vo videu B („Andrej - Mild, Calm“, rýchlosť 0,9).
 - **Hlas pátrača** zatiaľ neexistuje. Týka sa riadkov „Hlas pátrača“, zápisu č. 1, citátu v závere a voliteľne aj „Pátračovho zápisu“. Treba vybrať jeden hlas pre celú kapitolu.
 - **Rub fotografie (riadok 76)** obsahuje dočasné miesto (`isPlaceholder`). Nahrávať až po potvrdení skutočného ďalšieho miesta.

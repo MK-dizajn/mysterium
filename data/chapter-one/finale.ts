@@ -10,6 +10,10 @@ export const chapterOneFinale: ChapterFinale = {
     title: "Strážca prichádza",
     text:
       "Z tmy pod bránou sa ozvú kroky. Strážca nesie ťažkú truhlicu a kladie ju pred teba. ‚Pátrač ju uzamkol tromi zámkami a jeden kľúč nestačil. Každý zámok sa otvára tým, čo si našiel. Poznáš kódy. Máš aj kľúč.‘",
+    // Video 3 (prehrávač Kino); text ostáva ako záloha a popis pre čítačku.
+    videoSrc: "/videos/strazca-truhlica.mp4",
+    posterSrc: "/videos/strazca-truhlica.poster.jpg",
+    captionsSrc: "/videos/strazca-truhlica.sk.vtt",
     skipLabel: "Preskočiť",
     continueLabel: "Otvoriť truhlicu",
   },
