@@ -4635,3 +4635,58 @@ Vývojový server je zastavený.
 **Build:** prešiel. **Lint:** bez zmeny, 14 starých problémov. **Server:** zastavený.
 
 **Ďalší krok:** K2, menu kapitol a nový tok, až po „pokračuj“.
+
+---
+
+## 28. 10. 2026 – Menu kapitol, krok K2: menu kapitol a nový tok
+
+**Čo sa zmenilo pre hráča:**
+- **Úvodná obrazovka:** „Pokračovať“ (iba s uloženou hrou), **„Kapitoly“** (namiesto „Nová hra“) a „Mám kód“. Potvrdenie „Začať odznova?“ sa presunulo do menu.
+- **Menu „Kapitoly“** (Bratislava): tri dlaždice, tlačidlá aspoň 44 px, dole „Späť“.
+  - **Kapitola I:** názov, podnázov „Zlatý prešporský kľúč“, trasa „10 zastávok · štart: Michalská brána · asi 2 hodiny (orientačne)“. Stavy:
+    - **uzamknutá:** „🔒 Uzamknutá“, „★ Začni tu“, tlačidlo „Zadať kód“,
+    - **odomknutá, nehratá:** „Odomknutá“, „Začať kapitolu“ (video A bez otázky),
+    - **rozohraná:** „Rozohraná“, akt a body (napríklad „Akt I – Prvé stopy · 0 bodov“), „Pokračovať“ a „Začať odznova“ (s potvrdením),
+    - **dokončená:** „Dokončená · … bodov“, „Pokračovať“ a „Hrať znova“ (s potvrdením).
+  - **Kapitola II a III:** „Čoskoro“, stlmené, nedajú sa ťuknúť, bez tlačidiel. Čítačka oznámi „Kapitola II, pripravujeme“.
+- **„Zadať kód“** otvorí obrazovku kódu so štítkom „Odomknúť kapitolu“, nadpisom „Kapitola I“ a vetou „Zadaj kód, ktorý si dostal ku kapitole.“
+  - Zlý kód ukáže chybu.
+  - Správny kód ukáže „Odomknuté: Kapitola I – …“ a spustí kapitolu (video A).
+  - Odomknutie sa uloží a „Začať odznova“ ho nezmaže.
+- **Staršie hry:** pri spustení hry sa kapitola rozohranej hry odomkne sama, testeri tak nie sú zamknutí.
+- **Obchádzanie zámku pri vývoji:** `http://localhost:3000/?dev-odomknut=1` odomkne kapitolu I, ale iba na vývojovom serveri (`npm run dev`).
+  - V hotovej verzii pre hráčov sa podmienka pri builde vypustí aj s textom parametra, čo overuje test K2.
+  - **Riziko:** keby sa podmienka omylom zmenila, test K2 to zachytí. Odomknutie v pamäti prehliadača si zdatný hráč vie prepísať aj tak (ochrana pred náhodným otvorením, nie zabezpečenie).
+
+**Súbory:**
+- `components/screens/ChapterMenuScreen.tsx`, `lib/devUnlock.ts` (nové),
+- `components/screens/LandingScreen.tsx`,
+- `components/screens/UnlockCodeScreen.tsx` (texty pri kóde kapitoly),
+- `hooks/useGameEngine.ts` (sprístupní uloženú hru pre stav dlaždice),
+- `app/page.tsx` (úvod, menu, kód, prevzatie starších hier, obchádzanie pri vývoji).
+
+**Testy:**
+- **Nový test K2 v prehliadači** (hotová verzia, 320 a 360 px, oba režimy). Pred zmenou 24 chýb, po zmene všetko OK. Overuje:
+  - úvodnú obrazovku a menu, všetky stavy dlaždice kapitoly I, „Čoskoro“,
+  - 44 px a bez posúvania do strany, „Späť“,
+  - zlý kód, skúšobný kód TEST-KAP1 (v skriptoch hry sa vymení odtlačok), „Odomknuté“, video A,
+  - uložené odomknutie, F5, „Začať odznova“ s potvrdením (odomknutie ostáva),
+  - staršia hra (odomkne sa sama, „Pokračovať“ otvorí uloženú hru), dokončená hra,
+  - hotová verzia: `?dev-odomknut=1` nič neodomkne a text „dev-odomknut“ nie je v žiadnom skripte.
+- **Skúška na vývojovom serveri:** bez parametra nič, s `?dev-odomknut=1` je kapitola I odomknutá („dev“), II a III nie. OK.
+- **Upravené testy:**
+  - G1 a D2 si zapíšu odomknutú kapitolu I a novú hru začnú cez „Kapitoly“ a „Začať kapitolu“,
+  - F3 čaká na úvode „Kapitoly“ namiesto „Nová hra“,
+  - test E4 (úvodná obrazovka s „Nová hra“) som vyradil zo stálych testov, celý ho pokrýva K2.
+
+**Chyby:**
+- Lint upozornil, že `aria-disabled` na položke zoznamu čítačky nepodporujú. Dlaždica je teraz skupina (`role="group"`) s popisom, kde to funguje.
+- Pri hromadnej úprave testov posledná náhrada v F3 nenašla text, lebo ho už zmenila predošlá. Výsledok je správny.
+- **Upravený Node test D4:** veta potvrdenia „Začať odznova?“ sa presunula z úvodnej obrazovky do menu kapitol, test ju hľadá tam.
+- **Celá séria stálych testov v prehliadači proti hotovej verzii** (25 behov vrátane K2): všetko OK.
+  - Trvanie 28 minút, server najviac 100 MB.
+- **Node:** 25 testov OK (B7: celá kapitola, skóre **1010**).
+
+**Build:** prešiel. **Lint:** bez zmeny, 14 starých problémov. **Server:** zastavený.
+
+**Ďalší krok:** K3, spoločné „Mám kód“ cez overovaciu funkciu (kapitola aj akt, stav „Overujem…“), až po „pokračuj“.

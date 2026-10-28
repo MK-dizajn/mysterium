@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { CityAmbient } from "../components/audio/CityAmbient";
 import { ArtifactFlow } from "../components/game/ArtifactFlow";
 import { CollectionFlow } from "../components/game/CollectionFlow";
@@ -23,7 +23,15 @@ import { ItemInspector } from "../components/items/ItemInspector";
 import { ArtifactUnlock } from "../components/ui/ArtifactUnlock";
 import { mysteriumGame } from "../data/mysterium-game";
 import { unlockCodes } from "../data/unlock-codes";
-import { unlockChapter } from "../lib/unlockStore";
+import {
+  getUnlockedChapterIds,
+  migrateLegacySave,
+  subscribeToUnlocks,
+  unlockChapter,
+} from "../lib/unlockStore";
+import { applyDevUnlock } from "../lib/devUnlock";
+import { chaptersCatalog } from "../data/chapters-catalog";
+import { ChapterMenuScreen } from "../components/screens/ChapterMenuScreen";
 import {
   applyDialogueChoiceActions,
   applyGameActions,
@@ -56,7 +64,12 @@ import {
   unlockFinaleLock,
 } from "../engine";
 import { useGameEngine } from "../hooks/useGameEngine";
-import type { Artifact, GameScreen, UnlockCode } from "../types/game";
+import type {
+  Artifact,
+  ChapterCatalogEntry,
+  GameScreen,
+  UnlockCode,
+} from "../types/game";
 
 export default function Home() {
   const {
@@ -65,6 +78,7 @@ export default function Home() {
     hasSavedProgress,
     setHasSavedProgress,
     continueSavedGame,
+    savedGameState,
   } = useGameEngine(mysteriumGame);
 
   const [selectedArtifact, setSelectedArtifact] =
@@ -91,8 +105,28 @@ export default function Home() {
   const [isFinaleVideoUnavailable, setIsFinaleVideoUnavailable] =
     useState(false);
 
-  // Obrazovka „Mám kód“ (iba z úvodnej obrazovky, neukladá sa).
-  const [isUnlockCodeOpen, setIsUnlockCodeOpen] = useState(false);
+  // Úvodná obrazovka, menu kapitol alebo obrazovka kódu (neukladá sa).
+  const [menuView, setMenuView] = useState<
+    | { view: "landing" }
+    | { view: "chapters" }
+    | { view: "code"; returnTo: "landing" | "chapters"; chapter?: ChapterCatalogEntry }
+  >({ view: "landing" });
+
+  // Odomknuté kapitoly v tomto zariadení (prekreslí menu po odomknutí).
+  const unlockedChapterIdsKey = useSyncExternalStore(
+    subscribeToUnlocks,
+    () => getUnlockedChapterIds().join(","),
+    () => ""
+  );
+  const unlockedChapterIds = unlockedChapterIdsKey
+    ? unlockedChapterIdsKey.split(",")
+    : [];
+
+  // Staršie hry dostanú svoju kapitolu odomknutú; pri vývoji obchádzanie zámku.
+  useEffect(() => {
+    migrateLegacySave(mysteriumGame);
+    applyDevUnlock(chaptersCatalog);
+  }, []);
 
   const fallbackChapter = mysteriumGame.chapters[0];
 
@@ -175,7 +209,7 @@ export default function Home() {
     unlockChapter(code.target.chapterId, code.target.actId ? "actCode" : "code");
 
     if (!code.target.actId) {
-      setIsUnlockCodeOpen(false);
+      setMenuView({ view: "landing" });
       startNewGame();
       return;
     }
@@ -191,7 +225,7 @@ export default function Home() {
     setUnlockedArtifact(null);
     setPreviousScreen("puzzle");
     setArtifactPreviousScreen("artifacts");
-    setIsUnlockCodeOpen(false);
+    setMenuView({ view: "landing" });
     setGameState(unlockedState);
   }
 
@@ -686,8 +720,8 @@ export default function Home() {
       );
     }
 
-    return (
-      isUnlockCodeOpen ? (
+    if (menuView.view === "code") {
+      return (
         <UnlockCodeScreen
           codes={unlockCodes}
           hasSavedProgress={hasSavedProgress}
@@ -698,17 +732,60 @@ export default function Home() {
             code.label
           }
           onUnlock={unlockWithCode}
-          onBack={() => setIsUnlockCodeOpen(false)}
+          onBack={() => setMenuView({ view: menuView.returnTo })}
+          context={
+            menuView.chapter && {
+              eyebrow: "Odomknúť kapitolu",
+              title: `Kapitola ${menuView.chapter.number}`,
+              text: "Zadaj kód, ktorý si dostal ku kapitole.",
+            }
+          }
         />
-      ) : (
-        <LandingScreen
-          hasSavedProgress={hasSavedProgress}
-          onContinueGame={continueSavedGame}
-          onStartNewGame={startNewGame}
-          onOpenUnlockCode={() => setIsUnlockCodeOpen(true)}
-          previewNotice={mysteriumGame.previewNotice}
+      );
+    }
+
+    if (menuView.view === "chapters") {
+      const savedChapter = savedGameState
+        ? mysteriumGame.chapters[savedGameState.currentChapterIndex]
+        : undefined;
+
+      return (
+        <ChapterMenuScreen
+          catalog={chaptersCatalog}
+          unlockedChapterIds={unlockedChapterIds}
+          savedGame={hasSavedProgress ? savedGameState : null}
+          savedChapterId={savedChapter?.id ?? null}
+          savedActTitle={
+            savedChapter?.acts.find(
+              (act) => act.id === savedGameState?.currentActId
+            )?.title
+          }
+          onEnterCode={(chapter) =>
+            setMenuView({ view: "code", returnTo: "chapters", chapter })
+          }
+          onStart={() => {
+            setMenuView({ view: "landing" });
+            startNewGame();
+          }}
+          onContinue={() => {
+            setMenuView({ view: "landing" });
+            continueSavedGame();
+          }}
+          onBack={() => setMenuView({ view: "landing" })}
         />
-      )
+      );
+    }
+
+    return (
+      <LandingScreen
+        hasSavedProgress={hasSavedProgress}
+        onContinueGame={continueSavedGame}
+        onOpenChapters={() => setMenuView({ view: "chapters" })}
+        onOpenUnlockCode={() =>
+          setMenuView({ view: "code", returnTo: "landing" })
+        }
+        previewNotice={mysteriumGame.previewNotice}
+      />
     );
   }
 

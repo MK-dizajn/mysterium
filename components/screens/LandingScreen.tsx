@@ -1,12 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import { ActionButton } from "../ui/ActionButton";
-import { ConfirmDialog } from "../ui/ConfirmDialog";
 
 type LandingScreenProps = {
   hasSavedProgress: boolean;
-  onStartNewGame: () => void;
+  /** „Kapitoly“: menu kapitol (nová hra sa začína pri kapitole). */
+  onOpenChapters: () => void;
   onContinueGame: () => void;
   /** „Mám kód“: obrazovka na vloženie kódu, ktorý odomkne časť hry. */
   onOpenUnlockCode: () => void;
@@ -18,23 +17,11 @@ const SOUND_TIP = "Najlepší zážitok dosiahneš so zapnutým zvukom.";
 
 export function LandingScreen({
   hasSavedProgress,
-  onStartNewGame,
+  onOpenChapters,
   onContinueGame,
   onOpenUnlockCode,
   previewNotice,
 }: LandingScreenProps) {
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-
-  function handleStartNewGame() {
-    // Bez uloženej hry nie je čo stratiť, preto sa nepýtame.
-    if (!hasSavedProgress) {
-      onStartNewGame();
-      return;
-    }
-
-    setIsConfirmOpen(true);
-  }
-
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#03050a] text-white">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_28%,_rgba(217,166,55,0.22),_transparent_28%,_transparent_100%)]" />
@@ -109,10 +96,10 @@ export function LandingScreen({
             )}
 
             <ActionButton
-              onClick={handleStartNewGame}
+              onClick={onOpenChapters}
               variant={hasSavedProgress ? "secondary" : "primary"}
             >
-              Nová hra
+              Kapitoly
             </ActionButton>
 
             <ActionButton variant="secondary" onClick={onOpenUnlockCode}>
@@ -129,18 +116,6 @@ export function LandingScreen({
         </div>
       </section>
 
-      {isConfirmOpen && (
-        <ConfirmDialog
-          title="Začať odznova?"
-          message="Tvoj doterajší postup sa vymaže: body, predmety, artefakty aj vyriešené úlohy. Túto akciu nemožno vrátiť."
-          confirmLabel="Áno, začať odznova"
-          onConfirm={() => {
-            setIsConfirmOpen(false);
-            onStartNewGame();
-          }}
-          onCancel={() => setIsConfirmOpen(false)}
-        />
-      )}
     </main>
   );
 }

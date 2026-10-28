@@ -14,6 +14,8 @@ type UnlockCodeScreenProps = {
   getTargetTitle: (code: UnlockCode) => string;
   onUnlock: (code: UnlockCode) => void;
   onBack: () => void;
+  /** Texty pri kóde konkrétnej kapitoly (z menu kapitol); inak všeobecné „Mám kód“. */
+  context?: { eyebrow: string; title: string; text: string };
 };
 
 /** Ako dlho ostane oznam „Odomknuté: …“, kým hra prejde na „Vydaj sa k …“. */
@@ -29,6 +31,7 @@ export function UnlockCodeScreen({
   getTargetTitle,
   onUnlock,
   onBack,
+  context,
 }: UnlockCodeScreenProps) {
   const inputId = useId();
   const errorId = useId();
@@ -92,18 +95,18 @@ export function UnlockCodeScreen({
         className="relative z-10 mx-auto flex min-h-[calc(100vh-6rem)] w-full max-w-sm flex-col justify-center"
       >
         <p className="text-xs font-black uppercase tracking-[0.3em] text-amber-400/80">
-          Odomknúť časť hry
+          {context?.eyebrow ?? "Odomknúť časť hry"}
         </p>
 
         <h1
           id="unlock-code-title"
           className="mt-4 text-3xl font-black text-amber-100"
         >
-          Máš kód?
+          {context?.title ?? "Máš kód?"}
         </h1>
 
         <p className="mt-4 text-[15px] leading-normal text-slate-300">
-          Kód odomkne časť pátrania, ktorú si už začal inde.
+          {context?.text ?? "Kód odomkne časť pátrania, ktorú si už začal inde."}
         </p>
 
         {unlockedCode ? (

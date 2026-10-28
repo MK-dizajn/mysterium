@@ -56,5 +56,7 @@ export function useGameEngine(game: Game) {
     hasSavedProgress,
     setHasSavedProgress,
     continueSavedGame,
+    // Pre menu kapitol (stav dlaždice: rozohraná, dokončená).
+    savedGameState,
   };
 }
