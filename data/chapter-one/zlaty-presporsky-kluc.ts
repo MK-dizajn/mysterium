@@ -7,9 +7,11 @@ export const zlatyPresporskyKlucScene: Scene = {
 
   cinematicText:
   "Zostávaš pri Primaciálnom paláci, no pozornosť sa už neupiera na ďalšiu budovu. Všetky indície, ktoré si počas cesty získal, sa pred tebou spájajú do jedného obrazu. Číslo domu, latinský odkaz, meno kráľa, rodový erb, rana v múre, strážca nad vodou, láskavosť, spravodlivosť aj mier. Jednotlivo sú úlomkami minulosti. Spolu vytvárajú význam Zlatého prešporského kľúča.",
+  cinematicAudioSrc: "/audio/hlas-063-rozpravac.mp3",
 
   voiceLine:
     "Hľadal si kľúč z kovu, no celý čas si držal iba jeho časti. Mesto ho nerozdelilo podľa tvaru, ale podľa spomienok. Teraz vyslov, čo všetky nájdené stopy spoločne chránia.",
+  voiceLineAudioSrc: "/audio/hlas-064-patrac.mp3",
 
   investigation: {
     objective:

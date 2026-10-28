@@ -8,9 +8,11 @@ export const venturskaBranaSpomienokScene: Scene = {
 
   cinematicText:
   "Z Panskej ulice sa vraciaš na Ventúrsku a po krátkej chôdzi prichádzaš k domu, v ktorom sa pred stáročiami učilo. Si na správnom mieste. Za nenápadnou fasádou sa kedysi stretávali učenci, astronómovia a ľudia, ktorí sa snažili porozumieť svetu.",
+  cinematicAudioSrc: "/audio/hlas-027-rozpravac.mp3",
 
   voiceLine:
     "Prvý údaj si našiel na dome. Druhý v odkaze lekárnika. Teraz hľadaj miesto, kde sa otázky nepovažovali za slabosť, ale za začiatok poznania. Meno muža, ktorý ho založil, otvorí ďalšiu časť denníka.",
+  voiceLineAudioSrc: "/audio/hlas-028-patrac.mp3",
 
   investigation: {
     objective:

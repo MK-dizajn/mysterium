@@ -4347,3 +4347,50 @@ Vývojový server je zastavený.
 **Odomykanie kódom (kroky 1 až 3) je hotové.**
 
 **Ďalší krok:** podľa plánu (menu kapitol, hlasy), až po potvrdení.
+
+---
+
+## 28. 10. 2026 – Hlasy, krok H1: súbory, cesty v dátach a text #22
+
+**Schválený plán:**
+- 24 nahratých hlasov (miesta „áno“ zo súpisu okrem #72) dostanú v hre tlačidlo „Prečítať nahlas“.
+- Hlas sa vypína existujúcim prepínačom zvuku v hornej lište.
+- Samo sa spustí iba pri #8 (zápis č. 1), #69 (koniec aktu I) a #77 (záver).
+- Postup v troch krokoch: H1 dáta, H2 prehrávač a tlačidlo na obrazovkách úloh, H3 zápis, koniec aktu a záver.
+
+**Čo sa zmenilo v kroku H1 (bez zmeny obrazoviek):**
+- Do gitu pribudlo **24 hlasov** v `public/audio/`, spolu 4,6 MB a 6 min 22 s.
+- **`hlasy-vsetky.zip`** som presunul mimo projektu do `Projekty\mysterium-zdroje\`. Všetko v `public/` je verejne stiahnuteľné a zip by zdvojnásobil veľkosť.
+- **`trvanie.json`** je presunuté do `docs/hlasy/`.
+- **Cesty k hlasom sú iba v dátach:**
+  - `cinematicAudioSrc` (rozprávač, úvodný odsek scény) a `voiceLineAudioSrc` (Hlas pátrača) v 10 scénach,
+  - `detectiveNote.audioSrc` (zápis č. 1),
+  - `ending.audioSrc` pri akte I (Strážca),
+  - `finale.ending.audioSrc` (záver) a `journalQuoteAudioSrc` (citát).
+- **Text #22** (Hlas pátrača, Lekáreň U Salvátora) je upravený podľa nahrávky: „Zapísal som si preto jedinú radu“ namiesto „Pátrač si preto zapísal jedinú radu“.
+- **Súpis hlasov:** riadok 22 (190 znakov), súčty a nová časť „Nahraté hlasy“.
+- **Licencie:** hlasy ElevenLabs, model Eleven v4:
+  - rozprávač „Peter - Alien Friendly and Soft“ (11 súborov),
+  - pátrač „Tibor“ (12 súborov),
+  - Strážca „Andrej - Mild, Calm“ (1 súbor),
+  - komerčné podmienky **NEOVERENÉ**.
+
+**Testy:**
+- **Nový Node test H1:** pred zmenou 32 chýb, po zmene všetko OK. Overuje:
+  - 24 súborov v `public/audio/` a nič iné (bez zipu),
+  - `trvanie.json` v `docs/hlasy/` (24 záznamov, spolu 382 s),
+  - každé miesto má správny súbor podľa čísla a toho, kto hovorí, a každý súbor je použitý práve raz,
+  - #72 a rub fotografie sú bez hlasu,
+  - text #22 v hre aj v súpise,
+  - obrazovky neobsahujú cesty k hlasom,
+  - licencie.
+- **Node:** 24 testov OK (B7: celá kapitola, skóre **1010**).
+- **Prehliadač:** v tomto kroku som séria testov nespúšťal. Obrazovky sa nezmenili (iba dáta a jedna veta textu), prehliadač príde na rad v kroku H2.
+
+**Chyby:**
+- V teste H1 kontrola súpisu najprv hľadala starú vetu v celom dokumente. Tá je tam však zámerne spomenutá v poznámke („predtým …“), preto teraz test kontroluje iba riadok 22.
+- V zozname médií som najprv uviedol 10 súborov rozprávača a 13 pátrača. Správne je 11 a 12, opravené.
+
+**Build:** prešiel. **Lint:** bez zmeny, 14 starých problémov. **Server:** nebežal (`npm run stop` – žiadne zabudnuté procesy).
+
+**Ďalší krok:** H2, prehrávač a tlačidlo „Prečítať nahlas“ na obrazovkách úloh.

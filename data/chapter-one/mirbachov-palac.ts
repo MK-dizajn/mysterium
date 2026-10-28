@@ -7,9 +7,11 @@ export const mirbachovPalacScene: Scene = {
 
   cinematicText:
   "Z Ventúrskej prichádzaš na Františkánske námestie. Oproti kostolu stojí bohato zdobený Mirbachov palác. Si na správnom mieste. Pátrač však nehľadá jeho najvýraznejšiu ozdobu, ale znak človeka, ktorého rod tu zanechal svoju stopu.",
+  cinematicAudioSrc: "/audio/hlas-033-rozpravac.mp3",
 
   voiceLine:
     "Majitelia prichádzajú a odchádzajú. Ich mená vyblednú, no znaky zostávajú nad hlavami tých, ktorí sa nikdy nepozrú nahor. Nájdi symbol ukrytý pod korunou.",
+  voiceLineAudioSrc: "/audio/hlas-034-patrac.mp3",
 
   investigation: {
     objective:

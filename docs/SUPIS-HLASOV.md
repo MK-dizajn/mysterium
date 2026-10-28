@@ -8,14 +8,24 @@ Stav dát: 27. 10. 2026 (po kroku F1). Texty sú prevzaté presne z dát hry (`d
 
 | Skupina | Počet miest | Znaky | Slová | Hlas spolu (približne) |
 |---|---|---|---|---|
-| **áno** (odporúčam nahrať, vrátane videa 3) | 25 | 5 411 | 863 | asi 6 min 30 s |
+| **áno** (odporúčam nahrať, vrátane videa 3) | 25 | 5 408 | 863 | asi 6 min 30 s |
 | **nepovinne** | 24 | 5 205 | 753 | asi 5 min 40 s |
 | **nie** | 30 | 5 198 | 781 | asi 5 min 55 s |
-| **spolu** | **79** | **15 814** | **2 397** | asi 18 min |
+| **spolu** | **79** | **15 811** | **2 397** | asi 18 min |
 | z toho **video 3** (Strážca prináša truhlicu) | 1 | 207 | 38 | asi 17 s |
 
-- **Odporúčané nahrávanie (áno):** 5 411 znakov, asi 6,5 minúty hlasu.
-- **Aj s nepovinnými:** 10 616 znakov, asi 12 minút hlasu.
+- **Odporúčané nahrávanie (áno):** 5 408 znakov, asi 6,5 minúty hlasu.
+- **Aj s nepovinnými:** 10 613 znakov, asi 12 minút hlasu.
+
+## Nahraté hlasy (28. 10. 2026)
+
+- **Nahratých je 24 miest s návrhom „áno“**, okrem #72 (to bude video 3). Rub fotografie zatiaľ nahratý nie je.
+- **Súbory:** `public/audio/hlas-NNN-<rozpravac|patrac|strazca>.mp3`, kde NNN je číslo riadku v tejto tabuľke. Spolu 4,6 MB a 6 min 22 s.
+- **Dĺžky:** `docs/hlasy/trvanie.json`.
+- **Cesty k súborom sú v dátach hry** (polia `cinematicAudioSrc`, `voiceLineAudioSrc`, `audioSrc`, `journalQuoteAudioSrc`).
+- **Hlasy (ElevenLabs, model Eleven v4):** rozprávač „Peter - Alien Friendly and Soft“, pátrač „Tibor“, Strážca „Andrej - Mild, Calm“.
+- **Riadok 22** je upravený podľa nahrávky: „Zapísal som si preto jedinú radu“ (predtým „Pátrač si preto zapísal jedinú radu“).
+- **Pri zmene textu v hre** treba nahrať aj hlas znova.
 
 ## Ako čítať tabuľku
 
@@ -67,7 +77,7 @@ Stav dát: 27. 10. 2026 (po kroku F1). Texty sú prevzaté presne z dát hry (`d
 | 19 | 2. Najužší dom pri Michalskej bráne | rozprávač | Nenápadná stavba pri Michalskej bráne pripomína, že najzaujímavejšie mestské objavy nemusia byť najväčšie. Dom sa tiesni v úzkej medzere medzi okolitými stavbami a mnoho návštevníkov si ho napriek jeho výnimočnosti vôbec nevšimne. | 230 | 32 | 15 s | detail artefaktu (Artefakty) | **nie** – zbierka na prezeranie, často až doma; text stačí |
 | 20 | 2. Najužší dom pri Michalskej bráne | pátrač | Číslo bolo iba prvou časťou skladačky. Samo osebe ešte nič neotvára. | 68 | 11 | 5 s | karta „Ďalšia stopa“ po vyriešení | **nie** – krátka myšlienka pri vodidle; hlas by zdržal odchod na ďalšie miesto |
 | 21 | 3. Lekáreň U Salvátora | rozprávač | Po Michalskej a Ventúrskej ulici prichádzaš na Panskú ulicu k historickej Lekárni U Salvátora. Si na správnom mieste. Jej fasáda však ukrýva viac než názov a výzdobu — zostal na nej odkaz starší než samotná budova. | 214 | 36 | 16 s | obrazovka úlohy – úvodný odsek scény | **áno** – atmosféra pri príchode na miesto; hráč sa môže pozerať na miesto, nie do telefónu |
-| 22 | 3. Lekáreň U Salvátora | pátrač | Liečiteľ musí poznať nielen začiatok svojho rozhodnutia, ale aj jeho následky. Pátrač si preto zapísal jedinú radu: Čokoľvek robíš, mysli na koniec. Nájdi miesto, odkiaľ tieto slová pochádzajú. | 193 | 28 | 13 s | obrazovka úlohy – „Hlas pátrača“ | **áno** – na obrazovke je už dnes nadpísané ako hlas; krátke, nesie postavu pátrača |
+| 22 | 3. Lekáreň U Salvátora | pátrač | Liečiteľ musí poznať nielen začiatok svojho rozhodnutia, ale aj jeho následky. Zapísal som si preto jedinú radu: Čokoľvek robíš, mysli na koniec. Nájdi miesto, odkiaľ tieto slová pochádzajú. | 190 | 28 | 13 s | obrazovka úlohy – „Hlas pátrača“ | **áno** – na obrazovke je už dnes nadpísané ako hlas; krátke, nesie postavu pátrača |
 | 23 | 3. Lekáreň U Salvátora | rozprávač | Latinský nápis pripomína, že pri každom rozhodnutí treba myslieť na jeho následky. | 82 | 12 | 5 s | príbeh miesta – „Tajomstvo odhalené“ | **nepovinne** – krátka odmena po vyriešení; stačí text |
 | 24 | 3. Lekáreň U Salvátora | pátrač | Nápis „Quidquid agis, prudenter agas et respice finem, 1658“ možno preložiť ako: „Čokoľvek robíš, rob rozvážne a mysli na koniec.“ Rok 1658 odkazuje na staršiu históriu lekárne a jej zariadenia. Dnešná budova Lekárne U Salvátora vznikla až v roku 1904 pre lekárnika Rudolfa Adlera. Vo vnútri sa však nachádza barokový lekárenský mobiliár s viac než 300-ročnou históriou, ktorý sa spája s niekdajšou jezuitskou lekárňou. | 419 | 64 | 29 s | príbeh miesta – „Pátračov zápis“ | **nepovinne** – dlhší historický text, hráč ho číta vlastným tempom a môže sa k nemu vrátiť; hlas iba ako voľba „Vypočuť“ |
 | 25 | 3. Lekáreň U Salvátora | rozprávač | Lekáreň U Salvátora patrí medzi najvýraznejšie historické lekárne Bratislavy. Budova pochádza z roku 1904, no jej príbeh siaha omnoho hlbšie. Vzácny barokový mobiliár má viac než 300 rokov a latinský nápis pripomína zásadu, ktorá platila pre lekárnikov aj pátračov: konať rozvážne a myslieť na následky. | 303 | 45 | 20 s | detail artefaktu (Artefakty) | **nie** – zbierka na prezeranie, často až doma; text stačí |

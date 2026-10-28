@@ -110,9 +110,11 @@ export const chapterOneFinale: ChapterFinale = {
     paragraphs: [
       "Kľúč, ktorý si držal, neotvoril dvere, ale pamäť mesta. Michalská brána, úzky dom, lekáreň, stará univerzita, palác, radnica, fontána aj sála, v ktorej sa podpísal mier. Všetko si pamätá, kým sa nenájde niekto, kto si to dokáže prečítať. Pátrač to vedel. Preto nezanechal odpovede, iba stopy.",
     ],
+    audioSrc: "/audio/hlas-077-rozpravac.mp3",
     quoteTitle: "Posledná strana denníka",
     // Úvodzovky „…“ doplní záverečná obrazovka.
     journalQuote: "Prešporok neukrýval jeden kľúč. Toto bol iba prvý.",
+    journalQuoteAudioSrc: "/audio/hlas-078-patrac.mp3",
     scoreLabel: "Konečné skóre",
     continuationTitle: "Druhý prípad sa blíži",
     continuationText:

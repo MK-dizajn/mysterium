@@ -38,9 +38,11 @@ export const michalskaBranaScene: Scene = {
 
   cinematicText:
     "Pod klenbou Michalskej brány sa miešajú kroky návštevníkov s ozvenou starého mesta. Väčšina ľudí prejde ďalej bez zastavenia. Ty však vieš, že pátrač nezačal svoju cestu pohľadom nahor, ale miestom, od ktorého sa symbolicky meria celý svet.",
+  cinematicAudioSrc: "/audio/hlas-009-rozpravac.mp3",
 
   voiceLine:
     "Nehľadaj značku, ktorú som tu zanechal ja. Hľadaj tú, ktorú tu zanechalo mesto. Mená sú roztrúsené po celom svete, no prvé z nich leží bližšie, než si myslíš.",
+  voiceLineAudioSrc: "/audio/hlas-010-patrac.mp3",
 
   investigation: {
     objective: `Postav sa priamo pod Michalskú bránu.
@@ -74,6 +76,7 @@ Pátračovo pravidlo znie: „Prvá stopa patrí mestu, ku ktorému vedie najkra
       "Hľadal som kľúč, ktorý mesto ukrylo po kúskoch. Nestihol som ho zložiť. Všetko, čo nájdeš, nesie v sebe číslo. Nehľadaj ho na papieri, skrýva sa v predmetoch. Zapíš si ich: raz ti otvoria to, čo som pre teba zamkol.",
     ],
     signature: "Starý pátrač",
+    audioSrc: "/audio/hlas-008-patrac.mp3",
     itemId: "detective-note-nulty-bod",
     introText:
       "Strážca ti podáva zažltnutý list. Papier neukrýva hotovú odpoveď — iba pravidlo, podľa ktorého starý pátrač začínal svoje vyšetrovania.",

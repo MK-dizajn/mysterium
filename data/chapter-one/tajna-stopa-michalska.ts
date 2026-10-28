@@ -8,9 +8,11 @@ export const tajnaStopaMichalskaScene: Scene = {
 
   cinematicText:
   "Od Michalskej brány stačí urobiť len niekoľko krokov. Medzi okolitými budovami stojí nenápadný dom, ktorý väčšina návštevníkov ani nezaregistruje. Si na správnom mieste. Práve tu sa ukrýva jedna z najnezvyčajnejších stavieb starého Prešporka.",
+  cinematicAudioSrc: "/audio/hlas-015-rozpravac.mp3",
 
   voiceLine:
     "Mesto niekedy ukryje tajomstvo tak, že ho nestavia do tieňa. Nechá ho priamo pred očami — iba mu vezme priestor. Nájdi dom, ktorý sa medzi svojich susedov takmer nezmestil.",
+  voiceLineAudioSrc: "/audio/hlas-016-patrac.mp3",
 
   investigation: {
     objective: `Zostaň pri Michalskej bráne a prezri si domy v jej bezprostrednej blízkosti.

@@ -7,9 +7,11 @@ export const staraRadnicaScene: Scene = {
 
   cinematicText:
   "Po niekoľkých krokoch prichádzaš na Hlavné námestie pred vežu Starej radnice. Si na správnom mieste. Budova pôsobí pokojne, no jej múr dodnes nesie stopu chvíle, keď sa mesto ocitlo pod paľbou.",
+  cinematicAudioSrc: "/audio/hlas-039-rozpravac.mp3",
 
   voiceLine:
     "Niektoré rany mesto opraví. Iné ponechá na očiach, aby ľudia nezabudli. Hľadaj stopu útoku, ktorá sa nestala súčasťou múzea. Zostala priamo v múre.",
+  voiceLineAudioSrc: "/audio/hlas-040-patrac.mp3",
 
   investigation: {
     objective:

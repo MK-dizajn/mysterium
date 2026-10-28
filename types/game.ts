@@ -149,6 +149,8 @@ export type DetectiveNote = {
   paragraphs: string[];
   /** Podpis pod zápisom (zobrazí sa s pomlčkou). */
   signature: string;
+  /** Hlas pátrača, ktorý zápis číta (napríklad /audio/hlas-008-patrac.mp3). */
+  audioSrc?: string;
   /**
    * Nepovinný obrázok čistého papiera s priehľadným pozadím; ak je,
    * nahradí papier nakreslený v kóde (text ostáva v HTML).
@@ -327,7 +329,11 @@ export type Scene = {
   location: string;
   title: string;
   cinematicText: string;
+  /** Hlas rozprávača k úvodnému odseku scény. */
+  cinematicAudioSrc?: string;
   voiceLine: string;
+  /** Nahratý „Hlas pátrača“. */
+  voiceLineAudioSrc?: string;
 
   investigation?: Investigation;
   detectiveNote?: DetectiveNote;
@@ -363,6 +369,8 @@ export type ActEnding = {
   /** Nadpis momentu, napríklad „Hlas Strážcu“ alebo „Pečať“. */
   label: string;
   text: string;
+  /** Hlas, ktorý text konca aktu číta. */
+  audioSrc?: string;
   /** Predmet, ktorý hráč na konci aktu dostane (iba raz). */
   reward?: InventoryItem;
   continueLabel: string;
@@ -502,9 +510,13 @@ export type FinaleEnding = {
   label: string;
   title: string;
   paragraphs: string[];
+  /** Hlas rozprávača k záverečnému textu. */
+  audioSrc?: string;
   /** Nadpis rámčeka s citátom; citát je bez úvodzoviek (doplní obrazovka). */
   quoteTitle: string;
   journalQuote: string;
+  /** Hlas pátrača k citátu z poslednej strany denníka. */
+  journalQuoteAudioSrc?: string;
   scoreLabel: string;
   continuationTitle: string;
   continuationText: string;

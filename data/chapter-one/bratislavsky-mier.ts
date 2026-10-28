@@ -8,9 +8,11 @@ export const bratislavskyMierScene: Scene = {
 
   cinematicText:
   "Od fasády Primaciálneho paláca sa tentoraz nemusíš nikam presúvať. Zostávaš na správnom mieste. Ďalšia stopa sa nenachádza vonku, ale viaže sa k miestnosti za týmito múrmi, v ktorej sa po veľkej vojne rozhodovalo o budúcnosti Európy.",
+  cinematicAudioSrc: "/audio/hlas-057-rozpravac.mp3",
 
   voiceLine:
     "Nie každá stopa sa dá nájsť pohľadom. Niekedy musíš spojiť miesto, udalosť a jej následok. Mier uzavretý v tomto paláci dostal meno mesta, no podpísali ho v miestnosti, ktorá znásobuje každý obraz.",
+  voiceLineAudioSrc: "/audio/hlas-058-patrac.mp3",
 
   investigation: {
     objective:

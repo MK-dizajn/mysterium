@@ -7,9 +7,11 @@ export const lekarenUSalvatoraScene: Scene = {
 
   cinematicText:
   "Po Michalskej a Ventúrskej ulici prichádzaš na Panskú ulicu k historickej Lekárni U Salvátora. Si na správnom mieste. Jej fasáda však ukrýva viac než názov a výzdobu — zostal na nej odkaz starší než samotná budova.",
+  cinematicAudioSrc: "/audio/hlas-021-rozpravac.mp3",
   
   voiceLine:
-    "Liečiteľ musí poznať nielen začiatok svojho rozhodnutia, ale aj jeho následky. Pátrač si preto zapísal jedinú radu: Čokoľvek robíš, mysli na koniec. Nájdi miesto, odkiaľ tieto slová pochádzajú.",
+    "Liečiteľ musí poznať nielen začiatok svojho rozhodnutia, ale aj jeho následky. Zapísal som si preto jedinú radu: Čokoľvek robíš, mysli na koniec. Nájdi miesto, odkiaľ tieto slová pochádzajú.",
+  voiceLineAudioSrc: "/audio/hlas-022-patrac.mp3",
 
   investigation: {
     objective:

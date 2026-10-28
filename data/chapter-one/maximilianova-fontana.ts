@@ -8,9 +8,11 @@ export const maximilianovaFontanaScene: Scene = {
 
   cinematicText:
   "Od Starej radnice prejdeš iba niekoľko krokov do stredu Hlavného námestia. Si na správnom mieste. Pred tebou stojí fontána, ktorá po stáročia sledovala trhy, oslavy aj nepokoje mesta.",
+  cinematicAudioSrc: "/audio/hlas-045-rozpravac.mp3",
 
   voiceLine:
     "Meno môže klamať. Legenda môže prežiť pravdu. Preto sa nespoliehaj na názov fontány. Pozri sa na postavu nad vodou a urči, čím bola pripravená chrániť mesto.",
+  voiceLineAudioSrc: "/audio/hlas-046-patrac.mp3",
 
   investigation: {
     objective:

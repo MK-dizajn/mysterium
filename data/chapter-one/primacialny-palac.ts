@@ -8,9 +8,11 @@ export const primacialnyPalacScene: Scene = {
 
   cinematicText:
   "Z Hlavného námestia prechádzaš na susedné Primaciálne námestie. Pred tebou stojí svetlá fasáda Primaciálneho paláca. Si na správnom mieste. Pátrač teraz nehľadá meno majiteľa ani veľký erb, ale dve malé písmená ukrývajúce zásady moci.",
+  cinematicAudioSrc: "/audio/hlas-051-rozpravac.mp3",
 
   voiceLine:
     "Moc bez zásad je iba prázdny titul. Arcibiskup preto nechal na fasáde dve vlastnosti, podľa ktorých sa mal rozhodovať. Nehľadaj celé slová. Nájdi ich začiatočné písmená.",
+  voiceLineAudioSrc: "/audio/hlas-052-patrac.mp3",
 
   investigation: {
     objective:

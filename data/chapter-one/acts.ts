@@ -15,6 +15,7 @@ export const chapterOneActs: Act[] = [
       label: "Hlas Strážcu",
       text:
         "Tri stopy máš za sebou. Pátrač mi povedal, že kto dôjde až sem, nezačal náhodou. Ešte nie je čas na otázky. Prijmi prvý útržok fotografie a pokračuj.",
+      audioSrc: "/audio/hlas-069-strazca.mp3",
       reward: {
         id: "torn-photo-fragment-act-1",
         title: "Prvý útržok fotografie",

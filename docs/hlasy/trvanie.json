@@ -1,0 +1,140 @@
+{
+ "hlas-009-rozpravac.mp3": {
+  "id": 9,
+  "sec": 16.3,
+  "chars": 240,
+  "cps": 14.7
+ },
+ "hlas-015-rozpravac.mp3": {
+  "id": 15,
+  "sec": 15.99,
+  "chars": 242,
+  "cps": 15.1
+ },
+ "hlas-021-rozpravac.mp3": {
+  "id": 21,
+  "sec": 14.76,
+  "chars": 214,
+  "cps": 14.5
+ },
+ "hlas-027-rozpravac.mp3": {
+  "id": 27,
+  "sec": 16.22,
+  "chars": 244,
+  "cps": 15.0
+ },
+ "hlas-033-rozpravac.mp3": {
+  "id": 33,
+  "sec": 15.8,
+  "chars": 229,
+  "cps": 14.5
+ },
+ "hlas-039-rozpravac.mp3": {
+  "id": 39,
+  "sec": 13.43,
+  "chars": 193,
+  "cps": 14.4
+ },
+ "hlas-045-rozpravac.mp3": {
+  "id": 45,
+  "sec": 12.56,
+  "chars": 183,
+  "cps": 14.6
+ },
+ "hlas-051-rozpravac.mp3": {
+  "id": 51,
+  "sec": 16.85,
+  "chars": 234,
+  "cps": 13.9
+ },
+ "hlas-057-rozpravac.mp3": {
+  "id": 57,
+  "sec": 15.73,
+  "chars": 233,
+  "cps": 14.8
+ },
+ "hlas-063-rozpravac.mp3": {
+  "id": 63,
+  "sec": 28.5,
+  "chars": 368,
+  "cps": 12.9
+ },
+ "hlas-010-patrac.mp3": {
+  "id": 10,
+  "sec": 12.04,
+  "chars": 158,
+  "cps": 13.1
+ },
+ "hlas-016-patrac.mp3": {
+  "id": 16,
+  "sec": 12.12,
+  "chars": 172,
+  "cps": 14.2
+ },
+ "hlas-022-patrac.mp3": {
+  "id": 22,
+  "sec": 14.71,
+  "chars": 190,
+  "cps": 12.9
+ },
+ "hlas-028-patrac.mp3": {
+  "id": 28,
+  "sec": 14.16,
+  "chars": 197,
+  "cps": 13.9
+ },
+ "hlas-034-patrac.mp3": {
+  "id": 34,
+  "sec": 12.28,
+  "chars": 154,
+  "cps": 12.5
+ },
+ "hlas-040-patrac.mp3": {
+  "id": 40,
+  "sec": 12.51,
+  "chars": 147,
+  "cps": 11.7
+ },
+ "hlas-046-patrac.mp3": {
+  "id": 46,
+  "sec": 11.76,
+  "chars": 157,
+  "cps": 13.4
+ },
+ "hlas-052-patrac.mp3": {
+  "id": 52,
+  "sec": 12.77,
+  "chars": 169,
+  "cps": 13.2
+ },
+ "hlas-058-patrac.mp3": {
+  "id": 58,
+  "sec": 14.97,
+  "chars": 197,
+  "cps": 13.2
+ },
+ "hlas-064-patrac.mp3": {
+  "id": 64,
+  "sec": 12.3,
+  "chars": 170,
+  "cps": 13.8
+ },
+ "hlas-077-rozpravac.mp3": {
+  "id": 77,
+  "sec": 23.43,
+  "chars": 0,
+  "cps": 0
+ },
+ "hlas-078-patrac.mp3": {
+  "id": 78,
+  "sec": 3.89
+ },
+ "hlas-008-patrac.mp3": {
+  "id": 8,
+  "sec": 47.23
+ },
+ "hlas-069-strazca.mp3": {
+  "id": 69,
+  "sec": 11.39
+ }
+}
