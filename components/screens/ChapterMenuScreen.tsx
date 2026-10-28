@@ -17,6 +17,8 @@ type ChapterMenuScreenProps = {
   /** Názov aktu uloženej hry (napríklad „Akt II – Moc a poznanie“). */
   savedActTitle?: string;
   onEnterCode: (chapter: ChapterCatalogEntry) => void;
+  /** „Mám kód časti“: kód aktu pri odomknutej kapitole. */
+  onEnterPartCode: (chapter: ChapterCatalogEntry) => void;
   onStart: (chapter: ChapterCatalogEntry) => void;
   onContinue: () => void;
   onBack: () => void;
@@ -44,6 +46,7 @@ export function ChapterMenuScreen({
   savedChapterId,
   savedActTitle,
   onEnterCode,
+  onEnterPartCode,
   onStart,
   onContinue,
   onBack,
@@ -171,6 +174,17 @@ export function ChapterMenuScreen({
                           {state === "finished" ? "Hrať znova" : "Začať odznova"}
                         </ActionButton>
                       </>
+                    )}
+
+                    {/* Kód časti (akt) pri odomknutej kapitole – nenápadný odkaz. */}
+                    {state !== "locked" && (
+                      <button
+                        type="button"
+                        onClick={() => onEnterPartCode(chapter)}
+                        className="min-h-11 self-center px-3 text-sm font-semibold text-amber-200 underline decoration-amber-300/40 underline-offset-4 hover:text-amber-100"
+                      >
+                        Mám kód časti
+                      </button>
                     )}
                   </div>
                 )}

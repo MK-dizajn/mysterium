@@ -4690,3 +4690,50 @@ Vývojový server je zastavený.
 **Build:** prešiel. **Lint:** bez zmeny, 14 starých problémov. **Server:** zastavený.
 
 **Ďalší krok:** K3, spoločné „Mám kód“ cez overovaciu funkciu (kapitola aj akt, stav „Overujem…“), až po „pokračuj“.
+
+---
+
+## 28. 10. 2026 – Menu kapitol, krok K3: spoločné „Mám kód“ cez jednu overovaciu funkciu
+
+**Čo sa zmenilo pre hráča:**
+- **„Mám kód“ na úvodnej obrazovke prijme akýkoľvek kód:**
+  - kód kapitoly I odomkne kapitolu a spustí ju (video A),
+  - kód aktu II alebo III odomkne aj kapitolu I a hra začne od aktu („Vydaj sa k …“).
+- **Počas overovania** je na tlačidle „Overujem…“, tlačidlo je vypnuté a čítačka dostane `aria-busy`. Dnes to trvá okamih. Keď overovanie presunieme na server, obrazovka bude pripravená.
+- **Nová chybová správa pre server:** „Kód sa teraz nedá overiť. Skontroluj pripojenie a skús znova.“ Pri overovaní v telefóne sa nikdy neukáže, je pripravená na server.
+- **Pri odomknutej kapitole** (odomknutá, rozohraná, dokončená) je v dlaždici nenápadný odkaz **„Mám kód časti“** (výška 44 px). Otvorí obrazovku kódu, „Späť“ vráti do menu. Uzamknutá kapitola ho nemá, tam je „Zadať kód“.
+
+**Ako je to v kóde:**
+- `components/screens/UnlockCodeScreen.tsx` overuje kód iba cez `verifyUnlockCode` (`lib/codeVerifier.ts`) a čaká na výsledok. Nepoužíva už porovnanie odtlačkov.
+- `components/screens/ChapterMenuScreen.tsx` dostal odkaz „Mám kód časti“.
+- `app/page.tsx` prepája „Mám kód časti“ s obrazovkou kódu a návratom do menu.
+- `docs/KONTROLA-PRED-VYDANIM.md`:
+  - testerom pred prvým testom poslať kód kapitoly I (osobne, nie do dokumentov),
+  - keď pribudne obsah kapitoly II, pripraviť samostatné uloženie pre každú kapitolu (nová verzia uloženia).
+
+**Testy (iba skúšobné kódy TEST-…):**
+- **Nový Node test K3:** pred zmenou 4 chyby, po zmene všetko OK. Overuje:
+  - obrazovka kódu volá iba overovaciu funkciu a hra neporovnáva odtlačky priamo,
+  - „Overujem…“, vypnuté tlačidlo, `aria-busy`, správa pri nedostupnom serveri,
+  - „Mám kód časti“ v menu.
+- **Nový test K3 v prehliadači** (hotová verzia, 360 px, oba režimy). Pred zmenou 4 chyby („Mám kód časti“ chýbal), po zmene všetko OK. Overuje:
+  - zlý kód, kód kapitoly cez „Mám kód“ (odomknutie „code“, video A),
+  - kód aktu bez odomknutej kapitoly (odomknutie „actCode“, akt II, „Vydaj sa k Academii…“),
+  - „Mám kód časti“ (44 px, obrazovka kódu, „Späť“ do menu, kód aktu),
+  - uzamknutá kapitola bez „Mám kód časti“.
+- **Upravený test K2:** dlaždice odomknutej kapitoly majú navyše „Mám kód časti“.
+- **Celá séria stálych testov v prehliadači proti hotovej verzii** (27 behov vrátane K3): všetko OK.
+  - Trvanie 29 minút, server najviac 99 MB.
+- **Node:** 26 testov OK (B7: celá kapitola, skóre **1010**).
+- Čitateľné kódy (kapitola I, akty II a III) nie sú v žiadnom súbore projektu, overené vyhľadaním.
+
+**Chyby:** žiadne.
+
+**Build:** prešiel. **Lint:** bez zmeny, 14 starých problémov. **Server:** zastavený.
+
+**Menu kapitol (kroky K1 až K3) je hotové.**
+
+**Ďalej podľa plánu, až po potvrdení:**
+- terénna skúška a dĺžka trasy kapitoly I (`isPlaceholder`),
+- kód pre testerov,
+- uloženie v3.

@@ -3,7 +3,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import type { UnlockCode } from "../../types/game";
-import { findUnlockCode } from "../../engine";
+import { verifyUnlockCode } from "../../lib/codeVerifier";
 import { ActionButton } from "../ui/ActionButton";
 import { ConfirmDialog } from "../ui/ConfirmDialog";
 
@@ -22,8 +22,9 @@ type UnlockCodeScreenProps = {
 const UNLOCKED_NOTICE_MS = 1600;
 
 /**
- * „Mám kód“: hráč vloží kód, ktorý odomkne časť hry. Kód sa porovná iba
- * s odtlačkami (engine/unlockCodes.ts). Pri uloženej hre sa najprv opýta.
+ * „Mám kód“: hráč vloží kód, ktorý odomkne kapitolu alebo jej časť. Kód overí
+ * jediná funkcia verifyUnlockCode (dnes v telefóne, neskôr server), preto
+ * obrazovka čaká na výsledok („Overujem…“). Pri uloženej hre sa najprv opýta.
  */
 export function UnlockCodeScreen({
   codes,
@@ -37,7 +38,9 @@ export function UnlockCodeScreen({
   const errorId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const [value, setValue] = useState("");
-  const [hasError, setHasError] = useState(false);
+  const [error, setError] = useState<"unknown" | "unavailable" | null>(null);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const hasError = error !== null;
   const [pendingCode, setPendingCode] = useState<UnlockCode | null>(null);
   const [unlockedCode, setUnlockedCode] = useState<UnlockCode | null>(null);
 
@@ -65,18 +68,25 @@ export function UnlockCodeScreen({
     return () => window.clearTimeout(timer);
   }, [unlockedCode]);
 
-  function submit(event: FormEvent) {
+  async function submit(event: FormEvent) {
     event.preventDefault();
 
-    const code = findUnlockCode(value, codes);
+    if (isVerifying) {
+      return;
+    }
 
-    if (!code) {
-      setHasError(true);
+    setIsVerifying(true);
+    const result = await verifyUnlockCode(value, codes);
+    setIsVerifying(false);
+
+    if (result.status !== "ok") {
+      setError(result.status);
       inputRef.current?.focus();
       return;
     }
 
-    setHasError(false);
+    const code = result.code;
+    setError(null);
 
     if (hasSavedProgress) {
       setPendingCode(code);
@@ -133,7 +143,7 @@ export function UnlockCodeScreen({
               value={value}
               onChange={(event) => {
                 setValue(event.target.value);
-                setHasError(false);
+                setError(null);
               }}
               autoCapitalize="characters"
               autoComplete="off"
@@ -156,16 +166,19 @@ export function UnlockCodeScreen({
                 data-unlock-error
                 className="text-[15px] leading-normal text-red-200"
               >
-                Tento kód nepoznáme. Skontroluj ho a skús znova.
+                {error === "unavailable"
+                  ? "Kód sa teraz nedá overiť. Skontroluj pripojenie a skús znova."
+                  : "Tento kód nepoznáme. Skontroluj ho a skús znova."}
               </p>
             )}
 
             <ActionButton
               type="submit"
-              disabled={!value.trim()}
+              disabled={!value.trim() || isVerifying}
+              aria-busy={isVerifying}
               className="mt-2 motion-reduce:transition-none motion-reduce:active:scale-100"
             >
-              Odomknúť
+              {isVerifying ? "Overujem…" : "Odomknúť"}
             </ActionButton>
 
             <ActionButton

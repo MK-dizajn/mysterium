@@ -763,6 +763,9 @@ export default function Home() {
           onEnterCode={(chapter) =>
             setMenuView({ view: "code", returnTo: "chapters", chapter })
           }
+          onEnterPartCode={() =>
+            setMenuView({ view: "code", returnTo: "chapters" })
+          }
           onStart={() => {
             setMenuView({ view: "landing" });
             startNewGame();
