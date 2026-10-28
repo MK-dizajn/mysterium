@@ -4116,3 +4116,56 @@ Vývojový server je zastavený.
 **Súbory:** `docs/PRACOVNY-DENNIK.md`.
 
 **Ďalší krok:** M2, skripty na bezpečné spustenie servera (B, C, D, E).
+
+---
+
+## 28. 10. 2026 – Opatrenia, krok M2: bezpečné spustenie a zastavenie servera (B, C, D, E)
+
+**Dôležité zistenie: skutočná príčina zaseknutia.**
+- Pri skúške dnešného správania vzniklo za necelú minútu **1 282 procesov node**.
+- Pri ďalšom spustení sa pri prvom preklade stránky objavilo 161 až 435 procesov a **10 až 28 GB** pamäte. Strážca pamäte, ktorý už bežal, server dvakrát ukončil.
+- **Príčina:** poškodená vyrovnávacia pamäť Turbopacku v `.next/dev` (1,7 GB). Server v nej opakovane spúšťal nové pomocné procesy (`node .next\dev\build\…js`).
+- Po jej zmazaní bežal server normálne: **3 procesy, asi 1,1 GB**.
+- Vyrovnávacia pamäť sa mohla poškodiť pri násilnom ukončovaní servera (pomocné procesy skôr ako server) alebo pri dočasnom odkladaní zmien (`git stash`) počas behu servera.
+
+**Čo sa zmenilo:**
+- `npm run dev` spúšťa `scripts/dev.mjs`:
+  - **iba jeden server na porte 3000**; keď je obsadený, nespustí sa a ohlási to (C),
+  - **limit pamäte pre JavaScript** `NODE_OPTIONS=--max-old-space-size=4096` (E),
+  - **strážca pamäte** na pozadí (D).
+- `scripts/memory-guard.mjs` – strážca pamäte (D):
+  - každých 5 s zmeria všetky procesy servera,
+  - nad 6 GB alebo nad 60 procesov server ukončí,
+  - pri priveľa procesoch zmaže aj vyrovnávaciu pamäť `.next/dev`,
+  - záznam vedie v `.next/memory-guard.log`.
+- `npm run stop` (`scripts/stop-dev.mjs`) – upratovací skript (B):
+  - ukončí server Next tohto projektu, najprv samotný server, potom pomocné procesy, opakovane, kým 3 sekundy nič nepribudne,
+  - ukončí strážcu pamäte a testovací Chrome (iba neviditeľný s testovacím profilom),
+  - na konci skontroluje, že nič neostalo a port 3000 je voľný.
+- `scripts/processes.mjs` – spoločné funkcie.
+- Skripty sú v Node, nie v PowerShelli:
+  - Windows predvolene nedovolí spúšťať súbory `.ps1` a obchádzanie tohto nastavenia (`-ExecutionPolicy Bypass`) zablokovala bezpečnostná kontrola nástroja,
+  - zoznam procesov sa zisťuje jednoduchým príkazom PowerShellu, čo nastavenie Windows nemení.
+
+**Skúška (všetko OK):**
+- Pred zmenou: druhé `next dev` sa spustilo bez varovania a po ukončení hlavných procesov ostali visieť stovky pomocných procesov.
+- Po zmene:
+  - `npm run dev` spustí server na porte 3000 so strážcom,
+  - druhé `npm run dev` skončí so správou „Port 3000 je obsadený…“ (kód 1) a iný port sa neotvorí,
+  - strážca s limitom 500 MB server ukončil aj s pomocnými procesmi (0 procesov po zásahu),
+  - `npm run stop` ukončil server, strážcu aj testovací Chrome,
+  - bežný Chrome ostal nedotknutý (17 procesov pred aj po),
+  - druhé `npm run stop` hlási „Žiadne zabudnuté procesy“.
+- Lint skriptov bez chýb.
+
+**Chyby počas práce:**
+- Prvá verzia skriptov bola v PowerShelli (`.ps1`), zápis `-ExecutionPolicy Bypass` do `package.json` zablokovala bezpečnostná kontrola. Prepísané do Node, súbory `.ps1` zmazané (neboli v gite).
+- PowerShell príkazom `Get-Content` bez voľby UTF-8 zobrazuje slovenské znaky v zázname strážcu pokazene. Súbor je v UTF-8 a správne ho zobrazí napríklad Poznámkový blok.
+- Pri ukončovaní nájdené visiace procesy (1 282 a ďalšie) sa ukončili. Teraz voľných 25,5 GB z 31,7 GB.
+
+**Súbory:**
+- `scripts/dev.mjs`, `scripts/stop-dev.mjs`, `scripts/memory-guard.mjs`, `scripts/processes.mjs` (nové),
+- `package.json` (skripty `dev` a `stop`),
+- `docs/PRACOVNY-DENNIK.md`.
+
+**Ďalší krok:** M3, cieľová pamäť Turbopacku (F) a meranie, či E a F nespomaľujú preklad.
