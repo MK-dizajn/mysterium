@@ -8,6 +8,7 @@ import { MessageBox } from "../ui/MessageBox";
 import { ScreenContainer } from "../ui/ScreenContainer";
 import { SectionCard } from "../ui/SectionCard";
 import { StoryCard } from "../ui/StoryCard";
+import { VoiceButton } from "../ui/VoiceButton";
 
 type ActTransitionScreenProps = {
   completedActTitle: string;
@@ -99,9 +100,13 @@ export function ActTransitionScreen({
               </div>
             )}
 
-            <p className="italic leading-relaxed text-amber-100">
-              „{ending.text}“
-            </p>
+            {/* Nahratý hlas (Strážca pri akte I) sa spustí sám iba pri prvom zobrazení. */}
+            <div className="flex items-start gap-3">
+              <p className="min-w-0 flex-1 italic leading-relaxed text-amber-100">
+                „{ending.text}“
+              </p>
+              <VoiceButton src={ending.audioSrc} autoPlay="once" />
+            </div>
           </SectionCard>
         )}
 

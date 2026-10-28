@@ -11,6 +11,7 @@ import { MessageBox } from "../ui/MessageBox";
 import { ScreenContainer } from "../ui/ScreenContainer";
 import { SectionCard } from "../ui/SectionCard";
 import { StoryCard } from "../ui/StoryCard";
+import { VoiceButton } from "../ui/VoiceButton";
 
 type FinishScreenProps = {
   finale: ChapterFinale;
@@ -44,10 +45,14 @@ export function FinishScreen({
     <ScreenContainer>
       <StoryCard label={ending.label} title={ending.title}>
         {/* Riadkovanie 1,5 a medzi odsekmi asi polovica riadku. */}
-        <div className="space-y-3 text-[16px] leading-normal text-slate-300">
-          {ending.paragraphs.map((paragraph) => (
-            <p key={paragraph}>{paragraph}</p>
-          ))}
+        {/* Hlas rozprávača k záveru sa spustí sám iba pri prvom zobrazení. */}
+        <div className="flex items-start gap-3">
+          <div className="min-w-0 flex-1 space-y-3 text-[16px] leading-normal text-slate-300">
+            {ending.paragraphs.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
+          </div>
+          <VoiceButton src={ending.audioSrc} autoPlay="once" />
         </div>
 
         <SectionCard
@@ -62,7 +67,10 @@ export function FinishScreen({
         </SectionCard>
 
         <MessageBox variant="info" title={ending.quoteTitle}>
-          {`„${ending.journalQuote}“`}
+          <span className="flex items-center justify-between gap-3">
+            <span className="min-w-0 flex-1">{`„${ending.journalQuote}“`}</span>
+            <VoiceButton src={ending.journalQuoteAudioSrc} />
+          </span>
         </MessageBox>
 
         <SectionCard

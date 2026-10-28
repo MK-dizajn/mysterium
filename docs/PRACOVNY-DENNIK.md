@@ -4451,3 +4451,50 @@ Vývojový server je zastavený.
 **Build:** prešiel. **Lint:** bez zmeny, 14 starých problémov. **Server:** zastavený (žiadne zabudnuté procesy).
 
 **Ďalší krok:** H3, hlas pri zápise č. 1, na konci aktu I a v závere (so samospustením po ťuknutí).
+
+---
+
+## 28. 10. 2026 – Hlasy, krok H3: zápis č. 1, koniec aktu I a záver
+
+**Čo sa zmenilo pre hráča:**
+- **#8 zápis č. 1 (hlas pátrača):** tlačidlo je nad papierom, nie na ňom, lebo papier sa dá ťahaním nakláňať.
+  - Hlas sa spustí sám po videu Strážcu, po „Prezrieť zápis“ a po ťuknutí na „Prečítať zápis“ v Inventári.
+  - „Preskúmať nultý bod“ a „Zavrieť“ hlas zastavia.
+- **#69 koniec aktu I („Hlas Strážcu“):** tlačidlo pri texte, hlas sa spustí sám iba pri prvom zobrazení.
+- **#77 záver kapitoly (rozprávač):** tlačidlo pri texte, hlas sa spustí sám iba pri prvom zobrazení. Po návrate napríklad z Inventára sa už nespustí znova, aby hráča neotravoval.
+- **#78 citát „Posledná strana denníka“ (pátrač):** iba tlačidlo, samo sa nespúšťa.
+- **Vypnutý zvuk:** nič sa nespustí samo. Keď prehliadač samospustenie zablokuje, ostane tlačidlo.
+- Koniec aktu II a III nemá hlas (nie je nahratý), tlačidlo sa tam neukáže.
+
+**Súbory:**
+- `lib/voicePlayer.ts` (samospustenie „iba prvýkrát“),
+- `components/ui/VoiceButton.tsx` (`autoPlay` aj „once“),
+- `components/ui/JournalReveal.tsx`,
+- `components/screens/InventoryScreen.tsx` (zápis v Inventári),
+- `components/screens/ActTransitionScreen.tsx`,
+- `components/screens/FinishScreen.tsx`,
+- `docs/KONTROLA-PRED-VYDANIM.md`:
+  - nová kontrola hlasov na mobile v teréne,
+  - podmienky ElevenLabs doplnené o hlasy v `public/audio/`.
+
+**Testy:**
+- **Nový test H3 v prehliadači** (proti hotovej verzii, 360 px, oba režimy, skutočné ťuknutia).
+  - Pred zmenou zlyhal (tlačidlá chýbali), po zmene všetko OK. Overuje:
+    - #8: tlačidlo 44 px nad papierom, samospustenie, zastavenie pri „Preskúmať nultý bod“, v Inventári „Prečítať zápis“ a „Zavrieť“, pri vypnutom zvuku nič samo,
+    - #69: samospustenie, zastavenie pri „Prijať útržok“, koniec aktu II bez tlačidla,
+    - #77 a #78: samospustenie záveru, citát iba tlačidlom (zastaví záver), odchod do Inventára zastaví, po návrate sa záver nespustí znova,
+    - bez posúvania do strany.
+- **Celá séria stálych testov v prehliadači proti hotovej verzii:** 22 behov (vrátane H2 a H3, aj s vypnutými animáciami), všetko OK.
+  - Tentoraz prešla aj kontrola truhlice v D5.
+  - Trvanie 24 minút, server najviac 99 MB.
+- **Node:** 24 testov OK (B7: celá kapitola, skóre **1010**).
+
+**Chyby:**
+- Test H3 najprv hlásil 4 chyby pri závere. Uložená hra na záverečnej obrazovke bez príznakov dohratého finále sa pri načítaní (správne) presunie späť do finále, takže test záver vôbec nevidel.
+- Test teraz pripraví uloženú hru s dohratým finále. V hre chyba nebola.
+
+**Build:** prešiel. **Lint:** bez zmeny, 14 starých problémov. **Server:** zastavený (žiadne zabudnuté procesy).
+
+**Hlasy (kroky H1 až H3) sú hotové.**
+
+**Ďalší krok:** podľa plánu, až po potvrdení. V `public/videos/` čakajú nové súbory `strazca-truhlica.*` (video 3), zatiaľ nie sú v hre ani v gite.

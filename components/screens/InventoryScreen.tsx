@@ -15,6 +15,7 @@ import { DetectiveIcon } from "../ui/MysteriumIcons";
 import { ScreenContainer } from "../ui/ScreenContainer";
 import { SectionCard } from "../ui/SectionCard";
 import { StoryCard } from "../ui/StoryCard";
+import { VoiceButton } from "../ui/VoiceButton";
 
 type InventoryScreenProps = {
   inventory: InventoryItem[];
@@ -56,6 +57,12 @@ function NoteDialog({ note, onClose }: { note: DetectiveNoteData; onClose: () =>
       className="fixed inset-0 z-[80] overflow-y-auto overscroll-contain bg-[#050403]/95 px-4 py-8 outline-none"
     >
       <div className="mx-auto w-full max-w-[470px] space-y-6">
+        {/* Hlas pátrača nad papierom; hráč zápis otvoril ťuknutím, preto sa spustí sám. */}
+        {note.audioSrc && (
+          <div className="flex justify-end">
+            <VoiceButton src={note.audioSrc} autoPlay />
+          </div>
+        )}
         <DetectiveNote
           number={note.number}
           title={note.title}

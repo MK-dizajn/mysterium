@@ -20,6 +20,8 @@ class VoicePlayer {
   private state: VoiceState = { src: null, progress: 0, failed: new Set() };
   private listeners = new Set<() => void>();
   private isListeningToSound = false;
+  /** Hlasy, ktoré sa už raz spustili samy (do zatvorenia hry). */
+  private autoPlayed = new Set<string>();
 
   subscribe = (listener: () => void) => {
     this.listeners.add(listener);
@@ -40,12 +42,20 @@ class VoicePlayer {
     this.start(src, false);
   }
 
-  /** Samospustenie (napríklad zápis po ťuknutí): pri vypnutom zvuku nič. */
-  autoPlay(src: string) {
-    if (soundManager.isMuted() || this.state.failed.has(src)) {
+  /**
+   * Samospustenie (napríklad zápis po ťuknutí): pri vypnutom zvuku nič.
+   * S `once` iba prvýkrát (po návrate na obrazovku sa už nespustí samo).
+   */
+  autoPlay(src: string, { once = false }: { once?: boolean } = {}) {
+    if (
+      soundManager.isMuted() ||
+      this.state.failed.has(src) ||
+      (once && this.autoPlayed.has(src))
+    ) {
       return;
     }
 
+    this.autoPlayed.add(src);
     this.start(src, true);
   }
 

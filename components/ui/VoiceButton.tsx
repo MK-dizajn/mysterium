@@ -6,8 +6,11 @@ import { getServerVoiceState, voicePlayer } from "../../lib/voicePlayer";
 type VoiceButtonProps = {
   /** Nahratý hlas (cesta z dát); bez neho sa tlačidlo neukáže. */
   src?: string;
-  /** Spustiť samo po zobrazení (iba keď na obrazovku viedlo ťuknutie). */
-  autoPlay?: boolean;
+  /**
+   * Spustiť samo po zobrazení (iba keď na obrazovku viedlo ťuknutie);
+   * „once“ = iba pri prvom zobrazení, nie po návrate na obrazovku.
+   */
+  autoPlay?: boolean | "once";
   className?: string;
 };
 
@@ -32,7 +35,7 @@ export function VoiceButton({ src, autoPlay = false, className = "" }: VoiceButt
     }
 
     if (autoPlay) {
-      voicePlayer.autoPlay(src);
+      voicePlayer.autoPlay(src, { once: autoPlay === "once" });
     }
 
     return () => voicePlayer.stop(src);

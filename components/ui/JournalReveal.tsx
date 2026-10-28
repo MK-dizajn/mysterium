@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import type { DetectiveNote as DetectiveNoteData } from "../../types/game";
 import { ActionButton } from "./ActionButton";
 import { DetectiveNote } from "./DetectiveNote";
+import { VoiceButton } from "./VoiceButton";
 
 type JournalRevealProps = {
   note: DetectiveNoteData;
@@ -116,6 +117,13 @@ export function JournalReveal({
           >
             {note.introText}
           </p>
+        )}
+
+        {/* Hlas pátrača nad papierom (papier sa dá ťahaním nakláňať); spustí sa sám. */}
+        {note.audioSrc && (
+          <div className="mb-3 flex justify-end">
+            <VoiceButton src={note.audioSrc} autoPlay />
+          </div>
         )}
 
         <figure
