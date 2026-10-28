@@ -4169,3 +4169,28 @@ Vývojový server je zastavený.
 - `docs/PRACOVNY-DENNIK.md`.
 
 **Ďalší krok:** M3, cieľová pamäť Turbopacku (F) a meranie, či E a F nespomaľujú preklad.
+
+---
+
+## 28. 10. 2026 – Opatrenia, krok M3: cieľová pamäť Turbopacku (F) a meranie E a F
+
+**Čo sa zmenilo:**
+- `next.config.ts`: `experimental.turbopackMemoryLimit` je 4 GB. Nad touto hranicou Turbopack uvoľňuje svoju vyrovnávaciu pamäť.
+- Je to cieľ, nie tvrdý limit. Tvrdú hranicu stráži strážca pamäte (M2).
+
+**Meranie (vývojový server, stránka „/“, prvý preklad s prázdnou `.next/dev` a potom po reštarte):**
+
+| Nastavenie | Server pripravený | Prvý preklad stránky | Po reštarte | Pamäť po preklade |
+|---|---|---|---|---|
+| bez opatrení | 1,4 s | 3,0 s | 0,4 s | 1 060 MB |
+| E (limit JavaScriptu 4 GB) | 1,3 s | 3,9 s | 0,3 s | 1 085 MB |
+| E + F (1. meranie) | 1,2 s | 2,7 s | 0,2 s | 1 070 MB |
+| E + F (2. meranie) | 1,1 s | 4,2 s | 0,4 s | 1 060 MB |
+
+**Záver:** E ani F preklad citeľne nespomaľujú. Rozdiely do 1 s sú bežné kolísanie (napríklad E+F raz 2,7 s, raz 4,2 s). Obe poistky ostávajú.
+
+**Build:** prešiel aj s novým nastavením.
+
+**Súbory:** `next.config.ts`, `docs/PRACOVNY-DENNIK.md`.
+
+**Ďalší krok:** M4, testy v prehliadači proti hotovej verzii (G) a mazanie testovacieho profilu po každom teste (I).
