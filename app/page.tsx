@@ -328,7 +328,12 @@ export default function Home() {
 
       return (
         <IntroScreen
-          arrival={currentChapter.arrival}
+          // Po odomknutí kódom „Vydaj sa…“ odomknutého aktu, inak začiatok kapitoly.
+          arrival={
+            currentChapter.acts.find(
+              (act) => act.id === gameState.currentActId
+            )?.arrival ?? currentChapter.arrival
+          }
           showFallbackText={isIntroVideoUnavailable}
           onContinue={() => updateGameScreen("puzzle")}
         />

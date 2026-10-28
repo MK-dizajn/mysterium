@@ -376,6 +376,20 @@ export type Act = {
   /** Označenie zámku truhlice pre tento akt (napríklad „I“). */
   lockLabel: string;
   ending?: ActEnding;
+  /** „Vydaj sa k …“ pri začiatku aktu odomknutom kódom (prvý akt používa príchod kapitoly). */
+  arrival?: ChapterArrival;
+};
+
+/** Kód „Mám kód“: iba odtlačok, nikdy samotný kód. */
+export type UnlockCode = {
+  id: string;
+  /** SHA-256 z upraveného kódu s predponou (engine/unlockCodes.ts). */
+  codeHash: string;
+  label: string;
+  target: {
+    chapterId: ChapterId;
+    actId: ActId;
+  };
 };
 
 /** Strážca prináša truhlicu (video je voliteľné, bez neho sa ukáže text). */
@@ -549,8 +563,8 @@ export type ChapterArrival = {
   title: string;
   text: string;
   /** Ukáže sa iba vtedy, keď sa úvodné video nedá prehrať (aby hráč nestratil príbeh). */
-  fallbackTitle: string;
-  fallbackText: string;
+  fallbackTitle?: string;
+  fallbackText?: string;
   /** Miesto pre odkaz do máp. */
   mapsQuery: string;
   mapsLabel: string;

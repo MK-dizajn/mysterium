@@ -29,7 +29,7 @@ export function IntroScreen({
       <ScreenTransition>
         {/* Štítok „Prvá stopa“ je nad pokynom (ako doteraz), hore ostáva „Úvodný prípad“. */}
         <StoryCard label="Úvodný prípad" title={arrival.title}>
-          {showFallbackText && (
+          {showFallbackText && arrival.fallbackTitle && arrival.fallbackText && (
             <Reveal delay={300}>
               <SectionCard
                 icon={<DetectiveIcon className="h-9 w-9" />}

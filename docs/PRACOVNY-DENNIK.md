@@ -4232,3 +4232,64 @@ Vývojový server je zastavený.
 **Opatrenia A, B, C, D, E, F, G a I sú hotové.**
 
 **Ďalší krok:** dokončiť krok 2 kódov.
+
+---
+
+## 28. 10. 2026 – Odomykanie kódom, krok 2: zoznam kódov a odomknutie aktov II a III
+
+**Čo sa zmenilo:**
+- **`data/unlock-codes.ts`** obsahuje dva kódy:
+  - Kapitola I · Akt II – Moc a poznanie,
+  - Kapitola I · Akt III – Posledné tajomstvo.
+  - Uložené sú iba **odtlačky** (SHA-256 z upraveného kódu s predponou). Čitateľné kódy nie sú v žiadnom súbore projektu, testov ani v tomto denníku, čo je overené vyhľadaním.
+  - Nový kód: pridať riadok s odtlačkom a cieľom (kapitola, akt).
+- **`engine/unlockCodes.ts`:**
+  - porovnanie kódu nerozlišuje veľké a malé písmená a ignoruje medzery a pomlčky,
+  - odtlačok SHA-256 je napísaný priamo v hre, takže funguje aj bez https, napríklad pri skúšaní na mobile v domácej sieti,
+  - `createUnlockedGameState` vytvorí uloženú hru odomknutého aktu.
+- **Odomknutie = poctivé prejdenie predošlých aktov** rovnakými funkciami hry (bez nápovedy, teda plné body):
+  - akt II: 300 bodov,
+  - akt III: 600 bodov,
+  - Inventár (zápis č. 1, predmety, útržky), artefakty, úlohy a príznaky ako po poctivom prejdení,
+  - číslice predmetov sú nájdené (nie odhalené tlačidlom),
+  - videá A a B sú označené ako videné,
+  - príbudne príznak `unlocked_by_code_…`.
+  - Hra začne obrazovkou „Vydaj sa k …“ odomknutého aktu.
+- **Obrazovky „Vydaj sa k …“ pre akty II a III** (schválené texty, v dátach aktov):
+  - „Vydaj sa k Academii Istropolitane“,
+  - „Vydaj sa k Maximiliánovej fontáne“,
+  - obe s „Otvoriť v mapách“ a „Som na mieste“.
+- **Uloženie:** verzia ostáva v2, nič nové sa neukladá, takže F5 a „Pokračovať“ fungujú ako pri bežnej hre.
+- **Tlačidlo „Mám kód“** a jeho obrazovka pribudnú v kroku 3. Dovtedy sa kód v hre nedá zadať.
+
+**Súbory:**
+- `engine/unlockCodes.ts`, `data/unlock-codes.ts` (nové),
+- `engine/index.ts`,
+- `types/game.ts` (`UnlockCode`, `Act.arrival`, voliteľný náhradný text príchodu),
+- `data/chapter-one/acts.ts`,
+- `components/screens/IntroScreen.tsx`,
+- `app/page.tsx`.
+
+**Testy (iba skúšobné kódy TEST-…):**
+- **Nový Node test E5:** pred zmenou 18 chýb, po zmene všetko OK. Overuje:
+  - SHA-256 (známe hodnoty, dlhý text s diakritikou, hranice blokov),
+  - porovnanie kódu, správny, nesprávny a prázdny kód,
+  - dáta bez čitateľných kódov,
+  - texty príchodu,
+  - odomknutie aktov II a III oproti poctivému prejdeniu (body, Inventár, artefakty, úlohy, príznaky, číslice),
+  - F5,
+  - dohratie do konca s kódom vrátane zámkov truhlice (skóre 1010),
+  - neznámy akt a neznáma kapitola.
+- Zhodu skutočných kódov s odtlačkami som overil funkciou hry bez zápisu kódov do súboru.
+- **Nový test E5 v prehliadači** (uloženie vyrobené funkciou hry so skúšobným kódom, 360 px, oba režimy): „Pokračovať“, „Vydaj sa…“ pre akty II a III, odkaz do máp, F5, „Som na mieste“ → úloha na správnom mieste. Všetko OK.
+  - Test pred zmenou v prehliadači som nespustil, lebo kód kroku bol napísaný už pred prerušením sedenia. Pred zmenou je overený iba Node test.
+- **Node:** 23 testov OK (B7: celá kapitola, skóre **1010**).
+- **Prehliadač, celá séria stálych testov proti hotovej verzii:** všetko OK (pozri M4).
+
+**Chyby:**
+- E5 v prehliadači najprv hlásil 2 chyby, lebo test hľadal názov miesta malými písmenami a na obrazovke je veľkými. Chyba bola v teste.
+- Sedenie sa včera prerušilo uprostred tohto kroku; kód ostal necommitnutý až do zavedenia opatrení M1 až M4.
+
+**Build:** prešiel. **Lint:** bez zmeny, 14 starých problémov.
+
+**Ďalší krok:** krok 3, tlačidlo a obrazovka „Mám kód“, až po „pokračuj“.

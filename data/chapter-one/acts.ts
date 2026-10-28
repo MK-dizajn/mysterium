@@ -35,6 +35,15 @@ export const chapterOneActs: Act[] = [
       "stara-radnica",
     ],
     lockLabel: "II",
+    // Začiatok aktu po odomknutí kódom.
+    arrival: {
+      label: "Akt II – Moc a poznanie",
+      title: "Vydaj sa k Academii Istropolitane",
+      text: "Druhá časť pátrania sa začína na Ventúrskej ulici. Zastav sa pri budove Academie Istropolitany s pamätnou tabuľou.",
+      mapsQuery: "Academia Istropolitana, Ventúrska 3, Bratislava",
+      mapsLabel: "Otvoriť v mapách",
+      confirmLabel: "Som na mieste",
+    },
     ending: {
       kind: "seal",
       label: "Pečať",
@@ -61,6 +70,15 @@ export const chapterOneActs: Act[] = [
       "zlaty-presporsky-kluc",
     ],
     lockLabel: "III",
+    // Začiatok aktu po odomknutí kódom.
+    arrival: {
+      label: "Akt III – Posledné tajomstvo",
+      title: "Vydaj sa k Maximiliánovej fontáne",
+      text: "Posledná časť pátrania sa začína na Hlavnom námestí, pri fontáne v jeho strede.",
+      mapsQuery: "Maximiliánova fontána, Hlavné námestie, Bratislava",
+      mapsLabel: "Otvoriť v mapách",
+      confirmLabel: "Som na mieste",
+    },
     ending: {
       kind: "keyAssembly",
       label: "Kľúč je kompletný",
