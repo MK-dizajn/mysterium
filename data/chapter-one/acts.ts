@@ -37,6 +37,7 @@ export const chapterOneActs: Act[] = [
     lockLabel: "II",
     // Začiatok aktu po odomknutí kódom.
     arrival: {
+      eyebrow: "Odomknuté kódom",
       label: "Akt II – Moc a poznanie",
       title: "Vydaj sa k Academii Istropolitane",
       text: "Druhá časť pátrania sa začína na Ventúrskej ulici. Zastav sa pri budove Academie Istropolitany s pamätnou tabuľou.",
@@ -72,6 +73,7 @@ export const chapterOneActs: Act[] = [
     lockLabel: "III",
     // Začiatok aktu po odomknutí kódom.
     arrival: {
+      eyebrow: "Odomknuté kódom",
       label: "Akt III – Posledné tajomstvo",
       title: "Vydaj sa k Maximiliánovej fontáne",
       text: "Posledná časť pátrania sa začína na Hlavnom námestí, pri fontáne v jeho strede.",

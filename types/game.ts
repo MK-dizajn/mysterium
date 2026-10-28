@@ -559,6 +559,8 @@ export type ChapterIntroVideo = StoryVideoContent;
 
 /** Obrazovka „Vydaj sa k …“: kam má hráč ísť a potvrdenie, že tam je. */
 export type ChapterArrival = {
+  /** Štítok nad nadpisom (bez neho „Úvodný prípad“). */
+  eyebrow?: string;
   label: string;
   title: string;
   text: string;

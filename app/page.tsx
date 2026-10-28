@@ -17,9 +17,11 @@ import { FinishScreen } from "../components/screens/FinishScreen";
 import { IntroScreen } from "../components/screens/IntroScreen";
 import { StoryVideoScreen } from "../components/screens/StoryVideoScreen";
 import { LandingScreen } from "../components/screens/LandingScreen";
+import { UnlockCodeScreen } from "../components/screens/UnlockCodeScreen";
 import { ItemInspector } from "../components/items/ItemInspector";
 import { ArtifactUnlock } from "../components/ui/ArtifactUnlock";
 import { mysteriumGame } from "../data/mysterium-game";
+import { unlockCodes } from "../data/unlock-codes";
 import {
   applyDialogueChoiceActions,
   applyGameActions,
@@ -28,6 +30,7 @@ import {
   continueAfterHistory,
   countChapterArtifacts,
   createNewGameState,
+  createUnlockedGameState,
   getActLockEvidence,
   getActTransition,
   getCodeItemInfo,
@@ -51,7 +54,7 @@ import {
   unlockFinaleLock,
 } from "../engine";
 import { useGameEngine } from "../hooks/useGameEngine";
-import type { Artifact, GameScreen } from "../types/game";
+import type { Artifact, GameScreen, UnlockCode } from "../types/game";
 
 export default function Home() {
   const {
@@ -81,6 +84,9 @@ export default function Home() {
   // aby sa video ukázalo, keď súbor pribudne.
   const [isIntroVideoUnavailable, setIsIntroVideoUnavailable] =
     useState(false);
+
+  // Obrazovka „Mám kód“ (iba z úvodnej obrazovky, neukladá sa).
+  const [isUnlockCodeOpen, setIsUnlockCodeOpen] = useState(false);
 
   const fallbackChapter = mysteriumGame.chapters[0];
 
@@ -155,6 +161,23 @@ export default function Home() {
       ...createNewGameState(),
       screen: "intro",
     });
+  }
+
+  /** Kód odomkol časť hry: nová uložená hra od odomknutého aktu („Vydaj sa k …“). */
+  function unlockWithCode(code: UnlockCode) {
+    const unlockedState = createUnlockedGameState(mysteriumGame, code);
+
+    if (!unlockedState) {
+      return;
+    }
+
+    clearGameState();
+    setSelectedArtifact(null);
+    setUnlockedArtifact(null);
+    setPreviousScreen("puzzle");
+    setArtifactPreviousScreen("artifacts");
+    setIsUnlockCodeOpen(false);
+    setGameState(unlockedState);
   }
 
   function openInventory() {
@@ -631,12 +654,28 @@ export default function Home() {
     }
 
     return (
-      <LandingScreen
-        hasSavedProgress={hasSavedProgress}
-        onContinueGame={continueSavedGame}
-        onStartNewGame={startNewGame}
-        previewNotice={mysteriumGame.previewNotice}
-      />
+      isUnlockCodeOpen ? (
+        <UnlockCodeScreen
+          codes={unlockCodes}
+          hasSavedProgress={hasSavedProgress}
+          getTargetTitle={(code) =>
+            mysteriumGame.chapters
+              .find((chapter) => chapter.id === code.target.chapterId)
+              ?.acts.find((act) => act.id === code.target.actId)?.title ??
+            code.label
+          }
+          onUnlock={unlockWithCode}
+          onBack={() => setIsUnlockCodeOpen(false)}
+        />
+      ) : (
+        <LandingScreen
+          hasSavedProgress={hasSavedProgress}
+          onContinueGame={continueSavedGame}
+          onStartNewGame={startNewGame}
+          onOpenUnlockCode={() => setIsUnlockCodeOpen(true)}
+          previewNotice={mysteriumGame.previewNotice}
+        />
+      )
     );
   }
 

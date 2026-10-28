@@ -4293,3 +4293,57 @@ Vývojový server je zastavený.
 **Build:** prešiel. **Lint:** bez zmeny, 14 starých problémov.
 
 **Ďalší krok:** krok 3, tlačidlo a obrazovka „Mám kód“, až po „pokračuj“.
+
+---
+
+## 28. 10. 2026 – Odomykanie kódom, krok 3: „Mám kód“
+
+**Čo sa zmenilo pre hráča:**
+- **Úvodná obrazovka** má tretie tlačidlo **„Mám kód“** (tmavé, pod „Nová hra“).
+- **Obrazovka kódu:**
+  - štítok „Odomknúť časť hry“, nadpis „Máš kód?“, veta „Kód odomkne časť pátrania, ktorú si už začal inde.“,
+  - pole „Kód“: po otvorení je zamerané, píše veľkými písmenami, bez opráv pravopisu a bez napovedania,
+  - „Odomknúť“ je vypnuté, kým je pole prázdne; Enter funguje tiež,
+  - „Späť“ vráti na úvodnú obrazovku.
+- **Zlý kód:** pod poľom sa ukáže „Tento kód nepoznáme. Skontroluj ho a skús znova.“
+  - Čítačka ju prečíta hneď, pole je označené ako chybné, kód v ňom ostane a hra sa nemení.
+- **Správny kód:**
+  - pri uloženej hre najprv potvrdenie „Odomknúť Akt II – Moc a poznanie?“ s vetou „Tvoj doterajší postup sa nahradí.“ a tlačidlami „Áno, odomknúť“ a „Zrušiť“ (vzhľad ako „Začať odznova?“),
+  - potom na chvíľu oznam „Odomknuté: Akt II – Moc a poznanie“ (pre čítačku ako stav),
+  - a hra prejde na „Vydaj sa k Academii Istropolitane“ (pri kóde aktu III „Vydaj sa k Maximiliánovej fontáne“).
+- **Štítok na obrazovkách „Vydaj sa k …“ pre akty II a III** je „Odomknuté kódom“ (namiesto „Úvodný prípad“).
+  - Vybral som ho namiesto „Akt II“ a „Akt III“: hráč hneď vidí, že kód zafungoval, a názov aktu je už v karte s pokynom („Akt II – Moc a poznanie“), takže by sa neopakoval.
+
+**Súbory:**
+- `components/screens/UnlockCodeScreen.tsx` (nový),
+- `components/screens/LandingScreen.tsx`,
+- `components/screens/IntroScreen.tsx`,
+- `app/page.tsx`,
+- `types/game.ts` (voliteľný štítok `eyebrow` pri príchode),
+- `data/chapter-one/acts.ts`.
+
+**Testy (iba skúšobný kód TEST-AAAA):**
+- **Nový test F3 v prehliadači** (320 a 360 px, zapnuté aj vypnuté animácie, proti hotovej verzii).
+  - Test počas behu nahradí v skriptoch hry odtlačok kódu aktu II odtlačkom TEST-AAAA. Skutočné kódy sa v teste nepoužívajú.
+  - Pred zmenou zlyhal (tlačidlo „Mám kód“ chýbalo), po zmene všetko OK. Overuje:
+    - tlačidlá na úvodnej obrazovke, 44 px, bez posúvania do strany,
+    - pole „Kód“ (popis, zameranie, veľké písmená, bez opráv),
+    - vypnuté „Odomknúť“ pri prázdnom poli,
+    - zlý kód (správa, čítačka, kód ostane, nič sa neuloží), „Späť“,
+    - správny kód iným zápisom a Enterom, oznam „Odomknuté…“,
+    - „Vydaj sa k Academii…“ so štítkom „Odomknuté kódom“, uložená hra (akt II, 300 bodov), F5,
+    - potvrdenie pri uloženej hre („Zrušiť“ nič nezmení, „Áno, odomknúť“ odomkne).
+- **Upravený test E4:** úvodná obrazovka má teraz tri tlačidlá.
+- Testy bežali cez nové bezpečné spúšťanie (`npm run test:server`, po sérii `npm run stop`). Strážca pamäte zapísal najviac 100 MB a 1 proces.
+- **Celá séria stálych testov v prehliadači proti hotovej verzii:** B3b, B4b, B4c-1, B4c-2, B4c-3, C1, D2, D3a, D4, D5, c6, E4, G1, E5 a F3 (G1, E5 a F3 aj s vypnutými animáciami) – 18 behov, všetko OK.
+  - Trvanie 20 minút.
+  - Server mal najviac 99 MB a 1 proces, na konci zastavený, profily zmazané.
+- **Node:** 23 testov OK (B7: celá kapitola, skóre **1010**).
+
+**Chyby:** žiadne v hre. Pri teste pred zmenou F3 spadol na prvej chýbajúcej položke (tlačidlo „Mám kód“ ešte nebolo), ako sa čakalo.
+
+**Build:** prešiel. **Lint:** bez zmeny, 14 starých problémov. **Server:** zastavený (`npm run stop` – žiadne zabudnuté procesy).
+
+**Odomykanie kódom (kroky 1 až 3) je hotové.**
+
+**Ďalší krok:** podľa plánu (menu kapitol, hlasy), až po potvrdení.

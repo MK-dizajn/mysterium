@@ -27,8 +27,8 @@ export function IntroScreen({
   return (
     <ScreenContainer>
       <ScreenTransition>
-        {/* Štítok „Prvá stopa“ je nad pokynom (ako doteraz), hore ostáva „Úvodný prípad“. */}
-        <StoryCard label="Úvodný prípad" title={arrival.title}>
+        {/* Hore „Úvodný prípad“ (po kóde „Odomknuté kódom“), štítok časti je nad pokynom. */}
+        <StoryCard label={arrival.eyebrow ?? "Úvodný prípad"} title={arrival.title}>
           {showFallbackText && arrival.fallbackTitle && arrival.fallbackText && (
             <Reveal delay={300}>
               <SectionCard

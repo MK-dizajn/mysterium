@@ -8,6 +8,8 @@ type LandingScreenProps = {
   hasSavedProgress: boolean;
   onStartNewGame: () => void;
   onContinueGame: () => void;
+  /** „Mám kód“: obrazovka na vloženie kódu, ktorý odomkne časť hry. */
+  onOpenUnlockCode: () => void;
   /** Štítok ukážkovej verzie z dát; bez neho sa ukáže veta o zvuku. */
   previewNotice?: string;
 };
@@ -18,6 +20,7 @@ export function LandingScreen({
   hasSavedProgress,
   onStartNewGame,
   onContinueGame,
+  onOpenUnlockCode,
   previewNotice,
 }: LandingScreenProps) {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
@@ -110,6 +113,10 @@ export function LandingScreen({
               variant={hasSavedProgress ? "secondary" : "primary"}
             >
               Nová hra
+            </ActionButton>
+
+            <ActionButton variant="secondary" onClick={onOpenUnlockCode}>
+              Mám kód
             </ActionButton>
           </div>
 
