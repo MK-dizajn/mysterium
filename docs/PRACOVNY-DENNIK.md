@@ -4553,3 +4553,36 @@ Vývojový server je zastavený.
 **Build:** prešiel. **Lint:** bez zmeny, 14 starých problémov. **Server:** zastavený (žiadne zabudnuté procesy).
 
 **Ďalší krok:** podľa plánu, až po potvrdení.
+
+---
+
+## 28. 10. 2026 – Nové video Strážcu na Michalskej bráne (video B)
+
+**Čo sa zmenilo:**
+- Používateľ nahradil video B novou verziou s rovnakými názvami súborov:
+  - `strazca-michalska-brana.mp4`: 30,5 s, 4,9 MB (predtým 5,4 MB), začne sa prehrávať ešte počas sťahovania,
+  - `strazca-michalska-brana.sk.vtt`: 10 častí (predtým 9), ten istý text, nové časy, dlhá veta o pátračovi rozdelená na dve časti,
+  - `strazca-michalska-brana.poster.jpg`.
+- Kód ani dáta hry sa nemenili, cesty ostávajú rovnaké.
+- `docs/MEDIA-LICENCIE.md`:
+  - pôvodná verzia nahradená 28. 10. 2026 novou, zloženou z troch klipov (príchod, privítanie gestami, vytiahnutie a podanie listu),
+  - klipy vznikli vo Flow (Veo 3.1 Lite, prvé snímky z Nano Banana), zvuk z klipov je vyhodený,
+  - hlas „Andrej - Mild, Calm“ (ElevenLabs, Eleven v4, rýchlosť 0,9), zostavenie ffmpeg,
+  - komerčné podmienky **NEOVERENÉ**.
+- `docs/KONTROLA-PRED-VYDANIM.md`: veľkosť videa B na mobilné dáta 4,9 MB.
+
+**Kontrola, čo počítalo so starým videom:**
+- Dáta hry počet častí ani dĺžku nepoužívajú.
+- **Node test E3** kontroloval 9 častí titulkov, upravil som ho na 10 (prvá „Videl som ťa prichádzať už zďaleka.“, posledná „Veľa šťastia, pátrač.“). Limit veľkosti (pod 10 MB) aj rýchly štart platia ďalej.
+- Test G1 v prehliadači hľadá iba úvodnú vetu titulkov, ktorá sa nezmenila.
+
+**Testy:**
+- **Node:** 24 testov OK (B7: celá kapitola, skóre **1010**).
+- **Prehliadač (proti hotovej verzii):**
+  - G1 (video Strážcu so skutočným súborom, celá obrazovka, titulky, koniec, „Preskočiť“, F5, chýbajúci súbor), v oboch režimoch, OK,
+  - H3 (zápis č. 1 sa po videu sám prečíta), OK.
+  - Server najviac 109 MB.
+
+**Chyby:** žiadne.
+
+**Build:** prešiel. **Lint:** bez zmeny, 14 starých problémov. **Server:** zastavený.
