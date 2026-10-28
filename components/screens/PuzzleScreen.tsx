@@ -9,6 +9,7 @@ import { ScreenContainer } from "../ui/ScreenContainer";
 import { LightbulbIcon, SearchIcon } from "../ui/MysteriumIcons";
 import { SectionCard } from "../ui/SectionCard";
 import { StoryCard } from "../ui/StoryCard";
+import { VoiceButton } from "../ui/VoiceButton";
 
 type PuzzleScreenProps = {
   scene: Scene;
@@ -101,12 +102,17 @@ export function PuzzleScreen({
           />
         )}
 
-        <p className="text-amber-200">{scene.cinematicText}</p>
+        {/* Text ostáva vždy zobrazený, hlas rozprávača je na požiadanie. */}
+        <div className="flex items-start gap-3">
+          <p className="min-w-0 flex-1 text-amber-200">{scene.cinematicText}</p>
+          <VoiceButton src={scene.cinematicAudioSrc} />
+        </div>
 
         {/* Hlas pátrača ako krátky citát (bez veľkej karty), aby bola úloha bližšie. */}
         <figure className="border-l-2 border-amber-300/50 pl-4">
-          <figcaption className="text-xs font-bold uppercase tracking-[0.22em] text-amber-300/80">
+          <figcaption className="flex min-h-11 items-center justify-between gap-3 text-xs font-bold uppercase tracking-[0.22em] text-amber-300/80">
             Hlas pátrača
+            <VoiceButton src={scene.voiceLineAudioSrc} />
           </figcaption>
           <blockquote className="mt-2 italic leading-normal text-slate-300">
             „{scene.voiceLine}“

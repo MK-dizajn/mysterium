@@ -4394,3 +4394,60 @@ Vývojový server je zastavený.
 **Build:** prešiel. **Lint:** bez zmeny, 14 starých problémov. **Server:** nebežal (`npm run stop` – žiadne zabudnuté procesy).
 
 **Ďalší krok:** H2, prehrávač a tlačidlo „Prečítať nahlas“ na obrazovkách úloh.
+
+---
+
+## 28. 10. 2026 – Hlasy, krok H2: prehrávač a „Prečítať nahlas“ na obrazovkách úloh
+
+**Čo sa zmenilo pre hráča:**
+- **Na obrazovke úlohy** je pri úvodnom odseku (rozprávač) a v riadku „Hlas pátrača“ okrúhle tlačidlo 44 × 44 px s reproduktorom.
+  - Popis pre čítačku: „Prečítať nahlas“, počas prehrávania „Zastaviť čítanie“ (aj `aria-pressed`).
+  - Počas prehrávania je v tlačidle štvorček a okolo zlatý krúžok priebehu. Pri vypnutých animáciách sa krúžok mení bez plynulého prechodu.
+- **Text ostáva vždy zobrazený.** Na obrazovkách úloh sa nič nespúšťa samo.
+- **Vždy hrá najviac jeden hlas:**
+  - nový hlas zastaví predošlý,
+  - druhé ťuknutie hlas zastaví,
+  - spustené video hlas tiež zastaví.
+- **Odchod z obrazovky** (napríklad do Inventára) hlas zastaví.
+- **Prepínač zvuku v hornej lište:**
+  - vypnutie zastaví aj hlas a pamätá sa po F5,
+  - ťuknutie na „Prečítať nahlas“ pri vypnutom zvuku zvuk zapne a hlas prehrá (výslovná žiadosť hráča).
+- **Chýbajúci súbor:** tlačidlo zmizne, text ostane a nič sa nepokazí.
+- **Sťahovanie:** súbor hlasu sa sťahuje až pri prehraní.
+
+**Ako je to v kóde:**
+- `lib/voicePlayer.ts` je spoločný prehrávač:
+  - jeden hlas naraz, priebeh, chyba súboru,
+  - riadi sa prepínačom zvuku,
+  - pre testy zapisuje práve hrajúci hlas do `data-voice-playing` na stránke.
+- `components/ui/VoiceButton.tsx` je tlačidlo. Bez cesty v dátach sa neukáže a pri odchode z obrazovky hlas zastaví.
+- `components/screens/PuzzleScreen.tsx` dostal tlačidlá pri textoch (cesty berie z dát scény).
+- `components/ui/StoryVideo.tsx` pri spustení videa zastaví hlas.
+
+**Testy:**
+- **Nový test H2 v prehliadači** (proti hotovej verzii, 320 a 360 px, zapnuté aj vypnuté animácie, skutočné ťuknutia v prehliadači bez povolenia samospustenia).
+  - Pred zmenou zlyhal (tlačidlá chýbali), po zmene všetko OK. Overuje:
+    - dve tlačidlá 44 px s popisom, text zobrazený, bez posúvania do strany,
+    - nič sa nespustí samo, prehranie a priebeh,
+    - druhý hlas zastaví prvý, druhé ťuknutie zastaví,
+    - odchod do Inventára zastaví a po návrate nič nehrá,
+    - vypnutie zvuku zastaví a pamätá sa po F5; „Prečítať nahlas“ zvuk zapne,
+    - chýbajúci súbor (404): tlačidlo zmizne, text ostane,
+    - krúžok pri vypnutých animáciách.
+- **Celá séria stálych testov v prehliadači proti hotovej verzii** (20 behov vrátane H2): všetko OK okrem známej kontroly truhlice v D5 („pri otáčaní opačným smerom sa nič neodreže“, 0 px rezervy hore).
+  - Táto kontrola občas zlyháva aj bez zmien (otvorená vec z kroku F1), s hlasmi nesúvisí.
+  - Trvanie 22 minút, server najviac 99 MB.
+- **Node:** 24 testov OK (B7: celá kapitola, skóre **1010**).
+
+**Chyby:** žiadne v hre.
+- Pri písaní prehrávača som doplnil ochranu: chyba už zastaveného hlasu (po `stop`) sa nepočíta ako chýbajúci súbor, inak by tlačidlo po zastavení mohlo zmiznúť.
+
+**Súbory:**
+- `lib/voicePlayer.ts`, `components/ui/VoiceButton.tsx` (nové),
+- `components/screens/PuzzleScreen.tsx`,
+- `components/ui/StoryVideo.tsx`,
+- `docs/PRACOVNY-DENNIK.md`.
+
+**Build:** prešiel. **Lint:** bez zmeny, 14 starých problémov. **Server:** zastavený (žiadne zabudnuté procesy).
+
+**Ďalší krok:** H3, hlas pri zápise č. 1, na konci aktu I a v závere (so samospustením po ťuknutí).

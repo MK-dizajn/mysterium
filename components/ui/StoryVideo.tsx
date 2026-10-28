@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { useReducedMotion } from "../items/useReducedMotion";
+import { voicePlayer } from "../../lib/voicePlayer";
 import { ActionButton } from "./ActionButton";
 
 type StoryVideoProps = {
@@ -89,6 +90,8 @@ export function StoryVideo({
       return;
     }
 
+    // Video a hlas nikdy naraz.
+    voicePlayer.stop();
     toggleRef.current?.focus();
     video.play().catch(() => setPhase("paused"));
   }, [src]);
