@@ -396,9 +396,39 @@ export type UnlockCode = {
   label: string;
   target: {
     chapterId: ChapterId;
-    actId: ActId;
+    /** Bez aktu kód odomkne celú kapitolu; s aktom odomkne kapitolu a hra začne od aktu. */
+    actId?: ActId;
   };
 };
+
+/** Kapitola v menu (aj taká, ktorá ešte nemá obsah – „Čoskoro“). */
+export type ChapterCatalogEntry = {
+  /** Rovnaké ako id obsahu kapitoly (Chapter.id), keď obsah existuje. */
+  id: ChapterId;
+  cityId: string;
+  /** Rímske číslo kapitoly („I“). */
+  number: string;
+  title: string;
+  subtitle?: string;
+  status: "available" | "comingSoon";
+  route?: {
+    stops: number;
+    start: string;
+    duration: string;
+    /** Dočasný údaj (napríklad dĺžka pred terénnou skúškou). */
+    isPlaceholder?: boolean;
+  };
+};
+
+/** Výsledok overenia kódu (dnes v telefóne, neskôr na serveri). */
+export type CodeVerification =
+  | {
+      status: "ok";
+      code: UnlockCode;
+      grant: { chapterId: ChapterId; actId?: ActId };
+    }
+  | { status: "unknown" }
+  | { status: "unavailable" };
 
 /** Strážca prináša truhlicu (video je voliteľné, bez neho sa ukáže text). */
 export type FinaleGuardian = {

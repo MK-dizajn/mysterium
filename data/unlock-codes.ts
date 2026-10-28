@@ -8,6 +8,14 @@ import type { UnlockCode } from "../types/game";
  */
 export const unlockCodes: UnlockCode[] = [
   {
+    id: "kapitola-1",
+    codeHash:
+      "00aa1cdcc0a6e7d7a7e37b65aec9f94c1b43a211131ec799718d82ef5950c632",
+    label: "Kapitola I – Stratený denník starého pátrača",
+    target: { chapterId: "bratislava-chapter-1" },
+  },
+  // Kódy aktov odomknú aj celú kapitolu.
+  {
     id: "kapitola-1-akt-2",
     codeHash:
       "93b3ce4667248309c3176add459f5235ea7d30c287b849eb1fc4a5c65f281227",

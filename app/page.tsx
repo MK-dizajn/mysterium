@@ -23,6 +23,7 @@ import { ItemInspector } from "../components/items/ItemInspector";
 import { ArtifactUnlock } from "../components/ui/ArtifactUnlock";
 import { mysteriumGame } from "../data/mysterium-game";
 import { unlockCodes } from "../data/unlock-codes";
+import { unlockChapter } from "../lib/unlockStore";
 import {
   applyDialogueChoiceActions,
   applyGameActions,
@@ -170,6 +171,15 @@ export default function Home() {
 
   /** Kód odomkol časť hry: nová uložená hra od odomknutého aktu („Vydaj sa k …“). */
   function unlockWithCode(code: UnlockCode) {
+    // Kód kapitoly odomkne kapitolu a začne ju; kód aktu odomkne aj kapitolu.
+    unlockChapter(code.target.chapterId, code.target.actId ? "actCode" : "code");
+
+    if (!code.target.actId) {
+      setIsUnlockCodeOpen(false);
+      startNewGame();
+      return;
+    }
+
     const unlockedState = createUnlockedGameState(mysteriumGame, code);
 
     if (!unlockedState) {

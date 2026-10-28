@@ -4586,3 +4586,52 @@ Vývojový server je zastavený.
 **Chyby:** žiadne.
 
 **Build:** prešiel. **Lint:** bez zmeny, 14 starých problémov. **Server:** zastavený.
+
+---
+
+## 28. 10. 2026 – Menu kapitol, krok K1: katalóg kapitol, overenie kódu a uloženie odomknutí
+
+**Schválený plán (fáza 1, bez platieb a servera):**
+- Na začiatku hry bude menu troch kapitol Bratislavy a každá kapitola sa odomyká vlastným kódom.
+- Kapitoly II a III majú stav „Čoskoro“.
+- „Nová hra“ nahradí „Kapitoly“.
+- Kód aktu odomkne aj kapitolu I.
+- Obchádzanie zámku `?dev-odomknut=1` bude fungovať iba vo vývojovom režime.
+- Kroky: K1 dáta a overenie, K2 menu a tok, K3 spoločné „Mám kód“ a úprava starších testov.
+
+**Čo sa zmenilo v kroku K1:**
+- **`data/chapters-catalog.ts`:** tri kapitoly Bratislavy (id, mesto, číslo, názov, stav, trasa).
+  - Kapitola I: dostupná, 10 zastávok, štart Michalská brána, dĺžka „asi 2 hodiny (orientačne)“ ako **dočasný údaj** (`isPlaceholder`, upraví sa po terénnej skúške; nájde ho aj existujúca kontrola `isPlaceholder` pred vydaním).
+  - „Kapitola II“ a „Kapitola III“: stav „Čoskoro“, bez obsahu a trasy.
+- **`data/unlock-codes.ts`:** pribudol **odtlačok kódu kapitoly I**. Čitateľný kód nie je v žiadnom súbore, overené vyhľadaním. Kódy aktov II a III ostávajú.
+- **`lib/codeVerifier.ts`:** jediná funkcia `verifyUnlockCode`, ktorou hra overuje kód.
+  - Je „čakajúca“ (vracia sľub/Promise), takže sa neskôr dá vymeniť za otázku na server bez zmeny obrazoviek.
+  - Výsledok: „ok“ s tým, čo kód odomyká (kapitola, prípadne akt), „unknown“ pri zlom alebo prázdnom kóde, „unavailable“ je rezervované pre server.
+- **`lib/unlockStore.ts`:** odomknuté kapitoly sa ukladajú zvlášť pod `mysterium-unlocks-v1` (kedy a ako: kód, kód aktu, staršia hra, vývoj), preto ich „Začať odznova“ nezmaže.
+  - Poškodený záznam sa správa ako „nič neodomknuté“.
+  - Prevzatie starších hier (`migrateLegacySave`): kto má rozohranú hru, dostane jej kapitolu odomknutú.
+- **`types/game.ts`:** `ChapterCatalogEntry`, `CodeVerification`; cieľ kódu môže byť kapitola bez aktu.
+- **`app/page.tsx`** (malé prepojenie, aby kód kapitoly už teraz nebol slepý):
+  - kód kapitoly v dnešnom „Mám kód“ odomkne kapitolu I a začne novú hru (video A),
+  - kód aktu odomkne aj kapitolu I a hra začne od aktu ako doteraz.
+- **Verzia uloženej hry ostáva v2.**
+
+**Testy (iba skúšobné kódy TEST-…):**
+- **Nový Node test K1:** pred zmenou spadol (21 chýb), po zmene všetko OK. Overuje:
+  - katalóg (3 kapitoly, stavy, trasa, dočasná dĺžka),
+  - kódy (kapitola a dva akty, iba odtlačky, nič čitateľné),
+  - overenie (Promise, kód kapitoly, kód aktu, zlý a prázdny kód, skúšobný kód v hre neplatí),
+  - uloženie odomknutí (pamätá sa, „Začať odznova“ ho nezmaže, poškodený záznam),
+  - prevzatie starších hier (rozohraná hra áno, bez hry nie, neprepíše odomknutie kódom),
+  - verzia uloženia v2.
+- **Upravený Node test E5:** v zozname kódov je teraz aj kód kapitoly, test vyberá iba kódy aktov.
+- **Node:** 25 testov OK (B7: celá kapitola, skóre **1010**).
+- **Prehliadač (hotová verzia):** F3 („Mám kód“) a E4 (úvodná obrazovka) OK.
+
+**Chyby:**
+- Nové súbory v `lib/` sa v kópii pre Node testy najprv nenačítali, lebo kopírovací skript nedopĺňal príponu `.ts` k importom v `lib`. Pridal som kópiu `k1-copy.ps1`, ktorá to robí (aj import `../engine` → `../engine/index.ts`).
+- Jednu kontrolu (obrazovky volajú iba overovaciu funkciu) som presunul do testu kroku K3, kde sa obrazovka kódu mení.
+
+**Build:** prešiel. **Lint:** bez zmeny, 14 starých problémov. **Server:** zastavený.
+
+**Ďalší krok:** K2, menu kapitol a nový tok, až po „pokračuj“.
