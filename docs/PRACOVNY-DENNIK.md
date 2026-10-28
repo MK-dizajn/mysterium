@@ -4194,3 +4194,41 @@ Vývojový server je zastavený.
 **Súbory:** `next.config.ts`, `docs/PRACOVNY-DENNIK.md`.
 
 **Ďalší krok:** M4, testy v prehliadači proti hotovej verzii (G) a mazanie testovacieho profilu po každom teste (I).
+
+---
+
+## 28. 10. 2026 – Opatrenia, krok M4: testy proti hotovej verzii (G) a mazanie profilov (I)
+
+**Čo sa zmenilo:**
+- **`npm run test:server`** (`scripts/test-server.mjs`) spustí testovací server:
+  1. uprace zabudnuté procesy,
+  2. urobí build,
+  3. spustí hotovú verziu hry (`next start`) na porte 3000 so strážcom pamäte a limitom pamäte pre JavaScript.
+  - Server beží na pozadí, zastaví ho `npm run stop`. Keď build zlyhá, server sa nespustí.
+- **Testy v prehliadači** (pracovný priečinok testov, mimo projektu):
+  - 14 spúšťačov stálych testov po každom teste zmaže profil testovacieho Chromu,
+  - nový spúšťač celej série `run-standing.ps1` testy pustí po jednom (jeden prehliadač naraz) proti hotovej verzii a na konci vždy zastaví server a uprace profily, aj keď test spadne.
+- **Strážca pamäte** sa pri `npm run stop` ukončí až po serveri. Stihne tak zapísať najvyššiu pamäť a počet procesov.
+
+**Skúška:**
+- **Celá séria stálych testov proti hotovej verzii:** B3b, B4b, B4c-1, B4c-2, B4c-3, C1, D2, D3a, D4, D5, c6, E4, G1 a G1 s vypnutými animáciami prešli. Prešla aj kontrola truhlice v D5, ktorá na vývojovom serveri občas zlyhávala.
+  - Trvanie 18 minút.
+  - Na konci server zastavený, profily zmazané, žiadny proces node.
+- **E5** (rozpracovaný krok 2 kódov) mal 2 chyby, ktoré patria ku kroku 2 a riešia sa tam.
+- **Záznam strážcu po úprave:** pri jednej načítanej stránke vo vývojovom serveri najviac 539 MB a 3 procesy.
+- Lint skriptov bez chýb.
+
+**Chyby počas práce:**
+- Pri hromadnej úprave spúšťačov sa stratila spätná lomka v ceste (`$spclean-profiles.mjs`) a pokus o opravu cez `sed` ju pokazil ešte viac. Opravené malým skriptom v Node.
+- Spúšťač série najprv posielal voľbu `-Variant` aj testom, ktoré ju nepoznajú. Teraz ju posiela iba tam, kde je zadaná.
+- Pri prvej sérii strážcu ukončilo `npm run stop` skôr, ako zapísal najvyššiu pamäť. Opravené poradím.
+
+**Súbory:**
+- `scripts/test-server.mjs` (nový),
+- `scripts/processes.mjs`,
+- `package.json` (skript `test:server`),
+- `docs/PRACOVNY-DENNIK.md`.
+
+**Opatrenia A, B, C, D, E, F, G a I sú hotové.**
+
+**Ďalší krok:** dokončiť krok 2 kódov.

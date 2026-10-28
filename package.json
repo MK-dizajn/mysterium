@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "stop": "node scripts/stop-dev.mjs",
+    "test:server": "node scripts/test-server.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"

@@ -103,14 +103,9 @@ export const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
  */
 export async function stopAll({ log = console.log, keepGuard = false } = {}) {
   const report = { server: 0, helpers: 0, guard: 0, chrome: 0, mb: 0 };
-  let processes = listProcesses();
+  const processes = listProcesses();
 
-  if (!keepGuard) {
-    for (const p of memoryGuardProcesses(processes)) {
-      if (killProcess(p.pid)) report.guard++;
-    }
-  }
-
+  // Strážca ostane do konca: keď server zmizne, sám zapíše najvyššiu pamäť a skončí.
   for (const p of projectServerProcesses(processes).filter((p) => !isHelperProcess(p))) {
     if (killProcess(p.pid)) {
       report.server++;
@@ -146,7 +141,19 @@ export async function stopAll({ log = console.log, keepGuard = false } = {}) {
   }
 
   if (report.chrome) log(`Ukončený testovací Chrome: ${report.chrome} procesov`);
-  if (report.guard) log("Ukončený strážca pamäte.");
+
+  if (!keepGuard) {
+    // Strážca kontroluje každých 5 s; chvíľu počká, nech zapíše záznam.
+    for (let i = 0; i < 8 && memoryGuardProcesses().length > 0; i++) {
+      await sleep(1000);
+    }
+
+    for (const p of memoryGuardProcesses()) {
+      if (killProcess(p.pid)) report.guard++;
+    }
+
+    if (report.guard) log("Ukončený strážca pamäte.");
+  }
 
   return report;
 }
