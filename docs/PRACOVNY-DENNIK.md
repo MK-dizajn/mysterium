@@ -4856,3 +4856,31 @@ Vývojový server je zastavený.
 - V doplnenej kontrole testu v prehliadači sa pri vkladaní stratila spätná lomka vo výraze na zlučovanie medzier, takže test najprv hlásil chybu, hoci text na obrazovke bol (overené snímkou). Opravené, v hre chyba nebola.
 
 **Build:** prešiel. **Lint:** bez zmeny, 14 starých problémov. **Server:** zastavený.
+
+---
+
+## 20. 11. 2026 – Súpis mechaník a návrh mini hier (iba dokumenty)
+
+**Úloha:** zmapovať, ako hra dnes dáva číslice, a navrhnúť nové mini hry s väčšou logikou a wow efektom. Kód ani hra sa nemenili.
+
+**Nové dokumenty:**
+- `docs/MECHANIKY-SUPIS.md`:
+  - tabuľka každej z 10 scén (úloha a odpoveď, predmet, mechanika, číslica, nápovedy a časy, body),
+  - spoločné časti: dáta, okno „Prezrieť“ (3D a 2D), zápisník, truhlica, skóre, uloženie, testy,
+  - tabuľka „čo je dobré a čo nefunguje“.
+  - Hlavné zistenia:
+    - 5× rovnaké počítanie ťukaním, z toho 3× za sebou na zuboch kľúča,
+    - 2× rovnaké otočenie listu alebo mapy,
+    - číslica nesúvisí so skutočným detailom na mieste,
+    - „Ukáž číslicu“ je bez pokuty.
+- `docs/NAVRH-MINIHIER.md`:
+  - typy mini hier, mapovanie na scény (ponechať scény 6 a 10 a finále, zmeniť scény 1 až 5 a 7 až 9),
+  - wow efekty (tajná schránka, vibrácia, zvuk, odhalenie),
+  - rámec `MiniGameShell` a dáta `minigame` pre ďalšie kapitoly,
+  - uloženie (ostáva v2), skóre („Preskočiť“ −10, návrh), riziká a postup po krokoch M0 až M10.
+
+**Chyby:**
+- V súpise som najprv vypísal celé kódy zámkov. Podľa pravidla, že kódy do dokumentov nepíšeme, som ich pred commitom odstránil.
+- Ostali iba číslice pri jednotlivých scénach, ako v `docs/KARTY-USLOH.md`.
+
+**Ďalší krok:** rozhodnutia používateľa a potom krok M0 (rámec), až po potvrdení.
