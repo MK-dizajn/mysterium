@@ -4832,3 +4832,27 @@ Vývojový server je zastavený.
 **Návrh na schválenie (zatiaľ nezapracovaný):** do príbehu miesta scény 9 (`history.fullText`, nenahratý text) doplniť údaj z tabule. Navrhovaná veta za „Dokument podpísali…“: „Pamätná tabuľa na paláci uvádza, že mierovú listinu podpísali za francúzskeho cisára Talleyrand a za rakúskeho cisára Lichtenstein.“
 
 **Build:** prešiel. **Lint:** bez zmeny, 14 starých problémov. **Server:** zastavený.
+
+---
+
+## 19. 11. 2026 – L1b: údaj z pamätnej tabule v príbehu miesta scény 9
+
+**Čo sa zmenilo:**
+- Do príbehu miesta scény 9 (`history.fullText`, „Pátračov zápis“, nenahratý text) som hneď za vetu „Dokument podpísali zástupcovia francúzskeho cisára Napoleona a rakúskeho cisára Františka I.“ vložil schválenú vetu: „Pamätná tabuľa na paláci uvádza, že mierovú listinu podpísali za francúzskeho cisára Talleyrand a za rakúskeho cisára Lichtenstein.“
+- **Súpis hlasov:** riadok 60 má nový text (487 znakov, 64 slov, asi 29 s), súčty sú upravené (nepovinne 5 337 znakov, spolu 15 943). Riadok nie je nahratý, nahrávky sa to netýka.
+
+**Súbory:** `data/chapter-one/bratislavsky-mier.ts`, `docs/SUPIS-HLASOV.md`, `docs/PRACOVNY-DENNIK.md`.
+
+**Testy:**
+- **Node test L1 doplnený (L1b):**
+  - veta je hneď po vete o podpise,
+  - riadok 60 súpisu sedí s textom v hre (text, znaky, slová).
+  - Pred zmenou 2 chyby, po zmene všetko OK.
+- **Test L1 v prehliadači doplnený:** po vyriešení úlohy je na obrazovke príbehu miesta veta o Talleyrandovi a Lichtensteinovi. Oba režimy OK.
+- **C1 (obrazovky príbehu miesta):** OK.
+- **Node:** 26 testov OK (B7: celá kapitola, skóre **1010**).
+
+**Chyby:**
+- V doplnenej kontrole testu v prehliadači sa pri vkladaní stratila spätná lomka vo výraze na zlučovanie medzier, takže test najprv hlásil chybu, hoci text na obrazovke bol (overené snímkou). Opravené, v hre chyba nebola.
+
+**Build:** prešiel. **Lint:** bez zmeny, 14 starých problémov. **Server:** zastavený.

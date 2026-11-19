@@ -9,13 +9,13 @@ Stav dát: 27. 10. 2026 (po kroku F1). Texty sú prevzaté presne z dát hry (`d
 | Skupina | Počet miest | Znaky | Slová | Hlas spolu (približne) |
 |---|---|---|---|---|
 | **áno** (odporúčam nahrať, vrátane videa 3) | 25 | 5 408 | 863 | asi 6 min 30 s |
-| **nepovinne** | 24 | 5 205 | 753 | asi 5 min 40 s |
+| **nepovinne** | 24 | 5 337 | 771 | asi 5 min 50 s |
 | **nie** | 30 | 5 198 | 781 | asi 5 min 55 s |
-| **spolu** | **79** | **15 811** | **2 397** | asi 18 min |
+| **spolu** | **79** | **15 943** | **2 415** | asi 18 min |
 | z toho **video 3** (Strážca prináša truhlicu) | 1 | 207 | 38 | asi 17 s |
 
 - **Odporúčané nahrávanie (áno):** 5 408 znakov, asi 6,5 minúty hlasu.
-- **Aj s nepovinnými:** 10 613 znakov, asi 12 minút hlasu.
+- **Aj s nepovinnými:** 10 745 znakov, asi 12 minút hlasu (riadok 60 doplnený 19. 11. 2026 o údaj z pamätnej tabule).
 
 ## Nahraté hlasy (28. 10. 2026)
 
@@ -116,7 +116,7 @@ Stav dát: 27. 10. 2026 (po kroku F1). Texty sú prevzaté presne z dát hry (`d
 | 57 | 9. Primaciálny palác | rozprávač | Od fasády Primaciálneho paláca sa tentoraz nemusíš nikam presúvať. Zostávaš na správnom mieste. Ďalšia stopa sa nenachádza vonku, ale viaže sa k miestnosti za týmito múrmi, v ktorej sa po veľkej vojne rozhodovalo o budúcnosti Európy. | 233 | 36 | 16 s | obrazovka úlohy – úvodný odsek scény | **áno** – atmosféra pri príchode na miesto; hráč sa môže pozerať na miesto, nie do telefónu |
 | 58 | 9. Primaciálny palác | pátrač | Nie každá stopa sa dá nájsť pohľadom. Niekedy musíš spojiť miesto, udalosť a jej následok. Mier uzavretý v tomto paláci dostal meno mesta, no podpísali ho v miestnosti, ktorá znásobuje každý obraz. | 197 | 32 | 15 s | obrazovka úlohy – „Hlas pátrača“ | **áno** – na obrazovke je už dnes nadpísané ako hlas; krátke, nesie postavu pátrača |
 | 59 | 9. Primaciálny palác | rozprávač | V Zrkadlovej sieni Primaciálneho paláca bol podpísaný jeden z najvýznamnejších mierových dokumentov napoleonských vojen. | 120 | 14 | 6 s | príbeh miesta – „Tajomstvo odhalené“ | **nepovinne** – krátka odmena po vyriešení; stačí text |
-| 60 | 9. Primaciálny palác | pátrač | Bratislavský mier bol podpísaný 26. decembra 1805 v Zrkadlovej sieni Primaciálneho paláca. Nasledoval po Napoleonovom víťazstve nad rakúskymi a ruskými vojskami v bitke pri Slavkove. Dokument podpísali zástupcovia francúzskeho cisára Napoleona a rakúskeho cisára Františka I. Mier výrazne zmenil politické usporiadanie Európy a oslabil postavenie Rakúska. | 355 | 46 | 21 s | príbeh miesta – „Pátračov zápis“ | **nepovinne** – dlhší historický text, hráč ho číta vlastným tempom a môže sa k nemu vrátiť; hlas iba ako voľba „Vypočuť“ |
+| 60 | 9. Primaciálny palác | pátrač | Bratislavský mier bol podpísaný 26. decembra 1805 v Zrkadlovej sieni Primaciálneho paláca. Nasledoval po Napoleonovom víťazstve nad rakúskymi a ruskými vojskami v bitke pri Slavkove. Dokument podpísali zástupcovia francúzskeho cisára Napoleona a rakúskeho cisára Františka I. Pamätná tabuľa na paláci uvádza, že mierovú listinu podpísali za francúzskeho cisára Talleyrand a za rakúskeho cisára Lichtenstein. Mier výrazne zmenil politické usporiadanie Európy a oslabil postavenie Rakúska. | 487 | 64 | 29 s | príbeh miesta – „Pátračov zápis“ | **nepovinne** – dlhší historický text, hráč ho číta vlastným tempom a môže sa k nemu vrátiť; hlas iba ako voľba „Vypočuť“ |
 | 61 | 9. Primaciálny palác | rozprávač | Bratislava sa v roku 1805 na krátky čas ocitla v centre európskej diplomacie. V Primaciálnom paláci sa rokovalo o následkoch Napoleonovho víťazstva pri Slavkove. Zmluva vstúpila do dejín ako Bratislavský, v zahraničí aj Prešporský mier. | 236 | 35 | 16 s | detail artefaktu (Artefakty) | **nie** – zbierka na prezeranie, často až doma; text stačí |
 | 62 | 9. Primaciálny palác | pátrač | Mier uzavrel poslednú historickú stopu. Teraz už máš všetky časti skladačky, no stále musíš pochopiť, čo ich spája. | 115 | 18 | 8 s | karta „Ďalšia stopa“ po vyriešení | **nie** – krátka myšlienka pri vodidle; hlas by zdržal odchod na ďalšie miesto |
 | 63 | 10. Pátračov denník | rozprávač | Zostávaš pri Primaciálnom paláci, no pozornosť sa už neupiera na ďalšiu budovu. Všetky indície, ktoré si počas cesty získal, sa pred tebou spájajú do jedného obrazu. Číslo domu, latinský odkaz, meno kráľa, rodový erb, rana v múre, strážca nad vodou, láskavosť, spravodlivosť aj mier. Jednotlivo sú úlomkami minulosti. Spolu vytvárajú význam Zlatého prešporského kľúča. | 368 | 54 | 25 s | obrazovka úlohy – úvodný odsek scény | **áno** – atmosféra pri príchode na miesto; hráč sa môže pozerať na miesto, nie do telefónu |

@@ -59,7 +59,7 @@ export const bratislavskyMierScene: Scene = {
     shortText:
       "V Zrkadlovej sieni Primaciálneho paláca bol podpísaný jeden z najvýznamnejších mierových dokumentov napoleonských vojen.",
     fullText:
-      "Bratislavský mier bol podpísaný 26. decembra 1805 v Zrkadlovej sieni Primaciálneho paláca. Nasledoval po Napoleonovom víťazstve nad rakúskymi a ruskými vojskami v bitke pri Slavkove. Dokument podpísali zástupcovia francúzskeho cisára Napoleona a rakúskeho cisára Františka I. Mier výrazne zmenil politické usporiadanie Európy a oslabil postavenie Rakúska.",
+      "Bratislavský mier bol podpísaný 26. decembra 1805 v Zrkadlovej sieni Primaciálneho paláca. Nasledoval po Napoleonovom víťazstve nad rakúskymi a ruskými vojskami v bitke pri Slavkove. Dokument podpísali zástupcovia francúzskeho cisára Napoleona a rakúskeho cisára Františka I. Pamätná tabuľa na paláci uvádza, že mierovú listinu podpísali za francúzskeho cisára Talleyrand a za rakúskeho cisára Lichtenstein. Mier výrazne zmenil politické usporiadanie Európy a oslabil postavenie Rakúska.",
   },
 
   artifact: {
