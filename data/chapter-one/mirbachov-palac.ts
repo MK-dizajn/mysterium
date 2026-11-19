@@ -39,6 +39,7 @@ export const mirbachovPalacScene: Scene = {
     hints: [
       "Pozri sa úplne hore do stredu priečelia.",
       "Takýto znak býva tvorený štítom a označuje šľachtický rod.",
+      "Správna odpoveď je erb.",
     ],
   },
 

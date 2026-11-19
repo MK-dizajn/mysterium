@@ -33,6 +33,10 @@ export function FinalePlaceScreen({
   const { nextPlace, photo } = finale;
   const [answer, setAnswer] = useState("");
   const [isWrong, setIsWrong] = useState(false);
+  const [wrongAttempts, setWrongAttempts] = useState(0);
+  const answerHint = nextPlace.answerHint;
+  const isAnswerHintShown =
+    answerHint !== undefined && wrongAttempts >= answerHint.afterWrongAttempts;
   const [isPhotoOpen, setIsPhotoOpen] = useState(false);
   const cardTitleRef = useRef<HTMLHeadingElement>(null);
   const isEmpty = answer.trim() === "";
@@ -47,6 +51,10 @@ export function FinalePlaceScreen({
 
     const isCorrect = onSubmit(answer);
     setIsWrong(!isCorrect);
+
+    if (!isCorrect) {
+      setWrongAttempts((count) => count + 1);
+    }
 
     if (isCorrect) {
       window.requestAnimationFrame(() => cardTitleRef.current?.focus());
@@ -85,6 +93,11 @@ export function FinalePlaceScreen({
               {isWrong && (
                 <p className="rounded-2xl border border-red-400/40 bg-red-500/10 px-4 py-3 text-[15px] leading-6 text-red-100">
                   {nextPlace.wrongAnswerText}
+                  {isAnswerHintShown && answerHint && (
+                    <span className="mt-2 block font-bold text-amber-100">
+                      {answerHint.text}
+                    </span>
+                  )}
                 </p>
               )}
             </div>

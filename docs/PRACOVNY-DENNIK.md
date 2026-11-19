@@ -4958,3 +4958,67 @@ Vývojový server je zastavený.
 **Build:** prešiel. **Lint:** bez zmeny, 14 starých problémov. **Server:** zastavený.
 
 **Ďalší krok:** používateľ vyskúša scénu 9 na mobile. Ďalšia mini hra až po potvrdení.
+
+---
+
+## 19. 11. 2026 – Úprava 1: finálna nápoveda s odpoveďou vo všetkých úlohách
+
+**Spätná väzba z mobilu:** scéna 9 a rámec mini hier sú v poriadku. Používateľ poslal štyri úpravy, robia sa po jednej. Toto je prvá.
+
+**Problém:** v poslednej úlohe (Pamäť mesta) sa hráč po prečítaní všetkých nápovedí zasekol, lebo žiadna nepovedala odpoveď.
+
+**Súpis celej hry:**
+- Pri hľadaní číslice v okne „Prezrieť“ (9 predmetov) a v mini hre scény 9 nič nechýbalo: nakoniec príde odpoveď alebo „Preskočiť (−10 bodov)“.
+- Scény 1 a 2 už mali tretiu nápovedu „Správna odpoveď je …“.
+- Scéna 8 v druhej nápovede prezradí obe písmená a scéna 9 obsahuje „Odpoveď: Bratislavský mier“.
+- **Chýbalo v scénach 3, 4, 5, 6, 7, 10** a pri zadaní miesta vo finále, kde nebola žiadna nápoveda.
+
+**Pravidlo (schválené):** posledná nápoveda v každej úlohe povie odpoveď. V mini hrách a pri hľadaní číslice ju nahrádza „Preskočiť (−10 bodov)“.
+
+**Zmeny:**
+- **A) Tretia nápoveda** v tvare zo scén 1 a 2:
+  - scéna 3: „Správna odpoveď je 1658.“
+  - scéna 4: „Správna odpoveď je Matej Korvín.“
+  - scéna 5: „Správna odpoveď je erb.“
+  - scéna 6: „Správna odpoveď je delová guľa.“
+  - scéna 7: „Správna odpoveď je brnenie.“
+  - scéna 10: „Správna odpoveď je Pamäť mesta.“
+  - Každá odpoveď je presne v zozname odpovedí, ktoré hra pri úlohe prijíma (overené testom).
+  - Nápoveda stojí 20 bodov ako ostatné. Maximum kapitoly ostáva 1010.
+- **B) Tlačidlo:** keď zostáva iba posledná poznámka, tlačidlo sa volá „Ukázať odpoveď“ (namiesto „Prečítať ďalšiu poznámku“). Platí to pre všetky úlohy.
+- **C) Finále, zadanie miesta:**
+  - Po druhom nesprávnom pokuse sa k hláške pridá tučná veta „Na zadnej strane fotografie je napísané miesto: Slovenské národné divadlo.“
+  - V hre som overil, že na zadnej strane fotografie naozaj stojí „Miesto: Slovenské národné divadlo“. Preto veta znie „je napísané miesto: …“.
+  - Zlé pokusy body nestoja.
+- **D) Strážny test:** test overí, že v každej úlohe posledná nápoveda obsahuje odpoveď, ktorú hra prijme.
+- **Hlasy:** nápovedy nemajú hlas ani pole pre zvuk, takže sa pri nich tlačidlo hlasu neukáže. Nahraté hlasy a ich texty sú bez zmeny.
+
+**Súbory:**
+- `data/chapter-one/lekaren-u-salvatora.ts`, `venturska-brana-spomienok.ts`, `mirbachov-palac.ts`, `stara-radnica.ts`, `maximilianova-fontana.ts`, `zlaty-presporsky-kluc.ts`, `finale.ts`,
+- `types/game.ts` (nové nepovinné pole `answerHint`),
+- `components/screens/PuzzleScreen.tsx`, `components/screens/FinalePlaceScreen.tsx`,
+- `docs/PRACOVNY-DENNIK.md`.
+
+**Testy:**
+- **Pred zmenou:**
+  - Node: 27 testov OK.
+  - V prehliadači L1 OK.
+  - B6 a B7 sa nedali spustiť, lebo ich uložené pozície zmazalo čistenie Windows (12. 11.). Skóre 1010 stráži Node test B7, ten prešiel.
+- **Nový Node test O1:**
+  - strážny test pre všetkých 10 úloh,
+  - presné znenie šiestich nových nápovedí,
+  - počty nápovedí v scénach 1, 2, 8 a 9 bez zmeny,
+  - mini hra scény 9,
+  - úlohy bez hlasu pri nápovedách a nahraté hlasy bez zmeny,
+  - finále: nápoveda, zadná strana fotografie, prijatie odpovede,
+  - cena nápovedy 20 bodov.
+- **Nový test O1 v prehliadači** (hotová verzia, 360 px, zapnuté aj vypnuté animácie):
+  - Scéna 10: tlačidlo „Ukázať odpoveď“ až pred poslednou poznámkou, tretia poznámka, nepribudlo tlačidlo hlasu, odpoveď z nápovedy hra prijme.
+  - Finále: zadná strana fotografie v hre, po 1. zlom pokuse bez nápovedy, po 2. s nápovedou (aj pre čítačku), skóre 1010, správna odpoveď vedie na kartu.
+  - Výsledok: všetko OK v oboch režimoch.
+- **Po zmene:** Node 28 testov OK (B7: celá kapitola aj staré uloženia, skóre **1010**).
+- **Celá séria v prehliadači** (33 behov vrátane O1, hotová verzia): všetko OK. Trvanie 33 minút, server najviac 576 MB, po teste nezostali žiadne procesy.
+
+**Build:** prešiel (v rámci testovacieho servera). **Typy:** bez chýb. **Lint:** bez zmeny, 14 starých problémov, v upravených súboroch žiadny. **Server:** zastavený.
+
+**Ďalší krok:** úprava 2 (vzhľad tajnej schránky v scéne 9), najprv návrh.

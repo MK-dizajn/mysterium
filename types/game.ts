@@ -560,6 +560,11 @@ export type FinaleNextPlace = {
   question: string;
   acceptedAnswers: string[];
   wrongAnswerText: string;
+  /** Finálna nápoveda s odpoveďou: pridá sa k hláške po N zlých pokusoch. */
+  answerHint?: {
+    afterWrongAttempts: number;
+    text: string;
+  };
   submitLabel: string;
   /** Otvorí fotografiu nad zadaním a jej zatvorenie. */
   showPhotoLabel: string;

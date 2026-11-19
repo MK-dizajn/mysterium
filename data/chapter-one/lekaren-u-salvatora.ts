@@ -36,6 +36,7 @@ export const lekarenUSalvatoraScene: Scene = {
     hints: [
       "Hľadaj historický nápis, nie aktuálnu tabuľu s názvom lekárne.",
       "Číslo sa nachádza na konci latinského odkazu.",
+      "Správna odpoveď je 1658.",
     ],
   },
 

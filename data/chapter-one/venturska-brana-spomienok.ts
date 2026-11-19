@@ -39,6 +39,7 @@ export const venturskaBranaSpomienokScene: Scene = {
     hints: [
       "Hľadaj na Ventúrskej ulici budovu Academie Istropolitany s pamätnou tabuľou.",
       "Odpoveď je napísaná na tmavej pamätnej tabuli upevnenej na fasáde.",
+      "Správna odpoveď je Matej Korvín.",
     ],
   },
 

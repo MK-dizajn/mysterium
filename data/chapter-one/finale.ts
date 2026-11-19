@@ -92,6 +92,11 @@ export const chapterOneFinale: ChapterFinale = {
       "Národné divadlo",
     ],
     wrongAnswerText: "Toto nie je to miesto. Pozri sa na fotografiu ešte raz.",
+    // Musí sedieť s textom na zadnej strane fotografie (photo.backLines).
+    answerHint: {
+      afterWrongAttempts: 2,
+      text: "Na zadnej strane fotografie je napísané miesto: Slovenské národné divadlo.",
+    },
     submitLabel: "Overiť odpoveď",
     showPhotoLabel: "Pozrieť fotografiu",
     closePhotoLabel: "Zavrieť",

@@ -38,6 +38,8 @@ export function PuzzleScreen({
 
   const visibleHints = scene.puzzle.hints.slice(0, hintsUsed);
   const hasMoreHints = hintsUsed < scene.puzzle.hints.length;
+  // Posledná poznámka v každej úlohe prezradí odpoveď – tlačidlo na to upozorní.
+  const isNextHintAnswer = hintsUsed === scene.puzzle.hints.length - 1;
 
   const investigationObjective =
     scene.investigation?.objective ??
@@ -151,9 +153,11 @@ export function PuzzleScreen({
                 variant="secondary"
                 className="w-full py-3 text-xs"
               >
-                {hasMoreHints
-                  ? "Prečítať ďalšiu poznámku"
-                  : "Všetky poznámky prečítané"}
+                {!hasMoreHints
+                  ? "Všetky poznámky prečítané"
+                  : isNextHintAnswer
+                    ? "Ukázať odpoveď"
+                    : "Prečítať ďalšiu poznámku"}
               </ActionButton>
 
               {visibleHints.length === 0 && (

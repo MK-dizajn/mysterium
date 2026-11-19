@@ -38,6 +38,7 @@ export const maximilianovaFontanaScene: Scene = {
     hints: [
       "Pozri sa na celé telo postavy, nie iba na jej tvár.",
       "Takúto kovovú ochranu nosievali rytieri v boji.",
+      "Správna odpoveď je brnenie.",
     ],
   },
 

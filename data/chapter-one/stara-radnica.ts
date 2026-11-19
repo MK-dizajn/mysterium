@@ -39,6 +39,7 @@ export const staraRadnicaScene: Scene = {
     hints: [
       "Pozeraj sa na vežu zo strany Hlavného námestia a sústreď sa na priestor pri gotickom okne.",
       "Ide o muníciu vystrelenú z dela.",
+      "Správna odpoveď je delová guľa.",
     ],
   },
 
