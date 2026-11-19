@@ -5022,3 +5022,16 @@ Vývojový server je zastavený.
 **Build:** prešiel (v rámci testovacieho servera). **Typy:** bez chýb. **Lint:** bez zmeny, 14 starých problémov, v upravených súboroch žiadny. **Server:** zastavený.
 
 **Ďalší krok:** úprava 2 (vzhľad tajnej schránky v scéne 9), najprv návrh.
+
+---
+
+## 19. 11. 2026 – Záver dňa
+
+- Hotové: úprava 1 (finálna nápoveda s odpoveďou), commit O1.
+- Zostáva v tomto poradí, každá najprv ako návrh na schválenie:
+  - úprava 2: vzhľad tajnej schránky,
+  - úprava 3: útržky fotografie v štýle SND (vlastná ilustrovaná verzia kvôli autorským právam),
+  - úprava 4: detailnejšia 3D truhlica s rozumným stropom pamäte a 2D zálohou.
+- Ďalšia mini hra (scéna 2 a ďalšie) až po týchto úpravách a po potvrdení.
+- Server je zastavený, nebeží žiadny proces node ani testovací Chrome.
+- Pokračujeme 20. 11. 2026.
