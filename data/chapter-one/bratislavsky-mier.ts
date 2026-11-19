@@ -4,7 +4,7 @@ import { COUNT_INSPECT_TIMING, THIRD_KEY_TOOTH_NOTCHES } from "./item-art";
 export const bratislavskyMierScene: Scene = {
   id: "bratislavsky-mier",
   location: "Primaciálny palác",
-  title: "9. Miestnosť, ktorá zmenila Európu",
+  title: "9. Mier, ktorý zmenil Európu",
 
   cinematicText:
   "Od fasády Primaciálneho paláca sa tentoraz nemusíš nikam presúvať. Zostávaš na správnom mieste. Ďalšia stopa sa nenachádza vonku, ale viaže sa k miestnosti za týmito múrmi, v ktorej sa po veľkej vojne rozhodovalo o budúcnosti Európy.",
@@ -14,31 +14,42 @@ export const bratislavskyMierScene: Scene = {
     "Nie každá stopa sa dá nájsť pohľadom. Niekedy musíš spojiť miesto, udalosť a jej následok. Mier uzavretý v tomto paláci dostal meno mesta, no podpísali ho v miestnosti, ktorá znásobuje každý obraz.",
   voiceLineAudioSrc: "/audio/hlas-058-patrac.mp3",
 
+  // Overené v teréne (11/2026): na stene paláca je priamo napísaný Bratislavský mier,
+  // Zrkadlová sieň sa na tabuliach nespomína – úloha sa pýta, čo sa tu podpísalo, nie kde.
   investigation: {
     objective:
-      "V tomto paláci bol 26. decembra 1805 podpísaný Bratislavský mier. Hľadaná miestnosť sa nachádza v Primaciálnom paláci a jej názov súvisí s predmetmi, ktoré opakujú obraz človeka stojaceho pred nimi.",
+      "Na vonkajšej stene Primaciálneho paláca nájdeš pripomienku udalosti z 26. decembra 1805. Pátrač sa nepýta, kde sa to stalo, ale čo sa tu uzavrelo.",
     detectiveHint:
-      "Keď sa do takého predmetu pozrieš, uvidíš svoju vlastnú podobu. V paláci nimi bola vyzdobená celá reprezentačná sieň.",
-    observationType: "deduction",
+      "Mier nesie meno mesta. Prečítaj si, čo je napísané na stene paláca.",
+    observationType: "inscription",
   },
 
   puzzle: {
     id: "puzzle-bratislavsky-mier",
-    answerLabel: "Zadaj názov sály, v ktorej bol podpísaný mier.",
+    answerLabel: "Zapíš, aký mier sa v tomto paláci podpísal.",
     question:
-      "V ktorej miestnosti Primaciálneho paláca bol 26. decembra 1805 podpísaný Bratislavský mier?",
+      "Aký mier bol 26. decembra 1805 podpísaný v Primaciálnom paláci?",
     acceptedAnswers: [
-      "zrkadlova sien",
-      "zrkadlová sieň",
-      "sien zrkadiel",
-      "sieň zrkadiel",
-      "zrkadlova sala",
-      "zrkadlová sála",
-      "hall of mirrors",
+      "Bratislavský mier",
+      "bratislavsky mier",
+      "Prešporský mier",
+      "mier",
+      "Mier v Bratislave",
+      "Peace of Pressburg",
+      "Treaty of Pressburg",
+      "Pressburger Frieden",
     ],
+    // Pamätná tabuľa na paláci (overené fotkou 11/2026) uvádza dátum „26. XII. 1805“.
     hints: [
-      "Názov miestnosti súvisí s odrazom obrazu.",
-      "Odpoveď tvoria dve slová: Zrkadlová sieň.",
+      "Nájdi na vonkajšej stene paláca pamätnú tabuľu. Hľadaj dátum 26. XII. 1805.",
+      "Prečítaj si, aký mier tabuľa spomína. Odpoveď: Bratislavský mier.",
+    ],
+    nearMisses: [
+      {
+        answers: ["Slavkovský mier", "Slavkovsky mier"],
+        message:
+          "Slavkov bol bitka pred mierom. Hľadaj, v ktorom meste sa mier uzavrel.",
+      },
     ],
   },
 
@@ -89,7 +100,7 @@ export const bratislavskyMierScene: Scene = {
             title: "Tretí zub Zlatého kľúča",
             icon: "🗝️",
             description:
-              "Tretí zub Zlatého kľúča. Patrí k miestnosti, v ktorej sa podpísal mier, ktorý zmenil Európu.",
+              "Tretí zub Zlatého kľúča. Patrí k mieru, ktorý sa v tomto paláci podpísal a zmenil Európu.",
             evidenceKind: "object",
             secretCode: "7",
             clue: "Všetky stopy máš pri sebe. Neodchádzaj – otvor denník a pozri sa na ne spolu.",

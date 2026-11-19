@@ -2,6 +2,7 @@
 
 import { useId, useState } from "react";
 import type { ChapterGuidance, Scene } from "../../types/game";
+import { isPuzzleAnswerCorrect } from "../../engine";
 import { ActionButton } from "../ui/ActionButton";
 import { RouteHint } from "../ui/RouteHint";
 import { TextInput } from "../ui/TextInput";
@@ -20,14 +21,6 @@ type PuzzleScreenProps = {
   onRevealHint: () => void;
   onSolved: () => void;
 };
-
-function normalizeAnswer(value: string) {
-  return value
-    .trim()
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
-}
 
 export function PuzzleScreen({
   scene,
@@ -60,16 +53,22 @@ export function PuzzleScreen({
     ) {
       document.activeElement.blur();
     }
-    const userAnswer = normalizeAnswer(answer);
-
-    const isCorrect = scene.puzzle.acceptedAnswers.some(
-      (correctAnswer) => normalizeAnswer(correctAnswer) === userAnswer
+    // Bez ohľadu na veľké a malé písmená, diakritiku, medzery a interpunkciu.
+    const isCorrect = isPuzzleAnswerCorrect(
+      answer,
+      scene.puzzle.acceptedAnswers
     );
 
     if (!isCorrect) {
+      // Známa blízka odpoveď má vlastnú hlášku (napríklad „Slavkovský mier“).
+      const nearMiss = scene.puzzle.nearMisses?.find((miss) =>
+        isPuzzleAnswerCorrect(answer, miss.answers)
+      );
+
       setSuccessMessage("");
       setError(
-        "Táto odpoveď zatiaľ nesedí. Vráť sa pohľadom k detailu pred sebou a skús nájsť niečo, čo si si predtým nevšimol."
+        nearMiss?.message ??
+          "Táto odpoveď zatiaľ nesedí. Vráť sa pohľadom k detailu pred sebou a skús nájsť niečo, čo si si predtým nevšimol."
       );
       return;
     }

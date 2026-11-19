@@ -83,3 +83,19 @@ export function isAnswerAccepted(answer: string, acceptedAnswers: string[]) {
       getAllowedTypos(acceptedAnswer)
   );
 }
+
+/**
+ * Odpoveď v úlohe scény: presná zhoda s niektorou prijatou odpoveďou, pričom
+ * sa ignorujú veľké a malé písmená, diakritika, medzery a interpunkcia
+ * („Bratislavský  mier.“ = „bratislavskymier“). Preklepy sa neodpúšťajú.
+ */
+export function isPuzzleAnswerCorrect(answer: string, acceptedAnswers: string[]) {
+  const compact = (value: string) => normalizeFreeText(value).replace(/ /g, "");
+  const userAnswer = compact(answer);
+
+  if (!userAnswer) {
+    return false;
+  }
+
+  return acceptedAnswers.some((acceptedAnswer) => compact(acceptedAnswer) === userAnswer);
+}

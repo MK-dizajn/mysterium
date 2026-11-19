@@ -4769,3 +4769,66 @@ Vývojový server je zastavený.
 **Stav:**
 - Nebeží žiadny proces node ani testovací Chrome, port 3000 je voľný.
 - Na začiatku ďalšieho sedenia postupovať podľa stáleho postupu (kontrola procesov).
+
+---
+
+## 19. 11. 2026 – L1: scéna 9 (Bratislavský mier) podľa terénu a porovnanie odpovedí
+
+**Zistenie z terénu:**
+- Na tabuliach pri Primaciálnom paláci sa Zrkadlová sieň nespomína.
+- Na stene je pamätná tabuľa s textom „…dňa 26. XII. 1805 uzavretý bratislavský mier…“.
+- Správna odpoveď je preto **Bratislavský mier**. Úloha sa pýta, čo sa tu podpísalo, nie kde.
+
+**Čo sa zmenilo v scéne 9** (`data/chapter-one/bratislavsky-mier.ts`):
+- **Nadpis:** „9. Mier, ktorý zmenil Európu“.
+- **Tvoja úloha:** „Na vonkajšej stene Primaciálneho paláca nájdeš pripomienku udalosti z 26. decembra 1805. Pátrač sa nepýta, kde sa to stalo, ale čo sa tu uzavrelo.“
+- **Pole:** „Zapíš, aký mier sa v tomto paláci podpísal.“
+- **Záložná otázka:** „Aký mier bol 26. decembra 1805 podpísaný v Primaciálnom paláci?“
+- **Prijaté odpovede:** Bratislavský mier, bratislavsky mier, Prešporský mier, mier, Mier v Bratislave, Peace of Pressburg, Treaty of Pressburg, Pressburger Frieden. „Zrkadlová sieň“ už neprejde.
+- **Nápovedy** (podľa fotky tabule):
+  1. „Nájdi na vonkajšej stene paláca pamätnú tabuľu. Hľadaj dátum 26. XII. 1805.“
+  2. „Prečítaj si, aký mier tabuľa spomína. Odpoveď: Bratislavský mier.“
+- **Špeciálna hláška** pri „Slavkovský mier“ (aj bez diakritiky): „Slavkov bol bitka pred mierom. Hľadaj, v ktorom meste sa mier uzavrel.“ Je zapísaná v dátach úlohy ako `nearMisses` (nové voliteľné pole).
+- **Pátračova pomôcka:** „Mier nesie meno mesta. Prečítaj si, čo je napísané na stene paláca.“ Druh pozorovania je teraz „nápis“.
+- **Predmet tretí zub:** „Patrí k mieru, ktorý sa v tomto paláci podpísal a zmenil Európu.“
+- **Bez zmeny:** nahraté hlasy #57 a #58 (stále spomínajú miestnosť), príbeh miesta a artefakt.
+
+**Porovnanie odpovedí vo všetkých úlohách:**
+- Nová spoločná funkcia `isPuzzleAnswerCorrect` (`engine/answerMatching.ts`). Ignoruje veľké a malé písmená, diakritiku, **medzery aj interpunkciu**, takže „Bratislavský  mier.“ = „bratislavskymier“. Preklepy sa ako doteraz neodpúšťajú.
+- Obrazovka úlohy (`components/screens/PuzzleScreen.tsx`) ju používa a pri známej blízkej odpovedi ukáže hlášku z `nearMisses`.
+
+**Súbory:**
+- `data/chapter-one/bratislavsky-mier.ts`,
+- `engine/answerMatching.ts`,
+- `components/screens/PuzzleScreen.tsx`,
+- `types/game.ts` (`nearMisses`),
+- `docs/PRACOVNY-DENNIK.md`.
+
+**Testy:**
+- **Nový Node test L1:** pred zmenou 44 chýb, po zmene všetko OK. Overuje:
+  - všetky nové odpovede aj v zápisoch s dvoma medzerami, bez medzery, s bodkou a s úvodzovkami,
+  - Zrkadlová sieň a Slavkovský mier neprejdú a hláška pre Slavkov je v dátach,
+  - texty a nápovedy, hlasy #57 a #58 bez zmeny,
+  - **každá úloha kapitoly prijme všetky svoje doterajšie odpovede** (zoznam uložený pred zmenou), aj veľkými písmenami s bodkou.
+- **Nový test L1 v prehliadači** (hotová verzia, 360 px, oba režimy):
+  - nový nadpis, úloha, pole a nápoveda 1,
+  - „Zrkadlová sieň“ a „Hall of mirrors“ ukážu chybu,
+  - „Slavkovský mier“ ukáže špeciálnu hlášku a úlohu nevyrieši,
+  - štyri správne zápisy úlohu vyriešia.
+- **Node:** 26 testov OK (B7: celá kapitola, skóre **1010**).
+
+**Chyby a zistenia:**
+- **12. 11. 2026 Windows vyčistil dočasný priečinok testov:**
+  - zmizli pripravené uloženia hier, kópie projektu, priečinok so snímkami, časť spúšťačov a reťaz kopírovacích skriptov,
+  - zmizol aj Node test fyziky otáčania (`b2b2`), ten sa nedal obnoviť a v zozname chýba.
+  - Uloženia som obnovil pôvodnými generátormi.
+  - Kopírovacie skripty som nahradil jedným samostatným (`mirror.mjs`) a pridal spúšťač všetkých Node testov (`run-node.ps1`).
+  - Kód hry to neovplyvnilo.
+- **Prvý beh testu L1 v prehliadači** padal na chýbajúcom priečinku snímok, ten som obnovil.
+- **Uloženie v teste malo úlohu 9 už vyriešenú,** takže nápoveda sa nedala prečítať. Test teraz začína od nevyriešenej úlohy. V hre chyba nebola.
+- **Celá séria stálych testov v prehliadači proti hotovej verzii** (29 behov vrátane L1): všetko OK.
+  - Trvanie 30 minút, server najviac 100 MB.
+
+**Návrh na schválenie (zatiaľ nezapracovaný):** do príbehu miesta scény 9 (`history.fullText`, nenahratý text) doplniť údaj z tabule. Navrhovaná veta za „Dokument podpísali…“: „Pamätná tabuľa na paláci uvádza, že mierovú listinu podpísali za francúzskeho cisára Talleyrand a za rakúskeho cisára Lichtenstein.“
+
+**Build:** prešiel. **Lint:** bez zmeny, 14 starých problémov. **Server:** zastavený.

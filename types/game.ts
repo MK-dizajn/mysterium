@@ -140,6 +140,11 @@ export type Puzzle = {
 
   acceptedAnswers: string[];
   hints: string[];
+  /**
+   * Známe nesprávne odpovede s vlastnou hláškou namiesto všeobecnej
+   * (napríklad „Slavkovský mier“ – hráč je blízko, ale pomýlil si bitku s mierom).
+   */
+  nearMisses?: { answers: string[]; message: string }[];
 };
 
 export type DetectiveNote = {
