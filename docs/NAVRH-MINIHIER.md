@@ -121,6 +121,55 @@ minigame: {
 - **Obrázky:** rytina na hľadanie rozdielov a obrázok na puzzle budú nakreslené v kóde (SVG) podľa vlastných fotiek, nie prevzaté, aby nebol problém s licenciou.
 - **Testy:** každá mini hra pridá jeden Node test (logika) a jeden test v prehliadači. Celá séria potrvá dlhšie (dnes 30 min). Navrhujem pri každej mini hre spúšťať iba jej testy a súvisiace, celú sériu pri každej tretej.
 
+## Rozhodnutia (20. 11. 2026)
+
+1. **Mapovanie** schválené. Scény 4 a 5 sa robia až na záver, lebo čakajú na overenie v teréne.
+2. **„Preskočiť“ stojí −10 bodov.** Nahrádza dnešné „Ukáž číslicu“ a je vždy dostupné po nápovedách, aby sa hráč nikdy nezasekol.
+3. **Čítačka obrazovky:** pri posuvnom puzzle a skladaní úlomkov je „Preskočiť“ bez pokuty.
+   - Rieši sa samostatným tlačidlom, ktoré vidí iba čítačka obrazovky.
+4. **Terén:** tabuľu Academie a priečelie Mirbachovho paláca overí Miloš naživo. Zatiaľ platia údaje z fotiek (nižšie).
+5. **Zvuky** vyrobí Miloš podľa zoznamu nižšie. Hra má pre ne pripravené miesta a kým súbory nie sú, ostáva ticho.
+6. **Postup:** M0 (rámec), potom scéna 9. Potom zastaviť a nechať vyskúšať na mobile.
+
+## Terénne údaje z fotiek (zatiaľ neoverené naživo)
+
+### Scéna 4 – tabuľa Academie Istropolitany
+
+- **Text podľa fotky:** „Národná kultúrna pamiatka. Academia Istropolitana. Prvá vysoká škola na Slovensku založená v r. 1465 Matejom Korvínom. Gotická stavba zo polovice 15. storočia.“
+- **Kľúčový údaj pre kryptex: rok 1465.**
+- „15. storočie“ na tabuli je **zavádzač**: hráč, ktorý nastaví 15xx podľa storočia, ešte nemá celý rok.
+- Miloš text pri obhliadke overí zblízka.
+
+### Scéna 5 – Mirbachov palác
+
+- **Tabuľa:** „Kultúrna pamiatka. Mirbachov palác. Rokoková stavba z r. 1768–1770.“ so znakom mesta.
+- **Stále prvky priečelia** (podklad pre rozdiely):
+  - štít s erbom (dva okrúhle medailóny),
+  - tri oblúkové nadokenice s ornamentom v tvare mušle,
+  - zábradlie balkóna nad portálom,
+  - zväzky pilastrov medzi oknami,
+  - mreže na oknách prízemia,
+  - hlavný a bočný portál.
+- **Rozdiely stavať na tvaroch a počte, nie na farbách ani zlatení.** Farby môžu byť z obnovy a rytina je čiernobiela.
+- **Nepoužívať** transparenty a vlajky, menia sa.
+- Starú rytinu paláca Miloš hľadá a overí jej licenciu. Kým nebude, kreslí sa vlastná rytina v kóde.
+
+## Zoznam zvukov (vyrobí Miloš)
+
+Súbory patria do `public/sounds/`, formát mp3, krátke a bez ticha na začiatku. Kým súbor chýba, hra ho nespúšťa (ticho). Licenciu zapísať do `docs/MEDIA-LICENCIE.md`.
+
+| Súbor | Kedy sa spustí | Ako má znieť | Dĺžka |
+|---|---|---|---|
+| `dial-click.mp3` | otočenie číselníka, kolieska, ružice alebo šifrovacieho kolieska o jeden krok | suché mechanické cvaknutie kovu (ako zámok s kolieskami), tiché | 0,1–0,2 s |
+| `tile-slide.mp3` | posun dielika v puzzle, položenie úlomku | krátke šúchnutie dreva alebo kameňa | 0,2–0,3 s |
+| `minigame-correct-step.mp3` | správny čiastkový krok (správny symbol v poradí, nájdený rozdiel) | jemný jasný tón, „ťing“ | 0,3 s |
+| `minigame-wrong.mp3` | nesprávny pokus (zlý dátum, zlé poradie) | tlmený tupý úder, nie nepríjemný bzučiak | 0,3–0,4 s |
+| `compartment-open.mp3` | otvorenie tajnej schránky (zlomenie pečate, vysunutie krytu) | cvaknutie, škrípnutie pántu a krátke zvonenie, tajomné | 1,2–1,8 s |
+| `digit-reveal.mp3` | číslica sa vynorí a vpíše do zápisníka | magický svetelný zvuk, trblietanie, končí čistým tónom | 1,0–1,5 s |
+| `hint-open.mp3` | otvorenie nápovedy | šuchot papiera (otočenie strany zápisníka) | 0,3–0,5 s |
+
+Existujúce prázdne súbory (0 B) z dnešnej hry (`artifact-unlock`, `chest-unlock`, `city-ambient`, `npc-message`, `puzzle-success`) ostávajú v zozname `docs/MEDIA-LICENCIE.md` ako „treba vytvoriť“.
+
 ## Postup po schválení (po jednej mini hre)
 
 Každý krok bude mať test pred a po zmene, build, lint, denník a commit iba dotknutých súborov, bez pushu.

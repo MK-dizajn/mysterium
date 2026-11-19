@@ -31,6 +31,8 @@ export function createNewGameState(): GameState {
     hintsUsed: {},
     foundCodeItemIds: [],
     revealedCodeItemIds: [],
+    skippedCodeItemIds: [],
+    minigameState: {},
   };
 }
 

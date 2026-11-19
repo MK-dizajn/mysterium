@@ -3,8 +3,10 @@ import type {
   Chapter,
   GameState,
   InventoryItem,
+  MiniGameSavedState,
   Scene,
 } from "../types/game";
+import { SKIP_PENALTY } from "./constants";
 import { getActLockEvidence } from "./gameProgress";
 
 export type CodeNotebookSlot = {
@@ -72,6 +74,50 @@ export function markCodeDigitFound(
     revealedCodeItemIds: shouldMarkRevealed
       ? [...gameState.revealedCodeItemIds, itemId]
       : gameState.revealedCodeItemIds,
+  };
+}
+
+/**
+ * „Preskočiť“: číslica sa odhalí bez hľadania alebo mini hry a strhne sa
+ * pokuta (SKIP_PENALTY, najviac do 0 bodov). S `free` bez pokuty
+ * (bezplatné preskočenie pre čítačku pri posuvnom puzzle a skladaní).
+ * Už nájdenú číslicu ani predmet, ktorý hráč nemá, nemení.
+ */
+export function skipCodeDigit(
+  gameState: GameState,
+  itemId: string,
+  options: { free?: boolean } = {}
+): GameState {
+  if (gameState.foundCodeItemIds.includes(itemId)) {
+    return gameState;
+  }
+
+  const revealedState = markCodeDigitFound(gameState, itemId, {
+    revealed: true,
+  });
+
+  if (revealedState === gameState) {
+    return gameState;
+  }
+
+  return {
+    ...revealedState,
+    score: options.free
+      ? revealedState.score
+      : Math.max(0, revealedState.score - SKIP_PENALTY),
+    skippedCodeItemIds: [...(revealedState.skippedCodeItemIds ?? []), itemId],
+  };
+}
+
+/** Uloží stav rozohranej mini hry predmetu (po F5 pokračuje). */
+export function setMinigameState(
+  gameState: GameState,
+  itemId: string,
+  state: MiniGameSavedState
+): GameState {
+  return {
+    ...gameState,
+    minigameState: { ...(gameState.minigameState ?? {}), [itemId]: state },
   };
 }
 

@@ -10,3 +10,4 @@ export * from "./codeNotebook";
 export * from "./answerMatching";
 export * from "./finale";
 export * from "./unlockCodes";
+export * from "./minigames/dateDials";

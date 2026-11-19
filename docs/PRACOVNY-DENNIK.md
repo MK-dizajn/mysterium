@@ -4884,3 +4884,77 @@ Vývojový server je zastavený.
 - Ostali iba číslice pri jednotlivých scénach, ako v `docs/KARTY-USLOH.md`.
 
 **Ďalší krok:** rozhodnutia používateľa a potom krok M0 (rámec), až po potvrdení.
+
+---
+
+## 20. 11. 2026 – Mini hry, kroky N0 (rámec) a N1 (scéna 9: dátum na číselníkoch)
+
+**Rozhodnutia používateľa** (zapísané v `docs/NAVRH-MINIHIER.md` spolu s terénnymi údajmi pre scény 4 a 5 a zoznamom zvukov):
+- „Preskočiť“ stojí −10 bodov, nahrádza „Ukáž číslicu“ a je vždy dostupné po nápovedách.
+- Pri posuvnom puzzle a skladaní je pre čítačku bezplatné preskočenie.
+- Zvuky vyrobí Miloš, dovtedy je ticho.
+- Scény 4 a 5 prídu na rad až na záver.
+
+**N0 – rámec mini hier:**
+- **Dáta:** pri predmete voliteľné pole `minigame` (typ, úvod, 3 nápovedy, tajná schránka, bezplatné preskočenie pre čítačku). Číslica ostáva v `secretCode`, takže zápisník, truhlica a kódy zámkov sa nemenia.
+- **`components/minigames/MiniGame.tsx`** – spoločný rám:
+  - úvod, hracia plocha,
+  - **„Nápoveda“** v 3 stupňoch (po 30 s nečinnosti sa sama ponúkne),
+  - **„Preskočiť (−10 bodov)“** po troch nápovedách alebo po 2 minútach, s potvrdením „Preskočiť túto hru?“,
+  - na konci tajná schránka.
+- **`components/minigames/SecretCompartment.tsx`** – tajná schránka: veko sa odklopí, zvnútra vyjde svetlo a vynorí sa číslica, so zvukom a vibráciou. Pri vypnutých animáciách bez pohybu.
+- **Okno „Prezrieť“:**
+  - predmet s mini hrou ju ukáže namiesto hľadania, po objavení číslice ukáže predmet ako doteraz,
+  - **„Ukáž číslicu“ sa zmenilo na „Preskočiť (−10 bodov)“** aj pri ostatných predmetoch.
+- **Pravidlá:** `skipCodeDigit` (číslica bez hľadania, −10 bodov, najviac do 0, pri čítačke bez pokuty), `setMinigameState`, pokuta `SKIP_PENALTY = 10`.
+- **Uloženie ostáva v2:** pribudli `skippedCodeItemIds` a `minigameState` (nastavenie a prečítané nápovedy), staršie uloženia ich dostanú prázdne.
+- **Zvuky:** 7 nových miest (`dial-click`, `tile-slide`, `minigame-correct-step`, `minigame-wrong`, `compartment-open`, `digit-reveal`, `hint-open`) s `ready: false`. Kým súbory nie sú, hra ich nespúšťa ani nesťahuje (ticho).
+- **Vibrácia:** `lib/haptics.ts` (iba ak ju prehliadač vie, pri vypnutom zvuku nie). Safari na iPhone vibráciu nepodporuje.
+
+**N1 – scéna 9, dátum na číselníkoch:**
+- Po vyriešení úlohy „Prezrieť“ pri treťom zube otvorí pečať mierovej listiny s tromi číselníkmi: **deň, mesiac (rímsky), rok**.
+- Hráč nastaví dátum z pamätnej tabule **26 · XII · 1805** a ťukne na „Zlomiť pečať“.
+- **Zlý dátum:** „Pečať drží. Niektorý údaj ešte nesedí s tabuľou.“, pečať sa zatrasie a zavibruje, nič sa neuloží.
+- **Správny dátum:** tajná schránka a číslica 7 do zápisníka (zámok III, miesto 3).
+- **Nápovedy:**
+  1. „Dátum je na pamätnej tabuli na vonkajšej stene paláca.“
+  2. „Mesiac je na tabuli zapísaný rímskou číslicou.“
+  3. „Nastav 26 · XII · 1805.“
+- Šípky 44 × 44 px, popisy pre čítačku. Po F5 ostane nastavenie aj prečítané nápovedy.
+- Úloha scény, hlasy #57 a #58, príbeh miesta a skóre úlohy sú bez zmeny.
+
+**Súbory:**
+- `types/game.ts`, `engine/constants.ts`, `engine/codeNotebook.ts`, `engine/gameEngine.ts`, `engine/gameStorage.ts`, `engine/minigames/dateDials.ts`, `engine/index.ts`,
+- `lib/soundManager.ts`, `lib/haptics.ts`,
+- `components/minigames/MiniGame.tsx`, `components/minigames/DateDialsGame.tsx`, `components/minigames/SecretCompartment.tsx`,
+- `components/items/ItemInspector.tsx`, `app/page.tsx`, `app/globals.css`,
+- `data/chapter-one/bratislavsky-mier.ts`,
+- `docs/NAVRH-MINIHIER.md`, `docs/PRACOVNY-DENNIK.md`.
+
+**Testy:**
+- **Nový Node test N1:** pred zmenou spadol (8 chýb a pád), po zmene všetko OK. Overuje:
+  - pokutu, preskočenie (aj bez pokuty a nie pod 0, nie druhýkrát, nie pre nájdenú číslicu),
+  - stav mini hry a uloženie v2 vrátane starého uloženia,
+  - zvuky v tichom režime, vibráciu,
+  - dáta scény 9 (číselníky, dátum, 3 nápovedy, schránka, číslica 7), logiku číselníkov (dokola, riešenie, zlý mesiac),
+  - hlasy bez zmeny, „Ukáž číslicu“ nahradené.
+- **Nový test N1 v prehliadači** (hotová verzia, 320 a 360 px, zapnuté aj vypnuté animácie, skutočné ťuknutia):
+  - Pred zmenou 22 chýb, po zmene všetko OK.
+  - Overuje mini hru v dialógu, 44 px a bez posúvania do strany,
+  - nápovedu a F5 (nastavenie aj nápoveda ostali),
+  - zlý dátum s vibráciou, správny dátum, tajnú schránku (animácia, pri vypnutých animáciách bez nej), vibráciu, číslicu do zápisníka bez pokuty,
+  - „Hotovo“ a opätovné „Prezrieť“,
+  - tri nápovedy, „Preskočiť (−10 bodov)“ s potvrdením (−10 bodov, preskočené),
+  - bez bezplatného preskočenia pri číselníkoch.
+- **Node:** 27 testov OK (B7: celá kapitola, skóre **1010**).
+
+**Chyby:**
+- Po objavení číslice ostal v okne starý úvod „Preskúmaj predmet a objav niečo, čo si nečakal.“. Pri predmete s mini hrou ho teraz nahradí text zo schránky, test to kontroluje.
+- Veko tajnej schránky pri otvorení „odletelo“ mimo obrázka a v rohu ostal odrezaný kúsok. Teraz sa iba odklopí a ostane celé viditeľné (overené snímkou).
+- **Celá séria stálych testov v prehliadači proti hotovej verzii** (31 behov vrátane N1): všetko OK.
+  - Trvanie 32 minút, server najviac 101 MB.
+  - Po úprave veka som N1 spustil znova v oboch režimoch, OK.
+
+**Build:** prešiel. **Lint:** bez zmeny, 14 starých problémov. **Server:** zastavený.
+
+**Ďalší krok:** používateľ vyskúša scénu 9 na mobile. Ďalšia mini hra až po potvrdení.

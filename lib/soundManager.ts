@@ -5,12 +5,22 @@ export type SoundId =
   | "digit-found"
   | "button-click"
   | "npc-message"
-  | "city-ambient";
+  | "city-ambient"
+  // Mini hry (docs/NAVRH-MINIHIER.md, „Zoznam zvukov“).
+  | "dial-click"
+  | "tile-slide"
+  | "minigame-correct-step"
+  | "minigame-wrong"
+  | "compartment-open"
+  | "digit-reveal"
+  | "hint-open";
 
 type SoundConfig = {
   src: string;
   volume?: number;
   loop?: boolean;
+  /** false = súbor ešte neexistuje: zvuk sa nespúšťa (ticho), nič sa nesťahuje. */
+  ready?: boolean;
 };
 
 type FadeState = {
@@ -52,6 +62,14 @@ const sounds: Record<SoundId, SoundConfig> = {
     volume: 0.3,
     loop: true,
   },
+  // Zvuky mini hier vyrobí Miloš; kým súbory nie sú, ready: false (ticho).
+  "dial-click": { src: "/sounds/dial-click.mp3", volume: 0.5, ready: false },
+  "tile-slide": { src: "/sounds/tile-slide.mp3", volume: 0.5, ready: false },
+  "minigame-correct-step": { src: "/sounds/minigame-correct-step.mp3", volume: 0.5, ready: false },
+  "minigame-wrong": { src: "/sounds/minigame-wrong.mp3", volume: 0.5, ready: false },
+  "compartment-open": { src: "/sounds/compartment-open.mp3", volume: 0.7, ready: false },
+  "digit-reveal": { src: "/sounds/digit-reveal.mp3", volume: 0.6, ready: false },
+  "hint-open": { src: "/sounds/hint-open.mp3", volume: 0.4, ready: false },
 };
 
 function clampVolume(volume: number) {
@@ -105,7 +123,11 @@ class SoundManager {
   }
 
   play(soundId: SoundId) {
-    if (typeof window === "undefined" || this.muted) {
+    if (
+      typeof window === "undefined" ||
+      this.muted ||
+      sounds[soundId].ready === false
+    ) {
       return;
     }
 

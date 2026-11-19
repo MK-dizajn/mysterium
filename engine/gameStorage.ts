@@ -71,6 +71,16 @@ function normalizeGameState(value: unknown): GameState | null {
     revealedCodeItemIds: isStringArray(saved.revealedCodeItemIds)
       ? saved.revealedCodeItemIds
       : defaults.revealedCodeItemIds,
+    // Od mini hier (N0); staršie uloženia ich nemajú – doplnia sa prázdne.
+    skippedCodeItemIds: isStringArray(saved.skippedCodeItemIds)
+      ? saved.skippedCodeItemIds
+      : defaults.skippedCodeItemIds,
+    minigameState:
+      saved.minigameState &&
+      typeof saved.minigameState === "object" &&
+      !Array.isArray(saved.minigameState)
+        ? saved.minigameState
+        : defaults.minigameState,
   };
 }
 

@@ -120,6 +120,40 @@ export const bratislavskyMierScene: Scene = {
               countLabel: "Zárez",
               artPart: 3,
             },
+            // Mini hra (N1): dátum z pamätnej tabule (overený fotkou 11/2026: „26. XII. 1805“).
+            minigame: {
+              type: "dateDials",
+              intro:
+                "Pečať mierovej listiny sa otvorí iba dátumom, ktorý mesto vytesalo do kameňa. Nastav deň, mesiac a rok.",
+              dials: [
+                {
+                  label: "Deň",
+                  values: Array.from({ length: 31 }, (_, index) => String(index + 1)),
+                  answer: "26",
+                },
+                {
+                  label: "Mesiac",
+                  values: ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"],
+                  answer: "XII",
+                },
+                {
+                  label: "Rok",
+                  values: Array.from({ length: 21 }, (_, index) => String(1795 + index)),
+                  answer: "1805",
+                  start: "1800",
+                },
+              ],
+              submitLabel: "Zlomiť pečať",
+              wrongText: "Pečať drží. Niektorý údaj ešte nesedí s tabuľou.",
+              hints: [
+                "Dátum je na pamätnej tabuli na vonkajšej stene paláca.",
+                "Mesiac je na tabuli zapísaný rímskou číslicou.",
+                "Nastav 26 · XII · 1805.",
+              ],
+              compartment: {
+                openText: "Pečať praskla. Vnútri leží tretí zub Zlatého kľúča.",
+              },
+            },
             evidenceOrder: 9,
             actId: "act-3",
           },

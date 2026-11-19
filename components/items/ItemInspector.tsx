@@ -2,8 +2,13 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
-import type { CodeItemInfo } from "../../engine";
-import type { InspectTiming, ItemInspectTranscript } from "../../types/game";
+import { SKIP_PENALTY, type CodeItemInfo } from "../../engine";
+import type {
+  InspectTiming,
+  ItemInspectTranscript,
+  MiniGameSavedState,
+} from "../../types/game";
+import { MiniGame } from "../minigames/MiniGame";
 import { soundManager } from "../../lib/soundManager";
 import { ActionButton } from "../ui/ActionButton";
 import { type ItemArtSide, ITEM_ARTS } from "./art/itemArtRegistry";
@@ -37,13 +42,17 @@ const Item3DView = dynamic(() => import("./3d/Item3DView"), {
 type ItemInspectorProps = {
   info: CodeItemInfo;
   onFound: () => void;
-  onReveal: () => void;
+  /** „Preskočiť“: číslica bez hľadania (−10 bodov; free = bez pokuty pre čítačku). */
+  onSkip: (options?: { free?: boolean }) => void;
   onClose: () => void;
+  /** Stav rozohranej mini hry predmetu (po F5 pokračuje). */
+  minigameState?: MiniGameSavedState;
+  onMinigameStateChange?: (state: MiniGameSavedState) => void;
 };
 
 /**
  * Časy bez vlastných údajov predmetu: po 20 s nečinnosti sa rozžiari miesto
- * a ukáže sa nápoveda, po 40 s „Ukáž číslicu“ ako posledná možnosť.
+ * a ukáže sa nápoveda, po 40 s „Preskočiť“ (s pokutou) ako posledná možnosť.
  */
 const DEFAULT_TIMING: InspectTiming = { hintMs: 20_000, revealMs: 40_000 };
 /** Ako dlho svieti riadok po prvom ťuknutí na prvok. */
@@ -101,8 +110,10 @@ function TranscriptView({
 export function ItemInspector({
   info,
   onFound,
-  onReveal,
+  onSkip,
   onClose,
+  minigameState,
+  onMinigameStateChange,
 }: ItemInspectorProps) {
   const { item, lockLabel, slotNumber, isFound } = info;
   const inspect = item.inspect;
@@ -152,7 +163,7 @@ export function ItemInspector({
   }, [shouldFocusDialog]);
 
   // Stupne nápovedy podľa dát predmetu: nápoveda, prípadne 2. nápoveda,
-  // nakoniec „Ukáž číslicu“. Časy sú od otvorenia alebo poslednej aktivity.
+  // nakoniec „Preskočiť“. Časy sú od otvorenia alebo poslednej aktivity.
   const timing = inspect?.timing ?? DEFAULT_TIMING;
   const hasSecondHint = Boolean(
     inspect?.secondHint && timing.secondHintMs !== undefined
@@ -224,7 +235,7 @@ export function ItemInspector({
     isFoundRequestedRef.current = true;
 
     if (revealed) {
-      onReveal();
+      onSkip();
     } else {
       onFound();
     }
@@ -276,6 +287,24 @@ export function ItemInspector({
   }
 
   const digit = item.secretCode;
+  // Mini hra (napríklad dátum na číselníkoch) nahrádza hľadanie, kým číslica nie je nájdená.
+  const isMinigameActive = Boolean(item.minigame) && !isFound;
+
+  function completeMinigame(result: { skipped: boolean; free?: boolean }) {
+    if (!result.skipped) {
+      markFound(false);
+      return;
+    }
+
+    if (isFound || isFoundRequestedRef.current) {
+      return;
+    }
+
+    isFoundRequestedRef.current = true;
+    onSkip({ free: result.free });
+    setIsJustFound(true);
+    window.setTimeout(() => setIsJustFound(false), FOUND_ANIMATION_MS);
+  }
   const definition =
     (inspect.kind === "hotspot" || inspect.kind === "count") && inspect.art
       ? ITEM_ARTS[inspect.art]
@@ -340,14 +369,28 @@ export function ItemInspector({
           {item.icon} {item.title}
         </h2>
 
-        <p
-          id="item-inspector-intro"
-          className="mt-3 text-sm leading-6 text-slate-300"
-        >
-          {inspect.intro}
-        </p>
+        {item.minigame && isMinigameActive ? (
+          <MiniGame
+            spec={item.minigame}
+            digit={digit}
+            introId="item-inspector-intro"
+            savedState={minigameState}
+            onStateChange={(state) => onMinigameStateChange?.(state)}
+            onComplete={completeMinigame}
+          />
+        ) : (
+          <p
+            id="item-inspector-intro"
+            className="mt-3 text-sm leading-6 text-slate-300"
+          >
+            {/* Po mini hre už nie je čo hľadať – úvod nahradí text zo schránky. */}
+            {item.minigame
+              ? (item.minigame.compartment?.openText ?? inspect.foundText)
+              : inspect.intro}
+          </p>
+        )}
 
-        {inspect.kind === "transcript" && inspect.transcript && (
+        {!isMinigameActive && inspect.kind === "transcript" && inspect.transcript && (
           <div className="mt-5 w-full">
             <TranscriptView
               transcript={inspect.transcript}
@@ -360,7 +403,7 @@ export function ItemInspector({
           </div>
         )}
 
-        {definition && inspect.art && (
+        {!isMinigameActive && definition && inspect.art && (
           <div
             className={`relative mt-5 ${artFrameClass}`}
             style={
@@ -496,7 +539,7 @@ export function ItemInspector({
           </div>
         )}
 
-        {definition && !isFound && (mode === "3d" || isCountMode) && (
+        {!isMinigameActive && definition && !isFound && (mode === "3d" || isCountMode) && (
           <p className="mt-3 text-xs leading-5 text-slate-400">
             {mode === "2d"
               ? "Ťukaj na detaily."
@@ -513,13 +556,13 @@ export function ItemInspector({
             </p>
           )}
 
-          {isHintVisible && (
+          {isHintVisible && !isMinigameActive && (
             <p className="mt-4 rounded-2xl border border-amber-300/25 bg-amber-400/10 px-4 py-3 text-sm leading-6 text-amber-100">
               {inspect.hint}
             </p>
           )}
 
-          {isSecondHintVisible && (
+          {isSecondHintVisible && !isMinigameActive && (
             <p className="mt-3 rounded-2xl border border-amber-300/25 bg-amber-400/10 px-4 py-3 text-sm leading-6 text-amber-100">
               {inspect.secondHint}
             </p>
@@ -531,7 +574,7 @@ export function ItemInspector({
         </div>
 
         <div className="mt-5 flex w-full flex-col gap-3">
-          {isTurnVisible && (
+          {isTurnVisible && !isMinigameActive && (
             <ActionButton
               variant="secondary"
               onClick={turn}
@@ -545,12 +588,12 @@ export function ItemInspector({
             </ActionButton>
           )}
 
-          {canReveal && (
+          {canReveal && !isMinigameActive && (
             <ActionButton
               variant="secondary"
               onClick={() => markFound(true)}
             >
-              Ukáž číslicu
+              {`Preskočiť (−${SKIP_PENALTY} bodov)`}
             </ActionButton>
           )}
         </div>

@@ -84,6 +84,43 @@ export type ItemInspect = {
   artPart?: number;
 };
 
+/** Jeden číselník mini hry (napríklad deň, mesiac, rok). */
+export type MiniGameDial = {
+  /** Názov pre čítačku a popis pod číselníkom („Deň“). */
+  label: string;
+  /** Hodnoty v poradí otáčania. */
+  values: string[];
+  /** Správna hodnota (skutočný údaj z miesta). */
+  answer: string;
+  /** Začiatočná hodnota (inak prvá). */
+  start?: string;
+};
+
+/**
+ * Mini hra, ktorou hráč získa číslicu predmetu (namiesto „Prezrieť“).
+ * Číslica ostáva v secretCode predmetu; mini hra rozhoduje iba, kedy sa odhalí.
+ */
+export type MiniGameSpec = {
+  intro: string;
+  /** Tri stupne nápovedy: kam sa pozrieť, čo hľadať, takmer riešenie. */
+  hints: [string, string, string];
+  /** Tajná schránka po vyriešení (text pri otvorení). */
+  compartment?: { openText: string };
+  /** Pre čítačku obrazovky „Preskočiť“ bez pokuty (posuvné puzzle, skladanie). */
+  accessibleFreeSkip?: boolean;
+} & {
+  type: "dateDials";
+  dials: MiniGameDial[];
+  submitLabel: string;
+  wrongText: string;
+};
+
+/** Uložený stav jednej mini hry (prečítané nápovedy a nastavenie, napríklad číselníky). */
+export type MiniGameSavedState = {
+  hintsRead?: number;
+  values?: number[];
+};
+
 export type InventoryItem = {
   id: string;
   title: string;
@@ -96,6 +133,8 @@ export type InventoryItem = {
   evidenceOrder?: number;
   actId?: ActId;
   inspect?: ItemInspect;
+  /** Mini hra na získanie číslice; bez nej ostáva hľadanie v „Prezrieť“ (inspect). */
+  minigame?: MiniGameSpec;
   /** Vodidlo na ďalšie miesto – smeruje, ale neprezrádza odpoveď ďalšej úlohy. */
   clue?: string;
 };
@@ -660,8 +699,12 @@ export type GameState = {
   hintsUsed: Record<PuzzleId, number>;
   /** Predmety, na ktorých hráč našiel číslicu kódu. */
   foundCodeItemIds: string[];
-  /** Predmety, ktorých číslicu hráč odhalil tlačidlom „Ukáž číslicu“. */
+  /** Predmety, ktorých číslicu hráč odhalil bez hľadania („Preskočiť“). */
   revealedCodeItemIds: string[];
+  /** Predmety, ktorých hľadanie alebo mini hru hráč preskočil (−10 bodov, okrem bezplatného pre čítačku). */
+  skippedCodeItemIds: string[];
+  /** Stav rozohraných mini hier podľa predmetu (po F5 pokračuje). */
+  minigameState: Record<string, MiniGameSavedState>;
   activeDialogueId?: string;
   activeDialogueNodeId?: string;
   activeNpcId?: string;

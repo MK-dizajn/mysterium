@@ -55,6 +55,8 @@ import {
   leaveFinalePhoto,
   leaveFinalePlace,
   markCodeDigitFound,
+  setMinigameState,
+  skipCodeDigit,
   markFinalePhotoAssembled,
   openFinaleChest,
   revealHint,
@@ -150,10 +152,8 @@ export default function Home() {
     ? getCodeItemInfo(currentChapter, gameState, inspectedItemId)
     : null;
 
-  function findCodeDigit(itemId: string, revealed: boolean) {
-    setGameState((currentState) =>
-      markCodeDigitFound(currentState, itemId, { revealed })
-    );
+  function findCodeDigit(itemId: string) {
+    setGameState((currentState) => markCodeDigitFound(currentState, itemId));
   }
 
   const ambientScreen: GameScreen = unlockedArtifact
@@ -800,9 +800,19 @@ export default function Home() {
       {inspectedItem && (
         <ItemInspector
           info={inspectedItem}
-          onFound={() => findCodeDigit(inspectedItem.item.id, false)}
-          onReveal={() => findCodeDigit(inspectedItem.item.id, true)}
+          onFound={() => findCodeDigit(inspectedItem.item.id)}
+          onSkip={(options) =>
+            setGameState((currentState) =>
+              skipCodeDigit(currentState, inspectedItem.item.id, options)
+            )
+          }
           onClose={() => setInspectedItemId(null)}
+          minigameState={gameState.minigameState?.[inspectedItem.item.id]}
+          onMinigameStateChange={(state) =>
+            setGameState((currentState) =>
+              setMinigameState(currentState, inspectedItem.item.id, state)
+            )
+          }
         />
       )}
     </>
