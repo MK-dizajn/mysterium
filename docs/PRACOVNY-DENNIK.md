@@ -5413,3 +5413,64 @@ Vývojový server je zastavený.
 **Build:** prešiel (v rámci testovacieho servera). **Typy:** bez chýb. **Lint:** bez zmeny, 14 starých problémov, v upravených súboroch žiadny. **Server:** po testoch spustený pre mobil (používateľ ho chce nechať bežať).
 
 **Ďalší krok:** používateľ vyskúša odomykanie troch zámkov na mobile. Potom návrh T3 (znak hry, rytiny, zamatové vnútro).
+
+---
+
+## 20. 11. 2026 – Úprava 4, krok T3a: rub fotografie zo 4 útržkov
+
+**Spätná väzba k T2** (mobil): „vyzerá super“. Server som zastavil.
+
+**Návrh T3** (znak hry na veku, rytiny na rohoch, zamatové vnútro) je poslaný a schválený. Začne sa po T3a a po potvrdení používateľa.
+
+**Zadanie T3a** (nová požiadavka k úprave 3):
+- predná strana poskladanej fotografie je roztrhnutá, rub bol celistvý,
+- rub má byť tiež zo 4 útržkov (zrkadlovo), s rôznymi odtieňmi kartónu a tieňom v škárach,
+- „Miesto: Slovenské národné divadlo“ musí ostať čitateľné a nesmie ho pretínať šev,
+- platí aj pre náhľad útržku v Inventári a pri vypnutých animáciách,
+- texty poznámky sa nemenia.
+
+**Čo je nové:**
+- **Rub zo 4 útržkov** (`PhotoBackArt` v `PhotoPiece.tsx`):
+  - zrkadlový roztrhnutý tvar (útržok vpredu vľavo je na rube vpravo),
+  - každý útržok má vlastný odtieň kartónu,
+  - svetlý roztrhnutý okraj s vláknami, jemný tieň v škárach, slabá škvrna a zrnitosť,
+  - pevná kresba, žiadna animácia ani nový súbor. Voliteľný kartón `backImageSrc` z dát sa stále použije.
+- **Poznámka na rube** (`PhotoBackNote` vo `FinalePhotoViewer.tsx`):
+  - prvé dva riadky hore cez celú šírku; písmo je nad útržkami, takže šev prejde medzi písmenami, ale žiadne nerozdelí,
+  - riadok s miestom kód spozná podľa začiatku „Miesto:“ a napíše ho po slovách (Miesto: / Slovenské / národné / divadlo) do **bezpečného obdĺžnika na rube útržku z truhlice**,
+  - podpis „— pátrač“ je dole vpravo,
+  - písmo sa mení podľa šírky fotografie, takže sedí rovnako aj pri prezretí jedného útržku.
+- **Bezpečný obdĺžnik** (`getBackPlaceBox` v `photoPieces.ts`):
+  - počíta sa z roztrhnutého tvaru: v každej výške od 38 % do 80 % sa nájde, kde trhliny pretínajú rub útržku z truhlice, a pridá sa odstup 1,5 %,
+  - vyšlo 34,8 % až 61,7 % šírky.
+  - Ak obrázok a útržky raz zmeníme, obdĺžnik sa prepočíta sám.
+- **Prezretie útržku v Inventári:** rub má zrkadlový roztrhnutý okraj, vlastný odtieň a svoj kúsok poznámky.
+- **Platí všade:** obrazovka fotografie, „Pozrieť fotografiu“ pri zadaní miesta, Inventár. Pri vypnutých animáciách je otočenie okamžité ako doteraz.
+
+**Súbory:**
+- `components/finale/photoPieces.ts`, `components/finale/PhotoPiece.tsx`, `components/finale/FinalePhotoViewer.tsx`,
+- `docs/PRACOVNY-DENNIK.md`.
+
+**Testy:**
+- **Pred zmenou** (rozšírené O3):
+  - Node: 3 chyby,
+  - v prehliadači v oboch režimoch: rub bez útržkov a test spadol na chýbajúcom riadku s miestom.
+- **Po zmene:**
+  - **O3 (Node):**
+    - zrkadlový obrys,
+    - bezpečný obdĺžnik celý vnútri rubu útržku z truhlice (kontrola bod po bode), dosť široký a vysoký a pod horným švom,
+    - útržky s odtieňmi, okrajom a tieňom,
+    - texty poznámky v dátach bez zmeny.
+    - Výsledok: všetko OK.
+  - **O3 v prehliadači** (oba režimy):
+    - rub celej fotografie zo 4 útržkov so 4 rôznymi odtieňmi a okrajmi,
+    - každý riadok „Miesto: …“ celý v bezpečnom obdĺžniku (meraná poloha na obrazovke) na 320 aj 360 px, písmo aspoň 12 px,
+    - rub jedného útržku v Inventári.
+    - Výsledok: všetko OK.
+  - **O1:** všetko OK.
+  - **Node:** 32 testov OK.
+  - **Celá séria v prehliadači** (40 behov, hotová verzia): všetko OK. Trvanie 39 minút, server najviac 102 MB, po teste nezostali žiadne procesy.
+
+**Build:** prešiel (v rámci testovacieho servera). **Typy:** bez chýb. **Lint:** bez zmeny, 14 starých problémov, v upravených súboroch žiadny. **Server:** po testoch spustený pre mobil.
+
+**Ďalší krok:** používateľ vyskúša rub fotografie na mobile. Potom po potvrdení T3 podľa schváleného návrhu.

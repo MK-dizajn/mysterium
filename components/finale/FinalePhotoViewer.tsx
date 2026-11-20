@@ -9,8 +9,72 @@ import {
 } from "react";
 import type { FinalePhoto } from "../../types/game";
 import { ActionButton } from "../ui/ActionButton";
-import { getPieceViewBox, PHOTO_VIEW, PhotoPieceArt } from "./PhotoPiece";
-import { PHOTO_PIECE_POINTS } from "./photoPieces";
+import { getPieceViewBox, PHOTO_VIEW, PhotoBackArt, PhotoPieceArt } from "./PhotoPiece";
+import { getBackPlaceBox, PHOTO_PIECE_POINTS } from "./photoPieces";
+
+/** Riadok s miestom na rube (spozná sa podľa začiatku „Miesto:“). */
+const PLACE_PREFIX = "Miesto:";
+
+/**
+ * Pátračova poznámka na rube v súradniciach celej fotografie (písmo
+ * v cqw – rovnaká veľkosť voči kartónu aj pri prezretí jedného útržku):
+ * prvé riadky hore cez celú šírku (nad švami), „Miesto: …“ po slovách
+ * v bezpečnom obdĺžniku rubu útržku z truhlice, podpis dole vpravo.
+ */
+function PhotoBackNote({ lines }: { lines: string[] }) {
+  const placeLine = lines.find((line) => line.startsWith(PLACE_PREFIX));
+  const signature = lines.find((line) => line.startsWith("—"));
+  const topLines = lines.filter((line) => line !== placeLine && line !== signature);
+  const box = getBackPlaceBox();
+  const noteClass = "font-serif italic text-[#3b2a12]";
+
+  // Bez riadku „Miesto:“ (iná kapitola) – celá poznámka ako jeden blok.
+  if (!placeLine) {
+    return (
+      <div className={`absolute inset-0 flex flex-col justify-center gap-[2cqw] px-[6cqw] text-[4.2cqw] leading-[6.4cqw] ${noteClass}`}>
+        {lines.map((line) => (
+          <p key={line}>{line}</p>
+        ))}
+      </div>
+    );
+  }
+
+  const placeWords = [
+    PLACE_PREFIX,
+    ...placeLine.slice(PLACE_PREFIX.length).trim().split(/\s+/),
+  ];
+
+  return (
+    <>
+      <div className={`absolute inset-x-[6%] top-[6%] space-y-[1.5cqw] text-[4.1cqw] leading-[6cqw] ${noteClass}`}>
+        {topLines.map((line) => (
+          <p key={line}>{line}</p>
+        ))}
+      </div>
+      <p
+        data-back-place
+        data-safe-box={`${box.left},${box.right},${box.top},${box.bottom}`}
+        className={`absolute text-center text-[4.6cqw] font-bold leading-[6.4cqw] ${noteClass}`}
+        style={{
+          left: `${box.left}%`,
+          width: `${box.right - box.left}%`,
+          top: `${box.top}%`,
+        }}
+      >
+        {placeWords.map((word, index) => (
+          <span key={`${word}-${index}`} data-back-place-line className="block">
+            {word}
+          </span>
+        ))}
+      </p>
+      {signature && (
+        <p className={`absolute bottom-[7%] right-[7%] text-[4.1cqw] ${noteClass}`}>
+          {signature}
+        </p>
+      )}
+    </>
+  );
+}
 
 type FinalePhotoViewerProps = {
   photo: FinalePhoto;
@@ -269,16 +333,11 @@ export function FinalePhotoViewer({
   const cropBox = isCropped ? getPieceViewBox(cropPieceIndex) : null;
   const croppedBack = isCropped ? getCroppedBack(cropPieceIndex) : null;
   const isAnimated = assembly === "animated";
-  const backImage = photo.backImageSrc
-    ? { backgroundImage: `url(${photo.backImageSrc})`, backgroundSize: "cover" }
-    : undefined;
-  const backLines = (
-    <div className="flex h-full w-full flex-col justify-center gap-3 px-6 py-5 text-left font-serif text-[16px] italic leading-7 text-[#3b2a12]">
-      {photo.backLines.map((line) => (
-        <p key={line}>{line}</p>
-      ))}
-    </div>
-  );
+  // Rub: vždy celá fotografia (všetky útržky), pri prezretí jedného útržku iba on.
+  const backIndexes = isCropped
+    ? [cropPieceIndex]
+    : photo.fragmentIds.map((_id, index) => index);
+  const backNote = <PhotoBackNote lines={photo.backLines} />;
 
   return (
     <>
@@ -364,26 +423,30 @@ export function FinalePhotoViewer({
             )}
           </div>
 
-          {/* Zadná strana: poznámka pátrača (pri útržku iba jeho kúsok, zrkadlovo). */}
+          {/*
+            Zadná strana z útržkov (zrkadlovo k prednej): roztrhnuté okraje,
+            odtiene kartónu, tieň v škárach. Poznámka je nad útržkami; riadok
+            s miestom leží celý v rube útržku z truhlice (žiadny šev ho nepretne).
+          */}
           <div
             data-photo-back
             aria-hidden={!isBackSide}
-            className={`absolute inset-0 overflow-hidden rounded-md shadow-inner [backface-visibility:hidden] [transform:rotateY(180deg)] ${
-              backImage ? "" : "bg-gradient-to-br from-[#efe2c2] via-[#e2cfa6] to-[#cdb284]"
-            }`}
-            style={croppedBack ? { clipPath: croppedBack.clipPath } : backImage}
+            className="absolute inset-0 overflow-hidden rounded-md [backface-visibility:hidden] [transform:rotateY(180deg)]"
           >
+            <PhotoBackArt
+              indexes={backIndexes}
+              cropIndex={cropPieceIndex}
+              backImageSrc={photo.backImageSrc}
+              className="absolute inset-0 block h-full w-full"
+            />
             {croppedBack ? (
-              <div
-                className={`absolute [container-type:inline-size] ${
-                  backImage ? "" : "bg-gradient-to-br from-[#efe2c2] via-[#e2cfa6] to-[#cdb284]"
-                }`}
-                style={{ ...croppedBack.inner, ...backImage }}
-              >
-                <div className="h-full w-full [&_div]:text-[4.2cqw]! [&_div]:leading-[6.6cqw]!">{backLines}</div>
+              <div data-back-clip className="absolute inset-0" style={{ clipPath: croppedBack.clipPath }}>
+                <div className="absolute [container-type:inline-size]" style={croppedBack.inner}>
+                  {backNote}
+                </div>
               </div>
             ) : (
-              backLines
+              <div className="absolute inset-0 [container-type:inline-size]">{backNote}</div>
             )}
           </div>
         </div>

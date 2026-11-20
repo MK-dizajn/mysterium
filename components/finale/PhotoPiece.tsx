@@ -1,7 +1,12 @@
 "use client";
 
 import { useId, useSyncExternalStore } from "react";
-import { getPieceBox, PHOTO_CARD, PHOTO_PIECE_POINTS } from "./photoPieces";
+import {
+  getMirroredPiecePoints,
+  getPieceBox,
+  PHOTO_CARD,
+  PHOTO_PIECE_POINTS,
+} from "./photoPieces";
 
 /** Kresba celej fotografie s kartónom (jednotky SVG, pomer 4 : 3). */
 export const PHOTO_VIEW = { width: 400, height: 300 };
@@ -12,6 +17,11 @@ const toView = ([x, y]: [number, number]) =>
 /** Obrys útržku ako cesta SVG (v jednotkách kresby). */
 export function getPiecePath(index: number) {
   return `M${PHOTO_PIECE_POINTS[index].map(toView).join(" L")} Z`;
+}
+
+/** Obrys rubu útržku (zrkadlovo) ako cesta SVG. */
+export function getMirroredPiecePath(index: number) {
+  return `M${getMirroredPiecePoints(index).map(toView).join(" L")} Z`;
 }
 
 /** Ohraničenie útržku v jednotkách kresby (na orezanie zmenšeniny). */
@@ -65,7 +75,7 @@ function getGrainUrl() {
 
 const subscribeNothing = () => () => {};
 
-function useGrainUrl() {
+export function useGrainUrl() {
   return useSyncExternalStore(subscribeNothing, getGrainUrl, () => null);
 }
 
@@ -80,8 +90,8 @@ const SCRATCHES = [
 const FOLD = { from: [150, 2], to: [258, 120] } as const;
 
 /** Vlákna roztrhnutého papiera: krátke čiarky pri okraji (každý 3. bod). */
-function getFibers(index: number) {
-  const points = PHOTO_PIECE_POINTS[index];
+function getFibers(index: number, mirrored = false) {
+  const points = mirrored ? getMirroredPiecePoints(index) : PHOTO_PIECE_POINTS[index];
 
   return points
     .filter((_, pointIndex) => pointIndex % 3 === 1)
@@ -187,6 +197,101 @@ export function PhotoPieceArt({ imageSrc, index, view = "full", className = "", 
           <path d={getFibers(index)} fill="none" stroke="#fffaf0" strokeWidth="0.5" strokeOpacity="0.9" />
         </g>
       </g>
+    </svg>
+  );
+}
+
+/**
+ * Odtiene kartónu na rube – každý útržok trochu inak zostarol
+ * (svetlý a tmavý koniec prechodu farieb pre útržok 1 až 4).
+ */
+const BACK_TONES: [string, string][] = [
+  ["#efe2c2", "#cdb284"],
+  ["#f3e8cc", "#d6be92"],
+  ["#e9d8b2", "#c3a674"],
+  ["#f0e4c6", "#cfb588"],
+];
+
+type PhotoBackArtProps = {
+  /** Útržky, ktoré sa na rube kreslia (0 až 3). */
+  indexes: number[];
+  /** Iba jeden útržok (prezretie v Inventári): orezané na jeho rub. */
+  cropIndex?: number;
+  /** Voliteľný obrázok kartónu z dát (inak prechod farieb). */
+  backImageSrc?: string;
+  className?: string;
+};
+
+/**
+ * Rub fotografie zo štyroch útržkov: zrkadlový roztrhnutý tvar, každý
+ * s iným odtieňom kartónu, svetlý roztrhnutý okraj s vláknami a jemný
+ * tieň v škárach. Pevná kresba (bez animácie).
+ */
+export function PhotoBackArt({ indexes, cropIndex, backImageSrc, className = "" }: PhotoBackArtProps) {
+  const grain = useGrainUrl();
+  const idPrefix = `photo-back-${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
+  const id = (name: string) => `${idPrefix}-${name}`;
+  const url = (name: string) => `url(#${id(name)})`;
+  let viewBox = `0 0 ${PHOTO_VIEW.width} ${PHOTO_VIEW.height}`;
+
+  if (cropIndex !== undefined) {
+    const box = getPieceViewBox(cropIndex);
+    viewBox = `${PHOTO_VIEW.width - (box.x + box.width)} ${box.y} ${box.width} ${box.height}`;
+  }
+
+  return (
+    <svg viewBox={viewBox} className={className} aria-hidden="true" preserveAspectRatio="none" overflow="visible">
+      <defs>
+        {indexes.map((index) => (
+          <g key={index}>
+            <clipPath id={id(`clip-${index}`)}>
+              <path d={getMirroredPiecePath(index)} />
+            </clipPath>
+            <linearGradient id={id(`tone-${index}`)} x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0" stopColor={BACK_TONES[index][0]} />
+              <stop offset="1" stopColor={BACK_TONES[index][1]} />
+            </linearGradient>
+          </g>
+        ))}
+        {grain && (
+          <pattern id={id("grain")} patternUnits="userSpaceOnUse" width="32" height="32">
+            <image href={grain} width="32" height="32" />
+          </pattern>
+        )}
+        {backImageSrc && (
+          <pattern id={id("card")} patternUnits="userSpaceOnUse" width={PHOTO_VIEW.width} height={PHOTO_VIEW.height}>
+            <image href={backImageSrc} width={PHOTO_VIEW.width} height={PHOTO_VIEW.height} preserveAspectRatio="xMidYMid slice" />
+          </pattern>
+        )}
+        <radialGradient id={id("stain")} cx="50%" cy="50%" r="50%">
+          <stop offset="0" stopColor="#8a6a36" stopOpacity="0.16" />
+          <stop offset="1" stopColor="#8a6a36" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+
+      {indexes.map((index) => {
+        const path = getMirroredPiecePath(index);
+
+        return (
+          <g key={index} data-photo-back-piece={index + 1} data-tone={BACK_TONES[index].join("-")}>
+            {/* Tieň útržku – v škárach medzi kusmi je jemná tmavá čiara. */}
+            <path d={path} fill="#000" opacity="0.32" transform="translate(1.4 2.2)" />
+            <g clipPath={url(`clip-${index}`)}>
+              <rect width={PHOTO_VIEW.width} height={PHOTO_VIEW.height} fill={url(`tone-${index}`)} />
+              {backImageSrc && (
+                <rect width={PHOTO_VIEW.width} height={PHOTO_VIEW.height} fill={url("card")} opacity="0.85" style={{ mixBlendMode: "multiply" }} />
+              )}
+              <ellipse cx={90 + index * 70} cy={60 + (index % 2) * 140} rx="46" ry="30" fill={url("stain")} />
+              {grain && <rect width={PHOTO_VIEW.width} height={PHOTO_VIEW.height} fill={url("grain")} opacity="0.3" />}
+              <g data-photo-back-torn-edge>
+                <path d={path} fill="none" stroke="#f8f1e0" strokeWidth="3.2" strokeLinejoin="round" />
+                <path d={path} fill="none" stroke="#b49a68" strokeOpacity="0.55" strokeWidth="0.7" transform="translate(-0.4 0.4)" />
+                <path d={getFibers(index, true)} fill="none" stroke="#fffaf0" strokeWidth="0.5" strokeOpacity="0.9" />
+              </g>
+            </g>
+          </g>
+        );
+      })}
     </svg>
   );
 }

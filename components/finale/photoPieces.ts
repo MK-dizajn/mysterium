@@ -90,6 +90,55 @@ export const PHOTO_PIECE_POINTS: PhotoPoint[][] = [
   [...MIDDLE, ...RIGHT_BOTTOM.slice(1), ...reversed(LEFT_BOTTOM).slice(0, -1)],
 ];
 
+/** Rub fotografie je zrkadlový: útržok vpredu vľavo je na rube vpravo. */
+export function getMirroredPiecePoints(index: number): PhotoPoint[] {
+  return (PHOTO_PIECE_POINTS[index] ?? PHOTO_PIECE_POINTS[0]).map(([x, y]) => [100 - x, y]);
+}
+
+/** Na rube: na ktorom útržku je riadok s miestom (rub útržku z truhlice). */
+export const BACK_PLACE_PIECE = 3;
+const BACK_PLACE_TOP = 38;
+const BACK_PLACE_BOTTOM = 80;
+/** Odstup textu od trhliny (percentá šírky). */
+const BACK_PLACE_MARGIN = 1.5;
+
+/**
+ * Obdĺžnik na rube (v percentách), ktorý celý leží vnútri rubu útržku
+ * z truhlice – riadok „Miesto: …“ tam nepretne žiadny šev.
+ */
+export function getBackPlaceBox() {
+  const polygon = getMirroredPiecePoints(BACK_PLACE_PIECE);
+  const xs = polygon.map(([x]) => x);
+  const centerX = (Math.min(...xs) + Math.max(...xs)) / 2;
+  let left = -Infinity;
+  let right = Infinity;
+
+  for (let y = BACK_PLACE_TOP; y <= BACK_PLACE_BOTTOM; y += 0.5) {
+    // Kde vodorovná čiara v tejto výške pretína obrys útržku.
+    const crossings: number[] = [];
+
+    polygon.forEach(([x1, y1], index) => {
+      const [x2, y2] = polygon[(index + 1) % polygon.length];
+
+      if ((y1 > y) !== (y2 > y)) {
+        crossings.push(x1 + ((y - y1) * (x2 - x1)) / (y2 - y1));
+      }
+    });
+
+    const leftEdge = Math.max(...crossings.filter((x) => x < centerX));
+    const rightEdge = Math.min(...crossings.filter((x) => x > centerX));
+    left = Math.max(left, leftEdge + BACK_PLACE_MARGIN);
+    right = Math.min(right, rightEdge - BACK_PLACE_MARGIN);
+  }
+
+  return {
+    left: Math.round(left * 10) / 10,
+    right: Math.round(right * 10) / 10,
+    top: BACK_PLACE_TOP,
+    bottom: BACK_PLACE_BOTTOM,
+  };
+}
+
 export type PieceBox = { left: number; top: number; width: number; height: number };
 
 /** Ohraničenie útržku (v percentách fotografie). */
