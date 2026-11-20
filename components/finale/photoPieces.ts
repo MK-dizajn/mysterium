@@ -61,14 +61,19 @@ function tear(from: PhotoPoint, to: PhotoPoint, seed: number): PhotoPoint[] {
   return points;
 }
 
-/** Miesta, kde sa stretávajú tri útržky. */
-const JOINT_LEFT: PhotoPoint = [30.5, 42];
-const JOINT_RIGHT: PhotoPoint = [69, 41];
+/**
+ * Miesta, kde sa stretávajú tri útržky. Nastavené podľa obrázka SND
+ * (20. 11. 2026): zvislé trhliny idú medzi krídlami a stredným rizalitom
+ * (asi 34 % a 70 % šírky obrázka), vodorovná pod rímsou kupoly, nad
+ * lodžiou s bustami (asi 32 % výšky obrázka).
+ */
+const JOINT_LEFT: PhotoPoint = [35, 31.5];
+const JOINT_RIGHT: PhotoPoint = [68.5, 31];
 
-const LEFT_TOP = tear([31.5, 0], JOINT_LEFT, 11);
-const LEFT_BOTTOM = tear(JOINT_LEFT, [32, 100], 23);
-const RIGHT_TOP = tear([68, 0], JOINT_RIGHT, 37);
-const RIGHT_BOTTOM = tear(JOINT_RIGHT, [67.5, 100], 41);
+const LEFT_TOP = tear([34.5, 0], JOINT_LEFT, 11);
+const LEFT_BOTTOM = tear(JOINT_LEFT, [35.5, 100], 23);
+const RIGHT_TOP = tear([69, 0], JOINT_RIGHT, 37);
+const RIGHT_BOTTOM = tear(JOINT_RIGHT, [68.5, 100], 41);
 const MIDDLE = tear(JOINT_LEFT, JOINT_RIGHT, 53);
 
 const reversed = (points: PhotoPoint[]) => [...points].reverse();

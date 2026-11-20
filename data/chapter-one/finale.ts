@@ -57,9 +57,11 @@ export const chapterOneFinale: ChapterFinale = {
   },
 
   photo: {
-    // Dočasný sépiový obrázok (vlastná kresba); nahradí ho historická fotografia
-    // v pomere 4 : 3 – stačí vymeniť súbor alebo cestu, kód netreba meniť.
-    imageSrc: "/images/finale/historicka-fotografia.jpg",
+    // Obrázok SND v štýle starej fotografie (Gemini, 20. 11. 2026; licencia
+    // v docs/MEDIA-LICENCIE.md). Pomer 4 : 3 – výmena: stačí vymeniť súbory
+    // alebo cesty, kód netreba meniť. Malá verzia je pre drobné zmenšeniny.
+    imageSrc: "/images/finale/historicka-fotografia.webp",
+    thumbnailSrc: "/images/finale/historicka-fotografia-mala.webp",
     imageAlt: "Stará sépiová fotografia mesta",
     fragmentIds: [
       "torn-photo-fragment-act-1",

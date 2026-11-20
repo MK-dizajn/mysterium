@@ -72,11 +72,11 @@ export function PhotoFragmentPreview({ photo, index, ownedFragmentIds }: PhotoFr
   );
 }
 
-/** Malý útržok v riadku Inventára (namiesto ikonky). */
+/** Malý útržok v riadku Inventára (namiesto ikonky): malá verzia obrázka. */
 export function PhotoFragmentThumb({ photo, index }: { photo: FinalePhoto; index: number }) {
   return (
     <span data-photo-fragment-thumb className="block h-7 w-7">
-      <PhotoPieceArt imageSrc={photo.imageSrc} index={index} view="crop" className="block h-full w-full" />
+      <PhotoPieceArt imageSrc={photo.thumbnailSrc ?? photo.imageSrc} index={index} view="crop" className="block h-full w-full" />
     </span>
   );
 }

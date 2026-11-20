@@ -5187,3 +5187,53 @@ Vývojový server je zastavený.
 **Build:** prešiel (v rámci testovacieho servera). **Typy:** bez chýb. **Lint:** bez zmeny, 14 starých problémov, v upravených súboroch žiadny. **Server:** zastavený.
 
 **Ďalší krok:** používateľ vyskúša úpravu 3 na mobile. Potom úprava 4 (truhlica vo finále), najprv návrh. Obrázok SND doplní Miloš, výmena súboru stačí.
+
+---
+
+## 20. 11. 2026 – Úprava 3b: obrázok SND (Gemini) a rozloženie útržkov podľa neho
+
+**Zadanie:** Miloš dodal obrázok `Gemini_Generated_Image_1d84ok1d84ok1d84.jpg` (2400 × 1792 px). Úlohy:
+- nahradiť ním dočasný obrázok, zmenšiť na 1600 × 1200 vo WebP a pridať malú verziu 480 × 360,
+- rozloženie útržkov nastaviť podľa obrázka,
+- zdroj zapísať ako Gemini s neoverenými komerčnými podmienkami.
+
+**Obrázok:**
+- stará sépiová fotografia SND s kupolou a súsoším, lodžia s bustami, Ganymedova fontána, lampy, stromy, fiaker, dobové postavy,
+- viditeľný vodoznak na rohoch nie je (skontrolované výrezmi), neviditeľný SynthID tam pravdepodobne je,
+- súbor som skopíroval do samostatného priečinka mimo projektu a spracoval knižnicou sharp z projektu.
+
+**Čo sa zmenilo:**
+- **Súbory:**
+  - `public/images/finale/historicka-fotografia.webp`: 1600 × 1200, kvalita 74, **233 KB** (v pamäti telefónu asi 7,7 MB),
+  - `public/images/finale/historicka-fotografia-mala.webp`: 480 × 360, **31 KB**,
+  - dočasný `historicka-fotografia.jpg` je odstránený.
+- **Dáta** (`data/chapter-one/finale.ts`): nové cesty `imageSrc` a `thumbnailSrc` (nové nepovinné pole v type `FinalePhoto`). Kód sa nemenil, iba malá zmenšenina v riadku Inventára a v ikone na konci aktu berie malú verziu. Väčšie náhľady, finále a 3D útržok používajú veľkú verziu, aby boli ostré.
+- **Rozloženie útržkov** (`photoPieces.ts`) podľa obrázka:
+  - zvislé trhliny medzi krídlami a stredným rizalitom (asi 34 % a 70 % šírky obrázka),
+  - vodorovná trhlina pod rímsou kupoly, nad lodžiou s bustami (asi 32 % výšky),
+  - výsledok: 1 ľavé krídlo, lampa a stromy; 2 kupola so súsoším a nebo; 3 pravé krídlo, lampa a fiaker; 4 lodžia s bustami, vstupy a fontána.
+- **Dokumenty:**
+  - `docs/MEDIA-LICENCIE.md`: riadok Gemini, komerčné podmienky **NEOVERENÉ**; presné znenie zadania doplní Miloš.
+  - `docs/KONTROLA-PRED-VYDANIM.md`: bod o dočasnej fotografii je odškrtnutý. Bod o licencii je teraz konkrétne pre Gemini a pribudlo v ňom overiť, že obrázok neopakuje konkrétnu archívnu fotografiu.
+
+**Chyby počas práce:**
+- **Prvý WebP (kvalita 82) mal 316 kB** a starší Node test B5 (limit 300 kB) zlyhal. V návrhu bol odhad 150 – 250 KB, preto som zvolil kvalitu 74: 233 KB, detaily (busty, orol, stĺpy) ostali ostré (overené výrezom).
+- **Nový test** mal zle dve veci a opravil som ich:
+  - „nebo vpravo hore“ patrí podľa rozloženia k pravému krídlu, test teraz kontroluje nebo nad kupolou,
+  - kontrola chýbajúcej malej verzie test zhodila namiesto toho, aby vypísala chybu.
+- **Prvý commit bol neúplný:** odstránenie starého JPG bolo pripravené už skôr (`git rm`), preto opätovné pridanie tej istej cesty zlyhalo. Commit sa i tak vytvoril, ale iba s odstránením JPG. Keďže ešte nebol odoslaný, doplnil som do neho zvyšné súbory (`--amend`) a overil zoznam zmien.
+
+**Testy:**
+- **Pred zmenou** (O3 rozšírený o miesta na obrázku a súbory): 7 chýb.
+  - busty v lodžii padli do útržku so strechou,
+  - chýbali súbory WebP, `thumbnailSrc` a riadok Gemini,
+  - dočasný JPG ešte existoval.
+- **Po zmene:**
+  - **O3 (Node):** 13 miest na obrázku je v správnom útržku (lampy, stromy, okná krídel, sochy, kupola, nebo, fiaker, fontána, vstup, busty, orol). Súbory WebP majú správnu veľkosť, JPG je preč, licencia je zapísaná. Všetko OK.
+  - **Node:** 30 testov OK (aj B5 s limitom 300 kB).
+  - **V prehliadači:** O3 (oba režimy, plus kontrola malej verzie v Inventári), B4c3 (3D útržok v truhlici) a B3b (koniec aktu III): všetko OK.
+  - **Celá séria v prehliadači** (35 behov, hotová verzia s novým obrázkom): všetko OK. Trvanie 35 minút, server najviac 100 MB, po teste nezostali žiadne procesy.
+
+**Build:** prešiel (v rámci testovacieho servera). **Typy:** bez chýb. **Lint:** bez zmeny, 14 starých problémov. **Server:** zastavený.
+
+**Ďalší krok:** používateľ vyskúša útržky s novým obrázkom na mobile. Potom úprava 4 (truhlica vo finále), najprv návrh.

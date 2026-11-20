@@ -558,6 +558,8 @@ export type FinalePhoto = {
    * zrnitosť, okraje a záhyby pridá kód – výmena súboru stačí.
    */
   imageSrc: string;
+  /** Malá verzia obrázka (480 × 360) pre drobné zmenšeniny útržkov. */
+  thumbnailSrc?: string;
   imageAlt: string;
   /** Voliteľný obrázok starého kartónu na rub (inak prechod farieb). */
   backImageSrc?: string;
