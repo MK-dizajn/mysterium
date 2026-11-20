@@ -373,6 +373,11 @@ export function ItemInspector({
           <MiniGame
             spec={item.minigame}
             digit={digit}
+            tooth={
+              inspect.art === "keyTooth" && countPoints
+                ? { countPoints, artPart: inspect.artPart ?? 1 }
+                : undefined
+            }
             introId="item-inspector-intro"
             savedState={minigameState}
             onStateChange={(state) => onMinigameStateChange?.(state)}

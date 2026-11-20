@@ -152,6 +152,8 @@ export const bratislavskyMierScene: Scene = {
               ],
               compartment: {
                 openText: "Pečať praskla. Vnútri leží tretí zub Zlatého kľúča.",
+                // Pečať nesie vlastný znak hry (M s kompasom), nie znak mesta.
+                look: { seal: "wax", contents: "keyTooth", palette: "oakBrass" },
               },
             },
             evidenceOrder: 9,

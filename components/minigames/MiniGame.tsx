@@ -6,11 +6,13 @@ import { SKIP_PENALTY, createDateDialsState } from "../../engine";
 import { soundManager } from "../../lib/soundManager";
 import { ActionButton } from "../ui/ActionButton";
 import { DateDialsGame } from "./DateDialsGame";
-import { SecretCompartment } from "./SecretCompartment";
+import { SecretCompartment, type CompartmentToothArt } from "./SecretCompartment";
 
 type MiniGameProps = {
   spec: MiniGameSpec;
   digit: string;
+  /** Zub kľúča, ktorý leží v tajnej schránke (ak predmet je zub). */
+  tooth?: CompartmentToothArt;
   introId: string;
   savedState?: MiniGameSavedState;
   onStateChange: (state: MiniGameSavedState) => void;
@@ -31,6 +33,7 @@ const SKIP_AVAILABLE_MS = 120_000;
 export function MiniGame({
   spec,
   digit,
+  tooth,
   introId,
   savedState,
   onStateChange,
@@ -88,6 +91,8 @@ export function MiniGame({
       <SecretCompartment
         digit={digit}
         text={spec.compartment?.openText ?? "Objavil si číslicu."}
+        look={spec.compartment?.look}
+        tooth={tooth}
         onDone={() => onComplete(result)}
       />
     );

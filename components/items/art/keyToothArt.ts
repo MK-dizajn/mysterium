@@ -216,6 +216,25 @@ export function getKeyToothSvg(
     + `</svg>`;
 }
 
+/**
+ * Časť brady na vloženie do inej kresby (tajná schránka): prechody, driek,
+ * brada so zárezmi a obrys brady (na odlesk). Súradnice 320 × 240.
+ */
+export function getKeyToothParts(
+  notches: InspectCountPoint[],
+  part: number,
+  idPrefix: string
+) {
+  return {
+    defs: getGradients(idPrefix),
+    body:
+      getRod(idPrefix)
+      + getBit(notches, part, `url(#${idPrefix}-gold)`)
+      + getWardOutlines(notches, "data-key-ward"),
+    bitPath: getBitPathData(notches, part),
+  };
+}
+
 /** Rozloženie zloženého kľúča: časti brady visia na drieku v rovnakej mierke. */
 export function getGoldenKeyLayout() {
   const pieceScale = 0.5;

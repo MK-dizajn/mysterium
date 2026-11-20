@@ -5035,3 +5035,75 @@ Vývojový server je zastavený.
 - Ďalšia mini hra (scéna 2 a ďalšie) až po týchto úpravách a po potvrdení.
 - Server je zastavený, nebeží žiadny proces node ani testovací Chrome.
 - Pokračujeme 20. 11. 2026.
+
+---
+
+## 20. 11. 2026 – Úprava 2: nový vzhľad tajnej schránky (scéna 9)
+
+**Zadanie:** princíp schránky (pečať, zlomenie, otvorenie, číslica 7) ostáva, ale vzhľad má byť detailnejší a krajší, s wow efektom.
+
+**Rozhodnutia používateľa:**
+- Hneď kreslené v SVG a CSS, bez obrázkov. Pre textúry (drevo, zamat) je v diele voliteľné miesto, doplnia sa neskôr.
+- Vnútri leží zub Zlatého kľúča s vyrytou číslicou 7.
+- **Pečať nesie vlastný znak hry, nie znak mesta Bratislavy:** písmeno M v kruhu s kompasovou ružicou. Platí to aj pre truhlicu vo finále (úprava 4).
+- Do kontroly pred vydaním pribudol bod: overiť podmienky používania znaku mesta.
+
+**Čo je nové:**
+- **Truhlička** nakreslená mierne zhora:
+  - tmavé drevo s letokruhmi a sukom,
+  - dva železné pásy, mosadzné rohy s nitmi (spolu 16 nitov), dva pánty,
+  - mosadzný zámok s kľúčovou dierkou a patinou,
+  - sklopná západka a vosková pečať so znakom hry,
+  - vnútri bordový zamat s tieňom pri zadnej stene a zamatom aj na vnútornej strane veka,
+  - tieň pod truhličkou.
+- **Otvorenie (2,6 s):**
+  - 0 – 0,6 s: pečať praskne, polovice a drobčeky vosku odpadnú, krátka vibrácia,
+  - 0,5 s: západka cvakne a truhlička sa jemne pohne,
+  - 0,8 – 1,7 s: veko sa odklopí dozadu, dlhšia vibrácia,
+  - 1,0 s: zvnútra svetlo a lúče, v lúčoch 7 zrniek prachu,
+  - 1,7 s: zub sa nadvihne zo zamatu,
+  - 1,9 s: po zube prebehne odlesk,
+  - 2,3 s: vyrytá 7 sa rozžiari.
+  - Potom sa číslica zapíše do zápisníka ako doteraz.
+- **Ťuknutie na schránku** preskočí animáciu na koniec. Číslica sa zapíše do pol sekundy.
+- **Vypnuté animácie:** 0,3 s zatvorená schránka s pečaťou, prelínanie na otvorenú schránku so zubom, koniec po 0,9 s. Nič sa nehýbe, vibrácia ostáva.
+- **Nastaviteľné v dátach** (`compartment.look`) pre scény 2, 7 a ďalšie kapitoly:
+  - `seal`: vosková pečať alebo bez pečate,
+  - `contents`: zub kľúča alebo iba číslica,
+  - `palette`: dub s mosadzou, alebo železo s čiernym voskom a zeleným zamatom pre neskoršie kapitoly,
+  - `textures`: voliteľné obrázky dreva a zamatu.
+  - Výklenok v múre (scéna 2) a hra vnútri schránky (scéna 7) pribudnú s danou mini hrou.
+- **Výkon:**
+  - Kresba je priamo v kóde, nič sa nesťahuje.
+  - Hýbu sa iba posuny, otočenia, priehľadnosť a farba výplne. Bez rozmazaní a šumových filtrov.
+- Zub v schránke je rovnaká kresba ako v okne „Prezrieť“ (nová funkcia `getKeyToothParts`).
+
+**Chyby počas práce:**
+- **Prvá verzia:** svetlo a stredný lúč boli nakreslené cez zub a prežiarili ho, takže 7 nebolo vidieť. Opravené: lúče a svetlo sú za zubom, zub je väčší, číslica väčšia a s tmavým obrysom (overené snímkou).
+- **Test N1 pri vypnutých animáciách** napočítal dvojnásobok pántov a prachu, lebo schránka má vtedy dva pokojné obrázky (zatvorená a otvorená). Test teraz počíta v jednom obrázku.
+- **Test O2** považoval za chybu komentár „nie znak mesta“ v kóde. Kontrola je teraz presnejšia.
+
+**Súbory:**
+- `components/minigames/SecretCompartment.tsx` (nový diel), `components/minigames/MiniGame.tsx`, `components/items/ItemInspector.tsx`, `components/items/art/keyToothArt.ts`,
+- `types/game.ts` (typ `CompartmentLook`), `data/chapter-one/bratislavsky-mier.ts`,
+- `app/globals.css` (staré štýly schránky nahradené novými),
+- `docs/KONTROLA-PRED-VYDANIM.md`, `docs/PRACOVNY-DENNIK.md`.
+
+**Testy:**
+- **Pred zmenou:**
+  - nový Node test O2: 8 chýb,
+  - rozšírený test N1 v prehliadači: 5 chýb, pri vypnutých animáciách 4. Chýbala pečať so znakom hry, západka, zámok, nity, pánty, zamat, zub so 7, lúče a prach, a ťuknutie neskracovalo animáciu.
+- **Po zmene:**
+  - **O2 (Node):** vzhľad v dátach, typ s textúrami, znak hry bez znaku mesta, farby pre ďalšie kapitoly, miesto pre textúry, ťuknutie, bez filtrov, vypnuté animácie v CSS, bod v kontrole pred vydaním, číslica a hlasy bez zmeny. Všetko OK.
+  - **N1 v prehliadači** (oba režimy): všetko OK. Pribudli kontroly:
+    - pečať so znakom hry, západka, zámok, nity, pánty, zamat, zub s vyrytou 7, svetlo a najviac 8 zrniek prachu,
+    - schránka sa zmestí na 360 aj 320 px bez posúvania do strany,
+    - otvorenie trvá asi 2,6 s (pri vypnutých animáciách do 1,6 s),
+    - ťuknutie zapíše číslicu do 1,2 s bez pokuty,
+    - plynulosť na 4× spomalenom procesore: medián snímky do 34 ms.
+  - **Node:** 29 testov OK. O1, O2, L1 a N1 sú odteraz v stálej sade.
+- **Celá séria v prehliadači** (33 behov, hotová verzia): všetko OK. Trvanie 34 minút, server najviac 107 MB, po teste nezostali žiadne procesy.
+
+**Build:** prešiel (v rámci testovacieho servera). **Typy:** bez chýb. **Lint:** bez zmeny, 14 starých problémov, v upravených súboroch žiadny. **Server:** zastavený.
+
+**Ďalší krok:** úprava 3 (útržky fotografie v štýle SND), najprv návrh.

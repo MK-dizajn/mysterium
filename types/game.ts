@@ -97,6 +97,23 @@ export type MiniGameDial = {
 };
 
 /**
+ * Vzhľad tajnej schránky (jeden diel pre všetky scény a kapitoly).
+ * Pečať nesie vlastný znak hry, nikdy znak mesta.
+ */
+export type CompartmentLook = {
+  /** Tvar schránky; výklenok v múre pribudne so scénou 2. */
+  shape?: "casket";
+  /** Vosková pečať cez škáru veka, alebo bez pečate (iba zámok). */
+  seal?: "wax" | "none";
+  /** Čo leží vnútri: zub Zlatého kľúča s vyrytou číslicou, alebo iba číslica. */
+  contents?: "keyTooth" | "digit";
+  /** Drevo, kov a vosk: dub s mosadzou, alebo železo s čiernym voskom. */
+  palette?: "oakBrass" | "ironBlack";
+  /** Voliteľné textúry (cesty k obrázkom WebP); bez nich sa drevo a zamat kreslia. */
+  textures?: { wood?: string; lining?: string };
+};
+
+/**
  * Mini hra, ktorou hráč získa číslicu predmetu (namiesto „Prezrieť“).
  * Číslica ostáva v secretCode predmetu; mini hra rozhoduje iba, kedy sa odhalí.
  */
@@ -104,8 +121,8 @@ export type MiniGameSpec = {
   intro: string;
   /** Tri stupne nápovedy: kam sa pozrieť, čo hľadať, takmer riešenie. */
   hints: [string, string, string];
-  /** Tajná schránka po vyriešení (text pri otvorení). */
-  compartment?: { openText: string };
+  /** Tajná schránka po vyriešení (text pri otvorení a vzhľad). */
+  compartment?: { openText: string; look?: CompartmentLook };
   /** Pre čítačku obrazovky „Preskočiť“ bez pokuty (posuvné puzzle, skladanie). */
   accessibleFreeSkip?: boolean;
 } & {
