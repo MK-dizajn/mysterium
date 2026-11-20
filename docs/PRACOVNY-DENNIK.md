@@ -5107,3 +5107,83 @@ Vývojový server je zastavený.
 **Build:** prešiel (v rámci testovacieho servera). **Typy:** bez chýb. **Lint:** bez zmeny, 14 starých problémov, v upravených súboroch žiadny. **Server:** zastavený.
 
 **Ďalší krok:** úprava 3 (útržky fotografie v štýle SND), najprv návrh.
+
+---
+
+## 20. 11. 2026 – Úprava 3: útržky fotografie (SND), útržky počas hry, prezretie útržku
+
+**Spätná väzba:** test úpravy 2 (tajná schránka) na mobile dopadol dobre.
+
+**Rozhodnutia používateľa:**
+- Obrázok SND pripraví Miloš (2400 × 1800 px, 4 : 3). Dovtedy všetko funguje s dočasným obrázkom a **výmena súboru nevyžaduje zmenu kódu** (rovnaký názov a cesta, cesta je iba v dátach).
+- Útržky sa ukážu už počas hry: na konci aktu a v Inventári namiesto ikonky 🖼️.
+- Skladanie je automatické, ťuknutím sa dá preskočiť a pri vypnutých animáciách je fotografia hneď celá.
+- Navyše posledný čiastkový krok: útržok v Inventári sa dá prezrieť (zväčšiť, posúvať, otočiť na rub).
+- **Pravidlo pre celú hru:** každá úloha a mini hra končí nápovedou s odpoveďou alebo „Preskočiť (−10 bodov)“. Strážny test to kontroluje aj pri nových mini hrách.
+
+**Čo je nové:**
+- **Tvary útržkov** (spoločné pre obrazovku, útržky počas hry aj 3D útržok v truhlici): namiesto štvrtín sú to štyri zmysluplné časti s nepravidelne roztrhnutými okrajmi.
+  - 1 (akt I): ľavé krídlo,
+  - 2 (akt II): strecha, sochy a nebo,
+  - 3 (akt III): pravé krídlo,
+  - 4 (truhlica): stred priečelia so vstupom a fontánou, podľa ktorého sa budova spozná.
+  - Okraje sú pevné (pri F5 sa nemenia) a susedné útržky do seba presne zapadnú.
+- **Vzhľad starej fotografie** (nový diel `PhotoPiece`):
+  - krémový kartón so zlatou linkou, obrázok v pomere 4 : 3 vnútri,
+  - sépiový tón, stmavené rohy, zrnitosť (malá dlaždica šumu sa nakreslí v prehliadači, nič sa nesťahuje),
+  - tri škrabance, záhyb cez útržok 2,
+  - svetlý roztrhnutý okraj s vláknami papiera a pevný tieň.
+- **Skladanie vo finále (asi 4 s):**
+  - útržky chvíľu ležia rozhodené, potom od 0,6 s priletia jeden po druhom (po 0,4 s); útržok z truhlice príde posledný,
+  - každý cvakne na miesto: vibrácia a tiché miesto pre zvuk `photo-piece-snap`,
+  - potom sa fotografia „vyvolá“ (1,5 s) a prejde cez ňu pruh svetla,
+  - „Otočiť“ jemne bliká, kým hráč fotografiu prvýkrát neotočí,
+  - ťuknutie na fotografiu skladanie hneď dokončí,
+  - pri vypnutých animáciách a po F5 je fotografia hneď celá,
+  - tiene sú nakreslené, nie počítané filtrom, takže je to plynulejšie ako predtým.
+- **Útržky počas hry:**
+  - na konci aktu je namiesto ikonky skutočný útržok a obrys celej fotografie (čo hráč má, čo chýba, ktorý je tento),
+  - v Inventári je v riadku malý útržok, po rozbalení väčší útržok s obrysom.
+- **Prezretie útržku (posledný čiastkový krok):**
+  - tlačidlo „Prezrieť“ pri útržku v Inventári otvorí okno s iba týmto útržkom, zväčšeným (najviac 60 % výšky obrazovky),
+  - dá sa približovať (+, −, ťuknutie, dva prsty), posúvať a otočiť na rub,
+  - rub je zrkadlový tvar útržku s kúskom pátračovej poznámky, Escape okno zavrie.
+- **Rub fotografie:** voliteľný obrázok kartónu `backImageSrc` v dátach, inak prechod farieb ako doteraz.
+- **3D útržok v truhlici** kreslí obrázok na rovnakom kartóne.
+
+**Dokumenty:**
+- `docs/MEDIA-LICENCIE.md`: riadok pre nový obrázok SND (pripraví Miloš), zadanie, pravidlo bez cudzích fotografií, licencia AI nástroja **NEOVERENÁ**.
+- `docs/KONTROLA-PRED-VYDANIM.md`: nový bod – pôvod a licencia obrázka SND (AI nástroj: komerčné použitie a vodoznak).
+- `docs/NAVRH-MINIHIER.md`: nové záväzné pravidlo „hráč sa nikdy nezasekne“ a ako ho stráži test.
+
+**Chyby počas práce:**
+- Pri útržku 4 vypadol jeden rohový bod a dole vznikla úzka medzera (plocha 9962 zo 10 000). Test to zachytil, opravené.
+- **Test** považoval za obrázok aj dlaždicu zrnitosti a zachytávanie vibrácií zapol až po skladaní. Oba testy som opravil.
+- **Prezretie úzkeho útržku** (útržok 1) bolo také vysoké, že tlačidlá vyšli pod obrazovku. Výška je teraz obmedzená na 60 % obrazovky a test kontroluje, že tlačidlá sú viditeľné bez posúvania.
+
+**Súbory:**
+- `components/finale/photoPieces.ts`, `components/finale/PhotoPiece.tsx` (nový), `components/finale/PhotoFragmentPreview.tsx` (nový), `components/finale/FinalePhotoViewer.tsx`, `components/finale/chest3d/PhotoFragment3D.tsx`,
+- `components/screens/FinalePhotoScreen.tsx`, `components/screens/ActTransitionScreen.tsx`, `components/screens/InventoryScreen.tsx`, `components/game/CollectionFlow.tsx`, `app/page.tsx`,
+- `app/globals.css`, `lib/soundManager.ts`, `types/game.ts`,
+- `docs/MEDIA-LICENCIE.md`, `docs/KONTROLA-PRED-VYDANIM.md`, `docs/NAVRH-MINIHIER.md`, `docs/PRACOVNY-DENNIK.md`.
+
+**Testy:**
+- **Pred zmenou:**
+  - nový Node test O3: 17 chýb,
+  - nový test O3 v prehliadači: 21 chýb, pri vypnutých animáciách 16,
+  - rozšírený strážny test O1 (mini hry a hľadanie číslice) prešiel už pred zmenou.
+- **Po zmene:**
+  - **O3 (Node):** tvary (4 útržky pokryjú celú fotografiu, správne časti budovy, roztrhnuté okraje), kartón 4 : 3, cesta k obrázku iba v dátach, efekty, bez filtrov, zvuk v tichom režime, 3D útržok, útržky počas hry, dokumenty. Všetko OK.
+  - **O1 (strážny test):** po novom aj pre všetky kapitoly. Každá mini hra má 3 nápovedy a posledná prezradí riešenie (neznámy typ test zastaví), hľadanie číslice a rámec mini hier vždy ponúknu „Preskočiť (−10 bodov)“. Všetko OK.
+  - **O3 v prehliadači** (oba režimy):
+    - koniec aktu III na 320 a 360 px,
+    - Inventár (zmenšeniny, rozbalenie, prezretie: orezanie, zväčšenie, „Priblížiť“, rub, Escape),
+    - finále: 4 útržky z jedného obrázka, bez filtra, priletenie po jednom, asi 4 s, vyvolanie a pruh svetla, 4 vibrácie, blikanie „Otočiť“, preskočenie ťuknutím do 1,2 s, pri vypnutých animáciách hneď celá a bez pohybu,
+    - rub s „Miesto: Slovenské národné divadlo“, 320 a 360 px bez posúvania, F5.
+    - Výsledok: všetko OK.
+  - **Node:** 30 testov OK. O3 je v stálej sade.
+- **Celá séria v prehliadači** (35 behov vrátane O3, hotová verzia): všetko OK. Trvanie 36 minút, server najviac 101 MB, po teste nezostali žiadne procesy.
+
+**Build:** prešiel (v rámci testovacieho servera). **Typy:** bez chýb. **Lint:** bez zmeny, 14 starých problémov, v upravených súboroch žiadny. **Server:** zastavený.
+
+**Ďalší krok:** používateľ vyskúša úpravu 3 na mobile. Potom úprava 4 (truhlica vo finále), najprv návrh. Obrázok SND doplní Miloš, výmena súboru stačí.

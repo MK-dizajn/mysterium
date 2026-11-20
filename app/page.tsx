@@ -524,6 +524,8 @@ export default function Home() {
                 (first.inspect?.artPart ?? 0) - (second.inspect?.artPart ?? 0)
             )
             .map((item) => item.inspect?.countPoints)}
+          photo={currentChapter.finale?.photo}
+          ownedItemIds={gameState.inventory.map((item) => item.id)}
           onContinue={finishActEnding}
         />
       );

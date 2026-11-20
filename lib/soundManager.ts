@@ -13,7 +13,9 @@ export type SoundId =
   | "minigame-wrong"
   | "compartment-open"
   | "digit-reveal"
-  | "hint-open";
+  | "hint-open"
+  // Útržok fotografie cvakne na miesto (úprava 3).
+  | "photo-piece-snap";
 
 type SoundConfig = {
   src: string;
@@ -70,6 +72,7 @@ const sounds: Record<SoundId, SoundConfig> = {
   "compartment-open": { src: "/sounds/compartment-open.mp3", volume: 0.7, ready: false },
   "digit-reveal": { src: "/sounds/digit-reveal.mp3", volume: 0.6, ready: false },
   "hint-open": { src: "/sounds/hint-open.mp3", volume: 0.4, ready: false },
+  "photo-piece-snap": { src: "/sounds/photo-piece-snap.mp3", volume: 0.5, ready: false },
 };
 
 function clampVolume(volume: number) {

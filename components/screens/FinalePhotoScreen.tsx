@@ -1,8 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { FinalePhoto } from "../../types/game";
-import { FinalePhotoViewer } from "../finale/FinalePhotoViewer";
+import { HAPTIC, vibrate } from "../../lib/haptics";
+import { soundManager } from "../../lib/soundManager";
+import {
+  FinalePhotoViewer,
+  PHOTO_ASSEMBLY_MS,
+  PHOTO_FLY_S,
+  PHOTO_FLY_START_S,
+  PHOTO_FLY_STEP_S,
+} from "../finale/FinalePhotoViewer";
 import { useReducedMotion } from "../items/useReducedMotion";
 import { ActionButton } from "../ui/ActionButton";
 import { ScreenContainer } from "../ui/ScreenContainer";
@@ -17,12 +25,12 @@ type FinalePhotoScreenProps = {
   onContinue: () => void;
 };
 
-/** Útržky chvíľu ležia od seba, potom sa zosunú do jednej fotografie (ms). */
-const SCATTER_MS = 900;
-const ASSEMBLE_MS = 1200;
-
-type Phase = "scattered" | "assembling" | "assembled";
-
+/**
+ * Historická fotografia: pri prvom príchode útržky chvíľu ležia od seba,
+ * potom priletia jeden po druhom (cvaknutie, vibrácia), fotografia sa
+ * „vyvolá“ a prejde cez ňu pruh svetla (spolu asi 4 s). Ťuknutie skladanie
+ * hneď dokončí. Pri vypnutých animáciách a po F5 je fotografia hneď celá.
+ */
 export function FinalePhotoScreen({
   photo,
   ownedFragmentIds,
@@ -31,43 +39,68 @@ export function FinalePhotoScreen({
   onContinue,
 }: FinalePhotoScreenProps) {
   const reducedMotion = useReducedMotion();
-  const [phase, setPhase] = useState<Phase>(() =>
-    isAssembled ? "assembled" : "scattered"
-  );
+  // Skladanie sa prehrá iba pri prvom príchode (rozhodne sa raz pri otvorení).
+  const [isFirstVisit] = useState(() => !isAssembled);
+  const [isDone, setIsDone] = useState(isAssembled);
+  const viewerRef = useRef<HTMLDivElement>(null);
+  const timersRef = useRef<number[]>([]);
+  const isAnimated = isFirstVisit && !reducedMotion;
+
+  function clearTimers() {
+    timersRef.current.forEach((timer) => window.clearTimeout(timer));
+    timersRef.current = [];
+  }
 
   // Prvý príchod: zapísať zloženie hneď (F5 už ukáže celú fotografiu)
   // a prehrať skladanie.
   useEffect(() => {
-    if (isAssembled) {
+    if (!isFirstVisit) {
       return;
     }
 
     onAssembled();
 
-    // Pri vypnutých animáciách je fotografia hneď celá (isTogether, isReady).
     if (reducedMotion) {
       return;
     }
 
-    const assembleTimer = window.setTimeout(
-      () => setPhase("assembling"),
-      SCATTER_MS
-    );
-    const doneTimer = window.setTimeout(
-      () => setPhase("assembled"),
-      SCATTER_MS + ASSEMBLE_MS
-    );
+    const pieceCount = photo.fragmentIds.filter((id) =>
+      ownedFragmentIds.includes(id)
+    ).length;
 
-    return () => {
-      window.clearTimeout(assembleTimer);
-      window.clearTimeout(doneTimer);
-    };
+    // Cvaknutie každého útržku na mieste (zvuk zatiaľ ticho, vibrácia).
+    for (let order = 0; order < pieceCount; order += 1) {
+      const snapMs = (PHOTO_FLY_START_S + order * PHOTO_FLY_STEP_S + PHOTO_FLY_S) * 1000;
+
+      timersRef.current.push(
+        window.setTimeout(() => {
+          soundManager.play("photo-piece-snap");
+          vibrate(HAPTIC.step);
+        }, snapMs)
+      );
+    }
+
+    timersRef.current.push(window.setTimeout(() => setIsDone(true), PHOTO_ASSEMBLY_MS));
+
+    return clearTimers;
     // Spustí sa iba pri prvom zobrazení obrazovky.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const isTogether = phase !== "scattered" || reducedMotion;
-  const isReady = phase === "assembled" || reducedMotion;
+  /** Ťuknutie počas skladania: animácie skočia na koniec. */
+  function skip() {
+    if (isDone) {
+      return;
+    }
+
+    clearTimers();
+    viewerRef.current
+      ?.getAnimations({ subtree: true })
+      .forEach((animation) => animation.finish());
+    setIsDone(true);
+  }
+
+  const isReady = isDone || reducedMotion;
 
   return (
     <ScreenContainer>
@@ -77,12 +110,15 @@ export function FinalePhotoScreen({
           <div className="mx-auto mt-4 h-px w-24 bg-gradient-to-r from-transparent via-amber-300/60 to-transparent" />
         </header>
 
-        <div className="mt-8">
+        <div ref={viewerRef} className="mt-8">
           <FinalePhotoViewer
             photo={photo}
             ownedFragmentIds={ownedFragmentIds}
-            isTogether={isTogether}
+            isTogether
             isReady={isReady}
+            assembly={isAnimated ? "animated" : "none"}
+            onSkip={skip}
+            highlightTurn={isFirstVisit}
             caption={
               <p className="mt-6 text-[16px] leading-normal text-slate-300">
                 {photo.frontDescription}

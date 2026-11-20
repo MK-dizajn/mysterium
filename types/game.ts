@@ -553,9 +553,14 @@ export type FinaleChest = {
 
 /** Historická fotografia zložená z útržkov. */
 export type FinalePhoto = {
-  /** Obrázkový súbor, ktorý kód rozreže na útržky. */
+  /**
+   * Obrázkový súbor (pomer 4 : 3), ktorý kód rozreže na útržky. Kartón,
+   * zrnitosť, okraje a záhyby pridá kód – výmena súboru stačí.
+   */
   imageSrc: string;
   imageAlt: string;
+  /** Voliteľný obrázok starého kartónu na rub (inak prechod farieb). */
+  backImageSrc?: string;
   /** Útržky v poradí skladania. */
   fragmentIds: string[];
   title: string;

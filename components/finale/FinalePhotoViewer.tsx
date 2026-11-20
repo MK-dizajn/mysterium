@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  type CSSProperties,
   type PointerEvent,
   type ReactNode,
   useRef,
@@ -8,7 +9,8 @@ import {
 } from "react";
 import type { FinalePhoto } from "../../types/game";
 import { ActionButton } from "../ui/ActionButton";
-import { PHOTO_PIECE_POINTS, type PhotoPoint } from "./photoPieces";
+import { getPieceViewBox, PHOTO_VIEW, PhotoPieceArt } from "./PhotoPiece";
+import { PHOTO_PIECE_POINTS } from "./photoPieces";
 
 type FinalePhotoViewerProps = {
   photo: FinalePhoto;
@@ -20,7 +22,22 @@ type FinalePhotoViewerProps = {
   isReady: boolean;
   /** Obsah medzi fotografiou a tlačidlami (napríklad popis). */
   caption?: ReactNode;
+  /** animated = útržky priletia jeden po druhom, fotografia sa vyvolá. */
+  assembly?: "animated" | "none";
+  /** Ťuknutie počas skladania (preskočí ho). */
+  onSkip?: () => void;
+  /** Prezretie jedného útržku (0 až 3): iba on, orezaný a zväčšený. */
+  cropPieceIndex?: number;
+  /** „Otočiť“ jemne bliká, kým hráč fotografiu prvýkrát neotočí. */
+  highlightTurn?: boolean;
 };
+
+/** Kedy priletí prvý útržok a odstup medzi útržkami (s). */
+export const PHOTO_FLY_START_S = 0.6;
+export const PHOTO_FLY_STEP_S = 0.4;
+export const PHOTO_FLY_S = 0.5;
+/** Celé skladanie: priletenie, vyvolanie a pruh svetla (ms). */
+export const PHOTO_ASSEMBLY_MS = 3900;
 
 const ZOOM_STEPS = [1, 1.5, 2, 3];
 const MAX_ZOOM = 3;
@@ -30,20 +47,38 @@ const TAP_SLOP = 6;
 
 type Point = [number, number];
 
-function toClipPath(points: PhotoPoint[]) {
-  return `polygon(${points.map(([x, y]) => `${x}% ${y}%`).join(", ")})`;
-}
-
-/** Roztrhnuté útržky (tvar je spoločný s 3D útržkom v truhlici). */
-const PIECE_SHAPES = PHOTO_PIECE_POINTS.map(toClipPath);
-
 /** Kam sú útržky rozhodené pred zložením. */
 const SCATTER = [
-  "translate(-14%, -10%) rotate(-6deg)",
-  "translate(12%, -12%) rotate(5deg)",
-  "translate(-10%, 12%) rotate(4deg)",
-  "translate(14%, 10%) rotate(-5deg)",
+  "translate(-16%, 6%) rotate(-8deg)",
+  "translate(4%, -16%) rotate(6deg)",
+  "translate(16%, 4%) rotate(7deg)",
+  "translate(-4%, 18%) rotate(-5deg)",
 ];
+
+/**
+ * Rub jedného útržku: na zadnej strane je zrkadlový tvar (útržok vľavo
+ * má rub vpravo). Vráti orezanie a posun celej poznámky v percentách.
+ */
+function getCroppedBack(index: number) {
+  const box = getPieceViewBox(index);
+  const mirroredX = PHOTO_VIEW.width - (box.x + box.width);
+  const points = PHOTO_PIECE_POINTS[index].map(([x, y]) => {
+    const px = PHOTO_VIEW.width - (x / 100) * PHOTO_VIEW.width;
+    const py = (y / 100) * PHOTO_VIEW.height;
+
+    return `${(((px - mirroredX) / box.width) * 100).toFixed(2)}% ${(((py - box.y) / box.height) * 100).toFixed(2)}%`;
+  });
+
+  return {
+    clipPath: `polygon(${points.join(", ")})`,
+    inner: {
+      width: `${(PHOTO_VIEW.width / box.width) * 100}%`,
+      height: `${(PHOTO_VIEW.height / box.height) * 100}%`,
+      left: `${(-mirroredX / box.width) * 100}%`,
+      top: `${(-box.y / box.height) * 100}%`,
+    },
+  };
+}
 
 /**
  * Historická fotografia zo štyroch útržkov: priblíženie (tlačidlá, ťuknutie,
@@ -56,9 +91,14 @@ export function FinalePhotoViewer({
   isTogether,
   isReady,
   caption,
+  assembly = "none",
+  onSkip,
+  cropPieceIndex,
+  highlightTurn = false,
 }: FinalePhotoViewerProps) {
   const [hasImageFailed, setHasImageFailed] = useState(false);
   const [isBackSide, setIsBackSide] = useState(false);
+  const [hasTurned, setHasTurned] = useState(false);
   const [zoom, setZoom] = useState(1);
   const [offset, setOffset] = useState<Point>([0, 0]);
   const frameRef = useRef<HTMLDivElement>(null);
@@ -121,7 +161,13 @@ export function FinalePhotoViewer({
   }
 
   function handlePointerDown(event: PointerEvent<HTMLDivElement>) {
-    if (!isReady || isBackSide) {
+    if (!isReady) {
+      // Ťuknutie počas skladania: hneď celá fotografia.
+      onSkip?.();
+      return;
+    }
+
+    if (isBackSide) {
       return;
     }
 
@@ -209,19 +255,49 @@ export function FinalePhotoViewer({
 
   function turn() {
     setIsBackSide((current) => !current);
+    setHasTurned(true);
     setZoom(1);
     setOffset([0, 0]);
   }
 
-  const owned = photo.fragmentIds.map((id) => ownedFragmentIds.includes(id));
+  const isCropped = cropPieceIndex !== undefined;
+  const pieceIndexes = isCropped
+    ? [cropPieceIndex]
+    : photo.fragmentIds
+        .map((id, index) => (ownedFragmentIds.includes(id) ? index : -1))
+        .filter((index) => index >= 0);
+  const cropBox = isCropped ? getPieceViewBox(cropPieceIndex) : null;
+  const croppedBack = isCropped ? getCroppedBack(cropPieceIndex) : null;
+  const isAnimated = assembly === "animated";
+  const backImage = photo.backImageSrc
+    ? { backgroundImage: `url(${photo.backImageSrc})`, backgroundSize: "cover" }
+    : undefined;
+  const backLines = (
+    <div className="flex h-full w-full flex-col justify-center gap-3 px-6 py-5 text-left font-serif text-[16px] italic leading-7 text-[#3b2a12]">
+      {photo.backLines.map((line) => (
+        <p key={line}>{line}</p>
+      ))}
+    </div>
+  );
 
   return (
     <>
-      <div className="[perspective:1200px]">
+      <div
+        className="mx-auto [perspective:1200px]"
+        data-photo-viewer
+        data-crop={isCropped ? cropPieceIndex + 1 : undefined}
+        // Úzky útržok (napríklad celé krídlo) najviac na 60 % výšky obrazovky.
+        style={cropBox ? { maxWidth: `calc(60dvh * ${cropBox.width / cropBox.height})` } : undefined}
+      >
         <div
-          className={`relative aspect-[4/3] w-full transition-transform duration-[600ms] ease-in-out [transform-style:preserve-3d] motion-reduce:transition-none ${
+          className={`relative w-full transition-transform duration-[600ms] ease-in-out [transform-style:preserve-3d] motion-reduce:transition-none ${
             isBackSide ? "[transform:rotateY(180deg)]" : ""
           }`}
+          style={{
+            aspectRatio: cropBox
+              ? `${cropBox.width} / ${cropBox.height}`
+              : `${PHOTO_VIEW.width} / ${PHOTO_VIEW.height}`,
+          }}
         >
           {/* Predná strana: útržky alebo zložená fotografia */}
           <div
@@ -233,9 +309,9 @@ export function FinalePhotoViewer({
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
             onPointerCancel={handlePointerUp}
-            className={`absolute inset-0 overflow-hidden rounded-md bg-[#1a120a] [backface-visibility:hidden] ${
-              isReady ? "cursor-zoom-in touch-none" : ""
-            }`}
+            className={`absolute inset-0 overflow-hidden rounded-md [backface-visibility:hidden] ${
+              isCropped ? "" : "bg-[#1a120a]"
+            } ${isReady ? "cursor-zoom-in touch-none" : "cursor-pointer"}`}
           >
             {hasImageFailed ? (
               <div className="flex h-full w-full items-center justify-center bg-gradient-to-b from-[#d9c29a] to-[#8f7349] p-6 text-center font-serif text-[16px] italic leading-7 text-[#3b2a12]">
@@ -243,45 +319,72 @@ export function FinalePhotoViewer({
               </div>
             ) : (
               <div
+                data-photo-zoom
                 className="h-full w-full"
                 style={{
                   transform: `translate(${offset[0]}px, ${offset[1]}px) scale(${zoom})`,
                 }}
               >
-                {PIECE_SHAPES.map((clipPath, index) =>
-                  owned[index] ? (
-                    <div
-                      key={clipPath}
-                      aria-hidden="true"
-                      className="absolute inset-0 transition-transform duration-[1200ms] ease-out [filter:drop-shadow(0_0_1px_#f4e6c8)_drop-shadow(0_4px_6px_rgba(0,0,0,0.5))] motion-reduce:transition-none"
-                      style={{
-                        transform: isTogether ? "none" : SCATTER[index],
-                      }}
-                    >
-                      {/* eslint-disable-next-line @next/next/no-img-element -- obrázok sa reže na útržky, súbor sa dá vymeniť v dátach */}
-                      <img
-                        src={photo.imageSrc}
-                        alt=""
-                        draggable={false}
-                        onError={() => setHasImageFailed(true)}
-                        className="h-full w-full select-none object-cover"
-                        style={{ clipPath }}
-                      />
-                    </div>
-                  ) : null
+                {pieceIndexes.map((index, order) => (
+                  <div
+                    key={index}
+                    data-photo-piece-layer={index + 1}
+                    aria-hidden="true"
+                    className={`absolute inset-0 ${isAnimated ? "photo-piece-fly" : ""}`}
+                    style={
+                      {
+                        "--photo-from": SCATTER[index],
+                        transform:
+                          isAnimated || isTogether || isCropped ? undefined : SCATTER[index],
+                        animationDelay: isAnimated
+                          ? `${PHOTO_FLY_START_S + order * PHOTO_FLY_STEP_S}s`
+                          : undefined,
+                        animationDuration: isAnimated ? `${PHOTO_FLY_S}s` : undefined,
+                      } as CSSProperties
+                    }
+                  >
+                    <PhotoPieceArt
+                      imageSrc={photo.imageSrc}
+                      index={index}
+                      view={isCropped ? "crop" : "full"}
+                      className="block h-full w-full select-none"
+                      onImageError={() => setHasImageFailed(true)}
+                    />
+                  </div>
+                ))}
+
+                {/* Fotografia sa „vyvolá“ a prejde cez ňu pruh svetla. */}
+                {isAnimated && (
+                  <>
+                    <div data-photo-develop aria-hidden="true" className="photo-develop pointer-events-none absolute inset-0 bg-[#efe3c4]" />
+                    <div data-photo-sweep aria-hidden="true" className="photo-sweep pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 bg-gradient-to-r from-transparent via-[#fff6dc]/55 to-transparent" />
+                  </>
                 )}
               </div>
             )}
           </div>
 
-          {/* Zadná strana: poznámka pátrača */}
+          {/* Zadná strana: poznámka pátrača (pri útržku iba jeho kúsok, zrkadlovo). */}
           <div
+            data-photo-back
             aria-hidden={!isBackSide}
-            className="absolute inset-0 flex flex-col justify-center gap-3 rounded-md bg-gradient-to-br from-[#efe2c2] via-[#e2cfa6] to-[#cdb284] px-6 py-5 text-left font-serif text-[16px] italic leading-7 text-[#3b2a12] shadow-inner [backface-visibility:hidden] [transform:rotateY(180deg)]"
+            className={`absolute inset-0 overflow-hidden rounded-md shadow-inner [backface-visibility:hidden] [transform:rotateY(180deg)] ${
+              backImage ? "" : "bg-gradient-to-br from-[#efe2c2] via-[#e2cfa6] to-[#cdb284]"
+            }`}
+            style={croppedBack ? { clipPath: croppedBack.clipPath } : backImage}
           >
-            {photo.backLines.map((line) => (
-              <p key={line}>{line}</p>
-            ))}
+            {croppedBack ? (
+              <div
+                className={`absolute [container-type:inline-size] ${
+                  backImage ? "" : "bg-gradient-to-br from-[#efe2c2] via-[#e2cfa6] to-[#cdb284]"
+                }`}
+                style={{ ...croppedBack.inner, ...backImage }}
+              >
+                <div className="h-full w-full [&_div]:text-[4.2cqw]! [&_div]:leading-[6.6cqw]!">{backLines}</div>
+              </div>
+            ) : (
+              backLines
+            )}
           </div>
         </div>
       </div>
@@ -318,7 +421,9 @@ export function FinalePhotoViewer({
             <ActionButton
               variant="secondary"
               onClick={turn}
-              className="motion-reduce:transition-none motion-reduce:active:scale-100"
+              className={`motion-reduce:transition-none motion-reduce:active:scale-100 ${
+                highlightTurn && !hasTurned ? "motion-safe:animate-pulse" : ""
+              }`}
             >
               {photo.turnLabel}
             </ActionButton>

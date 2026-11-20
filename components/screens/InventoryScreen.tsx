@@ -5,8 +5,16 @@ import type { CodeNotebookLock } from "../../engine";
 import type {
   ChapterGuidance,
   DetectiveNote as DetectiveNoteData,
+  FinalePhoto,
   InventoryItem,
 } from "../../types/game";
+import { FinaleDialog } from "../finale/FinaleDialog";
+import { FinalePhotoViewer } from "../finale/FinalePhotoViewer";
+import {
+  getFragmentIndex,
+  PhotoFragmentPreview,
+  PhotoFragmentThumb,
+} from "../finale/PhotoFragmentPreview";
 import { ActionButton } from "../ui/ActionButton";
 import { BackBar } from "../ui/BackBar";
 import { CodeNotebook } from "../ui/CodeNotebook";
@@ -28,6 +36,8 @@ type InventoryScreenProps = {
   /** Zápis od pátrača k predmetu (karta dostane „Prečítať zápis“). */
   getDetectiveNote: (itemId: string) => DetectiveNoteData | undefined;
   onInspectItem: (itemId: string) => void;
+  /** Historická fotografia kapitoly: útržky sa ukážu ako skutočné kúsky. */
+  photo?: FinalePhoto;
   onBack: () => void;
 };
 
@@ -109,9 +119,12 @@ export function InventoryScreen({
   getItemData,
   getDetectiveNote,
   onInspectItem,
+  photo,
   onBack,
 }: InventoryScreenProps) {
   const [openNote, setOpenNote] = useState<DetectiveNoteData | null>(null);
+  const [openFragment, setOpenFragment] = useState<{ index: number; title: string } | null>(null);
+  const ownedItemIds = inventory.map((item) => item.id);
   const [expandedIds, setExpandedIds] = useState<Record<string, boolean>>({});
   const notebookSlots = codeNotebook.flatMap((lock) => lock.slots);
 
@@ -167,6 +180,8 @@ export function InventoryScreen({
                 const clue = getClue(item.id);
                 const isExpanded = Boolean(expandedIds[item.id]);
                 const detailsId = `inventory-item-${item.id}`;
+                const fragmentIndex = getFragmentIndex(photo, item.id);
+                const fragmentButtonId = `inventory-fragment-${item.id}`;
 
                 return (
                   <li
@@ -183,7 +198,11 @@ export function InventoryScreen({
                         className="flex min-h-11 min-w-0 flex-1 items-center gap-2 rounded-xl px-1.5 py-1 text-left transition hover:bg-slate-900/80 motion-reduce:transition-none"
                       >
                         <span className="w-7 shrink-0 text-center text-xl" aria-hidden="true">
-                          {item.icon}
+                          {photo && fragmentIndex >= 0 ? (
+                            <PhotoFragmentThumb photo={photo} index={fragmentIndex} />
+                          ) : (
+                            item.icon
+                          )}
                         </span>
 
                         <span className="min-w-0 flex-1">
@@ -228,6 +247,21 @@ export function InventoryScreen({
                           Prečítať zápis
                         </button>
                       )}
+
+                      {/* Útržok fotografie: zväčšiť, posúvať a otočiť na rub. */}
+                      {photo && fragmentIndex >= 0 && (
+                        <button
+                          id={fragmentButtonId}
+                          type="button"
+                          onClick={() =>
+                            setOpenFragment({ index: fragmentIndex, title: item.title })
+                          }
+                          aria-label={`Prezrieť: ${item.title}`}
+                          className={ROW_BUTTON}
+                        >
+                          Prezrieť
+                        </button>
+                      )}
                     </div>
 
                     <div
@@ -238,6 +272,14 @@ export function InventoryScreen({
                       <span className="inline-block rounded-full border border-sky-300/20 bg-sky-400/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] text-sky-200">
                         {getEvidenceKindLabel(item)}
                       </span>
+
+                      {photo && fragmentIndex >= 0 && (
+                        <PhotoFragmentPreview
+                          photo={photo}
+                          index={fragmentIndex}
+                          ownedFragmentIds={ownedItemIds}
+                        />
+                      )}
 
                       <p className="text-sm leading-normal text-slate-300">
                         {item.description}
@@ -263,6 +305,23 @@ export function InventoryScreen({
       <BackBar label="Späť k pátraniu" onBack={onBack} />
 
       {openNote && <NoteDialog note={openNote} onClose={() => setOpenNote(null)} />}
+
+      {photo && openFragment && (
+        <FinaleDialog
+          label={openFragment.title}
+          closeLabel="Zavrieť"
+          returnFocusId={`inventory-fragment-${photo.fragmentIds[openFragment.index]}`}
+          onClose={() => setOpenFragment(null)}
+        >
+          <FinalePhotoViewer
+            photo={photo}
+            ownedFragmentIds={[photo.fragmentIds[openFragment.index]]}
+            isTogether
+            isReady
+            cropPieceIndex={openFragment.index}
+          />
+        </FinaleDialog>
+      )}
     </ScreenContainer>
   );
 }

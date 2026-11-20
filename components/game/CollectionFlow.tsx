@@ -37,6 +37,7 @@ export function CollectionFlow({
             .find((note) => note?.itemId === itemId)
         }
         onInspectItem={onInspectItem}
+        photo={chapter.finale?.photo}
         onBack={onBack}
       />
     );

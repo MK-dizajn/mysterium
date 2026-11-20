@@ -1811,3 +1811,67 @@ body {
     animation: none !important;
   }
 }
+
+/*
+ * ===== Historická fotografia (úprava 3): skladanie útržkov =====
+ * 0,6 s prvý útržok priletí, ďalšie po 0,4 s (každý 0,5 s) · 2,3 s fotografia
+ * sa vyvolá (1,5 s) · 2,6 s pruh svetla. Hýbe sa iba celý útržok.
+ */
+
+@keyframes photo-piece-fly {
+  from {
+    transform: var(--photo-from);
+  }
+
+  to {
+    transform: none;
+  }
+}
+
+@keyframes photo-develop {
+  from {
+    opacity: 0.65;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes photo-sweep {
+  from {
+    transform: translateX(0) skewX(-15deg);
+  }
+
+  to {
+    transform: translateX(450%) skewX(-15deg);
+  }
+}
+
+.photo-piece-fly {
+  animation-name: photo-piece-fly;
+  animation-timing-function: cubic-bezier(0.25, 0.9, 0.35, 1.08);
+  animation-fill-mode: both;
+  will-change: transform;
+}
+
+.photo-develop {
+  animation: photo-develop 1.5s ease-out 2.3s both;
+}
+
+.photo-sweep {
+  animation: photo-sweep 0.8s ease-in-out 2.6s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photo-piece-fly,
+  .photo-develop,
+  .photo-sweep {
+    animation: none !important;
+  }
+
+  .photo-develop,
+  .photo-sweep {
+    display: none;
+  }
+}

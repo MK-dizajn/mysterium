@@ -25,6 +25,22 @@ Stav k 20. 11. 2026. **Návrh na schválenie, nič z toho ešte nie je v hre.** 
 | Stav po F5 | Rozohraná mini hra sa uloží (napríklad poloha dielikov) a po F5 pokračuje. |
 | Bez veľkých knižníc | Všetko vlastným kódom (React, SVG, CSS). Three.js už v hre je a použije sa iba na voliteľné 3D ozdoby. Zvuk cez existujúci `soundManager`, vibrácia cez vstavané `navigator.vibrate`. |
 
+### Pravidlo: hráč sa nikdy nezasekne (záväzné pre všetky hry)
+
+Platí pre každú úlohu a každú mini hru v kapitole I aj v budúcich scénach 2 až 8 a v kapitolách II a III (rozhodnutie z 20. 11. 2026, úprava 1 a 3).
+
+- **Úloha s odpoveďou:** posledná nápoveda vždy povie odpoveď v tvare „Správna odpoveď je …“. Odpoveď musí byť presne jedna z odpovedí, ktoré hra pri úlohe prijme. Tlačidlo pred ňou sa volá „Ukázať odpoveď“.
+- **Mini hra:**
+  - má presne 3 nápovedy a tretia prezradí riešenie (napríklad „Nastav 26 · XII · 1805.“),
+  - po 3. nápovede (alebo po 2 minútach) je vždy „Preskočiť (−10 bodov)“,
+  - mini hry s ťahaním majú pre čítačku obrazovky aj bezplatné preskočenie.
+- **Hľadanie číslice v okne „Prezrieť“:** po nápovedách vždy príde „Preskočiť (−10 bodov)“.
+- **Strážny test** (Node test O1) to kontroluje pri všetkých kapitolách:
+  - posledná nápoveda každej úlohy obsahuje prijatú odpoveď,
+  - každá mini hra má 3 nápovedy a pre jej typ platí pravidlo „posledná nápoveda prezradí riešenie“,
+  - rámec mini hier a okno „Prezrieť“ vždy ponúknu „Preskočiť (−10 bodov)“.
+- **Nový typ mini hry** (napríklad posuvné puzzle) test zastaví, kým sa do neho nedoplní pravidlo pre posledné nápovedy tohto typu. Bez toho sa hra nedá dokončiť.
+
 ## Typy mini hier
 
 | Typ | Ako sa hrá | Väzba na miesto | Nápovedy (3 stupne) | Kde v kapitole I |

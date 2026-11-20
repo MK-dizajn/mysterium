@@ -3,7 +3,7 @@
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
 import { CanvasTexture, DoubleSide, type Group, SRGBColorSpace } from "three";
-import { PHOTO_PIECE_POINTS, type PhotoPoint } from "../photoPieces";
+import { PHOTO_CARD, PHOTO_PIECE_POINTS, type PhotoPoint } from "../photoPieces";
 import type { OpeningFrame } from "./chestZoom";
 
 const CANVAS_HEIGHT_PX = 384;
@@ -72,16 +72,16 @@ class FragmentPicture {
     context.fillRect(0, 0, width, height);
 
     if (image) {
+      // Obrázok leží na kartóne (rovnako ako na obrazovke fotografie).
+      const scaleX = width / boxWidth;
+      const scaleY = height / boxHeight;
+
       context.drawImage(
         image,
-        (left / 100) * image.naturalWidth,
-        (top / 100) * image.naturalHeight,
-        (boxWidth / 100) * image.naturalWidth,
-        (boxHeight / 100) * image.naturalHeight,
-        0,
-        0,
-        width,
-        height
+        (PHOTO_CARD.imageX - left) * scaleX,
+        (PHOTO_CARD.imageY - top) * scaleY,
+        PHOTO_CARD.imageWidth * scaleX,
+        PHOTO_CARD.imageHeight * scaleY
       );
     }
 

@@ -1,4 +1,9 @@
-import type { ActEnding, InspectCountPoint } from "../../types/game";
+import type { ActEnding, FinalePhoto, InspectCountPoint } from "../../types/game";
+import {
+  getFragmentIndex,
+  PhotoFragmentPreview,
+  PhotoFragmentThumb,
+} from "../finale/PhotoFragmentPreview";
 import { formatItemCount } from "../../lib/itemCount";
 import { getGoldenKeySvg } from "../items/art/keyToothArt";
 import { useReducedMotion } from "../items/useReducedMotion";
@@ -17,6 +22,10 @@ type ActTransitionScreenProps = {
   ending?: ActEnding;
   /** Zárezy a okienka troch častí brady (pri zložení kľúča). */
   keyPieceNotches?: (InspectCountPoint[] | undefined)[];
+  /** Historická fotografia kapitoly: útržok sa ukáže namiesto ikonky. */
+  photo?: FinalePhoto;
+  /** Útržky, ktoré hráč má (id z inventára). */
+  ownedItemIds?: string[];
   onContinue: () => void;
 };
 
@@ -68,8 +77,13 @@ export function ActTransitionScreen({
   evidenceCount,
   ending,
   keyPieceNotches = [],
+  photo,
+  ownedItemIds = [],
   onContinue,
 }: ActTransitionScreenProps) {
+  const reward = ending?.reward;
+  const fragmentIndex = reward ? getFragmentIndex(photo, reward.id) : -1;
+
   return (
     <ScreenContainer>
       <StoryCard
@@ -110,17 +124,33 @@ export function ActTransitionScreen({
           </SectionCard>
         )}
 
-        {ending?.reward && (
+        {reward && (
           <SectionCard
             icon={
-              <span className="text-3xl" aria-hidden="true">
-                {ending.reward.icon}
-              </span>
+              photo && fragmentIndex >= 0 ? (
+                <span className="block scale-125">
+                  <PhotoFragmentThumb photo={photo} index={fragmentIndex} />
+                </span>
+              ) : (
+                <span className="text-3xl" aria-hidden="true">
+                  {reward.icon}
+                </span>
+              )
             }
-            title={ending.reward.title}
+            title={reward.title}
           >
+            {/* Skutočný útržok fotografie a obrys: čo hráč už má. */}
+            {photo && fragmentIndex >= 0 && (
+              <div className="mb-3">
+                <PhotoFragmentPreview
+                  photo={photo}
+                  index={fragmentIndex}
+                  ownedFragmentIds={[...ownedItemIds, reward.id]}
+                />
+              </div>
+            )}
             <p className="text-sm leading-relaxed text-slate-300">
-              {ending.reward.description}
+              {reward.description}
             </p>
           </SectionCard>
         )}
