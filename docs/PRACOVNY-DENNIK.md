@@ -5237,3 +5237,12 @@ Vývojový server je zastavený.
 **Build:** prešiel (v rámci testovacieho servera). **Typy:** bez chýb. **Lint:** bez zmeny, 14 starých problémov. **Server:** zastavený.
 
 **Ďalší krok:** používateľ vyskúša útržky s novým obrázkom na mobile. Potom úprava 4 (truhlica vo finále), najprv návrh.
+
+---
+
+## 20. 11. 2026 – Zadanie pre Gemini zapísané, hra spustená pre mobil
+
+- Používateľ potvrdil, že obrázok SND aj rozdelenie útržkov sú v poriadku.
+- Do `docs/MEDIA-LICENCIE.md` som zapísal presné znenie zadania, ktoré použil v Gemini (namiesto poznámky „doplní Miloš“). Kód sa nemenil, testy netreba.
+- Hotová verzia hry je spustená pre mobil na Wi-Fi.
+- Ďalej sa nepokračuje, kým sa používateľ neozve.
