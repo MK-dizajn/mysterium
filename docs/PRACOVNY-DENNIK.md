@@ -5530,3 +5530,23 @@ Vývojový server je zastavený.
 **Build:** prešiel (v rámci testovacieho servera). **Typy:** bez chýb. **Lint:** bez zmeny, 14 starých problémov, v upravených súboroch žiadny. **Server:** po testoch spustený pre mobil.
 
 **Ďalší krok:** používateľ vyskúša veko zhora, rohy a vnútro na mobile. Potom návrh T4 (efekty otvorenia, teplé zlaté svetlo bez zeleného nádychu, voliteľný železný pás, ktorý sa povolí, s odhadom stropu).
+
+---
+
+## 20. 11. 2026 – Záver dňa
+
+- **Hotové dnes:**
+  - úprava 2 (tajná schránka),
+  - úprava 3 (útržky fotografie, obrázok SND z Gemini, rub zo 4 útržkov T3a),
+  - z úpravy 4 kroky T1 (drevo, kov, ľahká verzia), T2 (zámky a nápoveda pri zámku) a T3 (znak hry, rytiny, zamatové vnútro).
+- **Spätná väzba:** T3 je otestovaný na mobile a v poriadku.
+- **Rozpracované – T4 (otvorenie truhlice):** návrh je poslaný, **čaká na potvrdenie** používateľa. Otvorená je aj otázka, či chce povolenie železných spôn po treťom zámku. Obsah návrhu:
+  - teplé zlaté (jantárové) svetlo s polovičnou silou, tmavší zamat,
+  - kužeľový lúč, ktorý sa stráca, a prach (asi 40 zrniek, iba v plnej verzii, iba počas otvárania),
+  - odlesky na kľúči a útržku, prúžok svetla zo škáry,
+  - nové časy otvárania asi 4,5 s,
+  - zvuky `chest-key-insert`, `chest-key-turn`, `chest-lid-creak`, `chest-hasp-release` a `chest-shine`, vibrácie pri otočení kľúča, otvorení veka a povolení spôn,
+  - vypnuté animácie, F5, pokoj po otvorení,
+  - odhad asi 110 kreslení, 26 500 trojuholníkov, 4,5 MB (strop 150 / 60 000 / 16 MB).
+- **Potom** T5 (2D záloha v štýle scény 9, doladenie, meranie) a spoločný zoznam všetkých zvukov hry.
+- **Stav:** server je zastavený, nebeží žiadny proces node ani testovací Chrome. Pokračujeme 21. 11. 2026.
