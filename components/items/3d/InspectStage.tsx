@@ -7,19 +7,21 @@ type InspectStageProps = {
   children: ReactNode;
   /** 3D prestalo fungovať (napríklad sa stratil grafický kontext). */
   onFailure: () => void;
+  /** Najvyššia ostrosť (násobok hustoty displeja); predvolene 1,5. */
+  maxDpr?: number;
 };
 
 /**
  * Spoločný „stôl“ pre 3D predmety na obrazovke „Prezrieť“:
  * jedno plátno, svetlo a kamera. Kreslí iba vtedy, keď sa niečo hýbe.
  */
-export function InspectStage({ children, onFailure }: InspectStageProps) {
+export function InspectStage({ children, onFailure, maxDpr = 1.5 }: InspectStageProps) {
   return (
     <Canvas
       // Bez tónovania (ACES), aby farby kreslených textúr zostali verné.
       flat
       frameloop="demand"
-      dpr={[1, 1.5]}
+      dpr={[1, maxDpr]}
       camera={{ position: [0, 0, 3.3], fov: 40, near: 0.1, far: 20 }}
       gl={{
         alpha: true,

@@ -5246,3 +5246,75 @@ Vývojový server je zastavený.
 - Do `docs/MEDIA-LICENCIE.md` som zapísal presné znenie zadania, ktoré použil v Gemini (namiesto poznámky „doplní Miloš“). Kód sa nemenil, testy netreba.
 - Hotová verzia hry je spustená pre mobil na Wi-Fi.
 - Ďalej sa nepokračuje, kým sa používateľ neozve.
+
+---
+
+## 20. 11. 2026 – Úprava 4, krok T1: vzhľad tela 3D truhlice, ľahká verzia, strop pamäte
+
+**Spätná väzba:** úprava 3 (útržky) je otestovaná na mobile a páči sa. Server z testovania som zastavil a nebeží žiadny proces hry ani testovací Chrome. Commity sú odoslané.
+
+**Schválený plán úpravy 4:** T1 až T5, po každom kroku zastavenie a skúška na mobile.
+- Obrázky zatiaľ nie sú, všetko sa robí kódom. Po T1 sa posúdi, či drevo stačí.
+- Nápoveda pri zámku bez straty bodov po stupňoch:
+  - po 2 zlých pokusoch: z ktorých scén sú číslice,
+  - po 4 zlých pokusoch: samotné číslice priamo zo zápisníka v hre, nikam sa nezapisujú.
+- Na konci úpravy 4 sa urobí spoločný zoznam všetkých zvukov.
+
+**Čo je nové v T1:**
+- **Textúry kódom** (`chest3d/chestMaterials.ts`, nič sa nesťahuje):
+  - drevo 512 × 512: päť dosiek so škárami, letokruhy, suky, škrabance, svetlejšie ošúchané hrany a otlčené miesta. Tá istá textúra slúži aj ako reliéf (bez druhej kópie v pamäti),
+  - železo 256 × 256 s hrdzavými škvrnami.
+  - Textúry sa pri odchode z obrazovky uvoľnia.
+- **Tvar** (`ChestModel3D.tsx`):
+  - telo, lišty a veko sú zaoblené kvádre (RoundedBoxGeometry z three.js),
+  - železné pásy vpredu, vzadu, po bokoch a cez veko,
+  - mosadzné rohové kovanie na 8 rohoch tela a 4 rohoch veka,
+  - nity na pásoch: rohy aj nity sú vždy jedno kreslenie pre celú skupinu.
+  - Mäkký tieň pod truhlicou sa nakreslí raz.
+  - Pôvodné mosadzné pruhy a rohové platne vpredu sú preč. Zámky, kolieska, kľúč, útržok, medailón, otvorenie aj ovládanie sú bez zmeny.
+- **Svetlo:** v plnej verzii odlesky okolia na mosadzi (malá „miestnosť“ so svetlami vytvorená v kóde, nakreslená raz) a zadné svetlo.
+- **Plná a ľahká verzia** (`chest3d/chestQuality.ts`):
+  - ľahká, ak telefón hlási najviac 4 GB pamäte, alebo hlási pamäť a najviac 4 jadrá,
+  - Safari pamäť nehlási a počet jadier skresľuje, preto tam rozhodne až meranie, aby ľahkú verziu nedostali všetky iPhony,
+  - inak plná, ktorú overí meranie 30 snímok (po 5 snímkach na zahriatie): ak sú pomalšie ako 30 snímok za sekundu, prepne sa na ľahkú,
+  - ľahká verzia: ostrosť 1×, bez odleskov okolia a zadného svetla, mosadz je matnejšia (aby nebola čierna),
+  - na skúšku sa dá vynútiť adresou `?truhlica=lahka` alebo `?truhlica=plna`.
+- **Meranie a ladiaci text:**
+  - okno truhlice má údaje pre testy: verzia a dôvod, odlesky, počet kreslení, trojuholníkov a textúr, odhad pamäte textúr v MB,
+  - s `?ladenie=1` v adrese sa nad truhlicou ukáže malý text, napríklad „Truhlica: plná verzia (predvolená) · 71 kreslení · 18 798 trojuholníkov · 3,4 MB“,
+  - bez tohto parametra sa text neukáže.
+- **Namerané v teste** (plná verzia, 360 px): 71 – 72 kreslení, asi 18 800 trojuholníkov, 3,4 MB textúr. Strop je 150 / 60 000 / 16 MB.
+
+**Chyby počas práce:**
+- **Rohové kovanie** bolo príliš veľké, horné rohy tela a veka pôsobili ako dve nakopené kocky. Zmenšil som ich a posunul k telu.
+- **Test D5** (truhlica sa pri otáčaní nesmie odrezať o okraj) po zmene zlyhal. Pri naklonení truhlice siahal tieň pod ňou (bol väčší ako truhlica) spolu s vysunutými rohmi až k hornému okraju obrazu. Tieň teraz tesne obopína truhlicu a rohy sú bližšie k telu. D5 znova prechádza.
+- **Vo vlastnom teste:**
+  - umelé ťahanie prstom vyvolalo chybu prehliadača, nahradené skutočným ťahaním myšou,
+  - dve kontroly v Node teste hľadali text v nesprávnom súbore.
+
+**Súbory:**
+- `components/finale/chest3d/ChestModel3D.tsx`, `components/finale/chest3d/Chest3DView.tsx`,
+- `components/finale/chest3d/chestMaterials.ts` (nový), `components/finale/chest3d/chestQuality.ts` (nový), `components/finale/chest3d/ChestStageExtras.tsx` (nový),
+- `components/items/3d/InspectStage.tsx` (nastaviteľná najvyššia ostrosť, predvolene ako doteraz),
+- `docs/PRACOVNY-DENNIK.md`.
+
+**Testy:**
+- **Pred zmenou:**
+  - nový Node test O4: 11 chýb,
+  - nový test O4 v prehliadači: 11 chýb, pri vypnutých animáciách 10,
+  - doterajšie testy truhlice B4b, B4c1, B4c2, B4c3 a D5: všetko OK.
+- **Po zmene:**
+  - **O4 (Node):** voľba verzie (4 GB, 4 jadrá, Safari, vynútenie, meranie), strop, nastavenia ľahkej verzie, textúry kódom bez sťahovania, uvoľnenie, zaoblené hrany, jedno kreslenie pre nity, rohy, tieň, odlesky iba v plnej verzii, údaje pre testy, ladiaci text, bez znaku mesta. Všetko OK.
+  - **O4 v prehliadači** (oba režimy):
+    - plná verzia v strope aj po otočení, ostrosť 1,5×, ladiaci text,
+    - slabý telefón (4 GB, 4 jadrá): ľahká verzia v strope, ostrosť 1×, ladiaci text,
+    - bez `?ladenie=1` bez textu,
+    - 6× spomalený procesor: meranie prepne na ľahkú verziu.
+    - Výsledok: všetko OK.
+  - **B4b, B4c1 až B4c3 a D5:** všetko OK.
+  - **Node:** 31 testov OK.
+  - **Celá séria v prehliadači** (37 behov vrátane O4, hotová verzia): všetko OK. Trvanie 37 minút, server najviac 100 MB, po teste nezostali žiadne procesy.
+
+**Build:** prešiel (v rámci testovacieho servera). **Typy:** bez chýb. **Lint:** bez zmeny, 14 starých problémov, v upravených súboroch žiadny. **Server:** zastavený.
+
+**Ďalší krok:** používateľ posúdi na mobile, či drevo vyzerá dosť realisticky (inak doplníme textúry). Potom T2 (zámky a nápoveda pri zámku).

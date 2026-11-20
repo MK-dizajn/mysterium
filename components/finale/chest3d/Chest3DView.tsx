@@ -39,6 +39,13 @@ import {
   LOCK_PLACEMENTS,
 } from "./ChestModel3D";
 import {
+  CHEST_QUALITY_SETTINGS,
+  chooseChestQuality,
+  isChestDebugOn,
+  readDeviceInfo,
+} from "./chestQuality";
+import { ChestEnvironment, ChestStats, QualityProbe } from "./ChestStageExtras";
+import {
   blendTransform,
   type ChestTransform,
   CLOSED_FRAME,
@@ -512,6 +519,24 @@ export default function Chest3DView({
   const [zoomedIndex, setZoomedIndex] = useState<number | null>(null);
   const [isZoomActive, setIsZoomActive] = useState(false);
   const [shakeKeys, setShakeKeys] = useState(() => locks.map(() => 0));
+  // Plná alebo ľahká verzia (výbava telefónu, potom meranie snímok).
+  const [qualityChoice, setQualityChoice] = useState(() =>
+    chooseChestQuality(readDeviceInfo())
+  );
+  const [isProbing, setIsProbing] = useState(qualityChoice.probe);
+  const [isDebug] = useState(isChestDebugOn);
+  const debugRef = useRef<HTMLParagraphElement>(null);
+  const settings = CHEST_QUALITY_SETTINGS[qualityChoice.quality];
+  const qualityLabel = `${
+    qualityChoice.quality === "full" ? "plná verzia" : "ľahká verzia"
+  } (${
+    {
+      vybava: "podľa výbavy telefónu",
+      meranie: "podľa merania snímok",
+      vynutene: "vynútená adresou",
+      predvolene: "predvolená",
+    }[qualityChoice.reason]
+  })`;
   const rootRef = useRef<HTMLDivElement>(null);
   const firstWheelRef = useRef<HTMLDivElement | null>(null);
   const pendingSettleRef = useRef<number | null>(null);
@@ -734,6 +759,9 @@ export default function Chest3DView({
       role="group"
       tabIndex={0}
       aria-label="Truhlica – otáčaj ju ťahaním alebo šípkami doľava a doprava"
+      data-chest-quality={qualityChoice.quality}
+      data-chest-quality-reason={qualityChoice.reason}
+      data-chest-env={settings.environment ? "1" : "0"}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerEnd}
@@ -744,9 +772,26 @@ export default function Chest3DView({
         isZoomActive ? "" : "cursor-grab active:cursor-grabbing"
       }`}
     >
-      <InspectStage onFailure={onFailure}>
+      <InspectStage onFailure={onFailure} maxDpr={settings.dpr}>
         {/* Drevo je tmavé – trochu viac svetla ako pri predmetoch. */}
         <ambientLight intensity={0.5} color="#ffe6c0" />
+        {/* Plná verzia: odlesky okolia na mosadzi a zadné svetlo (obrys). */}
+        {settings.environment && <ChestEnvironment />}
+        {settings.rimLight && (
+          <directionalLight position={[-2.5, 3, -4]} intensity={0.9} color="#ffd9a0" />
+        )}
+        {isProbing && (
+          <QualityProbe
+            onDone={(isSlow) => {
+              setIsProbing(false);
+
+              if (isSlow) {
+                setQualityChoice({ quality: "light", reason: "meranie", probe: false });
+              }
+            }}
+          />
+        )}
+        <ChestStats rootRef={rootRef} debugRef={debugRef} qualityLabel={qualityLabel} />
 
         <ChestRotation
           controller={controller}
@@ -765,6 +810,7 @@ export default function Chest3DView({
             fragmentImageSrc={fragmentImageSrc}
             fragmentPieceIndex={fragmentPieceIndex}
             reducedMotion={reducedMotion}
+            quality={qualityChoice.quality}
           />
 
           {/* Po otvorení sa štítky zámkov skryjú (nad truhlicou je útržok). */}
@@ -798,6 +844,18 @@ export default function Chest3DView({
           )}
         </ChestRotation>
       </InspectStage>
+
+      {/* Ladiaci text pre skúšku na mobile: iba s ?ladenie=1 v adrese. */}
+      {isDebug && (
+        <p
+          ref={debugRef}
+          data-chest-debug
+          aria-hidden="true"
+          className="pointer-events-none absolute left-2 top-2 max-w-[calc(100%-1rem)] rounded bg-black/70 px-2 py-0.5 text-[11px] leading-4 text-amber-100"
+        >
+          {`Truhlica: ${qualityLabel}`}
+        </p>
+      )}
 
       {/* Po troch zámkoch: vloženie Zlatého kľúča nad scénou. */}
       {areAllLocksOpen && !isChestOpened && !isZoomActive && (
