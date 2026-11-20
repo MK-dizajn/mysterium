@@ -27,6 +27,11 @@ export const chapterOneFinale: ChapterFinale = {
     lockActIds: ["act-1", "act-2", "act-3"],
     keyItemId: "golden-pressburg-key-complete",
     wrongCodeText: "Zámok sa ani nepohol. Niektorá číslica nesedí.",
+    // Nápoveda bez straty bodov; číslice sa doplnia zo zápisníka v hre.
+    lockHintScenesText:
+      "Zámok {lock}: číslice zo scén {scenes}. Nájdeš ich v zápisníku pod truhlicou.",
+    lockHintDigitsText:
+      "Zámok {lock}: v zápisníku sú číslice {digits}. Nastav ich na kolieskach zľava doprava.",
     lockOpenedText: "Gratulujem, zámok sa otvoril. Pokračuj ďalším zámkom.",
     lastLockOpenedText:
       "Gratulujem, posledný zámok sa otvoril. Teraz vlož Zlatý kľúč.",

@@ -40,9 +40,10 @@ import {
 } from "./ChestModel3D";
 import {
   CHEST_QUALITY_SETTINGS,
-  chooseChestQuality,
+  chooseChestQualityForSession,
   isChestDebugOn,
   readDeviceInfo,
+  rememberMeasuredQuality,
 } from "./chestQuality";
 import { ChestEnvironment, ChestStats, QualityProbe } from "./ChestStageExtras";
 import {
@@ -55,6 +56,7 @@ import {
   getOpeningTransform,
   getTapStep,
   getTiltFitScale,
+  LOCK_UNLOCK_SEC,
   getZoomTransform,
   OPEN_FRAME,
   type OpeningFrame,
@@ -67,8 +69,10 @@ import {
 const MAX_FRAME_SECONDS = 0.05;
 /** Posun ukazovateľa, od ktorého ide o ťahanie (nie ťuknutie). */
 const DRAG_SLOP_PX = 6;
-/** Po správnom kóde chvíľu ostane priblížené, aby bolo vidieť zelený zámok. */
-const UNLOCK_ZOOM_OUT_DELAY_MS = 350;
+/** Po správnom kóde ostane priblížené, kým sa zámok neotvorí (krok T2: 1,1 s). */
+const UNLOCK_ZOOM_OUT_DELAY_MS = 1200;
+/** Ako veľmi ostane priblížené počas otvárania zámku (1 = kolieska, 0 = celá truhlica). */
+const UNLOCK_VIEW_ZOOM = 0.42;
 
 const STILL_BUTTON = "motion-reduce:transition-none motion-reduce:active:scale-100";
 
@@ -180,6 +184,12 @@ class ChestController {
 
   zoomOut() {
     this.zoomTarget = 0;
+    this.invalidate?.();
+  }
+
+  /** Čiastočné vzdialenie (pri otváraní zámku je vidieť celý zámok aj s oblúkom). */
+  zoomPartly(amount: number) {
+    this.zoomTarget = amount;
     this.invalidate?.();
   }
 
@@ -519,9 +529,14 @@ export default function Chest3DView({
   const [zoomedIndex, setZoomedIndex] = useState<number | null>(null);
   const [isZoomActive, setIsZoomActive] = useState(false);
   const [shakeKeys, setShakeKeys] = useState(() => locks.map(() => 0));
+  // Práve sa otvárajúci zámok (krok T2): ktorý a odkedy.
+  const [unlockAnimation, setUnlockAnimation] = useState<{
+    index: number;
+    startedAt: number;
+  } | null>(null);
   // Plná alebo ľahká verzia (výbava telefónu, potom meranie snímok).
   const [qualityChoice, setQualityChoice] = useState(() =>
-    chooseChestQuality(readDeviceInfo())
+    chooseChestQualityForSession(readDeviceInfo())
   );
   const [isProbing, setIsProbing] = useState(qualityChoice.probe);
   const [isDebug] = useState(isChestDebugOn);
@@ -654,7 +669,7 @@ export default function Chest3DView({
     }
 
     if (result === "opened") {
-      // Zámok zozelenie a vysunie oblúk, potom sa pohľad oddiali.
+      // Zámok sa otvorí (kolieska, pružina, oblúk nabok, zlatý odlesk), potom sa pohľad oddiali.
       // Kolieska a tlačidlá zmiznú – fokus prejde na truhlicu.
       keepFocusOnChest();
       pendingSettleRef.current = index;
@@ -662,7 +677,11 @@ export default function Chest3DView({
       if (reducedMotion) {
         controller.zoomOut();
       } else {
+        setUnlockAnimation({ index, startedAt: performance.now() });
+        // Pohľad sa trochu vzdiali, aby bolo vidieť celý zámok (oblúk sa otáča k hráčovi).
+        controller.zoomPartly(UNLOCK_VIEW_ZOOM);
         timersRef.current.push(
+          window.setTimeout(() => setUnlockAnimation(null), LOCK_UNLOCK_SEC * 1000 + 50),
           window.setTimeout(() => controller.zoomOut(), UNLOCK_ZOOM_OUT_DELAY_MS)
         );
       }
@@ -762,6 +781,7 @@ export default function Chest3DView({
       data-chest-quality={qualityChoice.quality}
       data-chest-quality-reason={qualityChoice.reason}
       data-chest-env={settings.environment ? "1" : "0"}
+      data-unlocking-lock={unlockAnimation ? String(unlockAnimation.index) : undefined}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerEnd}
@@ -784,6 +804,11 @@ export default function Chest3DView({
           <QualityProbe
             onDone={(isSlow) => {
               setIsProbing(false);
+              // Zapamätať do zatvorenia stránky – meranie prebehne iba raz.
+              rememberMeasuredQuality(
+                isSlow ? "light" : qualityChoice.quality,
+                isSlow ? "meranie" : qualityChoice.reason
+              );
 
               if (isSlow) {
                 setQualityChoice({ quality: "light", reason: "meranie", probe: false });
@@ -811,6 +836,9 @@ export default function Chest3DView({
             fragmentPieceIndex={fragmentPieceIndex}
             reducedMotion={reducedMotion}
             quality={qualityChoice.quality}
+            lockUnlockStarts={locks.map((_lock, index) =>
+              unlockAnimation?.index === index ? unlockAnimation.startedAt : null
+            )}
           />
 
           {/* Po otvorení sa štítky zámkov skryjú (nad truhlicou je útržok). */}
@@ -830,13 +858,13 @@ export default function Chest3DView({
                   }`}
                   className={`flex min-h-11 min-w-11 items-center gap-1.5 whitespace-nowrap rounded-full border-2 px-3 py-1.5 text-base font-black outline-none transition focus-visible:ring-4 focus-visible:ring-amber-300 motion-reduce:transition-none ${
                     lock.isOpen
-                      ? "border-emerald-300/70 bg-emerald-950/85 text-emerald-100"
+                      ? "border-amber-200/80 bg-amber-950/85 text-amber-100"
                       : lock.isNext
                         ? "border-amber-300 bg-amber-950/90 text-amber-100 shadow-[0_0_14px_rgba(252,211,77,0.55)] motion-safe:animate-pulse"
                         : "border-slate-500/60 bg-slate-950/85 text-slate-200"
                   } ${selectedIndex === index ? "ring-4 ring-amber-200" : ""}`}
                 >
-                  <span aria-hidden="true">{lock.isOpen ? "🔓" : "🔒"}</span>
+                  <span aria-hidden="true">{lock.isOpen ? "✓" : "🔒"}</span>
                   {`Zámok ${lock.lockLabel}`}
                 </button>
               </Html>

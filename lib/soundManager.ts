@@ -15,7 +15,12 @@ export type SoundId =
   | "digit-reveal"
   | "hint-open"
   // Útržok fotografie cvakne na miesto (úprava 3).
-  | "photo-piece-snap";
+  | "photo-piece-snap"
+  // Zámky truhlice (úprava 4, krok T2).
+  | "chest-dial-click"
+  | "chest-lock-open"
+  | "chest-lock-wrong"
+  | "chest-shine";
 
 type SoundConfig = {
   src: string;
@@ -73,6 +78,10 @@ const sounds: Record<SoundId, SoundConfig> = {
   "digit-reveal": { src: "/sounds/digit-reveal.mp3", volume: 0.6, ready: false },
   "hint-open": { src: "/sounds/hint-open.mp3", volume: 0.4, ready: false },
   "photo-piece-snap": { src: "/sounds/photo-piece-snap.mp3", volume: 0.5, ready: false },
+  "chest-dial-click": { src: "/sounds/chest-dial-click.mp3", volume: 0.4, ready: false },
+  "chest-lock-open": { src: "/sounds/chest-lock-open.mp3", volume: 0.7, ready: false },
+  "chest-lock-wrong": { src: "/sounds/chest-lock-wrong.mp3", volume: 0.6, ready: false },
+  "chest-shine": { src: "/sounds/chest-shine.mp3", volume: 0.5, ready: false },
 };
 
 function clampVolume(volume: number) {

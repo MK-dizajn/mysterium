@@ -5318,3 +5318,98 @@ Vývojový server je zastavený.
 **Build:** prešiel (v rámci testovacieho servera). **Typy:** bez chýb. **Lint:** bez zmeny, 14 starých problémov, v upravených súboroch žiadny. **Server:** zastavený.
 
 **Ďalší krok:** používateľ posúdi na mobile, či drevo vyzerá dosť realisticky (inak doplníme textúry). Potom T2 (zámky a nápoveda pri zámku).
+
+---
+
+## 20. 11. 2026 – Úprava 4, krok T2: otvorenie zámku, čitateľné číslice, nápoveda pri zámku
+
+**Spätná väzba k T1** (mobil): truhlica „detailovo vyzerá brutálne“, drevo stačí a textúry netreba. Treba doladiť zelené svetlo zámku po správnej trojici a krajšie otvorenie zámku.
+
+**Schválené:**
+- otvorenie zámku asi 1,1 s, zlatý odlesk namiesto zeleného svitu, oblúk otočený nabok,
+- nápovedy po 2 a 4 pokusoch, vypnuté animácie, F5.
+- Zelený nádych svetla po otvorení celej truhlice sa opraví až v T4 (svetlo má byť teplé zlaté).
+- Pre T4 zvážiť železný pás cez truhlicu, ktorý sa po treťom zámku povolí a odsunie.
+
+**Server počas práce:** používateľ skúšal T1 na mobile. Kód a Node testy som urobil počas skúšania. Hotovú verziu som zostavil a testy v prehliadači spustil až po jeho pokyne, keď server zastavil.
+
+**Čo je nové:**
+- **Otvorenie zámku (1,1 s, časová os `getLockUnlockFrame` v `chestZoom.ts`):**
+  - 0 – 0,3 s: tri kolieska postupne zapadnú (dotočia sa s odpružením) a ryska vedľa nich sa rozžiari zlatou,
+  - 0,3 – 0,45 s: pružina, telo poskočí a oblúk vyskočí hore s prekmitnutím,
+  - 0,45 – 0,9 s: oblúk sa otočí o pol otáčky nabok okolo dlhého ramena (na konci leží v rovine zámku) a zámok sa nakloní, akoby visel,
+  - 0,6 – 0,9 s: zlatý odlesk po mosadznom tele.
+  - Pohľad sa na začiatku trochu vzdiali, aby bolo vidieť celý zámok, a úplne sa oddiali po 1,2 s.
+- **Bez zeleného svitu:**
+  - odomknutý zámok je leštená mosadz bez farby, otvorenie poznať podľa tvaru,
+  - štítok nad zámkom, riadky zámkov v 2D ovládaní a hláška o otvorení sú zlaté s ✓.
+- **Zámok:** zaoblené telo a platnička, oblúk s dlhým a krátkym ramenom. Rámik vybraného zámku je teraz tenký zlatý rám, predtým plná svetlá doska, ktorá zámok prekrývala.
+- **Číslice na kolieskach:** tmavé vyryté číslice so svetlým okrajom na svetlej mosadzi, väčšie písmo (76 px na 80 px políčko).
+- **Zlý kód:** zatrasenie ako doteraz, k tomu tiché miesto pre tupé „ťuk“ a dvojitá vibrácia.
+- **Nápoveda pri zámku** (bez straty bodov, `getFinaleLockHint` v `engine/finale.ts`):
+  - po 2 zlých pokusoch: „Zámok I: číslice zo scén 1, 2 a 3. Nájdeš ich v zápisníku pod truhlicou.“,
+  - po 4 zlých pokusoch: „Zámok I: v zápisníku sú číslice … Nastav ich na kolieskach zľava doprava.“ Číslice sa berú priamo zo zápisníka v hre, nenájdená je „?“. Nikde v súboroch nie sú.
+  - Nápoveda ostáva, kým sa zámok neotvorí. Počítadlo zlých pokusov sa po F5 vynuluje.
+  - Kódy zámkov ani skóre sa nemenia.
+- **Zvuky (tiché miesta, súbory dodá Miloš):** `chest-dial-click`, `chest-lock-open`, `chest-lock-wrong`, `chest-shine`.
+- **Vibrácie:**
+  - 3 krátke pri kolieskach a jedna pri pružine (`HAPTIC.lock`),
+  - pri zlom kóde dvojitá,
+  - pri vypnutých animáciách iba cvak zámku.
+- **Vypnuté animácie:** zámok je hneď otvorený (oblúk nabok, naklonený), pohľad sa hneď oddiali. Po F5 je odomknutý zámok hneď otvorený.
+
+**Chyby počas práce:**
+- **Test D5:** oblúk bočného zámku otočený o 110° trčal von z truhlice a dotýkal sa okraja obrazu. Oblúk sa teraz otočí o pol otáčky a na konci leží v rovine zámku. D5 prechádza.
+- **Prvá verzia otvárania:** kamera ostala tesne pri kolieskach a oblúk jej prešiel pred „objektívom“ (na snímke veľká hnedá škvrna). Pohľad sa teraz pri otváraní trochu vzdiali.
+- **Test O5:**
+  - ťukal myšou na tlačidlá, ktoré si okno truhlice zachytáva samo, teraz ich stláča priamo,
+  - vyberal tlačidlo „Odomknúť zámok“ zo zbaleného bloku 2D ovládania (prehliadač ho hlási ako viditeľné), takže odomykal bez 3D animácie. Výber som opravil po preskúmaní ladiacou kópiou testu (potom zmazanou),
+  - pri vypnutých animáciách čakal 4 vibrácie namiesto jednej,
+  - hľadal štítok zámku I, ktorý po otočení truhlice k ďalšiemu zámku nie je vidieť,
+  - zelenú farbu hľadal na celej stránke (aj v hornej lište).
+- **Staršie Node testy B4c2 a B4c3** hľadali presný tvar kódu pravidla „odomknutý zámok nemá kolieska“. Pravidlo platí ďalej (kolieska sú vidieť iba 1,1 s počas otvárania), testy som upravil.
+- **Prvá celá séria po T2** (39 behov, 37 OK) mala 2 chyby. Z nich a z ďalšieho ladenia vzišli tieto opravy:
+  - **D5 (truhlica sa pri náklone nesmie odrezať):** truhlica je od T1 pre mosadzné rohy o kúsok širšia. Pri najväčšom náklone sa niekedy pravým okrajom dotkla kraja obrazu. **Oprava v hre:** pri náklone sa truhlica zmenší o 25 % namiesto 22 % (`TILT_FIT_SHRINK`).
+  - **O4 (meranie na 6× spomalenom procesore):** v plnej sérii meranie nestihlo dobehnúť, kým sa test pozrel. Test teraz čaká až 30 s.
+  - **B4c3 („počas animácie sa kreslí“):** zlyhal 2-krát zo 4. Jedna snímka bohatšej truhlice trvá v testovacom prehliadači bez grafickej karty aj viac ako 200 ms. Okno kontroly je teraz do 1 s.
+  - **B4c3 pri vypnutých animáciách** (doteraz nebol v stálej sérii, teraz už je): po otvorení truhlica ešte chvíľu kreslila. Ladením som zistil, že nejde o nekonečné kreslenie, ale o **meranie snímok**, ktoré pri rýchlom priebehu ešte bežalo. Cestou som vylúčil:
+    - hromadenie snímok (knižnica si drží najviac 2),
+    - opakované prekresľovanie obrazovky (počítadlo: 5 za celý čas),
+    - posúvanie stránky a zmenu rozmerov (0 počas merania).
+    - Dočasné počítadlá v kóde som potom odstránil (súbory vrátené zo zálohy) a ladiace kópie testu zmazal.
+  - **Opravy v hre z tohto ladenia:**
+    - meranie trvá najviac 2 s (plus pol sekundy na zahriatie). Ak 30 snímok nestihne, telefón je pomalší ako 30 snímok za sekundu a hneď prejde na ľahkú verziu, takže slabý telefón nekreslí zbytočne dlho,
+    - výsledok merania si truhlica pamätá do zatvorenia stránky (meranie prebehne iba raz, aj keď sa 3D truhlica na obrazovke vytvorí znova).
+  - **Test B4c3:** za pokoj sa teraz považuje 600 ms bez kreslenia (predtým 250 ms, čo pomalé snímky testovacieho prehliadača nespĺňali).
+  - **Node test O4** má dve nové kontroly: meranie najviac 2 s a zapamätanie výsledku.
+- **Test B4c3** raz zlyhal na kontrole „počas animácie sa kreslí“ a pri ďalšom behu s tým istým kódom prešiel (náhodné zaváhanie testovacieho prehliadača). Okno kontroly je teraz dlhšie (pozri vyššie).
+
+**Súbory:**
+- `components/finale/chest3d/ChestModel3D.tsx`, `components/finale/chest3d/Chest3DView.tsx`, `components/finale/chest3d/LockDials3D.tsx`, `components/finale/chest3d/chestZoom.ts`, `components/finale/chest3d/chestQuality.ts`, `components/finale/chest3d/ChestStageExtras.tsx`,
+- `components/screens/FinaleChestScreen.tsx`,
+- `engine/finale.ts`, `types/game.ts`, `data/chapter-one/finale.ts`,
+- `lib/soundManager.ts`, `lib/haptics.ts`,
+- `docs/PRACOVNY-DENNIK.md`.
+
+**Testy:**
+- **Pred zmenou:** nový Node test O5 mal 8 chýb (prehliadačový test O5 sa pred zmenou nedal spustiť, lebo bežal server na skúšku).
+- **Po zmene:**
+  - **O5 (Node):**
+    - nápoveda po 0/1, 2/3 a 4+ pokusoch, číslice zhodné so zápisníkom (bez vypísania), zámok II = scény 4, 5, 6, nenájdená číslica „?“, formát scén,
+    - texty v dátach bez čitateľného kódu, odomknutie stále iba správnou trojicou,
+    - časová os otvárania vo všetkých úsekoch, oddialenie až po otvorení, bez zelenej, zlatý odlesk, čitateľné číslice, zvuky v tichom režime.
+    - Výsledok: všetko OK.
+  - **O5 v prehliadači** (oba režimy, číslice číta zo zápisníka na obrazovke):
+    - 1. až 4. zlý pokus a nápoveda pre čítačku, skóre 1010,
+    - otvorenie beží, v strope aj počas otvárania, oddialenie po 1,1 s (pri vypnutých animáciách hneď),
+    - vibrácie, odomknutý zámok bez zelenej, ✓ na štítku, F5.
+    - Výsledok: všetko OK.
+  - **O4, B4b, B4c1 až B4c3 a D5:** všetko OK.
+  - **Node:** 32 testov OK.
+  - **Celá séria v prehliadači:**
+    - po opravách: 40 behov (nové O5 v oboch režimoch a B4c3 pri vypnutých animáciách), všetko OK,
+    - trvanie 39 minút, server najviac 100 MB, po teste nezostali žiadne procesy.
+
+**Build:** prešiel (v rámci testovacieho servera). **Typy:** bez chýb. **Lint:** bez zmeny, 14 starých problémov, v upravených súboroch žiadny. **Server:** po testoch spustený pre mobil (používateľ ho chce nechať bežať).
+
+**Ďalší krok:** používateľ vyskúša odomykanie troch zámkov na mobile. Potom návrh T3 (znak hry, rytiny, zamatové vnútro).

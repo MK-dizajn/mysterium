@@ -518,6 +518,10 @@ export type FinaleChest = {
   /** Predmet, ktorý sa po troch zámkoch vloží do stredného zámku. */
   keyItemId: string;
   wrongCodeText: string;
+  /** Nápoveda po 2 zlých pokusoch: {lock} = označenie zámku, {scenes} = „1, 2 a 3“. */
+  lockHintScenesText?: string;
+  /** Nápoveda po 4 zlých pokusoch: {digits} = číslice zo zápisníka v hre. */
+  lockHintDigitsText?: string;
   lockOpenedText: string;
   /** Hláška po odomknutí posledného zámku. */
   lastLockOpenedText: string;

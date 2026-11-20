@@ -5,6 +5,7 @@ import type {
   GameState,
 } from "../types/game";
 import { isAnswerAccepted } from "./answerMatching";
+import { getChapterItem, getCodeNotebook } from "./codeNotebook";
 import { getActLockCodes } from "./gameProgress";
 
 /*
@@ -244,6 +245,61 @@ export type UnlockFinaleLockResult =
   | "unknownLock";
 
 /** Skúsi odomknúť zámok kódom; zlý kód ani zámok mimo poradia nič nezmení. */
+/** Po koľkých zlých pokusoch pri jednom zámku prídu stupne nápovedy. */
+export const LOCK_HINT_SCENES_AFTER = 2;
+export const LOCK_HINT_DIGITS_AFTER = 4;
+
+export type FinaleLockHint =
+  | { stage: "scenes"; scenes: number[] }
+  | { stage: "digits"; digits: string[] };
+
+/**
+ * Nápoveda pri zámku (bez straty bodov), aby sa hráč nikdy nezasekol:
+ * po 2 zlých pokusoch, z ktorých scén sú číslice; po 4 zlých pokusoch
+ * samotné číslice – berú sa priamo zo zápisníka v hre (nenájdená = „?“).
+ */
+export function getFinaleLockHint(
+  chapter: Chapter,
+  gameState: GameState,
+  actId: ActId,
+  wrongAttempts: number
+): FinaleLockHint | null {
+  if (wrongAttempts < LOCK_HINT_SCENES_AFTER) {
+    return null;
+  }
+
+  const notebookLock = getCodeNotebook(chapter, gameState).find(
+    (lock) => lock.actId === actId
+  );
+
+  if (!notebookLock) {
+    return null;
+  }
+
+  if (wrongAttempts >= LOCK_HINT_DIGITS_AFTER) {
+    return {
+      stage: "digits",
+      digits: notebookLock.slots.map((slot) => slot.digit ?? "?"),
+    };
+  }
+
+  return {
+    stage: "scenes",
+    scenes: notebookLock.slots
+      .map((slot) => getChapterItem(chapter, slot.itemId)?.evidenceOrder)
+      .filter((order): order is number => typeof order === "number"),
+  };
+}
+
+/** „1, 2 a 3“ – zoznam čísel scén po slovensky. */
+export function formatSceneList(scenes: number[]) {
+  if (scenes.length <= 1) {
+    return scenes.join("");
+  }
+
+  return `${scenes.slice(0, -1).join(", ")} a ${scenes[scenes.length - 1]}`;
+}
+
 export function unlockFinaleLock(
   chapter: Chapter,
   gameState: GameState,

@@ -5,6 +5,8 @@ export const HAPTIC = {
   step: 12,
   wrong: [40, 60, 40],
   open: [30, 70, 30, 70, 160],
+  /** Cvak pružiny zámku truhlice. */
+  lock: 45,
 } as const;
 
 /**

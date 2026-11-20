@@ -5,14 +5,22 @@ import { useEffect, useRef, useState } from "react";
 import {
   FINALE_CHEST_OPENED_FLAG,
   FINALE_KEY_INSERTED_FLAG,
+  formatSceneList,
   getCodeNotebook,
+  getFinaleLockHint,
   getFinaleLocks,
   type UnlockFinaleLockResult,
 } from "../../engine";
+import { HAPTIC, vibrate } from "../../lib/haptics";
 import { soundManager } from "../../lib/soundManager";
 import type { ActId, Chapter, GameState } from "../../types/game";
 import { getGoldenKeySvg } from "../items/art/keyToothArt";
-import { OPENING_LID_START_SEC } from "../finale/chest3d/chestZoom";
+import {
+  LOCK_DIAL_CLICK_SEC,
+  LOCK_GLINT_SEC,
+  LOCK_SPRING_SEC,
+  OPENING_LID_START_SEC,
+} from "../finale/chest3d/chestZoom";
 import { InspectErrorBoundary } from "../items/InspectErrorBoundary";
 import { canUse3D } from "../items/supportsWebGL";
 import { useReducedMotion } from "../items/useReducedMotion";
@@ -76,6 +84,8 @@ export function FinaleChestScreen({
   );
   const [digits, setDigits] = useState<Record<string, string[]>>({});
   const [message, setMessage] = useState<"wrong" | "opened" | null>(null);
+  // Zlé pokusy pri každom zámku (nápoveda po 2 a 4 pokusoch, bez straty bodov).
+  const [wrongAttempts, setWrongAttempts] = useState<Partial<Record<ActId, number>>>({});
   // 3D, ak to prehliadač zvládne a nie je ?bez3d; pri chybe WebGL 2D záloha.
   const [mode, setMode] = useState<"3d" | "2d">(() =>
     canUse3D() ? "3d" : "2d"
@@ -131,13 +141,43 @@ export function FinaleChestScreen({
     const result = onUnlock(actId, getDigits(actId, length));
 
     if (result === "opened") {
-      soundManager.play("chest-unlock");
+      playUnlockFeedback();
       setMessage(showOpenedMessage ? "opened" : null);
     } else if (result === "wrong") {
+      soundManager.play("chest-lock-wrong");
+      vibrate(HAPTIC.wrong);
+      setWrongAttempts((current) => ({ ...current, [actId]: (current[actId] ?? 0) + 1 }));
       setMessage("wrong");
     }
 
     return result;
+  }
+
+  /**
+   * Zvuk a vibrácia otvorenia zámku podľa časovej osi (kolieska zapadnú,
+   * pružina cvakne, zlatý odlesk). Pri vypnutých animáciách iba cvak zámku.
+   */
+  function playUnlockFeedback() {
+    if (reducedMotion) {
+      soundManager.play("chest-lock-open");
+      vibrate(HAPTIC.lock);
+      return;
+    }
+
+    const schedule = (sec: number, action: () => void) =>
+      timersRef.current.push(window.setTimeout(action, sec * 1000));
+
+    LOCK_DIAL_CLICK_SEC.forEach((sec) =>
+      schedule(sec, () => {
+        soundManager.play("chest-dial-click");
+        vibrate(HAPTIC.step);
+      })
+    );
+    schedule(LOCK_SPRING_SEC, () => {
+      soundManager.play("chest-lock-open");
+      vibrate(HAPTIC.lock);
+    });
+    schedule(LOCK_GLINT_SEC, () => soundManager.play("chest-shine"));
   }
 
   function insertKey() {
@@ -199,7 +239,7 @@ export function FinaleChestScreen({
         }`}
         className={`rounded-2xl border p-4 ${
           lock.isOpen
-            ? "border-emerald-300/40 bg-emerald-400/5"
+            ? "border-amber-200/50 bg-amber-300/5"
             : lock.isNext
               ? "border-amber-300/40 bg-amber-400/5"
               : "border-slate-700 bg-slate-950/60 opacity-60"
@@ -219,7 +259,7 @@ export function FinaleChestScreen({
                   <span
                     key={index}
                     aria-hidden="true"
-                    className="flex h-[136px] w-11 items-center justify-center rounded-md border border-emerald-300/40 bg-emerald-400/10 text-xl text-emerald-200"
+                    className="flex h-[136px] w-11 items-center justify-center rounded-md border border-amber-200/50 bg-amber-300/10 text-xl text-amber-100"
                   >
                     ✓
                   </span>
@@ -262,16 +302,42 @@ export function FinaleChestScreen({
   const fragmentIndex = chapter.finale?.photo.fragmentIds.indexOf(chest.reward.id) ?? -1;
   const fragmentPieceIndex = fragmentIndex === -1 ? 3 : fragmentIndex;
 
+  // Nápoveda pri zámku na rade (ostáva, kým sa zámok neotvorí): po 2 zlých
+  // pokusoch scény, po 4 číslice priamo zo zápisníka v hre.
+  const nextLock = locks.find((lock) => lock.isNext);
+  const lockHint = nextLock
+    ? getFinaleLockHint(chapter, gameState, nextLock.actId, wrongAttempts[nextLock.actId] ?? 0)
+    : null;
+  const lockHintText =
+    nextLock && lockHint
+      ? lockHint.stage === "scenes"
+        ? (chest.lockHintScenesText ?? "")
+            .replace("{lock}", nextLock.lockLabel)
+            .replace("{scenes}", formatSceneList(lockHint.scenes))
+        : (chest.lockHintDigitsText ?? "")
+            .replace("{lock}", nextLock.lockLabel)
+            .replace("{digits}", lockHint.digits.join(" "))
+      : null;
+
   const messages = (
-    <div aria-live="polite" className="mt-4">
+    <div aria-live="polite" className="mt-4 space-y-3">
       {message === "wrong" && (
         <p className="rounded-2xl border border-red-400/40 bg-red-500/10 px-4 py-3 text-[15px] leading-6 text-red-100">
           {chest.wrongCodeText}
         </p>
       )}
 
+      {lockHintText && (
+        <p
+          data-lock-hint={lockHint?.stage}
+          className="rounded-2xl border border-amber-300/40 bg-amber-400/10 px-4 py-3 text-[15px] font-bold leading-6 text-amber-100"
+        >
+          {lockHintText}
+        </p>
+      )}
+
       {message === "opened" && (
-        <p className="rounded-2xl border border-emerald-300/40 bg-emerald-400/10 px-4 py-3 text-[15px] leading-6 text-emerald-100">
+        <p className="rounded-2xl border border-amber-300/40 bg-amber-400/10 px-4 py-3 text-[15px] leading-6 text-amber-100">
           {areAllLocksOpen ? chest.lastLockOpenedText : chest.lockOpenedText}
         </p>
       )}
@@ -400,11 +466,11 @@ export function FinaleChestScreen({
                     key={lock.actId}
                     className={`flex h-16 w-14 flex-col items-center justify-center rounded-lg border font-serif text-xs font-black ${
                       lock.isOpen
-                        ? "border-emerald-300/50 bg-emerald-400/10 text-emerald-200"
+                        ? "border-amber-200/60 bg-amber-300/15 text-amber-100"
                         : "border-amber-300/30 bg-black/40 text-amber-200/80"
                     }`}
                   >
-                    <span className="text-lg">{lock.isOpen ? "🔓" : "🔒"}</span>
+                    <span className="text-lg">{lock.isOpen ? "✓" : "🔒"}</span>
                     <span>{lock.lockLabel}</span>
                   </div>
                 ))}

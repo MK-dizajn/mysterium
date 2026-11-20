@@ -36,6 +36,12 @@ export const CHEST_QUALITY_SETTINGS: Record<
 /** Meranie: počet snímok a najpomalšia priemerná snímka (30 snímok za sekundu). */
 export const PROBE_FRAMES = 30;
 export const PROBE_MAX_FRAME_MS = 1000 / 30;
+/**
+ * Najdlhšie meranie: ak 30 snímok nestihne za 2 s, telefón je určite
+ * pomalší ako 30 snímok za sekundu – meranie hneď skončí (slabý telefón
+ * nemá zbytočne dlho kresliť, keď sa nič nehýbe).
+ */
+export const PROBE_MAX_MS = 2000;
 
 type DeviceInfo = {
   deviceMemory?: number;
@@ -68,6 +74,28 @@ export function chooseChestQuality({ deviceMemory, cores, override }: DeviceInfo
   }
 
   return { quality: "full", reason: "predvolene", probe: true };
+}
+
+/**
+ * Výsledok merania sa pamätá do zatvorenia stránky: truhlica sa na
+ * obrazovke môže vytvoriť znova (napríklad po otvorení), meranie však
+ * prebehne iba raz.
+ */
+let measuredQuality: { quality: ChestQuality; reason: ChestQualityReason } | null = null;
+
+export function rememberMeasuredQuality(quality: ChestQuality, reason: ChestQualityReason) {
+  measuredQuality = { quality, reason };
+}
+
+/** Voľba verzie: zapamätané meranie z tohto sedenia, inak podľa výbavy. */
+export function chooseChestQualityForSession(info: DeviceInfo) {
+  const choice = chooseChestQuality(info);
+
+  if (choice.probe && measuredQuality) {
+    return { ...measuredQuality, probe: false };
+  }
+
+  return choice;
 }
 
 /** Bolo meranie pomalé? (priemer snímok nad 1/30 s) */

@@ -4,7 +4,7 @@ import { Environment, Lightformer } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import { type RefObject, useEffect, useRef } from "react";
 import { HalfFloatType, type Material, type Mesh, type Scene, type Texture } from "three";
-import { isProbeTooSlow, PROBE_FRAMES } from "./chestQuality";
+import { isProbeTooSlow, PROBE_FRAMES, PROBE_MAX_MS } from "./chestQuality";
 
 /**
  * Odlesky okolia pre mosadz (iba plná verzia): malá „miestnosť“ so svetlami
@@ -23,6 +23,8 @@ export function ChestEnvironment() {
 
 /** Snímky na zahriatie (prvé sa zdržia pri príprave tieňov a textúr) – nemerajú sa. */
 const PROBE_WARMUP_FRAMES = 5;
+/** Čas, ktorý sa na zahriatie toleruje navyše k najdlhšiemu meraniu. */
+const PROBE_WARMUP_MS = 500;
 
 /**
  * Meranie: po zahriatí 30 snímok za sebou. Ak sú v priemere pomalšie ako
@@ -33,6 +35,7 @@ export function QualityProbe({ onDone }: { onDone: (isSlow: boolean) => void }) 
   const framesRef = useRef<number[]>([]);
   const countRef = useRef(0);
   const lastRef = useRef<number | null>(null);
+  const startRef = useRef<number | null>(null);
   const isDoneRef = useRef(false);
   const onDoneRef = useRef(onDone);
 
@@ -52,11 +55,21 @@ export function QualityProbe({ onDone }: { onDone: (isSlow: boolean) => void }) 
     const now = performance.now();
     countRef.current += 1;
 
+    startRef.current ??= now;
+
     if (lastRef.current !== null && countRef.current > PROBE_WARMUP_FRAMES) {
       framesRef.current.push(now - lastRef.current);
     }
 
     lastRef.current = now;
+
+    // Príliš pomalé: meranie (aj so zahriatím) by trvalo dlhšie ako 2 s
+    // plus pol sekundy na zahriatie → ľahká verzia hneď.
+    if (now - startRef.current > PROBE_MAX_MS + PROBE_WARMUP_MS) {
+      isDoneRef.current = true;
+      onDoneRef.current(true);
+      return;
+    }
 
     if (framesRef.current.length >= PROBE_FRAMES) {
       isDoneRef.current = true;

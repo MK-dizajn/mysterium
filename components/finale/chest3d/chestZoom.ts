@@ -61,7 +61,8 @@ export const OVERVIEW_TRANSFORM: ChestTransform = {
 
 /** Najväčší náklon ťahaním (ako MAX_TILT v rotationPhysics) a o koľko sa pri ňom truhlica oddiali. */
 const TILT_FIT_MAX_RAD = (35 * Math.PI) / 180;
-const TILT_FIT_SHRINK = 0.22;
+// 0,25 od T2: mosadzné rohy z T1 truhlicu o kúsok rozšírili (pri náklone sa nesmie odrezať o okraj).
+const TILT_FIT_SHRINK = 0.25;
 
 /**
  * Pri nakláňaní ťahaním sa truhlica mierne oddiali, aby sa veko ani dno
@@ -157,6 +158,101 @@ const OPENING_TIMES = {
 } as const;
 
 export const OPENING_SEC = 3.6;
+
+/*
+ * ===== Otvorenie jedného zámku (úprava 4, krok T2), spolu 1,1 s =====
+ * 0,0–0,3 s kolieska postupne zapadnú (dotočia sa s odpružením), ryska sa rozžiari,
+ * 0,3–0,45 s pružina: telo poskočí, oblúk vyskočí hore s prekmitnutím,
+ * 0,45–0,9 s oblúk sa otočí nabok a zámok sa nakloní (visí),
+ * 0,6–0,9 s zlatý odlesk po tele, potom sa všetko ustáli.
+ */
+export const LOCK_UNLOCK_SEC = 1.1;
+/** Kedy cvakne koliesko 1, 2, 3 a kedy pružina zámku (zvuk a vibrácia). */
+export const LOCK_DIAL_CLICK_SEC = [0.08, 0.18, 0.28] as const;
+export const LOCK_SPRING_SEC = 0.3;
+export const LOCK_GLINT_SEC = 0.6;
+
+export type LockUnlockFrame = {
+  /** Odpruženie každého kolieska (0 = pokoj). */
+  dialSettle: [number, number, number];
+  /** Ryska vedľa koliesok (0 až 1). */
+  indicator: number;
+  /** Poskočenie tela (posun dole/hore). */
+  jolt: number;
+  /** Vysunutie oblúka 0 až 1 (počas pružiny aj nad 1 – prekmitnutie). */
+  shackleLift: number;
+  /** Otočenie oblúka nabok 0 až 1. */
+  shackleSwing: number;
+  /** Naklonenie zámku 0 až 1. */
+  tilt: number;
+  /** Zlatý odlesk 0 až 1. */
+  glint: number;
+};
+
+export const LOCK_CLOSED_FRAME: LockUnlockFrame = {
+  dialSettle: [0, 0, 0],
+  indicator: 0,
+  jolt: 0,
+  shackleLift: 0,
+  shackleSwing: 0,
+  tilt: 0,
+  glint: 0,
+};
+
+export const LOCK_OPEN_FRAME: LockUnlockFrame = {
+  dialSettle: [0, 0, 0],
+  indicator: 1,
+  jolt: 0,
+  shackleLift: 1,
+  shackleSwing: 1,
+  tilt: 1,
+  glint: 0,
+};
+
+/** Krátke odpruženie (0 → kmit → 0) počas úseku. */
+function bump(elapsedSec: number, start: number, length: number) {
+  const t = (elapsedSec - start) / length;
+
+  return t <= 0 || t >= 1 ? 0 : Math.sin(t * Math.PI * 2) * (1 - t);
+}
+
+/** Pružina s prekmitnutím (0 → 1,15 → 1). */
+function easeOutBack(t: number) {
+  const s = 2.2;
+  const x = t - 1;
+
+  return 1 + (s + 1) * x * x * x + s * x * x;
+}
+
+const smooth = (t: number) => t * t * (3 - 2 * t);
+
+/** Stav otvárania zámku v danom okamihu (po LOCK_UNLOCK_SEC presne konečný stav). */
+export function getLockUnlockFrame(elapsedSec: number): LockUnlockFrame {
+  if (elapsedSec <= 0) {
+    return LOCK_CLOSED_FRAME;
+  }
+
+  if (elapsedSec >= LOCK_UNLOCK_SEC) {
+    return LOCK_OPEN_FRAME;
+  }
+
+  const lift = phase(elapsedSec, [LOCK_SPRING_SEC, 0.45]);
+  const glint = phase(elapsedSec, [LOCK_GLINT_SEC, 0.9]);
+
+  return {
+    dialSettle: [
+      bump(elapsedSec, 0, 0.12),
+      bump(elapsedSec, 0.1, 0.12),
+      bump(elapsedSec, 0.2, 0.12),
+    ],
+    indicator: smooth(phase(elapsedSec, [0.2, 0.32])),
+    jolt: bump(elapsedSec, LOCK_SPRING_SEC, 0.15),
+    shackleLift: lift === 0 ? 0 : easeOutBack(lift),
+    shackleSwing: smooth(phase(elapsedSec, [0.45, 0.9])),
+    tilt: smooth(phase(elapsedSec, [0.45, 0.9])),
+    glint: glint === 0 || glint === 1 ? 0 : Math.sin(glint * Math.PI),
+  };
+}
 /** Kedy sa začne dvíhať veko (zvuk). */
 export const OPENING_LID_START_SEC = OPENING_TIMES.lid[0];
 

@@ -9,6 +9,7 @@ import {
   type Group,
   type InstancedMesh,
   type MeshBasicMaterial,
+  type MeshStandardMaterial,
   Object3D,
   type PointLight,
   type Texture,
@@ -18,7 +19,14 @@ import { MysteriumEmblem, Rivet } from "../../ui/chest-3d/ChestParts";
 import { createChestTextures } from "./chestMaterials";
 import type { ChestQuality } from "./chestQuality";
 import { ChestKey3D } from "./ChestKey3D";
-import { getShakeOffset, type OpeningFrame, SHAKE_SEC, stepToward } from "./chestZoom";
+import {
+  getLockUnlockFrame,
+  getShakeOffset,
+  LOCK_CLOSED_FRAME,
+  LOCK_OPEN_FRAME,
+  type OpeningFrame,
+  SHAKE_SEC,
+} from "./chestZoom";
 import { LockDials3D } from "./LockDials3D";
 import { PhotoFragment3D } from "./PhotoFragment3D";
 
@@ -41,10 +49,20 @@ const BRASS_LIGHT = "#d6a451";
 
 /** Pri ťahaní nemá ťuknutie na zámok vybrať zámok. */
 const CLICK_SLOP_PX = 6;
-/** Oblúk zámku: zasunutý a po odomknutí vysunutý hore (pomaly, aby to bolo vidieť). */
+/** Oblúk zámku: zasunutý a po odomknutí vysunutý hore. */
 const SHACKLE_CLOSED_Y = 0.14;
-const SHACKLE_OPEN_Y = 0.25;
-const SHACKLE_SPEED = 5;
+const SHACKLE_OPEN_Y = 0.27;
+/** Ramená oblúka: dlhé (os otáčania) vľavo, krátke vpravo. */
+const SHACKLE_RADIUS = 0.15;
+const LONG_LEG = 0.2;
+const SHORT_LEG = 0.09;
+/** Otočenie oblúka nabok (pol otáčky – na konci leží v rovine zámku, netrčí z truhlice) a naklonenie visiaceho zámku. */
+const SHACKLE_SWING_RAD = -Math.PI;
+const LOCK_TILT_RAD = 0.14;
+/** Zámok visí z hornej hrany (os naklonenia). */
+const LOCK_HANG_Y = 0.32;
+/** Zlatý odlesk po tele odomknutého zámku (teplá farba, nie zelená). */
+const LOCK_GLINT_COLOR = "#ffcf70";
 const MAX_FRAME_SECONDS = 0.05;
 
 function Lock3D({
@@ -54,6 +72,8 @@ function Lock3D({
   digits,
   shakeKey,
   reducedMotion,
+  unlockStartedAt,
+  brass,
 }: {
   state: ChestLockState;
   isSelected: boolean;
@@ -62,18 +82,27 @@ function Lock3D({
   /** Zvýšenie spustí krátke zatrasenie (pri vypnutých animáciách sa nemení). */
   shakeKey: number;
   reducedMotion: boolean;
+  /** Kedy sa začalo otváranie zámku (performance.now); null = bez animácie. */
+  unlockStartedAt: number | null;
+  /** Lesk mosadze podľa verzie truhlice. */
+  brass: { metalness: number; roughness: number };
 }) {
   const invalidate = useThree((three) => three.invalidate);
   const shakeRef = useRef<Group>(null);
+  const hangRef = useRef<Group>(null);
+  const bodyGroupRef = useRef<Group>(null);
   const shackleRef = useRef<Group>(null);
-  const shackleTarget = state === "open" ? SHACKLE_OPEN_Y : SHACKLE_CLOSED_Y;
-  // Po F5 je odomknutý zámok hneď otvorený, bez vysúvania.
-  const shackleYRef = useRef(shackleTarget);
+  const bodyMaterialRef = useRef<MeshStandardMaterial>(null);
+  const indicatorRef = useRef<MeshStandardMaterial>(null);
+  const settleRef = useRef<readonly number[]>([0, 0, 0]);
   const shakeStartRef = useRef<number | null>(null);
+  const body = useRoundedBox(0.5, 0.44, 0.17, 0.05);
+  const plate = useRoundedBox(0.66, 0.76, 0.06, 0.03);
+  const isAnimating = unlockStartedAt !== null && !reducedMotion;
 
   useEffect(() => {
     invalidate();
-  }, [shackleTarget, invalidate]);
+  }, [state, unlockStartedAt, invalidate]);
 
   useEffect(() => {
     if (shakeKey === 0) {
@@ -84,22 +113,34 @@ function Lock3D({
     invalidate();
   }, [shakeKey, invalidate]);
 
-  useFrame((_, delta) => {
-    const dtSec = Math.min(delta, MAX_FRAME_SECONDS);
+  useFrame(() => {
+    // Stav zámku v snímke: zatvorený, práve sa otvára, alebo otvorený (aj po F5).
+    const frame =
+      state !== "open"
+        ? LOCK_CLOSED_FRAME
+        : isAnimating
+          ? getLockUnlockFrame((performance.now() - (unlockStartedAt ?? 0)) / 1000)
+          : LOCK_OPEN_FRAME;
+    const isMoving = isAnimating && frame !== LOCK_OPEN_FRAME;
 
-    shackleYRef.current = stepToward(
-      shackleYRef.current,
-      shackleTarget,
-      dtSec,
-      reducedMotion,
-      SHACKLE_SPEED
-    );
-    shackleRef.current?.position.set(0, shackleYRef.current, 0.09);
+    settleRef.current = frame.dialSettle;
+    hangRef.current?.rotation.set(0, 0, frame.tilt * LOCK_TILT_RAD);
+    bodyGroupRef.current?.position.set(0, -LOCK_HANG_Y - frame.jolt * 0.018, 0);
+
+    const lift = SHACKLE_CLOSED_Y + (SHACKLE_OPEN_Y - SHACKLE_CLOSED_Y) * frame.shackleLift;
+    shackleRef.current?.position.set(-SHACKLE_RADIUS, lift, 0.09);
+    shackleRef.current?.rotation.set(0, frame.shackleSwing * SHACKLE_SWING_RAD, 0);
+
+    bodyMaterialRef.current?.setValues({ emissiveIntensity: frame.glint * 0.85 });
+    indicatorRef.current?.setValues({ emissiveIntensity: 0.15 + frame.indicator * 1.1 });
 
     let shake = 0;
 
     if (shakeStartRef.current !== null) {
-      const elapsedSec = (performance.now() - shakeStartRef.current) / 1000;
+      const elapsedSec = Math.min(
+        (performance.now() - shakeStartRef.current) / 1000,
+        SHAKE_SEC + MAX_FRAME_SECONDS
+      );
       shake = getShakeOffset(elapsedSec);
 
       if (elapsedSec >= SHAKE_SEC) {
@@ -109,17 +150,16 @@ function Lock3D({
 
     shakeRef.current?.position.set(shake, 0, 0);
 
-    if (shackleYRef.current !== shackleTarget || shakeStartRef.current !== null) {
+    if (isMoving || shakeStartRef.current !== null) {
       invalidate();
     }
   });
 
-  const glow =
+  // Zámok na rade jemne svieti; inak bez svitu (zlatý odlesk iba pri otvorení).
+  const highlight =
     state === "next"
       ? { emissive: "#ffb347", emissiveIntensity: 0.45 }
-      : state === "open"
-        ? { emissive: "#3fa35a", emissiveIntensity: 0.4 }
-        : { emissive: "#000000", emissiveIntensity: 0 };
+      : { emissive: LOCK_GLINT_COLOR, emissiveIntensity: 0 };
 
   function handleClick(event: ThreeEvent<MouseEvent>) {
     if (event.delta > CLICK_SLOP_PX) {
@@ -130,48 +170,92 @@ function Lock3D({
     onSelect();
   }
 
+  // Kolieska: zatvorený zámok a počas otvárania; odomknutý ich už neukazuje (ani po F5).
+  const showDials = state !== "open" || isAnimating;
+
   return (
     <group ref={shakeRef} onClick={handleClick}>
-      {/* Platnička zámku */}
-      <mesh>
-        <boxGeometry args={[0.66, 0.76, 0.06]} />
+      {/* Platnička zámku na truhlici */}
+      <mesh geometry={plate}>
         <meshStandardMaterial color="#6b4417" roughness={0.45} metalness={0.75} />
       </mesh>
 
-      {/* Rám pri vybranom zámku */}
-      {isSelected && (
-        <mesh position={[0, 0, 0.02]}>
-          <boxGeometry args={[0.76, 0.86, 0.03]} />
-          <meshStandardMaterial
-            color="#fff1c2"
-            emissive="#ffd27a"
-            emissiveIntensity={0.7}
-            roughness={0.3}
-            metalness={0.4}
-          />
-        </mesh>
-      )}
+      {/* Tenký zlatý rámik pri vybranom zámku (zámok ostane dobre vidieť). */}
+      {isSelected &&
+        (
+          [
+            [0, 0.415, 0.76, 0.03],
+            [0, -0.415, 0.76, 0.03],
+            [-0.365, 0, 0.03, 0.86],
+            [0.365, 0, 0.03, 0.86],
+          ] as const
+        ).map(([x, y, width, height]) => (
+          <mesh key={`${x}-${y}`} position={[x, y, 0.04]}>
+            <boxGeometry args={[width, height, 0.03]} />
+            <meshStandardMaterial
+              color="#fff1c2"
+              emissive="#ffd27a"
+              emissiveIntensity={0.8}
+              roughness={0.3}
+              metalness={0.4}
+            />
+          </mesh>
+        ))}
 
-      {/* Telo zámku */}
-      <mesh position={[0, -0.08, 0.09]}>
-        <boxGeometry args={[0.48, 0.42, 0.14]} />
-        <meshStandardMaterial
-          color={state === "open" ? "#b9a24a" : "#b8812f"}
-          roughness={0.3}
-          metalness={0.85}
-          {...glow}
-        />
-      </mesh>
+      {/* Visiaci zámok: nakloní sa okolo hornej hrany. */}
+      <group ref={hangRef} position={[0, LOCK_HANG_Y, 0]}>
+        <group ref={bodyGroupRef} position={[0, -LOCK_HANG_Y, 0]}>
+          {/* Mosadzné telo so zaoblenými hranami (pri otvorení zlatý odlesk) */}
+          <mesh geometry={body} position={[0, -0.08, 0.09]}>
+            <meshStandardMaterial
+              ref={bodyMaterialRef}
+              color="#c8953f"
+              {...brass}
+              {...highlight}
+            />
+          </mesh>
 
-      {/* Tri kolieska číselníka – odomknutý zámok ich neukazuje (ani po F5) */}
-      {state !== "open" && <LockDials3D digits={digits} reducedMotion={reducedMotion} />}
+          {/* Ryska vedľa koliesok: pri zapadnutí sa rozžiari zlatou. */}
+          {[-1, 1].map((side) => (
+            <mesh key={side} position={[side * 0.215, -0.06, 0.18]}>
+              <boxGeometry args={[0.016, 0.07, 0.01]} />
+              <meshStandardMaterial
+                ref={side === 1 ? indicatorRef : undefined}
+                color="#f3d27a"
+                emissive={LOCK_GLINT_COLOR}
+                emissiveIntensity={0.15}
+                roughness={0.3}
+                metalness={0.6}
+              />
+            </mesh>
+          ))}
 
-      {/* Oblúk zámku – po odomknutí sa vysunie hore (poloha v snímke) */}
-      <group ref={shackleRef}>
-        <mesh>
-          <torusGeometry args={[0.15, 0.035, 12, 24, Math.PI]} />
-          <meshStandardMaterial color={BRASS_LIGHT} roughness={0.28} metalness={0.9} />
-        </mesh>
+          {showDials && (
+            <LockDials3D
+              digits={digits}
+              reducedMotion={reducedMotion}
+              readSettle={() => settleRef.current}
+            />
+          )}
+
+          {/* Oblúk: pružina ho vysunie, potom sa otočí nabok okolo dlhého ramena. */}
+          <group ref={shackleRef} position={[-SHACKLE_RADIUS, SHACKLE_CLOSED_Y, 0.09]}>
+            <group position={[SHACKLE_RADIUS, 0, 0]}>
+              <mesh>
+                <torusGeometry args={[SHACKLE_RADIUS, 0.035, 12, 24, Math.PI]} />
+                <meshStandardMaterial color={BRASS_LIGHT} {...brass} />
+              </mesh>
+              <mesh position={[-SHACKLE_RADIUS, -LONG_LEG / 2, 0]}>
+                <cylinderGeometry args={[0.035, 0.035, LONG_LEG, 12]} />
+                <meshStandardMaterial color={BRASS_LIGHT} {...brass} />
+              </mesh>
+              <mesh position={[SHACKLE_RADIUS, -SHORT_LEG / 2, 0]}>
+                <cylinderGeometry args={[0.035, 0.035, SHORT_LEG, 12]} />
+                <meshStandardMaterial color={BRASS_LIGHT} {...brass} />
+              </mesh>
+            </group>
+          </group>
+        </group>
       </group>
 
       <Rivet position={[-0.25, 0.3, 0.04]} scale={0.6} />
@@ -506,6 +590,8 @@ type ChestModel3DProps = {
   reducedMotion: boolean;
   /** Plná alebo ľahká verzia (mosadz bez odleskov okolia je matnejšia). */
   quality: ChestQuality;
+  /** Kedy sa začalo otváranie každého zámku (null = bez animácie). */
+  lockUnlockStarts: (number | null)[];
 };
 
 /**
@@ -523,6 +609,7 @@ export function ChestModel3D({
   fragmentPieceIndex,
   reducedMotion,
   quality,
+  lockUnlockStarts,
 }: ChestModel3DProps) {
   const looks = useChestLooks(quality);
 
@@ -575,6 +662,8 @@ export function ChestModel3D({
             digits={lockDigits[index] ?? [0, 0, 0]}
             shakeKey={shakeKeys[index] ?? 0}
             reducedMotion={reducedMotion}
+            unlockStartedAt={lockUnlockStarts[index] ?? null}
+            brass={looks.brass}
           />
         </group>
       ))}
