@@ -9,9 +9,9 @@ import type { OpeningFrame } from "./chestZoom";
 const CANVAS_HEIGHT_PX = 384;
 /** Výška útržku v súradniciach truhlice. */
 const FRAGMENT_HEIGHT = 1.15;
-/** Útržok vystúpi zo stredu truhlice sem (nad otvorené veko). */
-const FRAGMENT_START_Y = 0.45;
-const FRAGMENT_RISE = 1.3;
+/** Útržok vystúpi zo zamatového lôžka na dne (T3) do rovnakej výšky ako doteraz (1,75). */
+const FRAGMENT_START_Y = 0.08;
+const FRAGMENT_RISE = 1.67;
 const PAPER = "#d8c39d";
 const PAPER_EDGE = "#f1e4c3";
 

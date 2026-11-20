@@ -12,10 +12,12 @@ import {
   type MeshStandardMaterial,
   Object3D,
   type PointLight,
+  Shape,
+  ShapeGeometry,
   type Texture,
 } from "three";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
-import { MysteriumEmblem, Rivet } from "../../ui/chest-3d/ChestParts";
+import { Rivet } from "../../ui/chest-3d/ChestParts";
 import { createChestTextures } from "./chestMaterials";
 import type { ChestQuality } from "./chestQuality";
 import { ChestKey3D } from "./ChestKey3D";
@@ -363,6 +365,10 @@ type ChestLooks = {
   woodLid: Texture;
   woodBump: Texture;
   iron: Texture;
+  emblem: Texture;
+  engraving: Texture;
+  engravingStrip: Texture;
+  velvet: Texture;
   /** Mosadz: s odleskami okolia lesklejšia, bez nich matnejšia (aby nebola čierna). */
   brass: { metalness: number; roughness: number };
 };
@@ -380,6 +386,10 @@ function useChestLooks(quality: ChestQuality): ChestLooks {
       woodLid: textures.woodVariant(1, 1),
       woodBump: textures.woodBump,
       iron: textures.iron,
+      emblem: textures.emblem,
+      engraving: textures.engraving,
+      engravingStrip: textures.engravingStrip,
+      velvet: textures.velvet,
       brass:
         quality === "full"
           ? { metalness: 0.92, roughness: 0.3 }
@@ -420,23 +430,149 @@ function BrassMaterial({ looks }: { looks: ChestLooks }) {
   return <meshStandardMaterial color="#c8953f" {...looks.brass} />;
 }
 
-/** Telo: drevo z dosiek, lišty, železné pásy, mosadzné rohy a nity. */
+/** Mosadzné rohy s rytinou (lem, lístok, hviezdička) – farba aj reliéf. */
+function CornerMaterial({ looks }: { looks: ChestLooks }) {
+  return (
+    <meshStandardMaterial
+      map={looks.engraving}
+      bumpMap={looks.engraving}
+      bumpScale={0.9}
+      {...looks.brass}
+    />
+  );
+}
+
+/* ===== Duté telo (krok T3): zvonka rovnaké ako plný kváder, vnútri zamat ===== */
+
+const WALL = 0.1;
+/** Steny tela (zvonka presne obrys pôvodného kvádra). */
+const CHEST_WALLS: { size: Vec3; position: Vec3 }[] = [
+  { size: [BODY.width, BODY.height, WALL], position: [0, BODY.y, BODY.depth / 2 - WALL / 2] },
+  { size: [BODY.width, BODY.height, WALL], position: [0, BODY.y, -(BODY.depth / 2 - WALL / 2)] },
+  { size: [WALL, BODY.height, BODY.depth - 2 * WALL], position: [-(BODY.width / 2 - WALL / 2), BODY.y, 0] },
+  { size: [WALL, BODY.height, BODY.depth - 2 * WALL], position: [BODY.width / 2 - WALL / 2, BODY.y, 0] },
+];
+/** Vnútro: dno (vrch plného spodku) a polovičné rozmery otvoru. */
+const INTERIOR = {
+  floorY: 0,
+  halfX: BODY.width / 2 - WALL,
+  halfZ: BODY.depth / 2 - WALL,
+  /** Kde začína drevená lišta (zamat na stenách je pod ňou). */
+  rimBottomY: 0.32,
+};
+/** Horná lišta po obvode (vnútro ostáva otvorené). */
+const RIM_PIECES: { size: Vec3; position: Vec3 }[] = [
+  { size: [3.48, 0.22, 0.2], position: [0, 0.43, 0.94] },
+  { size: [3.48, 0.22, 0.2], position: [0, 0.43, -0.94] },
+  { size: [0.2, 0.22, 1.68], position: [-1.64, 0.43, 0] },
+  { size: [0.2, 0.22, 1.68], position: [1.64, 0.43, 0] },
+];
+
+function RoundedPart({ size, position, children }: { size: Vec3; position: Vec3; children: ReactNode }) {
+  const geometry = useRoundedBox(size[0], size[1], size[2], Math.min(0.04, Math.min(...size) / 2.5));
+
+  return (
+    <mesh geometry={geometry} position={position}>
+      {children}
+    </mesh>
+  );
+}
+
+/** Zaoblený obdĺžnik (lôžko útržku, rám zamatu vo veku) ako plochý tvar. */
+function useRoundedRectShape(width: number, height: number, radius: number, hole?: { width: number; height: number }) {
+  const geometry = useMemo(() => {
+    const roundedRect = (w: number, h: number, r: number) => {
+      const shape = new Shape();
+      const x = -w / 2;
+      const y = -h / 2;
+      shape.moveTo(x + r, y);
+      shape.lineTo(x + w - r, y);
+      shape.quadraticCurveTo(x + w, y, x + w, y + r);
+      shape.lineTo(x + w, y + h - r);
+      shape.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      shape.lineTo(x + r, y + h);
+      shape.quadraticCurveTo(x, y + h, x, y + h - r);
+      shape.lineTo(x, y + r);
+      shape.quadraticCurveTo(x, y, x + r, y);
+
+      return shape;
+    };
+    const shape = roundedRect(width, height, radius);
+
+    if (hole) {
+      shape.holes.push(roundedRect(hole.width, hole.height, radius * 0.6));
+    }
+
+    return new ShapeGeometry(shape, 6);
+  }, [width, height, radius, hole]);
+
+  useEffect(() => () => geometry.dispose(), [geometry]);
+
+  return geometry;
+}
+
+const FRAGMENT_BED = { width: 1.3, height: 0.95 };
+const LID_FRAME_HOLE = { width: 3.2, height: 1.8 };
+
+/** Zamatové vnútro: dno, steny pod lištou a lôžko, z ktorého vystúpi útržok. */
+function VelvetInterior({ looks }: { looks: ChestLooks }) {
+  const fragmentBed = useRoundedRectShape(FRAGMENT_BED.width, FRAGMENT_BED.height, 0.12);
+  const wallHeight = INTERIOR.rimBottomY - INTERIOR.floorY;
+  const wallY = INTERIOR.floorY + wallHeight / 2;
+  const { halfX, halfZ } = INTERIOR;
+  const walls: { size: [number, number]; position: Vec3; rotationY: number }[] = [
+    { size: [halfX * 2, wallHeight], position: [0, wallY, halfZ - 0.001], rotationY: Math.PI },
+    { size: [halfX * 2, wallHeight], position: [0, wallY, -halfZ + 0.001], rotationY: 0 },
+    { size: [halfZ * 2, wallHeight], position: [-halfX + 0.001, wallY, 0], rotationY: Math.PI / 2 },
+    { size: [halfZ * 2, wallHeight], position: [halfX - 0.001, wallY, 0], rotationY: -Math.PI / 2 },
+  ];
+
+  return (
+    <group>
+      <mesh position={[0, INTERIOR.floorY + 0.004, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[halfX * 2, halfZ * 2]} />
+        <meshStandardMaterial map={looks.velvet} roughness={1} metalness={0} />
+      </mesh>
+      {walls.map((wall) => (
+        <mesh key={`${wall.position.join(",")}`} position={wall.position} rotation={[0, wall.rotationY, 0]}>
+          <planeGeometry args={wall.size} />
+          <meshStandardMaterial map={looks.velvet} color="#b98a90" roughness={1} metalness={0} />
+        </mesh>
+      ))}
+      {/* fragmentBed: vytlačené lôžko pre útržok (tmavší zamat). */}
+      <mesh geometry={fragmentBed} position={[0, INTERIOR.floorY + 0.008, 0.05]} rotation={[-Math.PI / 2, 0, 0]}>
+        <meshStandardMaterial map={looks.velvet} color="#7a5058" roughness={1} metalness={0} />
+      </mesh>
+    </group>
+  );
+}
+
+/** Telo: duté drevo z dosiek, lišty, železné pásy, mosadzné rohy s rytinou a nity. */
 function ChestBody3D({ looks }: { looks: ChestLooks }) {
-  const core = useRoundedBox(BODY.width, BODY.height, BODY.depth, 0.04);
-  const topRim = useRoundedBox(3.48, 0.22, 2.08, 0.05);
   const bottomRim = useRoundedBox(3.48, 0.25, 2.08, 0.05);
   const corner = useRoundedBox(0.24, 0.28, 0.24, 0.035);
   const strapHeight = STRAP_TOP - STRAP_BOTTOM;
   const strapY = (STRAP_TOP + STRAP_BOTTOM) / 2;
+  const floorHeight = INTERIOR.floorY - (BODY.y - BODY.height / 2);
 
   return (
     <group>
-      <mesh geometry={core} position={[0, BODY.y, 0]}>
-        <WoodMaterial map={looks.woodBody} bump={looks.woodBump} />
+      {/* Steny (zvonka ako pôvodný kváder) a plný spodok pod dnom. */}
+      {CHEST_WALLS.map((wall) => (
+        <RoundedPart key={wall.position.join(",")} size={wall.size} position={wall.position}>
+          <WoodMaterial map={looks.woodBody} bump={looks.woodBump} />
+        </RoundedPart>
+      ))}
+      <mesh position={[0, INTERIOR.floorY - floorHeight / 2, 0]}>
+        <boxGeometry args={[INTERIOR.halfX * 2, floorHeight, INTERIOR.halfZ * 2]} />
+        <meshStandardMaterial color="#2a170b" roughness={0.9} />
       </mesh>
-      <mesh geometry={topRim} position={[0, 0.43, 0]}>
-        <WoodMaterial map={looks.woodRim} bump={looks.woodBump} tint="#c9a27e" />
-      </mesh>
+      {RIM_PIECES.map((rim) => (
+        <RoundedPart key={rim.position.join(",")} size={rim.size} position={rim.position}>
+          <WoodMaterial map={looks.woodRim} bump={looks.woodBump} tint="#c9a27e" />
+        </RoundedPart>
+      ))}
+      <VelvetInterior looks={looks} />
       <mesh geometry={bottomRim} position={[0, -0.92, 0]}>
         <WoodMaterial map={looks.woodRim} bump={looks.woodBump} tint="#b48c69" />
       </mesh>
@@ -459,10 +595,10 @@ function ChestBody3D({ looks }: { looks: ChestLooks }) {
         ))
       )}
 
-      {/* Mosadzné rohy (jedno kreslenie) a nity (jedno kreslenie). */}
+      {/* Mosadzné rohy s rytinou (jedno kreslenie) a nity (jedno kreslenie). */}
       <InstancedParts positions={BRASS_CORNERS}>
         <primitive object={corner} attach="geometry" />
-        <BrassMaterial looks={looks} />
+        <CornerMaterial looks={looks} />
       </InstancedParts>
       <InstancedParts positions={BODY_RIVETS}>
         <sphereGeometry args={[0.04, 10, 6]} />
@@ -510,23 +646,100 @@ function ChestLid3D({
         </group>
       ))}
 
-      {/* Mosadzná lišta pod vekom vpredu, rohy a nity veka. */}
+      {/* Mosadzná lišta pod vekom vpredu s opakovaným ornamentom, rohy s rytinou a nity veka. */}
       <mesh position={[0, 0.03, 2.1]}>
         <boxGeometry args={[3.5, 0.08, 0.06]} />
-        <BrassMaterial looks={looks} />
+        <meshStandardMaterial
+          map={looks.engravingStrip}
+          bumpMap={looks.engravingStrip}
+          bumpScale={0.8}
+          {...looks.brass}
+        />
       </mesh>
       <InstancedParts positions={LID_CORNERS}>
         <primitive object={corner} attach="geometry" />
-        <BrassMaterial looks={looks} />
+        <CornerMaterial looks={looks} />
       </InstancedParts>
       <InstancedParts positions={LID_RIVETS}>
         <sphereGeometry args={[0.04, 10, 6]} />
         <BrassMaterial looks={looks} />
       </InstancedParts>
-      <MysteriumEmblem position={[0, 0.21, 2.12]} />
+
+      {/* Znak hry: veľký medailón na vrchu veka, malý vpredu. */}
+      <ChestEmblem3D {...LID_TOP_EMBLEM} faceUp looks={looks} />
+      <ChestEmblem3D {...LID_FRONT_EMBLEM} looks={looks} />
+
+      {/* lidVelvet: vnútorná strana veka – zamat v mosadznom ráme (vidno po otvorení). */}
+      <LidVelvet looks={looks} />
     </group>
   );
 }
+
+/** Medailóny so znakom hry (v súradniciach veka). */
+const LID_TOP_EMBLEM = { position: [0, 0.445, 1.04] as Vec3, radius: 0.34 };
+const LID_FRONT_EMBLEM = { position: [0, 0.21, 2.1] as Vec3, radius: 0.17 };
+
+/**
+ * Mosadzný medailón so znakom hry (M v kruhu s kompasovou ružicou):
+ * okraj (prstenec), bok kotúča a čelo s farbou aj reliéfom z textúry znaku.
+ */
+function ChestEmblem3D({
+  position,
+  radius,
+  faceUp = false,
+  looks,
+}: {
+  position: Vec3;
+  radius: number;
+  faceUp?: boolean;
+  looks: ChestLooks;
+}) {
+  // Čelo kruhu je v rovine XY (pozerá dopredu); na veku sa sklopí nahor
+  // tak, aby M stálo rovno pri pohľade spredu.
+  const rotation: Vec3 = faceUp ? [-Math.PI / 2, 0, 0] : [0, 0, 0];
+
+  return (
+    <group position={position} rotation={rotation}>
+      <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 0, -0.012]}>
+        <cylinderGeometry args={[radius, radius, 0.03, 48, 1, true]} />
+        <BrassMaterial looks={looks} />
+      </mesh>
+      <mesh position={[0, 0, 0.004]}>
+        <circleGeometry args={[radius, 48]} />
+        <meshStandardMaterial
+          map={looks.emblem}
+          bumpMap={looks.emblem}
+          bumpScale={1.6}
+          {...looks.brass}
+        />
+      </mesh>
+      <mesh position={[0, 0, 0.006]}>
+        <torusGeometry args={[radius, radius * 0.07, 10, 48]} />
+        <BrassMaterial looks={looks} />
+      </mesh>
+    </group>
+  );
+}
+
+/** Zamat na vnútornej strane veka v mosadznom ráme (ako truhlička v scéne 9). */
+function LidVelvet({ looks }: { looks: ChestLooks }) {
+  const frame = useRoundedRectShape(3.34, 1.94, 0.08, LID_FRAME_HOLE);
+
+  return (
+    <group position={[0, -0.004, 1.04]} rotation={[Math.PI / 2, 0, 0]}>
+      <mesh>
+        <planeGeometry args={[LID_FRAME_HOLE.width, LID_FRAME_HOLE.height]} />
+        <meshStandardMaterial map={looks.velvet} color="#c49aa0" roughness={1} metalness={0} />
+      </mesh>
+      <mesh geometry={frame} position={[0, 0, 0.002]}>
+        <BrassMaterial looks={looks} />
+      </mesh>
+    </group>
+  );
+}
+
+/** Svetlo dna leží tesne nad zamatom, aby ho nezakrylo (T3); farbu a efekty rieši T4. */
+const GLOW_FLOOR_Y = 0.02;
 
 /** Teplé svetlo z otvorenej truhlice: žiariace dno, lúč a svetlo vnútri. */
 function ChestGlow3D({ readOpening }: { readOpening: () => OpeningFrame }) {
@@ -542,7 +755,8 @@ function ChestGlow3D({ readOpening }: { readOpening: () => OpeningFrame }) {
       groupRef.current.visible = light > 0;
     }
 
-    floorRef.current?.setValues({ opacity: 0.9 * light });
+    // Zamat ostáva vidieť: svetlo ho iba prežiari (sčítanie farieb).
+    floorRef.current?.setValues({ opacity: 0.4 * light });
     beamRef.current?.setValues({ opacity: 0.16 * light });
 
     if (lightRef.current) {
@@ -552,9 +766,17 @@ function ChestGlow3D({ readOpening }: { readOpening: () => OpeningFrame }) {
 
   return (
     <group ref={groupRef} visible={false}>
-      <mesh position={[0, 0.56, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[3.2, 1.85]} />
-        <meshBasicMaterial ref={floorRef} color="#ffd27a" transparent opacity={0} toneMapped={false} />
+      <mesh position={[0, GLOW_FLOOR_Y, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[INTERIOR.halfX * 2, INTERIOR.halfZ * 2]} />
+        <meshBasicMaterial
+          ref={floorRef}
+          color="#ffd27a"
+          transparent
+          opacity={0}
+          blending={AdditiveBlending}
+          depthWrite={false}
+          toneMapped={false}
+        />
       </mesh>
       <mesh position={[0, 1.35, 0]}>
         <cylinderGeometry args={[1.5, 1.25, 1.6, 32, 1, true]} />

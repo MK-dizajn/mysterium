@@ -17,6 +17,10 @@ import {
 
 export const WOOD_TEXTURE_SIZE = 512;
 export const IRON_TEXTURE_SIZE = 256;
+/** Krok T3: znak hry, rytina rohov a zamat vnútra. */
+export const EMBLEM_TEXTURE_SIZE = 256;
+export const ENGRAVING_TEXTURE_SIZE = 128;
+export const VELVET_TEXTURE_SIZE = 256;
 const PLANK_COUNT = 5;
 
 /** Pevná náhoda – drevo vyzerá pri každom načítaní rovnako. */
@@ -199,6 +203,181 @@ function drawIron() {
   return canvas;
 }
 
+/**
+ * Znak hry na medailóne (rovnaký ako pečať v scéne 9, iba v mosadzi):
+ * kruh s čiarkami (ticks) ako na ciferníku kompasu, osemcípa kompasová
+ * ružica (compass) a v strede písmeno M s pätkami. Svetlé = vystúpené.
+ */
+function drawEmblem() {
+  const size = EMBLEM_TEXTURE_SIZE;
+  const { canvas, context } = createCanvas(size);
+
+  if (!context) {
+    return canvas;
+  }
+
+  const center = size / 2;
+  const brass = context.createRadialGradient(center * 0.8, center * 0.7, 10, center, center, center);
+  brass.addColorStop(0, "#f1d48a");
+  brass.addColorStop(0.7, "#c9973f");
+  brass.addColorStop(1, "#8a6224");
+  context.fillStyle = brass;
+  context.fillRect(0, 0, size, size);
+
+  // Vonkajší a vnútorný kruh (vyryté).
+  context.strokeStyle = "#5c3d12";
+  context.lineWidth = 5;
+  context.beginPath();
+  context.arc(center, center, 112, 0, Math.PI * 2);
+  context.stroke();
+  context.lineWidth = 3;
+  context.beginPath();
+  context.arc(center, center, 88, 0, Math.PI * 2);
+  context.stroke();
+
+  // ticks: 32 čiarok medzi kruhmi, každá štvrtá dlhšia.
+  for (let tick = 0; tick < 32; tick += 1) {
+    const angle = (tick / 32) * Math.PI * 2;
+    const inner = tick % 4 === 0 ? 90 : 98;
+    context.lineWidth = tick % 4 === 0 ? 3 : 2;
+    context.beginPath();
+    context.moveTo(center + Math.cos(angle) * inner, center + Math.sin(angle) * inner);
+    context.lineTo(center + Math.cos(angle) * 110, center + Math.sin(angle) * 110);
+    context.stroke();
+  }
+
+  // compass: osemcípa ružica (štyri dlhé cípy, štyri kratšie), svetlá = vystúpená.
+  const drawPoints = (length: number, width: number, offset: number, color: string) => {
+    context.fillStyle = color;
+
+    for (let point = 0; point < 4; point += 1) {
+      const angle = offset + (point * Math.PI) / 2;
+      context.beginPath();
+      context.moveTo(center + Math.cos(angle) * length, center + Math.sin(angle) * length);
+      context.lineTo(center + Math.cos(angle + Math.PI / 2) * width, center + Math.sin(angle + Math.PI / 2) * width);
+      context.lineTo(center + Math.cos(angle - Math.PI / 2) * width, center + Math.sin(angle - Math.PI / 2) * width);
+      context.closePath();
+      context.fill();
+    }
+  };
+  drawPoints(66, 14, Math.PI / 4, "#d9ad55");
+  drawPoints(86, 18, -Math.PI / 2, "#f6dc93");
+
+  // Tmavý kruh pod písmenom a písmeno M s pätkami.
+  context.fillStyle = "#6b4714";
+  context.beginPath();
+  context.arc(center, center, 38, 0, Math.PI * 2);
+  context.fill();
+  context.font = 'bold 60px Georgia, "Times New Roman", serif';
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+  context.fillStyle = "#3b2508";
+  context.fillText("M", center + 2, center + 6);
+  context.fillStyle = "#fbe7a8";
+  context.fillText("M", center, center + 4);
+
+  return canvas;
+}
+
+/** Rytina rohového kovania: lem po okraji, vinutý lístok (leaf) a hviezdička (star). */
+function drawEngraving() {
+  const size = ENGRAVING_TEXTURE_SIZE;
+  const { canvas, context } = createCanvas(size);
+
+  if (!context) {
+    return canvas;
+  }
+
+  const brass = context.createLinearGradient(0, 0, size, size);
+  brass.addColorStop(0, "#e2b862");
+  brass.addColorStop(1, "#a9792f");
+  context.fillStyle = brass;
+  context.fillRect(0, 0, size, size);
+  context.strokeStyle = "#5c3d12";
+  context.lineWidth = 3;
+  context.strokeRect(9, 9, size - 18, size - 18);
+  context.lineWidth = 1.5;
+  context.strokeRect(15, 15, size - 30, size - 30);
+
+  // leaf: vinutá línia s lístkami
+  context.lineWidth = 2.5;
+  context.beginPath();
+  context.moveTo(26, 96);
+  context.bezierCurveTo(40, 40, 88, 88, 102, 30);
+  context.stroke();
+  [[44, 62], [70, 70], [90, 48]].forEach(([x, y], index) => {
+    context.beginPath();
+    context.ellipse(x, y, 9, 4, index * 0.9 - 0.6, 0, Math.PI * 2);
+    context.stroke();
+  });
+
+  // star: malá štvorcípa hviezdička v rohu
+  context.fillStyle = "#5c3d12";
+  context.beginPath();
+  context.moveTo(98, 84);
+  context.lineTo(101, 95);
+  context.lineTo(112, 98);
+  context.lineTo(101, 101);
+  context.lineTo(98, 112);
+  context.lineTo(95, 101);
+  context.lineTo(84, 98);
+  context.lineTo(95, 95);
+  context.closePath();
+  context.fill();
+
+  return canvas;
+}
+
+/** Bordový zamat: vlas (pile), mäkké záhyby a zvislé prešívanie (stitch). */
+function drawVelvet() {
+  const size = VELVET_TEXTURE_SIZE;
+  const { canvas, context } = createCanvas(size);
+
+  if (!context) {
+    return canvas;
+  }
+
+  const random = createRandom(1888);
+  context.fillStyle = "#6e1424";
+  context.fillRect(0, 0, size, size);
+
+  // záhyby: mäkké svetlejšie a tmavšie pruhy
+  for (let fold = 0; fold < 8; fold += 1) {
+    const x = (fold + 0.5) * (size / 8);
+    const gradient = context.createLinearGradient(x - 16, 0, x + 16, 0);
+    gradient.addColorStop(0, "rgba(255, 140, 150, 0)");
+    gradient.addColorStop(0.5, "rgba(255, 140, 150, 0.12)");
+    gradient.addColorStop(1, "rgba(30, 0, 6, 0.2)");
+    context.fillStyle = gradient;
+    context.fillRect(x - 16, 0, 32, size);
+  }
+
+  // pile: jemný vlas zamatu
+  for (let fiber = 0; fiber < 2400; fiber += 1) {
+    context.fillStyle = random() < 0.5
+      ? `rgba(255, 170, 180, ${random() * 0.08})`
+      : `rgba(20, 0, 5, ${random() * 0.18})`;
+    context.fillRect(random() * size, random() * size, 1, 1 + random() * 2);
+  }
+
+  // stitch: prešívanie medzi záhybmi (čiarkovaná tmavá čiara)
+  context.strokeStyle = "rgba(30, 2, 8, 0.55)";
+  context.lineWidth = 1.5;
+  context.setLineDash([5, 4]);
+
+  for (let stitch = 1; stitch < 8; stitch += 1) {
+    const x = stitch * (size / 8);
+    context.beginPath();
+    context.moveTo(x, 0);
+    context.lineTo(x, size);
+    context.stroke();
+  }
+
+  context.setLineDash([]);
+
+  return canvas;
+}
+
 function toTexture(canvas: HTMLCanvasElement) {
   const texture = new CanvasTexture(canvas);
   texture.colorSpace = SRGBColorSpace;
@@ -214,6 +393,14 @@ export type ChestTextures = {
   /** Reliéf dreva (tá istá kresba bez farebného priestoru). */
   woodBump: Texture;
   iron: Texture;
+  /** Znak hry na medailóne (farba aj reliéf). */
+  emblem: Texture;
+  /** Rytina rohového kovania. */
+  engraving: Texture;
+  /** Rytina ako opakovaný pás (lišta pod vekom) – zdieľa obrázok rytiny. */
+  engravingStrip: Texture;
+  /** Zamat vnútra (dno, steny, veko). */
+  velvet: Texture;
   /** Kópia dreva s iným opakovaním (zdieľa obrázok, pamäť navyše netreba). */
   woodVariant: (repeatX: number, repeatY: number, offsetY?: number) => Texture;
   dispose: () => void;
@@ -226,12 +413,21 @@ export function createChestTextures(): ChestTextures {
   // Reliéf z tej istej textúry (bez druhej kópie v pamäti).
   const woodBump = wood;
   const iron = toTexture(drawIron());
-  const variants: Texture[] = [];
+  const emblem = toTexture(drawEmblem());
+  const engraving = toTexture(drawEngraving());
+  const engravingStrip = engraving.clone();
+  engravingStrip.repeat.set(14, 1);
+  const velvet = toTexture(drawVelvet());
+  const variants: Texture[] = [engravingStrip];
 
   return {
     wood,
     woodBump,
     iron,
+    emblem,
+    engraving,
+    engravingStrip,
+    velvet,
     woodVariant(repeatX, repeatY, offsetY = 0) {
       const variant = wood.clone();
       variant.repeat.set(repeatX, repeatY);
@@ -241,7 +437,9 @@ export function createChestTextures(): ChestTextures {
       return variant;
     },
     dispose() {
-      [wood, iron, ...variants].forEach((texture) => texture.dispose());
+      [wood, iron, emblem, engraving, velvet, ...variants].forEach((texture) =>
+        texture.dispose()
+      );
     },
   };
 }

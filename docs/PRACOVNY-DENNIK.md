@@ -5474,3 +5474,59 @@ Vývojový server je zastavený.
 **Build:** prešiel (v rámci testovacieho servera). **Typy:** bez chýb. **Lint:** bez zmeny, 14 starých problémov, v upravených súboroch žiadny. **Server:** po testoch spustený pre mobil.
 
 **Ďalší krok:** používateľ vyskúša rub fotografie na mobile. Potom po potvrdení T3 podľa schváleného návrhu.
+
+---
+
+## 20. 11. 2026 – Úprava 4, krok T3: znak hry na veku, rytiny na rohoch, zamatové vnútro
+
+**Spätná väzba k T3a** (mobil): v poriadku.
+
+**Podmienka používateľa:** dutá truhlica nesmie zmeniť otváranie, zámky ani otáčanie.
+
+**Server počas práce:** používateľ nechal server bežať na skúšku T3a. Kód a Node testy som urobil počas skúšania. Hotovú verziu som zostavil a testy v prehliadači spustil až po jeho pokyne, keď server zastavil.
+
+**Čo je nové:**
+- **Znak hry** (textúra 256 × 256 kódom, farba aj reliéf z jednej kresby):
+  - kruh s 32 čiarkami (každá štvrtá dlhšia), osemcípa kompasová ružica (štyri dlhé a štyri kratšie cípy), v strede písmeno M s pätkami,
+  - rovnaký znak ako pečať v scéne 9, iba v mosadzi,
+  - veľký medailón (polomer 0,34) leží na vrchu veka medzi železnými pásmi, sklopený tak, aby M stálo rovno pri pohľade spredu,
+  - malý medailón (0,17) je vpredu na veku namiesto starého „M“ (`MysteriumEmblem` sa vo finále už nepoužíva; ostáva iba v pôvodnom starom modeli),
+  - medailón tvorí bok kotúča, čelo so znakom a prstencový okraj.
+- **Rytiny** (textúra 128 × 128):
+  - 12 mosadzných rohov má vyrytý dvojitý lem, vinutú líniu s lístkami a štvorcípu hviezdičku (rohy ostávajú jedným kreslením na skupinu),
+  - mosadzná lišta pod vekom vpredu má ten istý ornament ako opakovaný pás (zdieľaný obrázok).
+- **Duté telo:**
+  - plný kváder nahradili 4 steny so zvonka presne rovnakým obrysom a plný spodok pod dnom,
+  - horná lišta je teraz 4 kusy po obvode, takže vnútro je otvorené,
+  - zámky, kľúčová dierka, kľúč, veko (os aj uhol), časy otvárania (3,6 s) a otáčanie sa nemenili.
+- **Zamatové vnútro** (textúra 256 × 256: vlas, záhyby, prešívanie):
+  - bordový zamat na dne a na stenách pod lištou,
+  - vytlačené lôžko (zaoblený obdĺžnik, tmavší zamat), z ktorého vystúpi útržok,
+  - vnútorná strana veka má zamat v mosadznom ráme (ako truhlička v scéne 9).
+- **Útržok** začína na dne (výška 0,08 namiesto 0,45) a končí v rovnakej výške ako doteraz (1,75).
+- **Svetlo dna** leží tesne nad zamatom a zamat iba prežiari (sčítanie farieb, slabšie), nezakryje ho. Farbu svetla a efekty otvorenia rieši T4.
+
+**Súbory:**
+- `components/finale/chest3d/ChestModel3D.tsx`, `components/finale/chest3d/chestMaterials.ts`, `components/finale/chest3d/PhotoFragment3D.tsx`,
+- `docs/PRACOVNY-DENNIK.md`.
+
+**Testy:**
+- **Pred zmenou:** nový Node test O6 mal 12 chýb. Kontroly „správanie bez zmeny“ (zámky, veko, časy otvárania) prechádzali už pred zmenou.
+- **Po zmene:**
+  - **O6 (Node):**
+    - znak (textúra, dva medailóny, farba aj reliéf, starý medailón preč, bez znaku mesta),
+    - rytiny (rohy, lišta), zamat a duté telo (steny, dno, lišty, zamat vo veku, lôžko),
+    - útržok začína vnútri a končí v rovnakej výške, svetlo pri zamate,
+    - zámky, veko a časy otvárania bez zmeny.
+    - Výsledok: všetko OK.
+  - **O6 v prehliadači** (oba režimy):
+    - plná aj ľahká verzia zatvorená, naklonená k vrchu veka a otvorená (zamat, svetlo, útržok),
+    - všetko v strope (16 MB, 60 000, 150), bez chýb.
+    - Výsledok: všetko OK.
+  - **O4, O5, B4b, B4c1 až B4c3 (aj pri vypnutých animáciách) a D5:** všetko OK.
+  - **Node:** 33 testov OK.
+  - **Celá séria v prehliadači** (42 behov vrátane O6, hotová verzia): všetko OK. Trvanie 42 minút, server najviac 100 MB, po teste nezostali žiadne procesy.
+
+**Build:** prešiel (v rámci testovacieho servera). **Typy:** bez chýb. **Lint:** bez zmeny, 14 starých problémov, v upravených súboroch žiadny. **Server:** po testoch spustený pre mobil.
+
+**Ďalší krok:** používateľ vyskúša veko zhora, rohy a vnútro na mobile. Potom návrh T4 (efekty otvorenia, teplé zlaté svetlo bez zeleného nádychu, voliteľný železný pás, ktorý sa povolí, s odhadom stropu).
