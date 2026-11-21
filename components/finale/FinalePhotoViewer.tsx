@@ -4,74 +4,270 @@ import {
   type CSSProperties,
   type PointerEvent,
   type ReactNode,
+  useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
 } from "react";
 import type { FinalePhoto } from "../../types/game";
 import { ActionButton } from "../ui/ActionButton";
 import { getPieceViewBox, PHOTO_VIEW, PhotoBackArt, PhotoPieceArt } from "./PhotoPiece";
-import { getBackPlaceBox, PHOTO_PIECE_POINTS } from "./photoPieces";
+import { BACK_SLOTS, getBackPlaceBox, getBackSafeBox, PHOTO_PIECE_POINTS } from "./photoPieces";
 
 /** Riadok s miestom na rube (spozná sa podľa začiatku „Miesto:“). */
 const PLACE_PREFIX = "Miesto:";
 
-/**
- * Pátračova poznámka na rube v súradniciach celej fotografie (písmo
- * v cqw – rovnaká veľkosť voči kartónu aj pri prezretí jedného útržku):
- * prvé riadky hore cez celú šírku (nad švami), „Miesto: …“ po slovách
- * v bezpečnom obdĺžniku rubu útržku z truhlice, podpis dole vpravo.
+/*
+ * ===== Poznámka na rube po kusoch (oprava 1) =====
+ * Žiadna trhlina nesmie pretnúť žiadny text: poznámka sa po celých slovách
+ * rozloží do bezpečných obdĺžnikov jednotlivých kusov (BACK_SLOTS). Text sa
+ * nemení, iba sa inak zalomí; veta pokračuje z kusu na kus. Meria sa
+ * skutočným písmom; jednotky: šírka kartónu = 1000, výška = 750 (písmo
+ * v cqw – rovnaké rozloženie na každom telefóne aj pri prezretí jedného kusu).
  */
-function PhotoBackNote({ lines }: { lines: string[] }) {
-  const placeLine = lines.find((line) => line.startsWith(PLACE_PREFIX));
-  const signature = lines.find((line) => line.startsWith("—"));
-  const topLines = lines.filter((line) => line !== placeLine && line !== signature);
-  const box = getBackPlaceBox();
-  const noteClass = "font-serif italic text-[#3b2a12]";
+const BACK_FONT = 'Georgia, "Times New Roman", serif';
+const CARD_UNITS = { width: 1000, height: 750 };
+/** Veľkosti písma, ktoré sa skúšajú (39 = aspoň 11 px aj na 320 px). */
+const BACK_FONT_SIZES = [42, 41, 40, 39];
+const BACK_LINE_HEIGHT = 1.42;
+/** Rezerva šírky voči meraniu (písmo v prehliadači môže byť o kúsok širšie). */
+const MEASURE_RESERVE = 1.08;
 
-  // Bez riadku „Miesto:“ (iná kapitola) – celá poznámka ako jeden blok.
-  if (!placeLine) {
-    return (
-      <div className={`absolute inset-0 flex flex-col justify-center gap-[2cqw] px-[6cqw] text-[4.2cqw] leading-[6.4cqw] ${noteClass}`}>
-        {lines.map((line) => (
-          <p key={line}>{line}</p>
-        ))}
-      </div>
-    );
+type BackBox = { left: number; right: number; top: number; bottom: number };
+type BackLine = {
+  text: string;
+  piece: number;
+  box: BackBox;
+  /** Horný okraj riadku v jednotkách kartónu. */
+  y: number;
+  align: "left" | "center" | "right";
+  bold: boolean;
+  place: boolean;
+};
+
+type Measure = (text: string, size: number, bold: boolean) => number;
+
+function createMeasure(): Measure | null {
+  if (typeof document === "undefined") {
+    return null;
   }
 
-  const placeWords = [
-    PLACE_PREFIX,
-    ...placeLine.slice(PLACE_PREFIX.length).trim().split(/\s+/),
-  ];
+  const context = document.createElement("canvas").getContext("2d");
+
+  if (!context) {
+    return null;
+  }
+
+  return (text, size, bold) => {
+    context.font = `italic ${bold ? "bold " : ""}${size}px ${BACK_FONT}`;
+
+    return context.measureText(text).width * MEASURE_RESERVE;
+  };
+}
+
+type Flow = {
+  words: string[];
+  slots: { piece: number; box: BackBox }[];
+  align: BackLine["align"];
+  bold?: boolean;
+  /** Každé slovo na vlastnom riadku (miesto). */
+  wordPerLine?: boolean;
+  place?: boolean;
+};
+
+/** Rozloží slová do obdĺžnikov po riadkoch; null, ak sa nezmestia. */
+function flowWords(flow: Flow, size: number, measure: Measure): BackLine[] | null {
+  const lineHeight = size * BACK_LINE_HEIGHT;
+  const lines: BackLine[] = [];
+  let slotIndex = 0;
+  let y = 0;
+  let current = "";
+
+  const slotTop = () => (flow.slots[slotIndex].box.top / 100) * CARD_UNITS.height;
+  const slotBottom = () => (flow.slots[slotIndex].box.bottom / 100) * CARD_UNITS.height;
+  const slotWidth = () => {
+    const { left, right } = flow.slots[slotIndex].box;
+
+    return ((right - left) / 100) * CARD_UNITS.width;
+  };
+
+  y = slotTop();
+
+  const pushLine = () => {
+    // Nový obdĺžnik, ak sa riadok do tohto nezmestí na výšku.
+    while (y + lineHeight > slotBottom()) {
+      slotIndex += 1;
+
+      if (slotIndex >= flow.slots.length) {
+        return false;
+      }
+
+      y = slotTop();
+    }
+
+    const slot = flow.slots[slotIndex];
+    lines.push({
+      text: current,
+      piece: slot.piece,
+      box: slot.box,
+      y,
+      align: flow.align,
+      bold: Boolean(flow.bold),
+      place: Boolean(flow.place),
+    });
+    y += lineHeight;
+    current = "";
+
+    return true;
+  };
+
+  for (const word of flow.words) {
+    const candidate = current ? `${current} ${word}` : word;
+
+    if (!flow.wordPerLine && measure(candidate, size, Boolean(flow.bold)) <= slotWidth()) {
+      current = candidate;
+      continue;
+    }
+
+    if (current && !pushLine()) {
+      return null;
+    }
+
+    current = word;
+
+    // Slovo samo širšie ako obdĺžnik: skúsiť ďalší obdĺžnik, inak sa nezmestí.
+    while (measure(current, size, Boolean(flow.bold)) > slotWidth()) {
+      slotIndex += 1;
+
+      if (slotIndex >= flow.slots.length) {
+        return null;
+      }
+
+      y = slotTop();
+    }
+  }
+
+  if (current && !pushLine()) {
+    return null;
+  }
+
+  return lines;
+}
+
+/** Celé rozloženie poznámky: najväčšie písmo, pri ktorom sa všetko zmestí. */
+function layoutBackNote(lines: string[], measure: Measure) {
+  const slot = (role: (typeof BACK_SLOTS)[number]["role"]) => {
+    const definition = BACK_SLOTS.find((item) => item.role === role)!;
+
+    return {
+      piece: definition.piece,
+      box: getBackSafeBox(definition.piece, definition.top, definition.bottom),
+    };
+  };
+  const words = (line: string | undefined) => (line ? line.split(/\s+/).filter(Boolean) : []);
+  const placeLine = lines.find((line) => line.startsWith(PLACE_PREFIX));
+  const signature = lines.find((line) => line.startsWith("—"));
+  const notes = lines.filter((line) => line !== placeLine && line !== signature);
+  const flows: Flow[] = [];
+
+  if (placeLine && notes.length === 2) {
+    flows.push(
+      { words: words(notes[0]), slots: [slot("first")], align: "left" },
+      { words: words(notes[1]), slots: [slot("secondStart"), slot("secondRest")], align: "left" },
+      { words: words(placeLine), slots: [slot("place")], align: "center", bold: true, wordPerLine: true, place: true }
+    );
+  } else {
+    // Iná poznámka (iná kapitola): všetok text postupne cez všetky kusy.
+    flows.push({
+      words: words(notes.concat(placeLine ?? []).join(" ")),
+      slots: [slot("first"), slot("secondStart"), slot("secondRest"), slot("place")],
+      align: "left",
+    });
+  }
+
+  if (signature) {
+    flows.push({ words: words(signature), slots: [slot("signature")], align: "right" });
+  }
+
+  for (const size of BACK_FONT_SIZES) {
+    const result: BackLine[] = [];
+    let fits = true;
+
+    for (const flow of flows) {
+      const flowed = flowWords(flow, size, measure);
+
+      if (!flowed) {
+        fits = false;
+        break;
+      }
+
+      result.push(...flowed);
+    }
+
+    if (fits || size === BACK_FONT_SIZES[BACK_FONT_SIZES.length - 1]) {
+      return { size, lines: result };
+    }
+  }
+
+  return { size: BACK_FONT_SIZES[BACK_FONT_SIZES.length - 1], lines: [] };
+}
+
+const subscribeNothing = () => () => {};
+
+/**
+ * Pátračova poznámka na rube v súradniciach celej fotografie: každý riadok
+ * leží celý v bezpečnom obdĺžniku jedného kusu (žiadna trhlina ho nepretne).
+ */
+function PhotoBackNote({ lines }: { lines: string[] }) {
+  // Meria sa až v prehliadači (na serveri sa poznámka ešte nekreslí).
+  const isClient = useSyncExternalStore(subscribeNothing, () => true, () => false);
+  const layout = useMemo(() => {
+    const measure = isClient ? createMeasure() : null;
+
+    return measure ? layoutBackNote(lines, measure) : null;
+  }, [isClient, lines]);
+
+  if (!layout) {
+    return null;
+  }
+
+  const fontSize = `${layout.size / 10}cqw`;
+  const lineHeight = `${(layout.size * BACK_LINE_HEIGHT) / 10}cqw`;
+  const placeBox = getBackPlaceBox();
+
+  const renderLine = (line: BackLine, order: number) => (
+    <span
+      key={`${order}-${line.text}`}
+      data-back-line
+      data-back-place-line={line.place ? "" : undefined}
+      data-order={order}
+      data-piece={line.piece + 1}
+      data-safe-box={`${line.box.left},${line.box.right},${line.box.top},${line.box.bottom}`}
+      className={`absolute block whitespace-nowrap italic text-[#3b2a12] ${line.bold ? "font-bold" : ""}`}
+      style={{
+        fontFamily: BACK_FONT,
+        fontSize,
+        lineHeight,
+        left: `${line.box.left}%`,
+        width: `${line.box.right - line.box.left}%`,
+        top: `${(line.y / CARD_UNITS.height) * 100}%`,
+        textAlign: line.align,
+      }}
+    >
+      {line.text}
+    </span>
+  );
 
   return (
     <>
-      <div className={`absolute inset-x-[6%] top-[6%] space-y-[1.5cqw] text-[4.1cqw] leading-[6cqw] ${noteClass}`}>
-        {topLines.map((line) => (
-          <p key={line}>{line}</p>
-        ))}
-      </div>
-      <p
+      {layout.lines.map((line, order) => (line.place ? null : renderLine(line, order)))}
+      <div
         data-back-place
-        data-safe-box={`${box.left},${box.right},${box.top},${box.bottom}`}
-        className={`absolute text-center text-[4.6cqw] font-bold leading-[6.4cqw] ${noteClass}`}
-        style={{
-          left: `${box.left}%`,
-          width: `${box.right - box.left}%`,
-          top: `${box.top}%`,
-        }}
+        data-safe-box={`${placeBox.left},${placeBox.right},${placeBox.top},${placeBox.bottom}`}
+        className="absolute inset-0"
       >
-        {placeWords.map((word, index) => (
-          <span key={`${word}-${index}`} data-back-place-line className="block">
-            {word}
-          </span>
-        ))}
-      </p>
-      {signature && (
-        <p className={`absolute bottom-[7%] right-[7%] text-[4.1cqw] ${noteClass}`}>
-          {signature}
-        </p>
-      )}
+        {layout.lines.map((line, order) => (line.place ? renderLine(line, order) : null))}
+      </div>
     </>
   );
 }
@@ -441,12 +637,12 @@ export function FinalePhotoViewer({
             />
             {croppedBack ? (
               <div data-back-clip className="absolute inset-0" style={{ clipPath: croppedBack.clipPath }}>
-                <div className="absolute [container-type:inline-size]" style={croppedBack.inner}>
+                <div data-back-card className="absolute [container-type:inline-size]" style={croppedBack.inner}>
                   {backNote}
                 </div>
               </div>
             ) : (
-              <div className="absolute inset-0 [container-type:inline-size]">{backNote}</div>
+              <div data-back-card className="absolute inset-0 [container-type:inline-size]">{backNote}</div>
             )}
           </div>
         </div>

@@ -102,18 +102,35 @@ const BACK_PLACE_BOTTOM = 80;
 /** Odstup textu od trhliny (percentá šírky). */
 const BACK_PLACE_MARGIN = 1.5;
 
+/** Odstup textu od okraja kartónu (percentá). */
+const BACK_EDGE_MARGIN = 4;
+
 /**
- * Obdĺžnik na rube (v percentách), ktorý celý leží vnútri rubu útržku
- * z truhlice – riadok „Miesto: …“ tam nepretne žiadny šev.
+ * Miesta pre poznámku na rube – každý kus nesie svoj kúsok (oprava 1):
+ * ľavý stĺpec (rub pravého krídla) prvá veta, horný stred (rub strechy)
+ * začiatok druhej vety, pravý stĺpec (rub ľavého krídla) jej pokračovanie
+ * a dole podpis, stredný dolný kus (rub útržku z truhlice) miesto.
  */
-export function getBackPlaceBox() {
-  const polygon = getMirroredPiecePoints(BACK_PLACE_PIECE);
+export const BACK_SLOTS = [
+  { role: "first", piece: 2, top: 6, bottom: 62 },
+  { role: "secondStart", piece: 1, top: 5, bottom: 27 },
+  { role: "secondRest", piece: 0, top: 6, bottom: 76 },
+  { role: "place", piece: BACK_PLACE_PIECE, top: BACK_PLACE_TOP, bottom: BACK_PLACE_BOTTOM },
+  { role: "signature", piece: 0, top: 82, bottom: 95 },
+] as const;
+
+/**
+ * Obdĺžnik na rube (v percentách), ktorý celý leží vnútri rubu daného
+ * kusu medzi výškami top a bottom – text v ňom nepretne žiadna trhlina.
+ */
+export function getBackSafeBox(piece: number, top: number, bottom: number) {
+  const polygon = getMirroredPiecePoints(piece);
   const xs = polygon.map(([x]) => x);
   const centerX = (Math.min(...xs) + Math.max(...xs)) / 2;
   let left = -Infinity;
   let right = Infinity;
 
-  for (let y = BACK_PLACE_TOP; y <= BACK_PLACE_BOTTOM; y += 0.5) {
+  for (let y = top; y <= bottom; y += 0.5) {
     // Kde vodorovná čiara v tejto výške pretína obrys útržku.
     const crossings: number[] = [];
 
@@ -131,12 +148,23 @@ export function getBackPlaceBox() {
     right = Math.min(right, rightEdge - BACK_PLACE_MARGIN);
   }
 
+  left = Math.max(left, BACK_EDGE_MARGIN);
+  right = Math.min(right, 100 - BACK_EDGE_MARGIN);
+
   return {
-    left: Math.round(left * 10) / 10,
-    right: Math.round(right * 10) / 10,
-    top: BACK_PLACE_TOP,
-    bottom: BACK_PLACE_BOTTOM,
+    left: Math.ceil(left * 10) / 10,
+    right: Math.floor(right * 10) / 10,
+    top,
+    bottom,
   };
+}
+
+/**
+ * Obdĺžnik na rube, ktorý celý leží vnútri rubu útržku z truhlice –
+ * riadok „Miesto: …“ tam nepretne žiadny šev.
+ */
+export function getBackPlaceBox() {
+  return getBackSafeBox(BACK_PLACE_PIECE, BACK_PLACE_TOP, BACK_PLACE_BOTTOM);
 }
 
 export type PieceBox = { left: number; top: number; width: number; height: number };

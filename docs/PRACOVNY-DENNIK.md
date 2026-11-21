@@ -5635,3 +5635,53 @@ Vývojový server je zastavený.
 **Build:** prešiel (v rámci testovacieho servera). **Typy:** bez chýb. **Lint:** bez zmeny, 14 starých problémov, v upravených súboroch žiadny. **Server:** zastavený, pre mobil sa podľa pokynu nespúšťa.
 
 **Ďalší krok:** používateľ vyskúša T4 na mobile, keď sa vráti. T5 až po jeho pokyne.
+
+---
+
+## 21. 11. 2026 – Oprava 1: rub fotografie – žiadna trhlina nepretína text
+
+**Spätná väzba k T4** (mobil, aj menší telefón s kódom aktu III): „je super“. Server som zastavil.
+
+**Zadanie:**
+- okrem riadku s miestom prechádzal aj ostatný text rubu cez trhliny,
+- nové pravidlo: žiadny šev nesmie pretínať žiadny text, každý riadok a slovo je celé v jednom kuse,
+- text sa nemení (slovo po slove, rovnaké poradie), iba sa inak zalomí, a veta musí dávať zmysel z kusu na kus,
+- písmo aspoň 11 px,
+- test musí kontrolovať všetky riadky a slová na 320 aj 360 px aj v Inventári.
+
+**Čo je nové:**
+- **Miesta pre text na každom kuse** (`BACK_SLOTS` a `getBackSafeBox` v `photoPieces.ts`):
+  - bezpečný obdĺžnik sa počíta z roztrhnutého tvaru kusu (v každej výške, kde trhliny pretínajú rub kusu, plus odstup 1,5 %) a 4 % od okraja kartónu,
+  - ľavý stĺpec (rub pravého krídla) nesie prvú vetu,
+  - horný stred (rub strechy) začiatok druhej vety,
+  - pravý stĺpec (rub ľavého krídla) jej pokračovanie a dole podpis,
+  - stredný dolný kus (rub útržku z truhlice) miesto.
+- **Rozloženie poznámky** (`PhotoBackNote` vo `FinalePhotoViewer.tsx`):
+  - slová sa rozložia po celých slovách podľa skutočnej šírky písma (meranie v prehliadači s rezervou 8 %),
+  - ak sa nezmestia, písmo sa zmenší (4,2 až 3,9 % šírky fotografie, teda aspoň 11 px aj na 320 px),
+  - veta pokračuje z kusu na kus: „Prešporok ukrýval viac než jeden kľúč.“ vľavo, „Tam, kde sa za oponou“ hore v strede, „skrýva pamäť mesta, nájdeš ďalšiu stopu.“ vpravo, miesto v strede dole, „— pátrač“ vpravo dole,
+  - rozloženie je rovnaké na každom telefóne (písmo aj kusy sa menia s veľkosťou fotografie),
+  - poznámka sa kreslí až v prehliadači (meranie písma).
+- **Inventár:** pri prezretí jedného kusu sú viditeľné iba jeho celé riadky. Žiadne odrezané písmená na okraji.
+
+**Súbory:**
+- `components/finale/photoPieces.ts`, `components/finale/FinalePhotoViewer.tsx`,
+- `docs/PRACOVNY-DENNIK.md`.
+
+**Testy:**
+- **Pred zmenou** (rozšírené O3):
+  - Node: 1 chyba (chýbali miesta pre text),
+  - v prehliadači v oboch režimoch 9 chýb.
+- **Po zmene:**
+  - **O3 (Node):** každý z 5 obdĺžnikov celý vnútri svojho kusu (kontrola bod po bode) na všetkých 4 kusoch. Všetko OK.
+  - **O3 v prehliadači** (oba režimy):
+    - pre každý riadok **každé slovo** (zmerané na obrazovke) celé v obdĺžniku svojho kusu a písmo aspoň 11 px, na 320 aj 360 px,
+    - text na rube **presne rovnaký**, slovo po slove v rovnakom poradí,
+    - v Inventári rub **každého zo 4 kusov**.
+    - Výsledok: všetko OK.
+  - **Node:** 34 testov OK.
+  - **Celá séria v prehliadači** (44 behov, hotová verzia): všetko OK. Trvanie 44 minút, server najviac 102 MB.
+
+**Build:** prešiel (v rámci testovacieho servera). **Typy:** bez chýb. **Lint:** bez zmeny, 14 starých problémov, v upravených súboroch žiadny. **Server:** zastavený, nespúšťa sa bez pokynu.
+
+**Ďalší krok:** návrh opravy 2 (súpis miest a GPS). Používateľ tiež chce zoznam textov bez nahratého hlasu.
