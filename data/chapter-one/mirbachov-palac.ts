@@ -39,8 +39,9 @@ export const mirbachovPalacScene: Scene = {
       "rodový znak",
     ],
     hints: [
-      "Pozri sa úplne hore do stredu priečelia.",
-      "Takýto znak býva tvorený štítom a označuje šľachtický rod.",
+      // Medailóny overil Miloš podľa fotky (21. 11. 2026).
+      "Je to veľký kamenný ornament s dvoma farebnými medailónmi. Patrí grófom Nyáryovcom, nie Mirbachovi, podľa ktorého sa palác volá.",
+      "Svoj vlastný mal každý šľachtický rod. Odpoveď má tri písmená.",
       "Správna odpoveď je erb.",
     ],
   },

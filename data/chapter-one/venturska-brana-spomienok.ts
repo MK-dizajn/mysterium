@@ -39,8 +39,9 @@ export const venturskaBranaSpomienokScene: Scene = {
       "matej",
     ],
     hints: [
-      "Hľadaj na Ventúrskej ulici budovu Academie Istropolitany s pamätnou tabuľou.",
-      "Odpoveď je napísaná na tmavej pamätnej tabuli upevnenej na fasáde.",
+      // Bez roku založenia: rok bude riešením kryptexu (pravidlo v docs/NAVRH-MINIHIER.md).
+      "Škola vznikla ako prvá univerzita na území dnešného Slovenska. Na tmavej tabuli hľadaj meno uhorského kráľa.",
+      "Odpoveď má dve slová: krstné meno a priezvisko. Priezvisko sa začína písmenom K a má šesť písmen.",
       "Správna odpoveď je Matej Korvín.",
     ],
   },

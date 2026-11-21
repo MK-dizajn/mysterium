@@ -41,6 +41,45 @@ Platí pre každú úlohu a každú mini hru v kapitole I aj v budúcich scénac
   - rámec mini hier a okno „Prezrieť“ vždy ponúknu „Preskočiť (−10 bodov)“.
 - **Nový typ mini hry** (napríklad posuvné puzzle) test zastaví, kým sa do neho nedoplní pravidlo pre posledné nápovedy tohto typu. Bez toho sa hra nedá dokončiť.
 
+### Pravidlo: nápovedy k úlohám (záväzné aj pre kapitoly II a III)
+
+Rozhodnutie z 21. 11. 2026.
+
+- Každá úloha má **presne 3 nápovedy**:
+  1. **smer**: kam sa pozerať, čo hľadať,
+  2. **zúženie**: takmer vedie k odpovedi (forma, počet písmen, súvislosť), ale odpoveď nepovie,
+  3. **odpoveď**: „Správna odpoveď je …“, tlačidlo pred ňou sa volá „Ukázať odpoveď“.
+- **Ceny:**
+  - nápoveda 1 stojí 5 bodov, nápoveda 2 stojí 5 bodov, „Ukázať odpoveď“ 10 bodov,
+  - úloha dá 100 bodov bez nápovied a najmenej 80,
+  - cena je napísaná na tlačidle, napríklad „Prečítať ďalšiu poznámku (−5 bodov)“.
+- **Bez opakovania:** žiadna nápoveda neopakuje zadanie, riadok nad odpoveďou ani Radu pátrača (test hľadá štyri slová za sebou). Každá nápoveda prináša novú informáciu.
+- **Odpoveď:** nápovedy 1 a 2 neobsahujú žiadnu z odpovedí, ktoré hra prijme (pozor aj na krátke prijaté odpovede, napríklad „znak“ alebo „mier“).
+- **Fakty:** iba overené, z textov hry alebo z terénu. Neistý fakt treba označiť a overiť.
+- **Hlasy:** texty s nahratým hlasom sa kvôli nápovedám nemenia.
+- **Mini hry a okno „Prezrieť“** majú vlastné tri stupne nápovied a „Preskočiť (−10 bodov)“, toto pravidlo sa ich netýka.
+- **Strážny test** (Node test O11) to kontroluje pri každej úlohe.
+
+### Pravidlo: údaj z mini hry iba na mieste
+
+Rozhodnutie z 21. 11. 2026.
+
+- Údaj, ktorý hráč zadáva do mini hry (rok, dátum, počet, poradie, posun…), **nesmie byť napísaný v texte hry**: v zadaní, nápovedách úlohy, príbehu miesta, artefakte, opise predmetu ani v úvode mini hry.
+- Je iba na reálnom mieste (tabuľa, fasáda) a v **3. nápovede mini hry**, ktorá prezradí riešenie, aby sa hráč nezasekol.
+- Pred začatím každej mini hry treba prejsť texty jej scény a údaj z nich odstrániť (texty s hlasom sa nemenia; ak by údaj bol v nahratom texte, treba to riešiť s autorom).
+- **Scéna 9 (hotová):**
+  - deň a mesiac (26. XII.) boli zo zadania, otázky, nápovedy, príbehu miesta a artefaktu odstránené,
+  - zadanie je teraz „Aký mier bol podpísaný v Primaciálnom paláci po bitke pri Slavkove?“,
+  - **rok 1805 v príbehu a artefakte zatiaľ ostáva** (rozhodnutie autora: z príbehu vynechať deň a mesiac).
+
+### Riziká pre plánované mini hry (vyriešiť pred ich začatím)
+
+| Scéna | Mini hra a údaj | Kde je údaj dnes v texte hry | Návrh |
+|---|---|---|---|
+| 3 Lekáreň | **šifra**, posun = počet slov latinského nápisu | Celý latinský nápis je v príbehu miesta („Quidquid agis, prudenter agas et respice finem, 1658“) a od 21. 11. 2026 aj v nápovede 1 úlohy. Hráč spočíta slová z obrazovky. Slovenský preklad je aj v nahratom Hlase pátrača (#22), ten sa nemení, ale má iný počet slov. | Pred M4 skrátiť nápis v nápovede 1 a v príbehu iba na začiatok („Quidquid agis…“), alebo zvoliť iný kľúč šifry, ktorý je iba na fasáde. |
+| 4 Academia | **kryptex**, rok založenia 1465 | Príbeh miesta („bola založená v roku 1465“) a krátky text artefaktu („bola založená v roku 1465“). Z nápovede 1 bol rok odstránený 21. 11. 2026. Nahraté texty scény rok nemajú. | Pred M3 vynechať rok z príbehu a artefaktu (napríklad „v 15. storočí“). |
+| 5 Mirbachov palác | **hľadanie rozdielov** rytina a priečelie | Zadanie opisuje „výzdobu zakončenú korunou“, príbeh „erb pod grófskou korunou“, nápoveda 1 „ornament s dvoma farebnými medailónmi“. | Rozdiely voliť mimo erbu, koruny a medailónov (okná, nadokenice s mušľou, zábradlie balkóna, pilastre, mreže, portály). Inak text prezradí, kde rozdiel hľadať. |
+
 ## Typy mini hier
 
 | Typ | Ako sa hrá | Väzba na miesto | Nápovedy (3 stupne) | Kde v kapitole I |
@@ -122,7 +161,7 @@ minigame: {
 
 ### Skóre
 
-- Úlohy ostávajú 100 / −20. Najviac ostáva 1010 (kto nepreskočí ani jednu mini hru).
+- Úloha dá 100 bodov, nápovedy stoja 5, 5 a 10 bodov (od 21. 11. 2026, predtým −20 za každú). Najviac ostáva 1010 (kto nepreskočí ani jednu mini hru a nečíta nápovedy).
 - „Preskočiť“ −10 (návrh). Nápovedy v mini hre bez pokuty, aby sa hráč nebál skúšať.
 
 ## Obmedzenia a riziká

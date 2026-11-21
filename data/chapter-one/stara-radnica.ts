@@ -39,8 +39,8 @@ export const staraRadnicaScene: Scene = {
       "kanónová guľa",
     ],
     hints: [
-      "Pozeraj sa na vežu zo strany Hlavného námestia a sústreď sa na priestor pri gotickom okne.",
-      "Ide o muníciu vystrelenú z dela.",
+      "Predmet sa do múru dostal po roku 1809, keď mesto ostreľovalo napoleonské vojsko.",
+      "Je to okrúhly kus munície, ktorý vystrelilo delo. Odpoveď má dve slová.",
       "Správna odpoveď je delová guľa.",
     ],
   },

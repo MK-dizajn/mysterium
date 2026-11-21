@@ -2,7 +2,11 @@
 
 import { useId, useState } from "react";
 import type { ChapterGuidance, Scene } from "../../types/game";
-import { getSceneMapsUrl, isPuzzleAnswerCorrect } from "../../engine";
+import {
+  getHintCost,
+  getSceneMapsUrl,
+  isPuzzleAnswerCorrect,
+} from "../../engine";
 import { ActionButton } from "../ui/ActionButton";
 import { RouteHint } from "../ui/RouteHint";
 import { TextInput } from "../ui/TextInput";
@@ -155,16 +159,24 @@ export function PuzzleScreen({
                 variant="secondary"
                 className="w-full py-3 text-xs"
               >
-                {!hasMoreHints
-                  ? "Všetky poznámky prečítané"
-                  : isNextHintAnswer
-                    ? "Ukázať odpoveď"
-                    : "Prečítať ďalšiu poznámku"}
+                {!hasMoreHints ? (
+                  "Všetky poznámky prečítané"
+                ) : (
+                  <>
+                    {isNextHintAnswer
+                      ? "Ukázať odpoveď"
+                      : "Prečítať ďalšiu poznámku"}{" "}
+                    {/* Cena ostane pokope, neláme sa na dva riadky. */}
+                    <span className="whitespace-nowrap">
+                      (−{getHintCost(hintsUsed)} bodov)
+                    </span>
+                  </>
+                )}
               </ActionButton>
 
               {visibleHints.length === 0 && (
                 <p className="mt-3 text-center text-sm leading-relaxed text-slate-400">
-                  Každá prečítaná poznámka zníži výsledné skóre.
+                  Poznámka stojí {getHintCost(0)} bodov, odpoveď {getHintCost(2)} bodov.
                 </p>
               )}
             </div>

@@ -38,8 +38,9 @@ export const primacialnyPalacScene: Scene = {
       "c+i",
     ],
     hints: [
-      "Hľadaj v strednej časti fasády dve detské postavy.",
-      "Prvé písmeno je C a druhé I.",
+      "Písmená sú skratkou latinského hesla arcibiskupa Jozefa Batthyányho, ktorý dal palác postaviť. Každá postava drží jedno písmeno.",
+      "Heslo znie „Clementia et Iustitia“, teda láskavosť a spravodlivosť. Hľadáš prvé písmená týchto dvoch latinských slov.",
+      "Správna odpoveď je C a I.",
     ],
   },
 

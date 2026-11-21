@@ -41,7 +41,7 @@ export const zlatyPresporskyKlucScene: Scene = {
     ],
     hints: [
       "Nejde o konkrétny predmet ani osobu. Ide o to, čo zostáva po udalostiach a ľuďoch.",
-      "Pátrač od začiatku tvrdil, že mesto si pamätá všetko.",
+      "Pátrač od začiatku tvrdil, že mesto si pamätá všetko. Druhé slovo odpovede je „mesta“.",
       "Správna odpoveď je Pamäť mesta.",
     ],
   },

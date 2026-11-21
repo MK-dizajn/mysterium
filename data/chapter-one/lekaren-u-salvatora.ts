@@ -36,8 +36,8 @@ export const lekarenUSalvatoraScene: Scene = {
       "tisíc šesťsto päťdesiatosem",
     ],
     hints: [
-      "Hľadaj historický nápis, nie aktuálnu tabuľu s názvom lekárne.",
-      "Číslo sa nachádza na konci latinského odkazu.",
+      "Hľadaj vetu „Quidquid agis, prudenter agas et respice finem“. Po slovensky znamená: Čokoľvek robíš, rob rozvážne a mysli na koniec.",
+      "Nápis má dve časti: latinskú vetu a číslo. Hľadaj štvorciferné číslo, ktoré je súčasťou nápisu, rok zo 17. storočia.",
       "Správna odpoveď je 1658.",
     ],
   },

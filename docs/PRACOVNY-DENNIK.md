@@ -5880,3 +5880,88 @@ e5:reduced   : TEST: všetko OK
 **Ďalší krok:**
 - používateľ vyskúša odkazy na mobile, keď o server požiada,
 - T5 až po jeho pokyne.
+
+---
+
+## 21. 11. 2026 – Spustenie hry pre mobil: chyba a oprava postupu
+
+- **Chyba:**
+  - spustil som vývojový server (`npm run dev`), používateľ na mobile ťukol na kapitolu a nič sa nestalo,
+  - príčina: Next.js 16 vo vývojovom režime blokuje prístup z adresy 192.168.0.120 k svojim súborom (`allowedDevOrigins`), stránka sa zobrazí, ale tlačidlá neožijú.
+- **Oprava:**
+  - server zastavený, spustená hotová verzia hry (`npm run test:server`), ktorá toto obmedzenie nemá,
+  - v hre ani v nastaveniach sa nič nemenilo.
+- **Postup odteraz:** hra pre mobil sa spúšťa cez `npm run test:server`.
+
+---
+
+## 21. 11. 2026 – Nápovedy k úlohám: 3 stupne, ceny 5, 5 a 10 bodov, bez dátumu z mini hry v texte
+
+**Zadanie (schválené s úpravami):**
+- každá úloha má presne 3 nápovedy: smer, zúženie, „Správna odpoveď je …“ (tlačidlo „Ukázať odpoveď“),
+- ceny 5, 5 a 10 bodov,
+- nápovedy nesmú opakovať zadanie ani Radu pátrača,
+- texty s hlasom sa nemenia,
+- údaj z mini hry nesmie byť v texte hry.
+
+**Zistenia:**
+- **Rada pátrača** (`detectiveHint`) je v dátach, ale hra ju nikde nezobrazuje, nie je platená ani zadarmo. Nemenila sa.
+- **Hlas** majú iba úvod rozprávača a Hlas pátrača pri každej úlohe. Nápovedy, zadania ani Rada pátrača hlas nemajú.
+- **Dátum mini hry scény 9** (26. XII.) bol v zadaní, záložnej otázke, nápovede 1, príbehu miesta a krátkom texte artefaktu.
+
+**Čo je nové:**
+- **Nové nápovedy vo všetkých 10 úlohách** podľa schváleného návrhu:
+  - scény 8 a 9 majú tretiu nápovedu,
+  - úpravy používateľa: scéna 3 bez „za čiarkou“, scéna 4 bez roku 1465 (bude riešením kryptexu), scéna 5 erb s dvoma medailónmi (overené fotkou),
+  - pri scéne 5 nápoveda 2 bez slova „znak“, lebo ho hra prijíma ako odpoveď.
+- **Scéna 9:**
+  - zadanie aj záložná otázka „Aký mier bol podpísaný v Primaciálnom paláci po bitke pri Slavkove?“,
+  - nápoveda 1 s menami Talleyranda a Lichtensteina,
+  - príbeh miesta (text č. 60, bez hlasu) a krátky text artefaktu: „v roku 1805“ namiesto dňa a mesiaca,
+  - hláška pri „Slavkovský mier“ aj 3. nápoveda mini hry („Nastav 26 · XII · 1805.“, aby sa hráč nezasekol) ostávajú.
+- **Ceny:**
+  - `HINT_COSTS` [5, 5, 10] a `getHintCost` v engine, úloha dá 100, 95, 90 alebo 80 bodov,
+  - maximum kapitoly ostáva 1010,
+  - zrušené `HINT_PENALTY` (20) a `MINIMUM_PUZZLE_SCORE`.
+- **Obrazovka úlohy:**
+  - tlačidlá „Prečítať ďalšiu poznámku (−5 bodov)“ a „Ukázať odpoveď (−10 bodov)“, cena sa neláme na dva riadky,
+  - pod tlačidlom „Poznámka stojí 5 bodov, odpoveď 10 bodov.“
+- **`docs/NAVRH-MINIHIER.md`:**
+  - pravidlo pre nápovedy k úlohám (aj pre kapitoly II a III),
+  - pravidlo „údaj z mini hry iba na mieste“,
+  - tabuľka rizík pre šifru (scéna 3), kryptex (scéna 4) a rozdiely (scéna 5),
+  - skóre 5, 5, 10.
+- **`docs/SUPIS-HLASOV.md`:** text č. 60 bez dňa a mesiaca (481 znakov).
+
+**Súbory:**
+- `data/chapter-one/` (10 scén),
+- `engine/constants.ts`, `engine/gameScoring.ts`, `components/screens/PuzzleScreen.tsx`,
+- `docs/NAVRH-MINIHIER.md`, `docs/SUPIS-HLASOV.md`, `docs/PRACOVNY-DENNIK.md`.
+
+**Testy:**
+- **Pred zmenou:** nový test O11 (Node) 24 chýb.
+- **Po zmene:**
+  - **O11 (Node)** všetko OK:
+    - 3 nápovedy v každej úlohe,
+    - nápovedy 1 a 2 bez žiadnej prijatej odpovede, nápoveda 3 „Správna odpoveď je …“,
+    - žiadne 4 slová za sebou zo zadania, riadku nad odpoveďou, záložnej otázky ani Rady pátrača,
+    - ceny 5, 5, 10, skóre 100, 95, 90, 80 a maximum 1010,
+    - scéna 9 bez dňa a mesiaca v žiadnom texte hry,
+    - texty s hlasom bez zmeny (odtlačok),
+    - pravidlá v NAVRH-MINIHIER.
+  - **Staré testy upravené na schválenú zmenu:**
+    - L1 (Node a prehliadač): nové zadanie a nápovedy scény 9,
+    - O1 (Node a prehliadač): 3 nápovedy všade, ceny, tlačidlá s cenou a 80 bodov po 3 nápovedách.
+  - **Node:** 38 testov OK.
+  - **V prehliadači iba dotknutá časť:** L1 a O1 v oboch režimoch, všetko OK. Na obrazovke úlohy nie je deň ani mesiac.
+  - **Chyba nájdená na snímke:** cena na tlačidle sa na 360 px lámala („(−10“ a „BODOV)“ na dvoch riadkoch). Opravené, cena ostáva pokope. Testy znova OK.
+
+**Build:** prešiel. **Typy:** bez chýb. **Lint:** v upravených súboroch žiadny problém (14 starých v iných súboroch). **Server:** zastavený.
+
+**Krokov od poslednej celej série:** 1 z 3.
+
+**Na rozhodnutie pred mini hrami (tabuľka rizík v NAVRH-MINIHIER):**
+- scéna 3: celý latinský nápis je v príbehu a od dnes aj v nápovede 1 (šifra počíta jeho slová),
+- scéna 4: rok 1465 je v príbehu a artefakte,
+- scéna 5: rozdiely voliť mimo erbu, koruny a medailónov,
+- scéna 9: rok 1805 v príbehu a artefakte ostáva podľa rozhodnutia.

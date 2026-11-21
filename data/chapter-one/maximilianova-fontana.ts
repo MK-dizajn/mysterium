@@ -38,8 +38,8 @@ export const maximilianovaFontanaScene: Scene = {
       "plátové brnenie",
     ],
     hints: [
-      "Pozri sa na celé telo postavy, nie iba na jej tvár.",
-      "Takúto kovovú ochranu nosievali rytieri v boji.",
+      "Postava je rytier. Jedna tradícia v ňom vidí kráľa Maximiliána II., iná legendárneho Rolanda. Všimni si, čo mu kryje telo.",
+      "Je to kovový odev, ktorý chránil rytierov pred údermi. Odpoveď má jedno slovo a začína sa písmenom B.",
       "Správna odpoveď je brnenie.",
     ],
   },

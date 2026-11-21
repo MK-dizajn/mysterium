@@ -119,8 +119,8 @@ Pátračovo pravidlo znie: „Prvá stopa patrí mestu, ku ktorému vedie najkra
     answerLabel: "Zapíš názov mesta, ku ktorému vedie najkratšia cesta.",
     acceptedAnswers: ["vieden", "viedeň", "vienna", "wien"],
     hints: [
-      "Nepozeraj iba na názvy miest. Porovnaj čísla, ktoré označujú ich vzdialenosť.",
-      "Hľadané mesto je hlavným mestom susedného Rakúska.",
+      "Mestá sú na kruhu rozmiestnené podľa smeru, ktorým ležia. Pri každom je číslo – nezaujíma ťa najväčšie, ale najmenšie.",
+      "Je to hlavné mesto susedného Rakúska. Jeho slovenský názov má šesť písmen.",
       "Správna odpoveď je Viedeň.",
     ],
   },

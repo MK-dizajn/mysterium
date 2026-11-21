@@ -30,8 +30,8 @@ Nájdi fasádu, ktorá je nápadne užšia než všetky ostatné. Keď dom objav
     answerLabel: "Zapíš orientačné číslo najužšieho domu.",
     acceptedAnswers: ["15", "cislo 15", "číslo 15", "dom 15"],
     hints: [
-      "Od brány sa nevzďaľuj. Hľadaný dom stojí v jej bezprostrednej blízkosti.",
-      "Pri pohľade na bránu z Michalskej ulice hľadaj mimoriadne úzky dom na pravej strane.",
+      "Pozri sa na bránu z Michalskej ulice. Dom stojí na pravej strane, vtesnaný medzi vežu a susednú stavbu.",
+      "Celý dom je široký iba asi 1,30 metra. Hľadané číslo je dvojciferné a menšie ako 20.",
       "Správna odpoveď je 15.",
     ],
   },

@@ -19,8 +19,9 @@ export const bratislavskyMierScene: Scene = {
   // Overené v teréne (11/2026): na stene paláca je priamo napísaný Bratislavský mier,
   // Zrkadlová sieň sa na tabuliach nespomína – úloha sa pýta, čo sa tu podpísalo, nie kde.
   investigation: {
+    // Deň a mesiac sú riešením mini hry (pečať s dátumom), preto sú iba na tabuli, nie v texte hry.
     objective:
-      "Na vonkajšej stene Primaciálneho paláca nájdeš pripomienku udalosti z 26. decembra 1805. Pátrač sa nepýta, kde sa to stalo, ale čo sa tu uzavrelo.",
+      "Aký mier bol podpísaný v Primaciálnom paláci po bitke pri Slavkove?",
     detectiveHint:
       "Mier nesie meno mesta. Prečítaj si, čo je napísané na stene paláca.",
     observationType: "inscription",
@@ -30,7 +31,7 @@ export const bratislavskyMierScene: Scene = {
     id: "puzzle-bratislavsky-mier",
     answerLabel: "Zapíš, aký mier sa v tomto paláci podpísal.",
     question:
-      "Aký mier bol 26. decembra 1805 podpísaný v Primaciálnom paláci?",
+      "Aký mier bol podpísaný v Primaciálnom paláci po bitke pri Slavkove?",
     acceptedAnswers: [
       "Bratislavský mier",
       "bratislavsky mier",
@@ -41,10 +42,12 @@ export const bratislavskyMierScene: Scene = {
       "Treaty of Pressburg",
       "Pressburger Frieden",
     ],
-    // Pamätná tabuľa na paláci (overené fotkou 11/2026) uvádza dátum „26. XII. 1805“.
+    // Pamätná tabuľa na paláci (overené fotkou 11/2026) uvádza dátum mieru;
+    // dátum sa v nápovedách nespomína, je riešením mini hry.
     hints: [
-      "Nájdi na vonkajšej stene paláca pamätnú tabuľu. Hľadaj dátum 26. XII. 1805.",
-      "Prečítaj si, aký mier tabuľa spomína. Odpoveď: Bratislavský mier.",
+      "Nájdi na vonkajšej stene paláca pamätnú tabuľu. Spomína Talleyranda a Lichtensteina, ktorí listinu podpísali.",
+      "Odpoveď má dve slová. Prvé je prídavné meno odvodené od názvu tohto mesta.",
+      "Správna odpoveď je Bratislavský mier.",
     ],
     nearMisses: [
       {
@@ -61,7 +64,7 @@ export const bratislavskyMierScene: Scene = {
     shortText:
       "V Zrkadlovej sieni Primaciálneho paláca bol podpísaný jeden z najvýznamnejších mierových dokumentov napoleonských vojen.",
     fullText:
-      "Bratislavský mier bol podpísaný 26. decembra 1805 v Zrkadlovej sieni Primaciálneho paláca. Nasledoval po Napoleonovom víťazstve nad rakúskymi a ruskými vojskami v bitke pri Slavkove. Dokument podpísali zástupcovia francúzskeho cisára Napoleona a rakúskeho cisára Františka I. Pamätná tabuľa na paláci uvádza, že mierovú listinu podpísali za francúzskeho cisára Talleyrand a za rakúskeho cisára Lichtenstein. Mier výrazne zmenil politické usporiadanie Európy a oslabil postavenie Rakúska.",
+      "Bratislavský mier bol podpísaný v roku 1805 v Zrkadlovej sieni Primaciálneho paláca. Nasledoval po Napoleonovom víťazstve nad rakúskymi a ruskými vojskami v bitke pri Slavkove. Dokument podpísali zástupcovia francúzskeho cisára Napoleona a rakúskeho cisára Františka I. Pamätná tabuľa na paláci uvádza, že mierovú listinu podpísali za francúzskeho cisára Talleyrand a za rakúskeho cisára Lichtenstein. Mier výrazne zmenil politické usporiadanie Európy a oslabil postavenie Rakúska.",
   },
 
   artifact: {
@@ -69,7 +72,7 @@ export const bratislavskyMierScene: Scene = {
     title: "Bratislavský mier",
     icon: "🕊️",
     shortFact:
-      "Mierová zmluva z 26. decembra 1805 bola podpísaná v Zrkadlovej sieni Primaciálneho paláca.",
+      "Mierová zmluva z roku 1805 bola podpísaná v Zrkadlovej sieni Primaciálneho paláca.",
     fullText:
       "Bratislava sa v roku 1805 na krátky čas ocitla v centre európskej diplomacie. V Primaciálnom paláci sa rokovalo o následkoch Napoleonovho víťazstva pri Slavkove. Zmluva vstúpila do dejín ako Bratislavský, v zahraničí aj Prešporský mier.",
   },
