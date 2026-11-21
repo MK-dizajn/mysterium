@@ -4,8 +4,8 @@ import { COUNT_INSPECT_TIMING, FIRST_KEY_TOOTH_NOTCHES } from "./item-art";
 export const maximilianovaFontanaScene: Scene = {
   id: "maximilianova-fontana",
   location: "Maximiliánova fontána",
-  // Súradnice zastávky odmeria Miloš v Google Maps (docs/SUPIS-MIEST.md).
-  mapPoint: null,
+  // Súradnice odmeral Miloš v Google Maps 21. 11. 2026 (docs/SUPIS-MIEST.md).
+  mapPoint: { lat: 48.143377, lng: 17.108169 },
   title: "7. Strážca nad vodou",
 
   cinematicText:

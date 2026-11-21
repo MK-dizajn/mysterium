@@ -3,8 +3,8 @@ import type { Scene } from "../../types/game";
 export const lekarenUSalvatoraScene: Scene = {
   id: "lekaren-u-salvatora",
   location: "Lekáreň U Salvátora",
-  // Súradnice zastávky odmeria Miloš v Google Maps (docs/SUPIS-MIEST.md).
-  mapPoint: null,
+  // Súradnice odmeral Miloš v Google Maps 21. 11. 2026 (docs/SUPIS-MIEST.md).
+  mapPoint: { lat: 48.141446, lng: 17.105571 },
   title: "3. Mysli na koniec",
 
   cinematicText:

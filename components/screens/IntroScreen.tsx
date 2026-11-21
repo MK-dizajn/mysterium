@@ -1,5 +1,5 @@
-import type { ChapterArrival } from "../../types/game";
-import { getMapsSearchUrl } from "../../engine";
+import type { ChapterArrival, MapPoint } from "../../types/game";
+import { getMapPointUrl, getMapsSearchUrl } from "../../engine";
 import { ActionButton } from "../ui/ActionButton";
 import { DetectiveIcon, SearchIcon } from "../ui/MysteriumIcons";
 import { ScreenContainer } from "../ui/ScreenContainer";
@@ -10,6 +10,8 @@ import { Reveal } from "../ui/Reveal";
 
 type IntroScreenProps = {
   arrival: ChapterArrival;
+  /** Odmeraný bod zastávky, ku ktorej hráč ide; bez neho hľadanie podľa názvu. */
+  mapPoint?: MapPoint | null;
   /** Úvodné video sa nedalo prehrať: ukáže sa aspoň jeho príbeh v skratke. */
   showFallbackText: boolean;
   onContinue: () => void;
@@ -21,6 +23,7 @@ type IntroScreenProps = {
  */
 export function IntroScreen({
   arrival,
+  mapPoint,
   showFallbackText,
   onContinue,
 }: IntroScreenProps) {
@@ -57,7 +60,7 @@ export function IntroScreen({
           <Reveal delay={700}>
             <div className="flex flex-col gap-3">
               <a
-                href={getMapsSearchUrl(arrival.mapsQuery)}
+                href={mapPoint ? getMapPointUrl(mapPoint) : getMapsSearchUrl(arrival.mapsQuery)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex min-h-[54px] w-full items-center justify-center rounded-2xl border border-slate-600 bg-slate-900 px-5 py-4 text-sm font-black uppercase tracking-[0.1em] text-slate-100 transition hover:border-amber-300/40 hover:bg-slate-800 motion-reduce:transition-none"

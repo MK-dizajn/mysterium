@@ -114,8 +114,8 @@ export const chapterOneFinale: ChapterFinale = {
     name: "Slovenské národné divadlo",
     address: "Hviezdoslavovo námestie 1, Bratislava",
     // Bod pri hlavnom vstupe historickej budovy z Hviezdoslavovho námestia –
-    // súradnice odmeria Miloš v Google Maps (docs/SUPIS-MIEST.md).
-    mapPoint: null,
+    // odmeral Miloš v Google Maps 21. 11. 2026 (docs/SUPIS-MIEST.md).
+    mapPoint: { lat: 48.142235, lng: 17.109815 },
     mapsButtonLabel: "Otvoriť v mapách",
     // Cesta je dočasná, overí sa v teréne.
     directions:

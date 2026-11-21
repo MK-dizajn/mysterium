@@ -1,4 +1,4 @@
-import type { CodeItemInfo } from "../../engine";
+import { getSceneMapsUrl, type CodeItemInfo } from "../../engine";
 import type { ChapterGuidance, Scene } from "../../types/game";
 import { ActionButton } from "../ui/ActionButton";
 import { RouteHint } from "../ui/RouteHint";
@@ -13,6 +13,8 @@ import { StoryCard } from "../ui/StoryCard";
 
 type HistoryScreenProps = {
   scene: Scene;
+  /** Nasledujúca zastávka – „Ukáž cestu“ odkáže na jej bod v mapách. */
+  nextScene?: Scene;
   /** Nový predmet s ukrytou číslicou (iba predmet s obrazovkou „Prezrieť“). */
   codeItem?: CodeItemInfo | null;
   /** Vodidlo na ďalšie miesto z odmeny scény. */
@@ -24,6 +26,7 @@ type HistoryScreenProps = {
 
 export function HistoryScreen({
   scene,
+  nextScene,
   codeItem,
   clue,
   guidance,
@@ -131,6 +134,8 @@ export function HistoryScreen({
                 route={scene.route}
                 showLabel={guidance.showRouteLabel}
                 hideLabel={guidance.hideRouteLabel}
+                mapUrl={getSceneMapsUrl(nextScene)}
+                mapLabel={guidance.routeMapsLabel}
               />
             </div>
           )}

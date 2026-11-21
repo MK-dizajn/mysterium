@@ -2,7 +2,7 @@
 
 import { useId, useState } from "react";
 import type { ChapterGuidance, Scene } from "../../types/game";
-import { isPuzzleAnswerCorrect } from "../../engine";
+import { getSceneMapsUrl, isPuzzleAnswerCorrect } from "../../engine";
 import { ActionButton } from "../ui/ActionButton";
 import { RouteHint } from "../ui/RouteHint";
 import { TextInput } from "../ui/TextInput";
@@ -100,6 +100,8 @@ export function PuzzleScreen({
             route={arrivalRoute}
             showLabel={guidance.showRouteLabel}
             hideLabel={guidance.hideRouteLabel}
+            mapUrl={getSceneMapsUrl(scene)}
+            mapLabel={guidance.routeMapsLabel}
           />
         )}
 

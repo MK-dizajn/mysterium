@@ -664,6 +664,8 @@ export type ChapterGuidance = {
   nextClueTitle: string;
   showRouteLabel: string;
   hideRouteLabel: string;
+  /** Odkaz do máp pri „Ukáž cestu“ (iba pri zastávke so súradnicami). */
+  routeMapsLabel: string;
   inventoryClueLabel: string;
 };
 

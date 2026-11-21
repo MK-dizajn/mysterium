@@ -34,8 +34,8 @@ const ACCEPT_NOTE_ACTIONS: GameAction[] = [
 export const michalskaBranaScene: Scene = {
   id: "michalska-brana",
   location: "Michalská brána",
-  // Súradnice zastávky odmeria Miloš v Google Maps (docs/SUPIS-MIEST.md).
-  mapPoint: null,
+  // Súradnice odmeral Miloš v Google Maps 21. 11. 2026 (docs/SUPIS-MIEST.md).
+  mapPoint: { lat: 48.145136, lng: 17.106789 },
   title: "1. Bod, od ktorého sa meria svet",
 
   cinematicText:

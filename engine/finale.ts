@@ -7,6 +7,7 @@ import type {
 import { isAnswerAccepted } from "./answerMatching";
 import { getChapterItem, getCodeNotebook } from "./codeNotebook";
 import { getActLockCodes } from "./gameProgress";
+import { getMapPointUrl, getMapsSearchUrl } from "./maps";
 
 /*
  * Finále kapitoly: truhlica s tromi zámkami, Zlatý kľúč a ďalšie miesto.
@@ -130,16 +131,14 @@ export function leaveFinalePlace(
   };
 }
 
-/** Odkaz, ktorý otvorí ďalšie miesto v Google Mapách (hra polohu nezisťuje). */
+/**
+ * Odkaz, ktorý otvorí ďalšie miesto v Google Mapách (hra polohu nezisťuje):
+ * odmeraný bod, inak hľadanie podľa názvu a adresy.
+ */
 export function getFinaleMapsUrl(nextPlace: FinaleNextPlace) {
-  return getMapsSearchUrl(`${nextPlace.name}, ${nextPlace.address}`);
-}
-
-/** Odkaz, ktorý otvorí hľadané miesto v Google Mapách. */
-export function getMapsSearchUrl(query: string) {
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-    query
-  )}`;
+  return nextPlace.mapPoint
+    ? getMapPointUrl(nextPlace.mapPoint)
+    : getMapsSearchUrl(`${nextPlace.name}, ${nextPlace.address}`);
 }
 
 /** Predmety, ktoré dávali staršie verzie hry a finále ich nahradilo. */

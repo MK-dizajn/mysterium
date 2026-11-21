@@ -63,6 +63,7 @@ export const chapterOne: Chapter = {
     nextClueTitle: "Ďalšia stopa",
     showRouteLabel: "Ukáž cestu",
     hideRouteLabel: "Skryť cestu",
+    routeMapsLabel: "Otvoriť v mapách",
     inventoryClueLabel: "Stopa",
   },
 

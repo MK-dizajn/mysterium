@@ -3,8 +3,8 @@ import type { Scene } from "../../types/game";
 export const mirbachovPalacScene: Scene = {
   id: "mirbachov-palac",
   location: "Mirbachov palác",
-  // Súradnice zastávky odmeria Miloš v Google Maps (docs/SUPIS-MIEST.md).
-  mapPoint: null,
+  // Súradnice odmeral Miloš v Google Maps 21. 11. 2026 (docs/SUPIS-MIEST.md).
+  mapPoint: { lat: 48.1448137, lng: 17.1078713 },
   title: "5. Znak posledných pánov",
 
   cinematicText:

@@ -4,8 +4,8 @@ import { COUNT_INSPECT_TIMING, THIRD_KEY_TOOTH_NOTCHES } from "./item-art";
 export const bratislavskyMierScene: Scene = {
   id: "bratislavsky-mier",
   location: "Primaciálny palác",
-  // Súradnice zastávky odmeria Miloš v Google Maps (docs/SUPIS-MIEST.md).
-  mapPoint: null,
+  // Ten istý bod ako scéna 8 (Primaciálny palác), odmerané 21. 11. 2026.
+  mapPoint: { lat: 48.1439145, lng: 17.1096556 },
   title: "9. Mier, ktorý zmenil Európu",
 
   cinematicText:

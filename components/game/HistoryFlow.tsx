@@ -10,6 +10,8 @@ import { HistoryScreen } from "../screens/HistoryScreen";
 type HistoryFlowProps = {
   gameState: GameState;
   scene: Scene;
+  /** Nasledujúca zastávka (bod pre odkaz do máp pri „Ďalšej stope“). */
+  nextScene?: Scene;
   totalArtifacts: number;
   codeItem: CodeItemInfo | null;
   clue?: string;
@@ -24,6 +26,7 @@ type HistoryFlowProps = {
 export function HistoryFlow({
   gameState,
   scene,
+  nextScene,
   totalArtifacts,
   codeItem,
   clue,
@@ -44,6 +47,7 @@ export function HistoryFlow({
     >
       <HistoryScreen
         scene={scene}
+        nextScene={nextScene}
         codeItem={codeItem}
         clue={clue}
         guidance={guidance}

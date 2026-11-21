@@ -406,6 +406,8 @@ export default function Home() {
               (act) => act.id === gameState.currentActId
             )?.arrival ?? currentChapter.arrival
           }
+          // Bod zastávky, ku ktorej „Vydaj sa…“ vedie (prvá scéna aktu).
+          mapPoint={currentScene.mapPoint}
           showFallbackText={isIntroVideoUnavailable}
           onContinue={() => updateGameScreen("puzzle")}
         />
@@ -487,6 +489,7 @@ export default function Home() {
           guidance={currentChapter.guidance}
           onInspectItem={setInspectedItemId}
           scene={currentScene}
+          nextScene={currentChapter.scenes[gameState.currentSceneIndex + 1]}
           onOpenInventory={openInventory}
           onOpenArtifacts={openArtifacts}
           onOpenQuests={openQuests}

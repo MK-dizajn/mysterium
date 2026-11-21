@@ -9,5 +9,6 @@ export * from "./dialogueActions";
 export * from "./codeNotebook";
 export * from "./answerMatching";
 export * from "./finale";
+export * from "./maps";
 export * from "./unlockCodes";
 export * from "./minigames/dateDials";
