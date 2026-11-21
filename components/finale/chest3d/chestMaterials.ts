@@ -378,6 +378,50 @@ function drawVelvet() {
   return canvas;
 }
 
+/**
+ * Lúč svetla (krok T4): zvislý prechod – dole jasný, hore sa stráca – a mäkké
+ * boky, aby kužeľ nemal ostré hrany (createBeamTexture).
+ */
+function createBeamTexture() {
+  const { canvas, context } = createCanvas(64);
+  canvas.height = 256;
+
+  if (context) {
+    const vertical = context.createLinearGradient(0, 0, 0, 256);
+    vertical.addColorStop(0, "rgba(255, 255, 255, 0)");
+    vertical.addColorStop(0.55, "rgba(255, 255, 255, 0.35)");
+    vertical.addColorStop(1, "rgba(255, 255, 255, 1)");
+    context.fillStyle = vertical;
+    context.fillRect(0, 0, 64, 256);
+    // Mäkké boky (okolo obvodu kužeľa sa jas mierne vlní).
+    context.globalCompositeOperation = "destination-in";
+    const sides = context.createLinearGradient(0, 0, 64, 0);
+    sides.addColorStop(0, "rgba(0, 0, 0, 0.55)");
+    sides.addColorStop(0.5, "rgba(0, 0, 0, 1)");
+    sides.addColorStop(1, "rgba(0, 0, 0, 0.55)");
+    context.fillStyle = sides;
+    context.fillRect(0, 0, 64, 256);
+  }
+
+  return canvas;
+}
+
+/** Zrnko prachu: malý mäkký svetlý bod. */
+function createDustSprite() {
+  const { canvas, context } = createCanvas(32);
+
+  if (context) {
+    const glow = context.createRadialGradient(16, 16, 0, 16, 16, 16);
+    glow.addColorStop(0, "rgba(255, 244, 214, 1)");
+    glow.addColorStop(0.4, "rgba(255, 220, 150, 0.5)");
+    glow.addColorStop(1, "rgba(255, 220, 150, 0)");
+    context.fillStyle = glow;
+    context.fillRect(0, 0, 32, 32);
+  }
+
+  return canvas;
+}
+
 function toTexture(canvas: HTMLCanvasElement) {
   const texture = new CanvasTexture(canvas);
   texture.colorSpace = SRGBColorSpace;
@@ -401,6 +445,10 @@ export type ChestTextures = {
   engravingStrip: Texture;
   /** Zamat vnútra (dno, steny, veko). */
   velvet: Texture;
+  /** Lúč svetla z otvorenej truhlice (krok T4). */
+  beam: Texture;
+  /** Zrnko prachu v lúči (krok T4). */
+  dustSprite: Texture;
   /** Kópia dreva s iným opakovaním (zdieľa obrázok, pamäť navyše netreba). */
   woodVariant: (repeatX: number, repeatY: number, offsetY?: number) => Texture;
   dispose: () => void;
@@ -418,7 +466,9 @@ export function createChestTextures(): ChestTextures {
   const engravingStrip = engraving.clone();
   engravingStrip.repeat.set(14, 1);
   const velvet = toTexture(drawVelvet());
-  const variants: Texture[] = [engravingStrip];
+  const beam = new CanvasTexture(createBeamTexture());
+  const dustSprite = new CanvasTexture(createDustSprite());
+  const variants: Texture[] = [engravingStrip, beam, dustSprite];
 
   return {
     wood,
@@ -428,6 +478,8 @@ export function createChestTextures(): ChestTextures {
     engraving,
     engravingStrip,
     velvet,
+    beam,
+    dustSprite,
     woodVariant(repeatX, repeatY, offsetY = 0) {
       const variant = wood.clone();
       variant.repeat.set(repeatX, repeatY);

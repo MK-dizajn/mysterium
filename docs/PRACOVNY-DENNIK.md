@@ -5550,3 +5550,88 @@ Vývojový server je zastavený.
   - odhad asi 110 kreslení, 26 500 trojuholníkov, 4,5 MB (strop 150 / 60 000 / 16 MB).
 - **Potom** T5 (2D záloha v štýle scény 9, doladenie, meranie) a spoločný zoznam všetkých zvukov hry.
 - **Stav:** server je zastavený, nebeží žiadny proces node ani testovací Chrome. Pokračujeme 21. 11. 2026.
+
+---
+
+## 21. 11. 2026 – Úprava 4, krok T4: otvorenie truhlice, teplé svetlo, lúč, prach, odlesky, železné spony
+
+**Schválené:**
+- návrh T4 vrátane povolenia železných spôn po treťom zámku,
+- server pre mobil sa po dokončení **nespúšťa**; používateľ skúsi T4 neskôr,
+- na konci zastaviť všetky procesy hry a testov,
+- T5 až po pokyne.
+
+**Na začiatku:** nebežal žiadny proces, všetko bolo odoslané.
+
+**Čo je nové:**
+- **Časy otvárania** (`chestZoom.ts`, spolu 4,5 s, predtým 3,6 s):
+  - 0 – 0,6 s: priblíženie,
+  - 0,6 – 1,2 s: kľúč sa zasunie (odlesk 0,9 – 1,3 s),
+  - 1,2 – 1,8 s: kľúč sa otočí,
+  - 1,8 – 2,1 s: veko sa pootvorí o 8 % a zo škáry vyšľahne prúžok svetla,
+  - 2,1 – 3,1 s: veko sa otvorí, svetlo (2,1 – 3,0 s), lúč (2,3 – 3,1 s), prach (2,3 – 4,5 s), pohľad sa vzdiali,
+  - 3,1 – 4,1 s: útržok vystúpi zo zamatu,
+  - 3,9 – 4,3 s: odlesk po útržku.
+  - Na konci prach dosadne a zmizne. Konečný stav: svetlo a lúč svietia, bez prachu a odleskov, takže truhlica v pokoji nekreslí.
+- **Svetlo:**
+  - teplé zlaté (jantárové, `#ffb347`) s polovičnou silou (3 namiesto 6), nízko vo vnútri,
+  - dno iba jemne prežiari,
+  - zamat je tmavší, takže pod svetlom ostane bordový a nezružovie.
+- **Lúč:** kužeľ s prechodom kresleným kódom (dole jasný, hore sa stráca, mäkké boky).
+- **Prach:** 40 zrniek, jedno kreslenie, pomaly stúpa a víri. Iba v plnej verzii a nie pri vypnutých animáciách.
+- **Odlesky:** zlatý záblesk po celom kľúči naraz (materiály kľúča sa zbierajú cez odkazy) a po útržku.
+- **Železné spony:**
+  - pásy veka pokračujú sponou cez telo, zachytenou v železnom očku,
+  - po treťom zámku (po jeho 1,1 s animácii) sa obe naraz odklopia hore a do strany (0,8 s), so zvukom a vibráciou,
+  - „Vložiť Zlatý kľúč“ nad truhlicou sa ukáže až potom,
+  - pri vypnutých animáciách a po F5 so všetkými zámkami sú spony hneď povolené.
+- **Zvuky (tiché miesta):** `chest-key-insert` (0,6 s), `chest-key-turn` (1,8 s), `chest-lid-creak` (2,1 s), `chest-shine` (3,9 s), `chest-hasp-release`.
+- **Vibrácie:**
+  - pri otočení kľúča (krátka), pri otvorení veka (dlhšia) a pri povolení spôn,
+  - pri vypnutých animáciách jedna pri otvorení.
+- **Ťuknutie** počas otvárania všetko hneď dokončí (ako doteraz).
+- **Údaje pre testy:** `data-hasps`, `data-opening`, `data-dust-enabled` na okne truhlice.
+
+**Chyby počas práce:**
+- **Lint:**
+  - zmena materiálu kľúča priamo v snímke nie je dovolená, odlesk teraz ide cez odkazy na materiály,
+  - nastavenie stavu priamo v efekte nie je dovolené, pri vypnutých animáciách sa spony povolia časovačom 0 ms.
+- **Prvý test O7:**
+  - obsahoval nepoužiteľný úvodný scenár, pred spustením som ho odstránil,
+  - hľadal „Vložiť Zlatý kľúč“ skôr, ako sa pomalý testovací prehliadač stihol oddialiť od zámku (na snímke tlačidlo bolo), teraz čaká až 4 s,
+  - čakal otvorenie do 7 s, v testovacom prehliadači trvalo 11,8 s. Prehliadač kreslí bez grafickej karty pomaly a truhlica zámerne neskáče o viac ako 0,05 s na snímku. Na telefóne trvá 4,5 s, čo stráži Node test O7. Hranica v prehliadači je teraz 20 s.
+- **Staršie testy s pevnými časmi** upravené podľa schválených nových časov: B4c3 Node („najviac 4 s“ na „najviac 5 s“) a O6 („3,6 s“ na „4,5 s“).
+
+**Súbory:**
+- `components/finale/chest3d/chestZoom.ts`, `components/finale/chest3d/ChestModel3D.tsx`, `components/finale/chest3d/Chest3DView.tsx`, `components/finale/chest3d/ChestKey3D.tsx`, `components/finale/chest3d/PhotoFragment3D.tsx`, `components/finale/chest3d/chestMaterials.ts`,
+- `components/screens/FinaleChestScreen.tsx`, `lib/soundManager.ts`,
+- `docs/PRACOVNY-DENNIK.md`.
+
+**Testy:**
+- **Pred zmenou:**
+  - nový Node test O7: 22 chýb,
+  - O7 v prehliadači: 11 chýb, pri vypnutých animáciách 6.
+- **Po zmene:**
+  - **O7 (Node):**
+    - časová os vo všetkých úsekoch, konečný stav bez prachu a odleskov, pohyb iba jedným smerom, časy zvukov,
+    - spony (0,8 s), tlačidlo až po sponách, vypnuté animácie a F5,
+    - teplé svetlo (farba aj sila), lúč, prach (najviac 40, jedno kreslenie, iba plná verzia), odlesky,
+    - zvuky v tichom režime, vibrácie.
+    - Výsledok: všetko OK.
+  - **O7 v prehliadači** (oba režimy):
+    - tretí zámok so zápisníkom na obrazovke, spony sa povoľujú a sú povolené asi 1,9 s po odomknutí (pri vypnutých animáciách hneď), tlačidlo až potom, vibrácie,
+    - otvorenie v strope v šiestich časoch, prach v plnej verzii,
+    - koniec otvárania, „Prijať útržok“, po otvorení pokoj bez kreslenia,
+    - preskočenie ťuknutím, ľahká verzia bez prachu v strope, F5 otvorená a v pokoji.
+    - Výsledok: všetko OK.
+  - **B4b, B4c1 až B4c3 (aj pri vypnutých animáciách), D5, O4, O5, O6:** všetko OK.
+  - **Node:** 34 testov OK.
+  - **Celá séria v prehliadači:**
+    - 44 behov (vrátane O7 v oboch režimoch), 41 OK, trvanie 47 minút, server najviac 101 MB,
+    - **zlyhali dve kontroly v B4c2** (F5 pri zámku II a natočenie k zámku III v 2D) a **jedna v N1** (plynulosť schránky v scéne 9 na 4× spomalenom procesore: iba 6 snímok, jedna 8,3 s, čo je zaseknutie počítača, nie hry).
+    - Samostatne spustené B4c2 a N1 prešli **dvakrát za sebou**, išlo o zaťaženie počítača počas dlhej série. Rovnaké testy prešli aj v cielenom behu pred sériou.
+    - Ak sa to zopakuje, zvážim pri B4c2 dlhšie čakanie na natočenie truhlice.
+
+**Build:** prešiel (v rámci testovacieho servera). **Typy:** bez chýb. **Lint:** bez zmeny, 14 starých problémov, v upravených súboroch žiadny. **Server:** zastavený, pre mobil sa podľa pokynu nespúšťa.
+
+**Ďalší krok:** používateľ vyskúša T4 na mobile, keď sa vráti. T5 až po jeho pokyne.

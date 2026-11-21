@@ -20,7 +20,12 @@ export type SoundId =
   | "chest-dial-click"
   | "chest-lock-open"
   | "chest-lock-wrong"
-  | "chest-shine";
+  | "chest-shine"
+  // Otvorenie truhlice a spony (úprava 4, krok T4).
+  | "chest-key-insert"
+  | "chest-key-turn"
+  | "chest-lid-creak"
+  | "chest-hasp-release";
 
 type SoundConfig = {
   src: string;
@@ -82,6 +87,10 @@ const sounds: Record<SoundId, SoundConfig> = {
   "chest-lock-open": { src: "/sounds/chest-lock-open.mp3", volume: 0.7, ready: false },
   "chest-lock-wrong": { src: "/sounds/chest-lock-wrong.mp3", volume: 0.6, ready: false },
   "chest-shine": { src: "/sounds/chest-shine.mp3", volume: 0.5, ready: false },
+  "chest-key-insert": { src: "/sounds/chest-key-insert.mp3", volume: 0.5, ready: false },
+  "chest-key-turn": { src: "/sounds/chest-key-turn.mp3", volume: 0.6, ready: false },
+  "chest-lid-creak": { src: "/sounds/chest-lid-creak.mp3", volume: 0.6, ready: false },
+  "chest-hasp-release": { src: "/sounds/chest-hasp-release.mp3", volume: 0.6, ready: false },
 };
 
 function clampVolume(volume: number) {

@@ -19,7 +19,7 @@ import {
   LOCK_DIAL_CLICK_SEC,
   LOCK_GLINT_SEC,
   LOCK_SPRING_SEC,
-  OPENING_LID_START_SEC,
+  OPENING_SOUND_SEC,
 } from "../finale/chest3d/chestZoom";
 import { InspectErrorBoundary } from "../items/InspectErrorBoundary";
 import { canUse3D } from "../items/supportsWebGL";
@@ -193,17 +193,28 @@ export function FinaleChestScreen({
     // 3D: animáciu vedie truhlica a na konci ohlási onOpenSettled.
     if (mode === "3d") {
       if (reducedMotion) {
+        // Vypnuté animácie: truhlica je hneď otvorená, raz vŕzganie a vibrácia.
+        soundManager.play("chest-lid-creak");
+        vibrate(HAPTIC.open);
         setSequence("done");
         return;
       }
 
       setSequence("inserting");
-      timersRef.current.push(
-        window.setTimeout(
-          () => soundManager.play("artifact-unlock"),
-          OPENING_LID_START_SEC * 1000
-        )
-      );
+      // Zvuky a vibrácie podľa časov otvárania (krok T4, OPENING_SOUND_SEC).
+      const schedule = (sec: number, action: () => void) =>
+        timersRef.current.push(window.setTimeout(action, sec * 1000));
+
+      schedule(OPENING_SOUND_SEC.keyInsert, () => soundManager.play("chest-key-insert"));
+      schedule(OPENING_SOUND_SEC.keyTurn, () => {
+        soundManager.play("chest-key-turn");
+        vibrate(HAPTIC.lock);
+      });
+      schedule(OPENING_SOUND_SEC.lidCreak, () => {
+        soundManager.play("chest-lid-creak");
+        vibrate(HAPTIC.open);
+      });
+      schedule(OPENING_SOUND_SEC.shine, () => soundManager.play("chest-shine"));
       return;
     }
 

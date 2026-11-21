@@ -46,6 +46,8 @@ import {
   rememberMeasuredQuality,
 } from "./chestQuality";
 import { ChestEnvironment, ChestStats, QualityProbe } from "./ChestStageExtras";
+import { HAPTIC, vibrate } from "../../../lib/haptics";
+import { soundManager } from "../../../lib/soundManager";
 import {
   blendTransform,
   type ChestTransform,
@@ -55,7 +57,9 @@ import {
   getOpeningFrame,
   getOpeningTransform,
   getTapStep,
+  getHaspFrame,
   getTiltFitScale,
+  HASP_RELEASE_SEC,
   LOCK_UNLOCK_SEC,
   getZoomTransform,
   OPEN_FRAME,
@@ -158,6 +162,11 @@ class ChestController {
 
     // Aj v poslednej snímke ešte jedna ďalšia, aby ju videli všetky časti truhlice.
     return { isMoving: true, finished: this.isOpeningDone };
+  }
+
+  /** Nová snímka na žiadosť (napríklad začiatok povolenia spôn). */
+  requestFrame() {
+    this.invalidate?.();
   }
 
   setInvalidate(invalidate: (() => void) | null) {
@@ -530,6 +539,16 @@ export default function Chest3DView({
   const [isZoomActive, setIsZoomActive] = useState(false);
   const [shakeKeys, setShakeKeys] = useState(() => locks.map(() => 0));
   // Práve sa otvárajúci zámok (krok T2): ktorý a odkedy.
+  // Železné spony (krok T4): po F5 so všetkými zámkami odomknutými hneď povolené.
+  const [hasps, setHasps] = useState<"closed" | "releasing" | "released">(() =>
+    areAllLocksOpen ? "released" : "closed"
+  );
+  const haspStartRef = useRef<number | null>(null);
+  const isHaspScheduledRef = useRef(false);
+  // Tretí zámok sa práve otvára animáciou – spony počkajú, kým dobehne (1,1 s).
+  const isLockAnimatingRef = useRef(false);
+  // Otvorenie truhlice skončilo (po F5 s otvorenou truhlicou hneď).
+  const [isOpeningDone, setIsOpeningDone] = useState(isChestOpened);
   const [unlockAnimation, setUnlockAnimation] = useState<{
     index: number;
     startedAt: number;
@@ -558,6 +577,50 @@ export default function Chest3DView({
   const timersRef = useRef<number[]>([]);
   const facingYaw = getFacingYawForLocks(locks);
   const lastFacingYawRef = useRef(facingYaw);
+
+  // Po treťom zámku sa spony povolia (zvuk, vibrácia), až potom „Vložiť Zlatý kľúč“.
+  // Pri vypnutých animáciách sú hneď released.
+  useEffect(() => {
+    if (!areAllLocksOpen || hasps !== "closed" || isHaspScheduledRef.current) {
+      return;
+    }
+
+    isHaspScheduledRef.current = true;
+    const delayMs = isLockAnimatingRef.current ? LOCK_UNLOCK_SEC * 1000 : 0;
+
+    const release = () => {
+      soundManager.play("chest-hasp-release");
+      vibrate(HAPTIC.lock);
+    };
+
+    if (reducedMotion) {
+      // Vypnuté animácie: spony sú hneď released (bez pohybu).
+      timersRef.current.push(
+        window.setTimeout(() => {
+          release();
+          setHasps("released");
+        }, 0)
+      );
+      return;
+    }
+
+    timersRef.current.push(
+      window.setTimeout(() => {
+        haspStartRef.current = performance.now();
+        release();
+        setHasps("releasing");
+        controller.requestFrame();
+      }, delayMs),
+      window.setTimeout(() => setHasps("released"), delayMs + HASP_RELEASE_SEC * 1000)
+    );
+  }, [areAllLocksOpen, hasps, reducedMotion, controller]);
+
+  const readHasps = () =>
+    hasps === "released"
+      ? 1
+      : hasps === "closed" || haspStartRef.current === null
+        ? 0
+        : getHaspFrame((performance.now() - haspStartRef.current) / 1000);
   // Kolieska nad scénou iba pri zámku, ktorý je stále na rade.
   const overlayIndex =
     zoomedIndex !== null && locks[zoomedIndex]?.isNext && !isChestOpened
@@ -678,6 +741,7 @@ export default function Chest3DView({
         controller.zoomOut();
       } else {
         setUnlockAnimation({ index, startedAt: performance.now() });
+        isLockAnimatingRef.current = true;
         // Pohľad sa trochu vzdiali, aby bolo vidieť celý zámok (oblúk sa otáča k hráčovi).
         controller.zoomPartly(UNLOCK_VIEW_ZOOM);
         timersRef.current.push(
@@ -782,6 +846,9 @@ export default function Chest3DView({
       data-chest-quality-reason={qualityChoice.reason}
       data-chest-env={settings.environment ? "1" : "0"}
       data-unlocking-lock={unlockAnimation ? String(unlockAnimation.index) : undefined}
+      data-hasps={hasps}
+      data-opening={isChestOpened ? (isOpeningDone ? "done" : "running") : "idle"}
+      data-dust-enabled={qualityChoice.quality === "full" && !reducedMotion ? "1" : "0"}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerEnd}
@@ -823,7 +890,10 @@ export default function Chest3DView({
           reducedMotion={reducedMotion}
           onFacingChange={setFacing}
           onZoomedOut={handleZoomedOut}
-          onOpeningDone={onOpenSettled}
+          onOpeningDone={() => {
+            setIsOpeningDone(true);
+            onOpenSettled();
+          }}
         >
           <ChestModel3D
             lockStates={lockStates}
@@ -836,6 +906,7 @@ export default function Chest3DView({
             fragmentPieceIndex={fragmentPieceIndex}
             reducedMotion={reducedMotion}
             quality={qualityChoice.quality}
+            readHasps={readHasps}
             lockUnlockStarts={locks.map((_lock, index) =>
               unlockAnimation?.index === index ? unlockAnimation.startedAt : null
             )}
@@ -886,7 +957,7 @@ export default function Chest3DView({
       )}
 
       {/* Po troch zámkoch: vloženie Zlatého kľúča nad scénou. */}
-      {areAllLocksOpen && !isChestOpened && !isZoomActive && (
+      {areAllLocksOpen && !isChestOpened && !isZoomActive && hasps === "released" && (
         <div className="absolute inset-x-0 bottom-0 p-2">
           <ActionButton
             onClick={onInsertKey}

@@ -12,6 +12,8 @@ import {
   type MeshStandardMaterial,
   Object3D,
   type PointLight,
+  type Points,
+  type PointsMaterial,
   Shape,
   ShapeGeometry,
   type Texture,
@@ -369,6 +371,8 @@ type ChestLooks = {
   engraving: Texture;
   engravingStrip: Texture;
   velvet: Texture;
+  beam: Texture;
+  dustSprite: Texture;
   /** Mosadz: s odleskami okolia lesklejšia, bez nich matnejšia (aby nebola čierna). */
   brass: { metalness: number; roughness: number };
 };
@@ -390,6 +394,8 @@ function useChestLooks(quality: ChestQuality): ChestLooks {
       engraving: textures.engraving,
       engravingStrip: textures.engravingStrip,
       velvet: textures.velvet,
+      beam: textures.beam,
+      dustSprite: textures.dustSprite,
       brass:
         quality === "full"
           ? { metalness: 0.92, roughness: 0.3 }
@@ -531,19 +537,38 @@ function VelvetInterior({ looks }: { looks: ChestLooks }) {
     <group>
       <mesh position={[0, INTERIOR.floorY + 0.004, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[halfX * 2, halfZ * 2]} />
-        <meshStandardMaterial map={looks.velvet} roughness={1} metalness={0} />
+        <meshStandardMaterial map={looks.velvet} color="#a87a7e" roughness={1} metalness={0} />
       </mesh>
       {walls.map((wall) => (
         <mesh key={`${wall.position.join(",")}`} position={wall.position} rotation={[0, wall.rotationY, 0]}>
           <planeGeometry args={wall.size} />
-          <meshStandardMaterial map={looks.velvet} color="#b98a90" roughness={1} metalness={0} />
+          <meshStandardMaterial map={looks.velvet} color="#8a5c62" roughness={1} metalness={0} />
         </mesh>
       ))}
       {/* fragmentBed: vytlačené lôžko pre útržok (tmavší zamat). */}
       <mesh geometry={fragmentBed} position={[0, INTERIOR.floorY + 0.008, 0.05]} rotation={[-Math.PI / 2, 0, 0]}>
-        <meshStandardMaterial map={looks.velvet} color="#7a5058" roughness={1} metalness={0} />
+        <meshStandardMaterial map={looks.velvet} color="#5e3a40" roughness={1} metalness={0} />
       </mesh>
     </group>
+  );
+}
+
+/** Očká na tele, v ktorých sú zachytené spony (HASP_STAPLES). */
+const HASP_STAPLES: Vec3[] = [
+  [-STRAP_X, 0.3, 1.02],
+  [STRAP_X, 0.3, 1.02],
+];
+
+function HaspStaples() {
+  return (
+    <>
+      {HASP_STAPLES.map((position) => (
+        <mesh key={position.join(",")} position={position}>
+          <torusGeometry args={[0.045, 0.012, 8, 16, Math.PI]} />
+          <meshStandardMaterial color="#3a3632" roughness={0.6} metalness={0.7} />
+        </mesh>
+      ))}
+    </>
   );
 }
 
@@ -573,6 +598,7 @@ function ChestBody3D({ looks }: { looks: ChestLooks }) {
         </RoundedPart>
       ))}
       <VelvetInterior looks={looks} />
+      <HaspStaples />
       <mesh geometry={bottomRim} position={[0, -0.92, 0]}>
         <WoodMaterial map={looks.woodRim} bump={looks.woodBump} tint="#b48c69" />
       </mesh>
@@ -614,16 +640,34 @@ const LID_OPEN_ANGLE = -1.25;
 function ChestLid3D({
   readOpening,
   looks,
+  readHasps,
 }: {
   readOpening: () => OpeningFrame;
   looks: ChestLooks;
+  readHasps: () => number;
 }) {
   const lidRef = useRef<Group>(null);
+  const haspRefs = useRef<(Group | null)[]>([]);
+  const invalidate = useThree((state) => state.invalidate);
   const lid = useRoundedBox(3.48, 0.42, 2.08, 0.06);
   const corner = useRoundedBox(0.24, 0.36, 0.24, 0.04);
 
   useFrame(() => {
     lidRef.current?.rotation.set(readOpening().lid * LID_OPEN_ANGLE, 0, 0);
+
+    // Spony sa po treťom zámku odklopia hore a do strany.
+    const release = readHasps();
+    HASPS.forEach((hasp, index) => {
+      haspRefs.current[index]?.rotation.set(
+        release * HASP_SWING_RAD,
+        0,
+        hasp.side * release * HASP_TWIST_RAD
+      );
+    });
+
+    if (release > 0 && release < 1) {
+      invalidate();
+    }
   });
 
   return (
@@ -665,6 +709,26 @@ function ChestLid3D({
         <BrassMaterial looks={looks} />
       </InstancedParts>
 
+      {/* Železné spony: pokračujú z pásov veka a sú zachytené v očkách na tele. */}
+      {HASPS.map((hasp, index) => (
+        <group
+          key={hasp.side}
+          ref={(group) => {
+            haspRefs.current[index] = group;
+          }}
+          position={[hasp.side * STRAP_X, 0.02, 2.115]}
+        >
+          <mesh position={[0, -0.15, 0]}>
+            <boxGeometry args={[0.16, 0.3, 0.025]} />
+            <meshStandardMaterial map={looks.iron} bumpMap={looks.iron} bumpScale={0.8} roughness={0.68} metalness={0.6} />
+          </mesh>
+          <mesh position={[0, -0.26, 0.012]}>
+            <boxGeometry args={[0.06, 0.04, 0.01]} />
+            <meshStandardMaterial color="#0d0b09" roughness={0.9} />
+          </mesh>
+        </group>
+      ))}
+
       {/* Znak hry: veľký medailón na vrchu veka, malý vpredu. */}
       <ChestEmblem3D {...LID_TOP_EMBLEM} faceUp looks={looks} />
       <ChestEmblem3D {...LID_FRONT_EMBLEM} looks={looks} />
@@ -674,6 +738,11 @@ function ChestLid3D({
     </group>
   );
 }
+
+/** Železné spony (krok T4): na oboch pásoch veka; po treťom zámku sa odklopia. */
+const HASPS = [{ side: -1 }, { side: 1 }] as const;
+const HASP_SWING_RAD = -2.0;
+const HASP_TWIST_RAD = 0.35;
 
 /** Medailóny so znakom hry (v súradniciach veka). */
 const LID_TOP_EMBLEM = { position: [0, 0.445, 1.04] as Vec3, radius: 0.34 };
@@ -729,7 +798,7 @@ function LidVelvet({ looks }: { looks: ChestLooks }) {
     <group position={[0, -0.004, 1.04]} rotation={[Math.PI / 2, 0, 0]}>
       <mesh>
         <planeGeometry args={[LID_FRAME_HOLE.width, LID_FRAME_HOLE.height]} />
-        <meshStandardMaterial map={looks.velvet} color="#c49aa0" roughness={1} metalness={0} />
+        <meshStandardMaterial map={looks.velvet} color="#9a6a70" roughness={1} metalness={0} />
       </mesh>
       <mesh geometry={frame} position={[0, 0, 0.002]}>
         <BrassMaterial looks={looks} />
@@ -738,39 +807,135 @@ function LidVelvet({ looks }: { looks: ChestLooks }) {
   );
 }
 
-/** Svetlo dna leží tesne nad zamatom, aby ho nezakrylo (T3); farbu a efekty rieši T4. */
+/** Svetlo dna leží tesne nad zamatom, aby ho nezakrylo. */
 const GLOW_FLOOR_Y = 0.02;
+/**
+ * Krok T4: teplé zlaté (jantárové) svetlo s polovičnou silou, nízko vo
+ * vnútri – osvetľuje útržok a okraj truhlice, zamat nezružovie.
+ */
+const GLOW_LIGHT_COLOR = "#ffb347";
+const GLOW_LIGHT_INTENSITY = 3;
+/** Prach v lúči: zrnká (jedno kreslenie), iba v plnej verzii počas otvárania. */
+const DUST_COUNT = 40;
 
-/** Teplé svetlo z otvorenej truhlice: žiariace dno, lúč a svetlo vnútri. */
-function ChestGlow3D({ readOpening }: { readOpening: () => OpeningFrame }) {
+/** Pevná náhoda pre polohy prachu. */
+function seeded(index: number, salt: number) {
+  const x = Math.sin(index * 12.9898 + salt * 78.233) * 43758.5453;
+
+  return x - Math.floor(x);
+}
+
+/** Prach, ktorý pomaly stúpa a víri v lúči; na konci otvárania dosadne a zmizne. */
+function ChestDust({ readOpening, sprite }: { readOpening: () => OpeningFrame; sprite: Texture }) {
+  const pointsRef = useRef<Points>(null);
+  const materialRef = useRef<PointsMaterial>(null);
+  const seeds = useMemo(
+    () =>
+      Array.from({ length: DUST_COUNT }, (_, index) => ({
+        x: (seeded(index, 1) - 0.5) * 2.4,
+        y: 0.1 + seeded(index, 2) * 0.5,
+        z: (seeded(index, 3) - 0.5) * 1.2,
+        speed: 0.6 + seeded(index, 4) * 0.8,
+        phase: seeded(index, 5) * Math.PI * 2,
+      })),
+    []
+  );
+  const positions = useMemo(() => new Float32Array(DUST_COUNT * 3), []);
+
+  useFrame(() => {
+    const { dust } = readOpening();
+    const points = pointsRef.current;
+
+    if (!points) {
+      return;
+    }
+
+    points.visible = dust > 0;
+
+    if (dust <= 0) {
+      return;
+    }
+
+    seeds.forEach((seed, index) => {
+      positions[index * 3] = seed.x + Math.sin(dust * 6 + seed.phase) * 0.08;
+      positions[index * 3 + 1] = seed.y + dust * 1.6 * seed.speed;
+      positions[index * 3 + 2] = seed.z + Math.cos(dust * 5 + seed.phase) * 0.06;
+    });
+    points.geometry.attributes.position.needsUpdate = true;
+    // Zjaví sa a na konci sa stratí.
+    const envelope = Math.min(1, dust / 0.15) * Math.min(1, (1 - dust) / 0.25);
+    materialRef.current?.setValues({ opacity: 0.85 * envelope });
+  });
+
+  return (
+    <points ref={pointsRef} visible={false} frustumCulled={false}>
+      <bufferGeometry>
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
+      </bufferGeometry>
+      <pointsMaterial
+        ref={materialRef}
+        map={sprite}
+        color="#ffe2a0"
+        size={0.06}
+        sizeAttenuation
+        transparent
+        opacity={0}
+        depthWrite={false}
+        blending={AdditiveBlending}
+        toneMapped={false}
+      />
+    </points>
+  );
+}
+
+/**
+ * Svetlo z otvorenej truhlice: prúžok svetla zo škáry pri pootvorení veka,
+ * teplé zlaté svetlo a prežiarené dno, kužeľový lúč, ktorý sa stráca,
+ * a prach (iba plná verzia, nie pri vypnutých animáciách).
+ */
+function ChestGlow3D({
+  readOpening,
+  looks,
+  quality,
+  reducedMotion,
+}: {
+  readOpening: () => OpeningFrame;
+  looks: ChestLooks;
+  quality: ChestQuality;
+  reducedMotion: boolean;
+}) {
   const groupRef = useRef<Group>(null);
   const floorRef = useRef<MeshBasicMaterial>(null);
   const beamRef = useRef<MeshBasicMaterial>(null);
+  const crackRef = useRef<MeshBasicMaterial>(null);
   const lightRef = useRef<PointLight>(null);
 
   useFrame(() => {
-    const { light } = readOpening();
+    const { light, beam, crack, lid } = readOpening();
 
     if (groupRef.current) {
-      groupRef.current.visible = light > 0;
+      groupRef.current.visible = light > 0 || crack > 0;
     }
 
-    // Zamat ostáva vidieť: svetlo ho iba prežiari (sčítanie farieb).
-    floorRef.current?.setValues({ opacity: 0.4 * light });
-    beamRef.current?.setValues({ opacity: 0.16 * light });
+    // Prúžok zo škáry: iba kým je veko len pootvorené.
+    const slit = crack > 0 ? Math.max(0, 1 - (lid - 0.08) / 0.25) * Math.min(1, crack * 3) : 0;
+    crackRef.current?.setValues({ opacity: 0.9 * slit });
+    // Zamat ostáva bordový: svetlo dno iba jemne prežiari.
+    floorRef.current?.setValues({ opacity: 0.25 * light });
+    beamRef.current?.setValues({ opacity: 0.3 * beam });
 
     if (lightRef.current) {
-      lightRef.current.intensity = 6 * light;
+      lightRef.current.intensity = GLOW_LIGHT_INTENSITY * light;
     }
   });
 
   return (
     <group ref={groupRef} visible={false}>
-      <mesh position={[0, GLOW_FLOOR_Y, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[INTERIOR.halfX * 2, INTERIOR.halfZ * 2]} />
+      <mesh position={[0, 0.56, 1.06]}>
+        <planeGeometry args={[3.2, 0.05]} />
         <meshBasicMaterial
-          ref={floorRef}
-          color="#ffd27a"
+          ref={crackRef}
+          color="#ffd28a"
           transparent
           opacity={0}
           blending={AdditiveBlending}
@@ -778,11 +943,25 @@ function ChestGlow3D({ readOpening }: { readOpening: () => OpeningFrame }) {
           toneMapped={false}
         />
       </mesh>
-      <mesh position={[0, 1.35, 0]}>
-        <cylinderGeometry args={[1.5, 1.25, 1.6, 32, 1, true]} />
+      <mesh position={[0, GLOW_FLOOR_Y, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[INTERIOR.halfX * 2, INTERIOR.halfZ * 2]} />
+        <meshBasicMaterial
+          ref={floorRef}
+          color={GLOW_LIGHT_COLOR}
+          transparent
+          opacity={0}
+          blending={AdditiveBlending}
+          depthWrite={false}
+          toneMapped={false}
+        />
+      </mesh>
+      {/* beamTexture: kužeľ dole jasný, hore sa stráca, mäkké boky. */}
+      <mesh position={[0, 1.65, 0]}>
+        <cylinderGeometry args={[1.55, 1.05, 2.2, 32, 1, true]} />
         <meshBasicMaterial
           ref={beamRef}
-          color="#ffe6a8"
+          map={looks.beam}
+          color="#ffd08a"
           transparent
           opacity={0}
           blending={AdditiveBlending}
@@ -791,7 +970,16 @@ function ChestGlow3D({ readOpening }: { readOpening: () => OpeningFrame }) {
           toneMapped={false}
         />
       </mesh>
-      <pointLight ref={lightRef} position={[0, 1.1, 0.6]} color="#ffcf70" intensity={0} distance={6} />
+      <pointLight
+        ref={lightRef}
+        position={[0, 0.45, 0.25]}
+        color={GLOW_LIGHT_COLOR}
+        intensity={0}
+        distance={3.5}
+      />
+      {quality === "full" && !reducedMotion && (
+        <ChestDust readOpening={readOpening} sprite={looks.dustSprite} />
+      )}
     </group>
   );
 }
@@ -814,6 +1002,8 @@ type ChestModel3DProps = {
   quality: ChestQuality;
   /** Kedy sa začalo otváranie každého zámku (null = bez animácie). */
   lockUnlockStarts: (number | null)[];
+  /** Povolenie železných spôn 0 (zachytené) až 1 (odklopené) – číta sa v snímke. */
+  readHasps: () => number;
 };
 
 /**
@@ -832,6 +1022,7 @@ export function ChestModel3D({
   reducedMotion,
   quality,
   lockUnlockStarts,
+  readHasps,
 }: ChestModel3DProps) {
   const looks = useChestLooks(quality);
 
@@ -891,8 +1082,8 @@ export function ChestModel3D({
       ))}
 
       {/* Veko, svetlo z truhlice a štvrtý útržok */}
-      <ChestLid3D readOpening={readOpening} looks={looks} />
-      <ChestGlow3D readOpening={readOpening} />
+      <ChestLid3D readOpening={readOpening} looks={looks} readHasps={readHasps} />
+      <ChestGlow3D readOpening={readOpening} looks={looks} quality={quality} reducedMotion={reducedMotion} />
       <PhotoFragment3D
         imageSrc={fragmentImageSrc}
         pieceIndex={fragmentPieceIndex}

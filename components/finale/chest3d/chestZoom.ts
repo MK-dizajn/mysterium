@@ -144,20 +144,69 @@ export type OpeningFrame = {
   light: number;
   /** Vystúpenie útržku nad truhlicu. */
   fragment: number;
+  /** Prúžok svetla zo škáry, keď sa veko prvýkrát pohne (0 až 1). */
+  crack: number;
+  /** Lúč svetla z truhlice (0 až 1). */
+  beam: number;
+  /** Prach v lúči: 0 = žiadny, inak priebeh (zmizne na konci otvárania). */
+  dust: number;
+  /** Odlesk po kľúči, keď zapadne (0 až 1 a späť). */
+  keyGlint: number;
+  /** Odlesk po útržku nad truhlicou (0 až 1 a späť). */
+  fragmentGlint: number;
 };
 
 /** Časy jednotlivých častí otvárania (v sekundách od ťuknutia). */
+/*
+ * ===== Otvorenie truhlice (úprava 4, krok T4), spolu 4,5 s =====
+ * 0,0–0,6 priblíženie · 0,6–1,2 kľúč sa zasunie (odlesk) · 1,2–1,8 otočí sa,
+ * cvak · 1,8–2,1 veko sa pootvorí, prúžok svetla · 2,1–3,1 veko sa otvorí,
+ * svetlo, lúč, prach, pohľad sa vzdiali · 3,1–4,1 útržok vystúpi · 3,9–4,3
+ * odlesk po útržku · 4,1–4,5 prach dosadne a zmizne.
+ */
 const OPENING_TIMES = {
-  zoomIn: [0, 0.7],
-  keyIn: [0.7, 1.4],
-  keyTurn: [1.4, 2.0],
-  zoomOut: [2.0, 2.8],
-  lid: [2.0, 3.4],
-  light: [2.3, 3.2],
-  fragment: [2.6, 3.6],
+  zoomIn: [0, 0.6],
+  keyIn: [0.6, 1.2],
+  keyGlint: [0.9, 1.3],
+  keyTurn: [1.2, 1.8],
+  crack: [1.8, 2.1],
+  lid: [2.1, 3.1],
+  zoomOut: [2.1, 2.9],
+  light: [2.1, 3.0],
+  beam: [2.3, 3.1],
+  dust: [2.3, 4.5],
+  fragment: [3.1, 4.1],
+  fragmentGlint: [3.9, 4.3],
 } as const;
 
-export const OPENING_SEC = 3.6;
+export const OPENING_SEC = 4.5;
+/** O koľko sa veko pootvorí pri prúžku svetla (podiel plného otvorenia). */
+const LID_CRACK = 0.08;
+
+/** Kedy zaznejú zvuky otvárania (s): vsunutie a otočenie kľúča, vŕzganie veka, odlesk útržku. */
+export const OPENING_SOUND_SEC = {
+  keyInsert: OPENING_TIMES.keyIn[0],
+  keyTurn: OPENING_TIMES.keyTurn[1],
+  lidCreak: OPENING_TIMES.lid[0],
+  shine: OPENING_TIMES.fragmentGlint[0],
+};
+
+/** Povolenie železných spôn po treťom zámku (s). */
+export const HASP_RELEASE_SEC = 0.8;
+
+/** Priebeh povolenia spôn 0 → 1 (s prekmitnutím na konci by spona narazila – plynule). */
+export function getHaspFrame(elapsedSec: number) {
+  const t = Math.max(0, Math.min(1, elapsedSec / HASP_RELEASE_SEC));
+
+  return t * t * (3 - 2 * t);
+}
+
+/** Krátky záblesk počas úseku (0 → 1 → 0). */
+function pulse(elapsedSec: number, range: readonly [number, number]) {
+  const t = phase(elapsedSec, range);
+
+  return t === 0 || t === 1 ? 0 : Math.sin(t * Math.PI);
+}
 
 /*
  * ===== Otvorenie jedného zámku (úprava 4, krok T2), spolu 1,1 s =====
@@ -254,7 +303,7 @@ export function getLockUnlockFrame(elapsedSec: number): LockUnlockFrame {
   };
 }
 /** Kedy sa začne dvíhať veko (zvuk). */
-export const OPENING_LID_START_SEC = OPENING_TIMES.lid[0];
+export const OPENING_LID_START_SEC = OPENING_TIMES.crack[0];
 
 export const CLOSED_FRAME: OpeningFrame = {
   zoomIn: 0,
@@ -265,6 +314,11 @@ export const CLOSED_FRAME: OpeningFrame = {
   lid: 0,
   light: 0,
   fragment: 0,
+  crack: 0,
+  beam: 0,
+  dust: 0,
+  keyGlint: 0,
+  fragmentGlint: 0,
 };
 
 export const OPEN_FRAME: OpeningFrame = {
@@ -276,6 +330,11 @@ export const OPEN_FRAME: OpeningFrame = {
   lid: 1,
   light: 1,
   fragment: 1,
+  crack: 1,
+  beam: 1,
+  dust: 0,
+  keyGlint: 0,
+  fragmentGlint: 0,
 };
 
 function phase(elapsedSec: number, [start, end]: readonly [number, number]) {
@@ -294,9 +353,20 @@ export function getOpeningFrame(elapsedSec: number): OpeningFrame {
     keyVisible: elapsedSec >= OPENING_TIMES.keyIn[0],
     keyDepth: 1 - easeZoom(phase(elapsedSec, OPENING_TIMES.keyIn)),
     keyTurn: easeZoom(phase(elapsedSec, OPENING_TIMES.keyTurn)),
-    lid: easeZoom(phase(elapsedSec, OPENING_TIMES.lid)),
+    lid:
+      LID_CRACK * easeZoom(phase(elapsedSec, OPENING_TIMES.crack)) +
+      (1 - LID_CRACK) * easeZoom(phase(elapsedSec, OPENING_TIMES.lid)),
     light: phase(elapsedSec, OPENING_TIMES.light),
     fragment: easeZoom(phase(elapsedSec, OPENING_TIMES.fragment)),
+    crack: phase(elapsedSec, OPENING_TIMES.crack),
+    beam: phase(elapsedSec, OPENING_TIMES.beam),
+    // Prach: kým trvá úsek (aspoň malá hodnota, aby bol viditeľný od začiatku).
+    dust:
+      elapsedSec >= OPENING_TIMES.dust[0] && elapsedSec < OPENING_TIMES.dust[1]
+        ? Math.max(0.001, phase(elapsedSec, OPENING_TIMES.dust))
+        : 0,
+    keyGlint: pulse(elapsedSec, OPENING_TIMES.keyGlint),
+    fragmentGlint: pulse(elapsedSec, OPENING_TIMES.fragmentGlint),
   };
 }
 

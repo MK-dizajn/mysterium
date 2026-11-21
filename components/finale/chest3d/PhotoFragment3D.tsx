@@ -2,7 +2,7 @@
 
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
-import { CanvasTexture, DoubleSide, type Group, SRGBColorSpace } from "three";
+import { CanvasTexture, DoubleSide, type Group, type MeshStandardMaterial, SRGBColorSpace } from "three";
 import { PHOTO_CARD, PHOTO_PIECE_POINTS, type PhotoPoint } from "../photoPieces";
 import type { OpeningFrame } from "./chestZoom";
 
@@ -12,6 +12,9 @@ const FRAGMENT_HEIGHT = 1.15;
 /** Útržok vystúpi zo zamatového lôžka na dne (T3) do rovnakej výšky ako doteraz (1,75). */
 const FRAGMENT_START_Y = 0.08;
 const FRAGMENT_RISE = 1.67;
+/** Vlastný jas útržku a sila odlesku nad truhlicou. */
+const FRAGMENT_LIGHT = 0.3;
+const FRAGMENT_GLINT = 0.9;
 const PAPER = "#d8c39d";
 const PAPER_EDGE = "#f1e4c3";
 
@@ -110,6 +113,7 @@ type PhotoFragment3DProps = {
 export function PhotoFragment3D({ imageSrc, pieceIndex, readOpening }: PhotoFragment3DProps) {
   const invalidate = useThree((state) => state.invalidate);
   const groupRef = useRef<Group>(null);
+  const materialRef = useRef<MeshStandardMaterial>(null);
   const picture = useMemo(
     () => new FragmentPicture(PHOTO_PIECE_POINTS[pieceIndex] ?? PHOTO_PIECE_POINTS[3]),
     [pieceIndex]
@@ -138,7 +142,7 @@ export function PhotoFragment3D({ imageSrc, pieceIndex, readOpening }: PhotoFrag
   }, [imageSrc, picture, invalidate]);
 
   useFrame(() => {
-    const { fragment } = readOpening();
+    const { fragment, fragmentGlint } = readOpening();
     const group = groupRef.current;
 
     if (!group) {
@@ -148,6 +152,8 @@ export function PhotoFragment3D({ imageSrc, pieceIndex, readOpening }: PhotoFrag
     group.visible = fragment > 0;
     group.position.set(0, FRAGMENT_START_Y + FRAGMENT_RISE * fragment, 0.05);
     group.scale.setScalar(0.3 + 0.7 * fragment);
+    // Odlesk po útržku, keď sa vynorí nad truhlicou (krok T4).
+    materialRef.current?.setValues({ emissiveIntensity: FRAGMENT_LIGHT + fragmentGlint * FRAGMENT_GLINT });
   });
 
   return (
@@ -156,10 +162,11 @@ export function PhotoFragment3D({ imageSrc, pieceIndex, readOpening }: PhotoFrag
       <mesh rotation={[-0.32, 0, -0.07]}>
         <planeGeometry args={[FRAGMENT_HEIGHT * picture.aspect, FRAGMENT_HEIGHT]} />
         <meshStandardMaterial
+          ref={materialRef}
           map={picture.texture}
           emissive="#ffffff"
           emissiveMap={picture.texture}
-          emissiveIntensity={0.3}
+          emissiveIntensity={FRAGMENT_LIGHT}
           transparent
           alphaTest={0.5}
           side={DoubleSide}
