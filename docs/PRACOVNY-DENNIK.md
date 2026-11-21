@@ -5729,3 +5729,154 @@ Vývojový server je zastavený.
   - Zmena sa hry nedotýka (iba prázdne polia a dokumenty). Celá séria sa spustí znova v nasledujúcom kroku (súradnice a odkazy), tentoraz s úplným výpisom.
 
 **Build:** prešiel. **Typy:** bez chýb. **Lint:** v upravených súboroch žiadny problém. **Server:** zastavený (mobilný test opravy 1 je hotový, OK).
+
+---
+
+## 21. 11. 2026 – Oprava 2: odmerané súradnice zastávok a odkazy „Otvoriť v mapách“
+
+**Zadanie:**
+- súradnice odmeral používateľ v Google Maps; scény 8 a 9 majú ten istý bod, SND hlavný vstup historickej budovy,
+- schválený odkaz pri „Ukáž cestu“, na karte „Ďalšia stopa“, v úvode a vo finále,
+- tvar `https://www.google.com/maps?q=šírka,dĺžka`, otvára sa v novom okne,
+- bez súradníc sa odkaz neukáže,
+- hra stále nezisťuje polohu.
+
+**Čo je nové:**
+- **Súradnice** v `mapPoint` scén 1 až 9 a SND (`finale.ts`), zapísané aj v `docs/SUPIS-MIEST.md` (stĺpec súradníc, odkaz a kde je v hre).
+- **`engine/maps.ts`** (nový):
+  - `getMapPointUrl` (odkaz na bod),
+  - `getSceneMapsUrl` (odkaz zastávky, bez súradníc `null`),
+  - presunuté `getMapsSearchUrl`.
+- **Finále:** `getFinaleMapsUrl` vedie na bod SND, bez bodu ostáva hľadanie podľa názvu.
+- **„Ukáž cestu“** (`RouteHint`): v rozbalenej ceste pod textom tlačidlo „📍 Otvoriť v mapách“ (44 px, nové okno), iba keď má zastávka bod:
+  - v úlohe na bod tejto zastávky,
+  - na karte „Ďalšia stopa“ na bod nasledujúcej zastávky (po scéne 9 nasleduje denník bez miesta, odkaz sa neukáže).
+- **Úvod „Vydaj sa k …“:** tlačidlo vedie na bod prvej zastávky aktu (scéna 1, 4, 7), inak hľadanie podľa názvu.
+- **Text odkazu v dátach:** `guidance.routeMapsLabel` „Otvoriť v mapách“.
+
+**Súbory:**
+- `engine/maps.ts` (nový), `engine/finale.ts`, `engine/index.ts`, `types/game.ts`,
+- `components/ui/RouteHint.tsx`, `components/screens/PuzzleScreen.tsx`, `HistoryScreen.tsx`, `IntroScreen.tsx`, `components/game/HistoryFlow.tsx`, `app/page.tsx`,
+- `data/chapter-one.ts`, `data/chapter-one/` (9 scén a `finale.ts`),
+- `docs/SUPIS-MIEST.md`, `docs/PRACOVNY-DENNIK.md`.
+
+**Testy:**
+- **Pred zmenou:** nový test O9 (Node) 32 chýb.
+- **Po zmene:**
+  - **O9 (Node), všetko OK:**
+    - súradnice každej zastávky presne podľa merania,
+    - odkaz má tvar `https://www.google.com/maps?q=šírka,dĺžka` a ukazuje na bod svojej zastávky,
+    - scéna 10 bez odkazu, SND na hlavný vstup,
+    - bez súradníc žiadny odkaz (finále: hľadanie podľa názvu),
+    - zapojenie v obrazovkách, bez zisťovania polohy, súradnice a odkazy v súpise miest.
+  - **O9 v prehliadači** (oba režimy), všetko OK:
+    - úlohy scén 2 až 9: odkaz pri „Ukáž cestu“ až po rozbalení, na bod zastávky,
+    - „Ďalšia stopa“ scén 1 až 8 na nasledujúcu zastávku, po scéne 9 žiadny odkaz,
+    - úvod aktov I, II, III a finále (SND),
+    - nové okno, žiadna chyba, hra nežiada polohu.
+  - **Chyba v mojom teste:** prvý beh O9 zlyhal celý, lebo test neťukol na „Pokračovať“ na titulnej obrazovke. Po oprave testu všetko OK.
+  - **Staré testy upravené na schválenú zmenu:**
+    - B6 (Node) kontroluje hľadanie podľa názvu iba pre finále bez bodu,
+    - E5 (prehliadač) čaká v úvode aktov II a III odkaz na bod zastávky.
+  - **Node:** 36 testov OK.
+  - **Celá séria v prehliadači** (46 behov, 47 minút, server najviac 101 MB):
+    - 44 OK, E5 v oboch režimoch 2 chyby: test ešte čakal hľadanie podľa názvu, hra už správne ukazovala na bod,
+    - po úprave testu E5 v oboch režimoch všetko OK.
+  - Táto séria platí ako celá séria po opravách 1 a 2 (rozhodnutie používateľa).
+
+**Celý výpis série:**
+
+```
+b3b          : TEST: všetko OK
+b4b          : TEST: všetko OK
+b4c1         : TEST: všetko OK
+b4c2         : TEST: všetko OK
+b4c3         : TEST: všetko OK
+b4c3:reduced : TEST: všetko OK
+c1           : TEST: všetko OK
+d2           : TEST: všetko OK
+d3a          : TEST: všetko OK
+d4           : TEST: všetko OK
+d5           : TEST: všetko OK
+c6           : TEST: všetko OK
+g1           : TEST: všetko OK
+g1:reduced   : TEST: všetko OK
+e5           : TEST: 2 chýb
+    FAIL act-2: „Otvoriť v mapách“ na Academia Istropolitana – ["https://www.google.com/maps?q=48.1423873,17.1063151","_blank",54]
+    FAIL act-3: „Otvoriť v mapách“ na Maximiliánova fontána – ["https://www.google.com/maps?q=48.143377,17.108169","_blank",54]
+e5:reduced   : TEST: 2 chýb
+    FAIL act-2: „Otvoriť v mapách“ na Academia Istropolitana – ["https://www.google.com/maps?q=48.1423873,17.1063151","_blank",54]
+    FAIL act-3: „Otvoriť v mapách“ na Maximiliánova fontána – ["https://www.google.com/maps?q=48.143377,17.108169","_blank",54]
+f3           : TEST: všetko OK
+f3:reduced   : TEST: všetko OK
+h2           : TEST: všetko OK
+h2:reduced   : TEST: všetko OK
+h3           : TEST: všetko OK
+h3:reduced   : TEST: všetko OK
+i1           : TEST: všetko OK
+i1:reduced   : TEST: všetko OK
+k2           : TEST: všetko OK
+k2:reduced   : TEST: všetko OK
+k3           : TEST: všetko OK
+k3:reduced   : TEST: všetko OK
+l1           : TEST: všetko OK
+l1:reduced   : TEST: všetko OK
+n1           : TEST: všetko OK
+n1:reduced   : TEST: všetko OK
+o1           : TEST: všetko OK
+o1:reduced   : TEST: všetko OK
+o3           : TEST: všetko OK
+o3:reduced   : TEST: všetko OK
+o4           : TEST: všetko OK
+o4:reduced   : TEST: všetko OK
+o5           : TEST: všetko OK
+o5:reduced   : TEST: všetko OK
+o6           : TEST: všetko OK
+o6:reduced   : TEST: všetko OK
+o7           : TEST: všetko OK
+o7:reduced   : TEST: všetko OK
+o9           : TEST: všetko OK
+o9:reduced   : TEST: všetko OK
+trvanie: 47 min, server najviac 101 MB
+opakovanie po úprave testu:
+e5           : TEST: všetko OK
+e5:reduced   : TEST: všetko OK
+```
+
+**Build:** prešiel. **Typy:** bez chýb. **Lint:** v upravených súboroch žiadny problém (14 starých problémov v iných súboroch). **Server:** zastavený.
+
+**Krokov od poslednej celej série:** 0 z 3 (táto séria je celá).
+
+---
+
+## 21. 11. 2026 – Nový postup testovania
+
+**Rozhodnutie používateľa:**
+- celá séria v prehliadači trvá asi 45 minút a pri zaťažení počítača zlyháva bez chyby v hre (B4c2, N1), preto sa nespúšťa po každom kroku,
+- pravidlá sú v novom súbore **`docs/PRAVIDLA-TESTOVANIA.md`**.
+
+**Pri každom kroku:**
+- test pred zmenou a po nej,
+- kontrola typov, lint, všetky Node testy, build,
+- v prehliadači iba testy dotknutej časti (tabuľka v pravidlách).
+- Strážne Node testy (skóre 1010, nápovedy, texty, súradnice) bežia vždy.
+
+**Celá séria v prehliadači:**
+- iba po väčšom celku (napríklad po T5), každý tretí krok a pred odovzdaním testerom alebo pred vydaním,
+- na pozadí, s uloženým celým výpisom,
+- v každom zázname denníka je riadok „Krokov od poslednej celej série: N z 3“.
+
+**Súbory:** `docs/PRAVIDLA-TESTOVANIA.md` (nový), `docs/PRACOVNY-DENNIK.md`.
+
+**Testy:**
+- **Pred zmenou:** nový test O10 (Node, obsah pravidiel a záznam v denníku) 18 chýb.
+- **Po zmene:** O10 všetko OK, Node spolu 37 testov OK.
+- V prehliadači nič (zmena iba v dokumentoch).
+
+**Build, typy, lint:** spoločné s opravou 2, bez chýb.
+
+**Krokov od poslednej celej série:** 0 z 3 (iba dokumenty, celá séria tesne pred týmto krokom).
+
+**Ďalší krok:**
+- používateľ vyskúša odkazy na mobile, keď o server požiada,
+- T5 až po jeho pokyne.
