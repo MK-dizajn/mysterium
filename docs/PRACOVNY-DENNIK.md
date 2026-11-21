@@ -5965,3 +5965,26 @@ e5:reduced   : TEST: všetko OK
 - scéna 4: rok 1465 je v príbehu a artefakte,
 - scéna 5: rozdiely voliť mimo erbu, koruny a medailónov,
 - scéna 9: rok 1805 v príbehu a artefakte ostáva podľa rozhodnutia.
+
+---
+
+## 21. 11. 2026 – Záver dňa
+
+**Hotové dnes:**
+- oprava 1 (rub fotografie bez trhlín cez text), otestovaná na mobile,
+- oprava 2 (súradnice zastávok a odkazy „Otvoriť v mapách“),
+- nový postup testovania (`docs/PRAVIDLA-TESTOVANIA.md`),
+- spustenie hry pre mobil cez `npm run test:server`,
+- nové nápovedy so cenami 5, 5 a 10 bodov a scéna 9 bez dátumu v texte hry.
+
+**Stav:**
+- všetky zmeny sú v commitoch,
+- všetky procesy sú zastavené (server, strážca pamäte, testovacie prehliadače),
+- push robí používateľ cez GitHub Desktop.
+
+**Krokov od poslednej celej série:** 1 z 3.
+
+**Otvorené na zajtra (22. 11. 2026):**
+- používateľ vyskúša na mobile odkazy „Otvoriť v mapách“ a nové nápovedy s cenami (server na požiadanie),
+- rozhodnúť riziká pred mini hrami (scéna 3 šifra, scéna 4 rok 1465, scéna 5 rozdiely, prípadne rok 1805 v scéne 9),
+- krok T5 iba po pokyne používateľa.
