@@ -4,6 +4,8 @@ import { COUNT_INSPECT_TIMING, OLD_TOWN_TOWERS } from "./item-art";
 export const tajnaStopaMichalskaScene: Scene = {
   id: "tajna-stopa-michalska",
   location: "Najužší dom pri Michalskej bráne",
+  // Súradnice zastávky odmeria Miloš v Google Maps (docs/SUPIS-MIEST.md).
+  mapPoint: null,
   title: "2. Dom, ktorý sa zmestil do medzery",
 
   cinematicText:

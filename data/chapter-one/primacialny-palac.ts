@@ -4,6 +4,8 @@ import { COUNT_INSPECT_TIMING, SECOND_KEY_TOOTH_NOTCHES } from "./item-art";
 export const primacialnyPalacScene: Scene = {
   id: "primacialny-palac",
   location: "Primaciálny palác",
+  // Súradnice zastávky odmeria Miloš v Google Maps (docs/SUPIS-MIEST.md).
+  mapPoint: null,
   title: "8. Láskavosť a spravodlivosť",
 
   cinematicText:

@@ -5685,3 +5685,47 @@ Vývojový server je zastavený.
 **Build:** prešiel (v rámci testovacieho servera). **Typy:** bez chýb. **Lint:** bez zmeny, 14 starých problémov, v upravených súboroch žiadny. **Server:** zastavený, nespúšťa sa bez pokynu.
 
 **Ďalší krok:** návrh opravy 2 (súpis miest a GPS). Používateľ tiež chce zoznam textov bez nahratého hlasu.
+
+---
+
+## 21. 11. 2026 – Oprava 2 (príprava): pole pre súradnice zastávok, súpis miest, nové texty v súpise hlasov
+
+**Zistenie:**
+- hra nezisťuje polohu telefónu,
+- na mapu odkazuje iba na dvoch miestach (úvod pri bráne a finále pri SND), a to hľadaním podľa názvu,
+- pri SND môže špendlík padnúť mimo hlavného vstupu historickej budovy.
+
+**Rozhodnutie používateľa:**
+- kontrola polohy (GPS polomer) sa **nepridáva**, ostáva ručné „Som pri bráne“,
+- súradnice odmeria sám v Google Maps,
+- odkaz „Otvoriť v mapách“ pri každej zastávke iba navrhnúť.
+
+**Čo je nové:**
+- **Typ `MapPoint`** (šírka, dĺžka) v `types/game.ts`. Pole `mapPoint` pri scéne aj pri ďalšom mieste vo finále.
+- **Scény 1 až 9 a SND vo finále** majú `mapPoint: null` (zatiaľ neodmerané). Scéna 10 miesto nemá.
+- **Nový `docs/SUPIS-MIEST.md`:**
+  - ako hra pracuje s miestami,
+  - návod na odmeranie,
+  - tabuľka všetkých zastávok so stĺpcom „Odmerané súradnice (šírka, dĺžka)“ a presným bodom (SND: hlavný vstup historickej budovy z Hviezdoslavovho námestia),
+  - návrh odkazu `https://www.google.com/maps?q=šírka,dĺžka`.
+- **`docs/SUPIS-HLASOV.md`:** riadky 80 až 85, nové texty bez hlasu:
+  - scéna 9: úvod mini hry, zlý dátum, otvorenie schránky a hláška „Slavkovský mier“,
+  - dve nápovedy pri zámkoch truhlice.
+- **Návrh pre používateľa:**
+  - odkaz v rozbalenom „Ukáž cestu“ pri úlohe a na karte „Ďalšia stopa“,
+  - pri úvode a vo finále na presný bod,
+  - ukáže sa iba pri zastávke so súradnicami.
+
+**Súbory:**
+- `types/game.ts`, `data/chapter-one/` (9 scén a `finale.ts`),
+- `docs/SUPIS-MIEST.md` (nový), `docs/SUPIS-HLASOV.md`, `docs/PRACOVNY-DENNIK.md`.
+
+**Testy:**
+- **Pred zmenou:** nový test O8 (Node) mal 9 chýb.
+- **Po zmene:**
+  - O8 všetko OK, Node spolu 35 testov OK,
+  - **celá séria v prehliadači:** 44 behov, 44 minút, server najviac 103 MB,
+  - **chyba v mojom postupe:** výpis som skrátil na posledných 20 riadkov, takže výsledok vidno iba pri posledných 14 behoch (N1 až O7, všetko OK). Výsledky prvých 30 behov sa nezachovali.
+  - Zmena sa hry nedotýka (iba prázdne polia a dokumenty). Celá séria sa spustí znova v nasledujúcom kroku (súradnice a odkazy), tentoraz s úplným výpisom.
+
+**Build:** prešiel. **Typy:** bez chýb. **Lint:** v upravených súboroch žiadny problém. **Server:** zastavený (mobilný test opravy 1 je hotový, OK).

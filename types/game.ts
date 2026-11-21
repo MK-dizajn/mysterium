@@ -385,9 +385,22 @@ export type Npc = {
   dialogueId: string;
 };
 
+/**
+ * Bod na mape (zemepisná šírka a dĺžka) pre budúci odkaz „Otvoriť v mapách“
+ * v tvare https://www.google.com/maps?q=šírka,dĺžka. Hra polohu telefónu
+ * nezisťuje – bod slúži iba na odkaz. Súradnice odmeria Miloš v Google Maps
+ * (docs/SUPIS-MIEST.md).
+ */
+export type MapPoint = {
+  lat: number;
+  lng: number;
+};
+
 export type Scene = {
   id: SceneId;
   location: string;
+  /** Bod zastávky na mape; null = zatiaľ neodmerané. */
+  mapPoint?: MapPoint | null;
   title: string;
   cinematicText: string;
   /** Hlas rozprávača k úvodnému odseku scény. */
@@ -605,6 +618,8 @@ export type FinaleNextPlace = {
   finishLabel: string;
   name: string;
   address: string;
+  /** Bod pri hlavnom vstupe historickej budovy; null = zatiaľ neodmerané. */
+  mapPoint?: MapPoint | null;
   /** Text tlačidla, ktoré otvorí adresu v Google Mapách. */
   mapsButtonLabel: string;
   directions: string;

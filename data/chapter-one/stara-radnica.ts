@@ -3,6 +3,8 @@ import type { Scene } from "../../types/game";
 export const staraRadnicaScene: Scene = {
   id: "stara-radnica",
   location: "Stará radnica",
+  // Súradnice zastávky odmeria Miloš v Google Maps (docs/SUPIS-MIEST.md).
+  mapPoint: null,
   title: "6. Stopa, ktorú mesto neodstránilo",
 
   cinematicText:

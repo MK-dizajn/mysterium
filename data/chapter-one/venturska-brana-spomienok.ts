@@ -4,6 +4,8 @@ import { COUNT_INSPECT_TIMING, EDUCATION_SEAL_RAYS } from "./item-art";
 export const venturskaBranaSpomienokScene: Scene = {
   id: "venturska-brana-spomienok",
   location: "Academia Istropolitana",
+  // Súradnice zastávky odmeria Miloš v Google Maps (docs/SUPIS-MIEST.md).
+  mapPoint: null,
   title: "4. Dom, v ktorom sa začalo vzdelanie",
 
   cinematicText:

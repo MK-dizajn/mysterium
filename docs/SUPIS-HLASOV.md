@@ -136,3 +136,19 @@ Stav dát: 27. 10. 2026 (po kroku F1). Texty sú prevzaté presne z dát hry (`d
 | 77 | Záver kapitoly | rozprávač | Kľúč, ktorý si držal, neotvoril dvere, ale pamäť mesta. Michalská brána, úzky dom, lekáreň, stará univerzita, palác, radnica, fontána aj sála, v ktorej sa podpísal mier. Všetko si pamätá, kým sa nenájde niekto, kto si to dokáže prečítať. Pátrač to vedel. Preto nezanechal odpovede, iba stopy. | 292 | 46 | 21 s | záverečná obrazovka „Kapitola dokončená“ | **áno** – vyvrcholenie celej kapitoly; zhrnutie trasy, hráč stojí na konci cesty |
 | 78 | Záver kapitoly – posledná strana denníka | pátrač | Prešporok neukrýval jeden kľúč. Toto bol iba prvý. | 50 | 8 | 4 s | záverečná obrazovka – citát | **áno** – posledné slová pátrača, uzavretie jeho línie; krátke |
 | 79 | Záver kapitoly | rozprávač | Fotografia na teba čaká. Hľadaj miesto, na ktoré ukazuje, a pátranie pokračuje. | 79 | 12 | 5 s | záverečná obrazovka – „Druhý prípad sa blíži“ | **nie** – praktická informácia o pokračovaní |
+
+## Nové texty od 27. 10. 2026 (doplnené 21. 11. 2026)
+
+Texty, ktoré pribudli v úpravách mini hier (scéna 9) a truhlice (úprava 4) a v súpise ešte neboli. Ani jeden nemá nahratý hlas. Čísla pokračujú za riadkom 79.
+
+| # | Scéna / miesto | Kto hovorí | Presný text | Znaky | Slová | Hlas (približne) | Kde sa dnes zobrazuje | Návrh – dôvod |
+|---|---|---|---|---|---|---|---|---|
+| 80 | 9. Primaciálny palác – mini hra (pečať s dátumom) | rozprávač | Pečať mierovej listiny sa otvorí iba dátumom, ktorý mesto vytesalo do kameňa. Nastav deň, mesiac a rok. | 103 | 18 | 8 s | okno „Prezrieť“ – úvod mini hry | **nepovinne** – krátky pokyn k mini hre, funguje aj ako text |
+| 81 | 9. Primaciálny palác – mini hra | rozprávač | Pečať drží. Niektorý údaj ešte nesedí s tabuľou. | 48 | 8 | 4 s | mini hra – zlý dátum | **nie** – krátka hláška pri chybe |
+| 82 | 9. Primaciálny palác – tajná schránka | rozprávač | Pečať praskla. Vnútri leží tretí zub Zlatého kľúča. | 51 | 9 | 4 s | otvorenie tajnej schránky | **nepovinne** – krátky okamih objavu; zvuk otvorenia schránky ho môže nahradiť |
+| 83 | 9. Primaciálny palác – úloha | pátrač | Slavkov bol bitka pred mierom. Hľadaj, v ktorom meste sa mier uzavrel. | 70 | 12 | 5 s | hláška pri odpovedi „Slavkovský mier“ | **nie** – hláška pri blízkej odpovedi |
+| 84 | Finále – truhlica, nápoveda pri zámku (po 2 zlých pokusoch) | rozprávač | Zámok {lock}: číslice zo scén {scenes}. Nájdeš ich v zápisníku pod truhlicou. | 75 | 12 | 5 s | pod truhlicou (zámok a scény dopĺňa hra, napríklad „Zámok I: číslice zo scén 1, 2 a 3.“) | **nie** – nápoveda; časti textu dopĺňa hra |
+| 85 | Finále – truhlica, nápoveda pri zámku (po 4 zlých pokusoch) | rozprávač | Zámok {lock}: v zápisníku sú číslice {digits}. Nastav ich na kolieskach zľava doprava. | 84 | 13 | 6 s | pod truhlicou (číslice dopĺňa hra zo zápisníka) | **nie** – nápoveda s číslicami, nedá sa nahrať vopred |
+
+- Zadania, nápovedy (aj nové tretie nápovedy „Správna odpoveď je …“), cesty a tlačidlá súpis zámerne nezahŕňa, ako doteraz.
+- Spolu nové texty: 431 znakov, 72 slov, asi 32 s hlasu. Odporúčané na nahratie sú najviac riadky 80 a 82 (nepovinne).
