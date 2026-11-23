@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   FINALE_CHEST_OPENED_FLAG,
   FINALE_KEY_INSERTED_FLAG,
@@ -14,7 +14,7 @@ import {
 import { HAPTIC, vibrate } from "../../lib/haptics";
 import { soundManager } from "../../lib/soundManager";
 import type { ActId, Chapter, GameState } from "../../types/game";
-import { getGoldenKeySvg } from "../items/art/keyToothArt";
+import { Chest2DView } from "../finale/chest2d/Chest2DView";
 import {
   LOCK_DIAL_CLICK_SEC,
   LOCK_GLINT_SEC,
@@ -25,14 +25,7 @@ import { InspectErrorBoundary } from "../items/InspectErrorBoundary";
 import { canUse3D } from "../items/supportsWebGL";
 import { useReducedMotion } from "../items/useReducedMotion";
 import { ActionButton } from "../ui/ActionButton";
-import { ChestBody } from "../ui/chest/ChestBody";
 import { ChestDial } from "../ui/chest/ChestDial";
-import { ChestInnerLight } from "../ui/chest/ChestInnerLight";
-import { ChestLid } from "../ui/chest/ChestLid";
-import { ChestLightEffects } from "../ui/chest/ChestLightEffects";
-import { ChestMist } from "../ui/chest/ChestMist";
-import { ChestParticles } from "../ui/chest/ChestParticles";
-import { ChestStage } from "../ui/chest/ChestStage";
 import { CodeNotebook } from "../ui/CodeNotebook";
 import { ScreenContainer } from "../ui/ScreenContainer";
 import { SectionCard } from "../ui/SectionCard";
@@ -48,11 +41,7 @@ type FinaleChestScreenProps = {
   onInspectItem: (itemId: string) => void;
 };
 
-/** Zasunutie kľúča, potom otvorenie veka a nakoniec útržok (ms). */
-const KEY_INSERT_MS = 700;
-const LID_OPEN_MS = 1500;
-
-type Sequence = "idle" | "inserting" | "opening" | "done";
+type Sequence = "idle" | "inserting" | "done";
 
 /** 3D truhlica sa stiahne až pri vstupe na obrazovku truhlice. */
 const Chest3DView = dynamic(() => import("../finale/chest3d/Chest3DView"), {
@@ -93,6 +82,11 @@ export function FinaleChestScreen({
   const [selectedLockIndex, setSelectedLockIndex] = useState<number | null>(null);
   // Priblížený zámok v 3D – pod obrázkom je vtedy pokyn ku kolieskam.
   const [isZoomed, setIsZoomed] = useState(false);
+  // 2D: zlý kód zatrasie zámok; „Vložiť Zlatý kľúč“ až po povolení spôn.
+  const [wrongPulse, setWrongPulse] = useState<{ lockIndex: number; count: number } | null>(null);
+  const [haspsReleased, setHaspsReleased] = useState(false);
+  const handleHaspsReleased = useCallback(() => setHaspsReleased(true), []);
+  const handleOpenSettled = useCallback(() => setSequence("done"), []);
   const timersRef = useRef<number[]>([]);
   const hasInsertedKeyRef = useRef(false);
 
@@ -107,8 +101,6 @@ export function FinaleChestScreen({
 
   const locks = getFinaleLocks(chapter, gameState);
   const areAllLocksOpen = locks.length > 0 && locks.every((lock) => lock.isOpen);
-  const isKeyVisible = sequence !== "idle" || isKeyInserted;
-  const isLidOpen = sequence === "opening" || sequence === "done";
   const isRewardVisible = sequence === "done" && isChestOpened;
 
   function getDigits(actId: ActId, length: number) {
@@ -147,6 +139,10 @@ export function FinaleChestScreen({
       soundManager.play("chest-lock-wrong");
       vibrate(HAPTIC.wrong);
       setWrongAttempts((current) => ({ ...current, [actId]: (current[actId] ?? 0) + 1 }));
+      setWrongPulse((current) => ({
+        lockIndex: locks.findIndex((lock) => lock.actId === actId),
+        count: (current?.count ?? 0) + 1,
+      }));
       setMessage("wrong");
     }
 
@@ -190,47 +186,38 @@ export function FinaleChestScreen({
     setMessage(null);
     onOpenChest();
 
-    // 3D: animáciu vedie truhlica a na konci ohlási onOpenSettled.
-    if (mode === "3d") {
-      if (reducedMotion) {
-        // Vypnuté animácie: truhlica je hneď otvorená, raz vŕzganie a vibrácia.
-        soundManager.play("chest-lid-creak");
-        vibrate(HAPTIC.open);
-        setSequence("done");
-        return;
-      }
-
-      setSequence("inserting");
-      // Zvuky a vibrácie podľa časov otvárania (krok T4, OPENING_SOUND_SEC).
-      const schedule = (sec: number, action: () => void) =>
-        timersRef.current.push(window.setTimeout(action, sec * 1000));
-
-      schedule(OPENING_SOUND_SEC.keyInsert, () => soundManager.play("chest-key-insert"));
-      schedule(OPENING_SOUND_SEC.keyTurn, () => {
-        soundManager.play("chest-key-turn");
-        vibrate(HAPTIC.lock);
-      });
-      schedule(OPENING_SOUND_SEC.lidCreak, () => {
-        soundManager.play("chest-lid-creak");
-        vibrate(HAPTIC.open);
-      });
-      schedule(OPENING_SOUND_SEC.shine, () => soundManager.play("chest-shine"));
-      return;
-    }
-
+    // Animáciu vedie truhlica (3D aj 2D) a na konci ohlási onOpenSettled.
     if (reducedMotion) {
+      // Vypnuté animácie: truhlica je hneď otvorená, raz vŕzganie a vibrácia.
+      soundManager.play("chest-lid-creak");
+      vibrate(HAPTIC.open);
       setSequence("done");
       return;
     }
 
     setSequence("inserting");
-    timersRef.current.push(
-      window.setTimeout(() => {
-        setSequence("opening");
-        soundManager.play("artifact-unlock");
-      }, KEY_INSERT_MS),
-      window.setTimeout(() => setSequence("done"), KEY_INSERT_MS + LID_OPEN_MS)
-    );
+    // Zvuky a vibrácie podľa časov otvárania (krok T4, OPENING_SOUND_SEC), rovnaké v 2D aj 3D.
+    const schedule = (sec: number, action: () => void) =>
+      timersRef.current.push(window.setTimeout(action, sec * 1000));
+
+    schedule(OPENING_SOUND_SEC.keyInsert, () => soundManager.play("chest-key-insert"));
+    schedule(OPENING_SOUND_SEC.keyTurn, () => {
+      soundManager.play("chest-key-turn");
+      vibrate(HAPTIC.lock);
+    });
+    schedule(OPENING_SOUND_SEC.lidCreak, () => {
+      soundManager.play("chest-lid-creak");
+      vibrate(HAPTIC.open);
+    });
+    schedule(OPENING_SOUND_SEC.shine, () => soundManager.play("chest-shine"));
+  }
+
+  /** 2D: ťuknutie na zámok posunie obrazovku k jeho kolieskam a zvýrazní ich. */
+  function selectLock2D(index: number) {
+    setSelectedLockIndex(index);
+    document
+      .querySelector(`[data-lock-row="${index}"]`)
+      ?.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "center" });
   }
 
   /* Zámky v poradí I, II, III (2D ovládanie, pri 3D v rozbaľovacom bloku). */
@@ -240,6 +227,7 @@ export function FinaleChestScreen({
     return (
       <div
         key={lock.actId}
+        data-lock-row={lockIndex}
         role="group"
         aria-label={`Zámok ${lock.lockLabel} – ${
           lock.isOpen
@@ -255,7 +243,7 @@ export function FinaleChestScreen({
               ? "border-amber-300/40 bg-amber-400/5"
               : "border-slate-700 bg-slate-950/60 opacity-60"
         } ${
-          // Zámok vybraný ťuknutím v 3D truhlici.
+          // Zámok vybraný ťuknutím na truhlicu (3D aj 2D).
           selectedLockIndex === lockIndex ? "ring-4 ring-amber-200/70" : ""
         }`}
       >
@@ -303,7 +291,9 @@ export function FinaleChestScreen({
     );
   });
 
-  const insertKeyButton = areAllLocksOpen && !isKeyInserted && sequence === "idle" && (
+  // V 2D až po povolení spôn (v 3D to stráži truhlica sama).
+  const insertKeyButton = areAllLocksOpen && !isKeyInserted && sequence === "idle" &&
+    (mode === "3d" || haspsReleased) && (
     <ActionButton onClick={insertKey} className={STILL_BUTTON}>
       {chest.insertKeyLabel}
     </ActionButton>
@@ -456,56 +446,39 @@ export function FinaleChestScreen({
             )}
           </div>
         ) : (
-        /* Truhlica (2D záloha) – pri vypnutých animáciách sa nič nehýbe (globals.css). */
-        <div className="finale-chest relative mt-8">
-          <ChestStage isUnlocked={isLidOpen}>
-            <ChestLid isLidOpen={isLidOpen} />
-
-            {!reducedMotion && (
-              <>
-                <ChestMist isLightVisible={isLidOpen} />
-                <ChestInnerLight isLightVisible={isLidOpen} />
-                <ChestLightEffects isLightVisible={isLidOpen} />
-                <ChestParticles isLightVisible={isLidOpen} />
-              </>
+        /* Truhlica (2D záloha, krok T5a) – rovnaké časovanie, zvuky a vibrácie ako v 3D. */
+        <div className="finale-chest mt-8">
+          <Chest2DView
+            locks={locks}
+            lockDigits={locks.map((lock) =>
+              getDigits(lock.actId, lock.code.length).map(Number)
             )}
-
-            <ChestBody isLidOpen={isLidOpen} isLightVisible={isLidOpen}>
-              <div className="flex items-end justify-center gap-3" aria-hidden="true">
-                {locks.map((lock) => (
-                  <div
-                    key={lock.actId}
-                    className={`flex h-16 w-14 flex-col items-center justify-center rounded-lg border font-serif text-xs font-black ${
-                      lock.isOpen
-                        ? "border-amber-200/60 bg-amber-300/15 text-amber-100"
-                        : "border-amber-300/30 bg-black/40 text-amber-200/80"
-                    }`}
-                  >
-                    <span className="text-lg">{lock.isOpen ? "✓" : "🔒"}</span>
-                    <span>{lock.lockLabel}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Kľúčová dierka v strede; Zlatý kľúč sa do nej zasunie. */}
-              <div className="relative mx-auto mt-3 h-10 w-full overflow-hidden" aria-hidden="true">
-                <div className="absolute left-1/2 top-1/2 h-6 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-black shadow-[0_0_0_3px_rgba(180,120,40,0.6)]" />
-                <div
-                  className={`absolute right-[calc(50%-4px)] top-1/2 w-32 -translate-y-1/2 transition-[transform,opacity] duration-700 ease-out [&_svg]:h-auto [&_svg]:w-full ${
-                    isKeyVisible
-                      ? "translate-x-0 opacity-100"
-                      : "-translate-x-24 opacity-0"
-                  }`}
-                  dangerouslySetInnerHTML={{
-                    __html: getGoldenKeySvg({
-                      idPrefix: "chest-key",
-                      pieceNotches: [],
-                    }),
-                  }}
-                />
-              </div>
-            </ChestBody>
-          </ChestStage>
+            stateLabels={{
+              open: chest.lockOpenLabel,
+              closed: chest.lockClosedLabel,
+              next: chest.lockNextLabel,
+            }}
+            selectedIndex={selectedLockIndex}
+            onSelectLock={selectLock2D}
+            wrongPulse={wrongPulse}
+            onHaspsReleased={handleHaspsReleased}
+            isOpening={sequence === "inserting"}
+            isChestOpened={isChestOpened}
+            onOpenSettled={handleOpenSettled}
+            fragmentImageSrc={chapter.finale?.photo.imageSrc}
+            fragmentPieceIndex={fragmentPieceIndex}
+            reducedMotion={reducedMotion}
+          />
+          <p
+            aria-live="polite"
+            className="mt-3 text-center text-[15px] leading-6 text-slate-400"
+          >
+            {sequence === "inserting"
+              ? chest.keyTurningText
+              : isRewardVisible
+                ? chest.openedHint
+                : null}
+          </p>
         </div>
         )}
 

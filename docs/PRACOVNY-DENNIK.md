@@ -6013,3 +6013,68 @@ Texty hry sa teraz nemenia, podmienky sa splnia v kroku danej mini hry.
 **Krokov od poslednej celej série:** 2 z 3 (krok iba s dokumentom).
 
 **Ďalší krok:** návrh T5 (2D záloha truhlice, vypnuté animácie, meranie, zoznam zvukov) na schválenie.
+
+---
+
+## 23. 11. 2026 – T5a: nová 2D záloha truhlice
+
+**Schválené:**
+- T5 rozdelený na T5a (2D záloha), T5b (vypnuté animácie a meranie) a T5c (zoznam zvukov),
+- rozhodnutia k zvukom: `puzzle-success` pri správnej odpovedi, `npc-message` pri rozhovore so Strážcom (nie súčasne s nahratým hlasom), `button-click` nezapájať.
+
+**Kedy sa 2D ukáže:** telefón bez 3D (WebGL), chyba 3D alebo adresa `?bez3d`.
+
+**Čo je nové (`components/finale/chest2d/`):**
+- **`Chest2DView.tsx` – kresba v SVG v štýle schránky zo scény 9:**
+  - dubové drevo, mosadzné rohy a nity, železné pásy,
+  - **znak hry** (M s kompasovou ružicou) veľký na veku a malý vpredu,
+  - tri mosadzné zámky I, II, III s **okienkami koliesok**, ktoré ukazujú práve nastavené číslice,
+  - železné spony z veka na telo,
+  - kovanie s kľúčovou dierkou na prednej hrane veka.
+- **Zámky:**
+  - ťuknutie na zámok posunie obrazovku k jeho kolieskam a zvýrazní ich (plocha aspoň 44 px aj na 320 px),
+  - zlý kód: zámok sa zatrasie (0,45 s),
+  - správny kód: kolieska zapadnú, ryska sa rozžiari, oblúk vyskočí a vykloní sa, zámok sa nakloní, zlatý odlesk (1,1 s ako v 3D).
+- **Spony a kľúč:**
+  - po treťom zámku sa spony odklopia (po 1,1 s, trvanie 0,8 s), so zvukom a vibráciou,
+  - až potom sa ukáže „Vložiť Zlatý kľúč“.
+- **Otvorenie (4,5 s, tá istá časová os ako v 3D):**
+  - kľúč sa zasunie a otočí, zo škáry prenikne prúžok svetla,
+  - veko sa odklopí k pántom a ukáže zamat v mosadznom ráme,
+  - teplé zlaté svetlo, lúče, prach,
+  - štvrtý útržok fotografie sa vznesie s odleskom.
+- **Prekresľovanie:** truhlica sa kreslí iba počas animácie, potom sa nič neprekresľuje.
+- **Vypnuté animácie:** všetko sa iba okamžite prepne, zvuk a vibrácia ostávajú.
+- **`chest2dLayout.ts`:** rozmery kresby a časovanie zo spoločného `chestZoom.ts`.
+- **Obrazovka truhlice:**
+  - stará 2D truhlica (smajlíky 🔒 a ✓) je nahradená,
+  - otvorenie má v 2D aj 3D rovnaké zvuky a vibrácie (`OPENING_SOUND_SEC`); zvuk `artifact-unlock` sa vo finále už nepoužíva,
+  - pod 2D truhlicou je stav („Kľúč zapadol…“, „Štvrtý útržok sa vznáša…“).
+  - Staré súčasti `components/ui/chest/` ostávajú pre truhlicu na konci aktu.
+
+**Súbory:**
+- `components/finale/chest2d/Chest2DView.tsx` a `chest2dLayout.ts` (nové),
+- `components/screens/FinaleChestScreen.tsx`, `docs/PRACOVNY-DENNIK.md`.
+
+**Testy:**
+- **Pred zmenou:**
+  - nový O12 (Node) 5 chýb (obrazovka ešte so starou 2D),
+  - nový O12 v prehliadači (`?bez3d`) 25 chýb.
+- **Po zmene:**
+  - **O12 (Node)** všetko OK: časovanie spoločné s 3D, rozmery (zámky sa neprekrývajú, plocha aspoň 44 px), kresba a zapojenie.
+  - **O12 v prehliadači** (oba režimy) všetko OK:
+    - znak hry na veku aj vpredu, tri zámky s okienkami, plochy 44 px na 360 aj 320 px, bez vodorovného posúvania,
+    - ťuknutie na zámok II zvýrazní jeho kolieska,
+    - zlý kód zatrasie zámok (pri vypnutých animáciách nie),
+    - tri správne kódy (číslice zo zápisníka na obrazovke),
+    - spony povolené asi 1,9 s po treťom zámku (pri vypnutých animáciách hneď), až potom kľúč,
+    - otvorenie asi 4,5 s (pri vypnutých animáciách hneď), útržok, svetlo, vibrácie, po otvorení žiadna animácia,
+    - F5 nechá truhlicu otvorenú.
+  - **Staré testy upravené:** B4c1, B4c2, B4c3 (Node) hľadali starú 2D truhlicu (`ChestStage`), teraz `Chest2DView`.
+  - **Node:** 39 testov OK.
+  - **V prehliadači iba truhlica:** O12, B4b, B4c1, B4c2, B4c3, O4 až O7 (aj bez animácií), všetko OK, 13 minút.
+- **Oprava po snímke:** otvorený zámok mal oblúk otočený o 150° a skrytý za telom, zmenené na 35° (oblúk ostáva viditeľný). O12 znova OK v oboch režimoch.
+
+**Build:** prešiel. **Typy:** bez chýb. **Lint:** v upravených súboroch žiadny problém (14 starých v iných súboroch). **Server:** zastavený.
+
+**Krokov od poslednej celej série:** 3 z 3. Celá séria sa spustí po T5c (väčší celok).
