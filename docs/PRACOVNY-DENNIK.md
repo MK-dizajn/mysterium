@@ -6078,3 +6078,61 @@ Texty hry sa teraz nemenia, podmienky sa splnia v kroku danej mini hry.
 **Build:** prešiel. **Typy:** bez chýb. **Lint:** v upravených súboroch žiadny problém (14 starých v iných súboroch). **Server:** zastavený.
 
 **Krokov od poslednej celej série:** 3 z 3. Celá séria sa spustí po T5c (väčší celok).
+
+---
+
+## 23. 11. 2026 – T5b: vypnuté animácie a meranie truhlice
+
+**Čo je nové:**
+- **`components/finale/chest3d/frameMeter.ts`:**
+  - počet nakreslených snímok a snímky za sekundu za posledné 1 s, pauza bez kreslenia sa nezapočíta,
+  - pamäť JavaScriptu v MB (Chrome a Android; Safari ju nehlási),
+  - ladiaci riadok „58 snímok/s · pamäť JS 42 MB“.
+- **3D (`ChestStats`):**
+  - nové údaje `data-chest-frames`, `data-chest-fps` a `data-chest-heap-mb`,
+  - ladiaci text pri `?ladenie=1` ukáže aj snímky za sekundu a pamäť.
+- **2D (`Chest2DView`):**
+  - rovnaké údaje (`data-frames`, `data-fps`, `data-heap-mb`),
+  - ladiaci text „Truhlica: 2D verzia · …“ pri `?ladenie=1`.
+- **`docs/KONTROLA-PRED-VYDANIM.md`:** nový bod „Meranie truhlice na skutočnom telefóne“:
+  - plná, ľahká aj 2D verzia s `?ladenie=1`, cieľ aspoň 30 snímok/s pri otváraní,
+  - testovací prehliadač kreslí bez grafickej karty, jeho čísla sú iba orientačné.
+
+**Vypnuté animácie (kontrola celej truhlice, 3D aj 2D):**
+- v pokoji sa nekreslí (0 snímok za 1,5 s),
+- na obrazovke nebeží žiadna animácia,
+- zámky, spony aj otvorenie sa iba prepnú, prach je vypnutý, po otvorení sa už nekreslí.
+- **Nič sa nemuselo opravovať** (kroky T2 až T5a to už mali).
+
+**Meranie v testovacom prehliadači** (360 px, softvérové kreslenie bez grafickej karty, orientačné):
+
+| Verzia | Prvé nakreslenie | V pokoji | Otvorenie | Snímky/s pri otváraní | Kreslenia / trojuholníky (uprostred otvárania) | Textúry | Pamäť JS |
+|---|---|---|---|---|---|---|---|
+| Plná 3D (`?truhlica=plna`) | 0,96 s | 0 snímok | 5,4 s | 22 | 71 / 18 946 | 3,3 MB | 26 MB |
+| Ľahká 3D (`?truhlica=lahka`) | 0,37 s | 0 snímok | 4,9 s | 34 | 102 / 25 088 | 3,3 MB | 20 MB |
+| 2D (`?bez3d`) | 0,01 s | 0 snímok | 4,5 s | 67 | – | – | 22 MB |
+
+- Všetko v strope: najviac 150 kreslení, 60 000 trojuholníkov, 16 MB textúr, pamäť JS do 150 MB.
+- Plná verzia v testovacom prehliadači nestíha 30 snímok/s (kreslí bez grafickej karty), preto by si tu telefón bez merania vybral ľahkú. Skutočné čísla ukáže meranie na telefóne (KONTROLA).
+- Kreslenia a trojuholníky sa líšia podľa toho, v ktorej chvíli otvárania sa odčítajú.
+
+**Súbory:**
+- `components/finale/chest3d/frameMeter.ts` (nový),
+- `components/finale/chest3d/ChestStageExtras.tsx`, `components/finale/chest2d/Chest2DView.tsx`,
+- `docs/KONTROLA-PRED-VYDANIM.md`, `docs/PRACOVNY-DENNIK.md`.
+
+**Testy:**
+- **Pred zmenou:**
+  - nový O13 (Node) 9 chýb,
+  - nový O13 v prehliadači 4 chyby (meranie) a 4 chyby (vypnuté animácie).
+- **Chyba v mojom teste:** O13 hľadal tlačidlo „Zvýšiť“ podľa textu, ale na tlačidle je iba šípka a názov má v popise pre čítačku, preto test nenastavil číslice. Opravené (rovnako ako v O12).
+  - Pri hľadaní chyby som ladiacim výpisom raz vypísal do konzoly číslice kódov zámkov. Výpis som hneď odstránil, do žiadneho súboru sa nedostal.
+- **Po zmene:**
+  - **O13 (Node)** všetko OK: meranie snímok (aj pauza), pamäť, ladiaci riadok, údaje v 3D aj 2D, KONTROLA,
+  - **O13 v prehliadači:** meranie (plná, ľahká, 2D) aj vypnuté animácie (3D aj 2D), všetko OK,
+  - **Node:** 40 testov OK.
+  - **V prehliadači iba truhlica:** O12, O4 a O7 v oboch režimoch, všetko OK.
+
+**Build:** prešiel. **Typy:** bez chýb. **Lint:** v upravených súboroch žiadny problém (14 starých v iných súboroch). **Server:** zastavený.
+
+**Krokov od poslednej celej série:** 3 z 3 (celá séria po T5c).

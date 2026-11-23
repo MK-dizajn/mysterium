@@ -5,6 +5,13 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { type RefObject, useEffect, useRef } from "react";
 import { HalfFloatType, type Material, type Mesh, type Scene, type Texture } from "three";
 import { isProbeTooSlow, PROBE_FRAMES, PROBE_MAX_MS } from "./chestQuality";
+import {
+  createFrameMeter,
+  formatMeterText,
+  readJsHeapMB,
+  tickFrameMeter,
+  type FrameMeter,
+} from "./frameMeter";
 
 /**
  * Odlesky okolia pre mosadz (iba plná verzia): malá „miestnosť“ so svetlami
@@ -161,31 +168,51 @@ export function ChestStats({
   qualityLabel: string;
 }) {
   const lastRef = useRef("");
+  const megabytesRef = useRef(0);
+  // Meranie snímok (krok T5b): počet, snímky za sekundu pri pohybe a pamäť JS.
+  const meterRef = useRef<FrameMeter | null>(null);
 
   useFrame(({ gl, scene }) => {
     const root = rootRef.current;
     const { calls, triangles } = gl.info.render;
 
-    if (!root || calls === 0) {
+    if (!root) {
+      return;
+    }
+
+    const now = performance.now();
+    meterRef.current ??= createFrameMeter(now);
+    const meter = meterRef.current;
+    const fpsChanged = tickFrameMeter(meter, now);
+    root.dataset.chestFrames = String(meter.frames);
+
+    if (calls === 0) {
       return;
     }
 
     const textures = gl.info.memory.textures;
     const signature = `${calls}/${triangles}/${textures}/${qualityLabel}`;
+    const isNewScene = signature !== lastRef.current;
 
-    if (signature === lastRef.current) {
+    if (!isNewScene && !fpsChanged) {
       return;
     }
 
-    lastRef.current = signature;
-    const megabytes = estimateTextureMB(scene);
-    root.dataset.chestCalls = String(calls);
-    root.dataset.chestTriangles = String(triangles);
-    root.dataset.chestTextures = String(textures);
-    root.dataset.chestTextureMb = megabytes.toFixed(1);
+    if (isNewScene) {
+      lastRef.current = signature;
+      megabytesRef.current = estimateTextureMB(scene);
+      root.dataset.chestCalls = String(calls);
+      root.dataset.chestTriangles = String(triangles);
+      root.dataset.chestTextures = String(textures);
+      root.dataset.chestTextureMb = megabytesRef.current.toFixed(1);
+    }
+
+    const heapMB = readJsHeapMB();
+    root.dataset.chestFps = String(meter.fps);
+    root.dataset.chestHeapMb = heapMB === null ? "" : heapMB.toFixed(0);
 
     if (debugRef.current) {
-      debugRef.current.textContent = `Truhlica: ${qualityLabel} · ${calls} kreslení · ${triangles.toLocaleString("sk-SK")} trojuholníkov · ${megabytes.toFixed(1).replace(".", ",")} MB`;
+      debugRef.current.textContent = `Truhlica: ${qualityLabel} · ${calls} kreslení · ${triangles.toLocaleString("sk-SK")} trojuholníkov · ${megabytesRef.current.toFixed(1).replace(".", ",")} MB · ${formatMeterText({ fps: meter.fps, heapMB })}`;
     }
   });
 

@@ -15,6 +15,14 @@ import {
   type LockUnlockFrame,
   type OpeningFrame,
 } from "../chest3d/chestZoom";
+import { isChestDebugOn } from "../chest3d/chestQuality";
+import {
+  createFrameMeter,
+  formatMeterText,
+  readJsHeapMB,
+  tickFrameMeter,
+  type FrameMeter,
+} from "../chest3d/frameMeter";
 import { PhotoPieceArt } from "../PhotoPiece";
 import {
   CHEST_2D_VIEW,
@@ -301,6 +309,32 @@ export function Chest2DView({
 
   const reportedHaspsRef = useRef(false);
   const reportedOpenRef = useRef(false);
+  // Meranie (krok T5b): každé vykreslenie je jedna snímka; kreslí sa iba pri pohybe.
+  const rootRef = useRef<HTMLDivElement>(null);
+  const debugRef = useRef<HTMLParagraphElement>(null);
+  const meterRef = useRef<FrameMeter | null>(null);
+  const [isDebug] = useState(isChestDebugOn);
+
+  useEffect(() => {
+    const root = rootRef.current;
+
+    if (!root) {
+      return;
+    }
+
+    const now = performance.now();
+    meterRef.current ??= createFrameMeter(now);
+    const meter = meterRef.current;
+    tickFrameMeter(meter, now);
+    const heapMB = readJsHeapMB();
+    root.dataset.frames = String(meter.frames);
+    root.dataset.fps = String(meter.fps);
+    root.dataset.heapMb = heapMB === null ? "" : heapMB.toFixed(0);
+
+    if (debugRef.current) {
+      debugRef.current.textContent = `Truhlica: 2D verzia · ${formatMeterText({ fps: meter.fps, heapMB })}`;
+    }
+  });
   // Posledné spätné volania rodiča (časovače sa kvôli nim nespúšťajú odznova).
   const callbacksRef = useRef({ onHaspsReleased, onOpenSettled });
 
@@ -368,6 +402,7 @@ export function Chest2DView({
 
   return (
     <div
+      ref={rootRef}
       data-chest-2d=""
       data-hasps={areHaspsReleased ? "released" : haspFrame > 0 ? "releasing" : "closed"}
       data-opening={isOpeningDone || (isChestOpened && !isOpening) ? "open" : animateOpening ? "opening" : "closed"}
@@ -601,6 +636,15 @@ export function Chest2DView({
             }}
           />
         ))}
+
+      {/* Ladiaci text pre skúšku na mobile: iba s ?ladenie=1 v adrese. */}
+      {isDebug && (
+        <p
+          ref={debugRef}
+          data-chest-debug=""
+          className="absolute inset-x-0 -bottom-6 text-center text-[11px] leading-4 text-slate-500"
+        />
+      )}
     </div>
   );
 }
