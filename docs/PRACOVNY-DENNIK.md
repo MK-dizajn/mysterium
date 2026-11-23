@@ -5988,3 +5988,28 @@ e5:reduced   : TEST: všetko OK
 - používateľ vyskúša na mobile odkazy „Otvoriť v mapách“ a nové nápovedy s cenami (server na požiadanie),
 - rozhodnúť riziká pred mini hrami (scéna 3 šifra, scéna 4 rok 1465, scéna 5 rozdiely, prípadne rok 1805 v scéne 9),
 - krok T5 iba po pokyne používateľa.
+
+---
+
+## 23. 11. 2026 – Podmienky pred stavbou mini hier
+
+**Spätná väzba:** nové nápovedy sú v poriadku.
+
+**Rozhodnutia používateľa k rizikám**, zapísané v `docs/NAVRH-MINIHIER.md` ako sekcia „Podmienky pred stavbou mini hier“:
+- **scéna 3, šifra (M4):** v príbehu a nápovede 1 iba „Quidquid agis…“ so slovenským prekladom, celú vetu a jej slová hráč nájde na fasáde,
+- **scéna 4, kryptex (M3):** v príbehu a artefakte „v 15. storočí“ namiesto 1465,
+- **scéna 5, rozdiely (M8):** v oknách, balkóne, pilastroch, mrežiach a portáloch, nie na erbe,
+- **scéna 9:** rok 1805 ostáva v texte, deň a mesiac iba na tabuli.
+
+Texty hry sa teraz nemenia, podmienky sa splnia v kroku danej mini hry.
+
+**Súbory:** `docs/NAVRH-MINIHIER.md`, `docs/PRACOVNY-DENNIK.md`.
+
+**Testy:**
+- **Pred zmenou:** rozšírený test O11 (Node) 5 chýb.
+- **Po zmene:** O11 všetko OK, Node spolu 38 testov OK.
+- Prehliadač ani build netreba (iba dokument).
+
+**Krokov od poslednej celej série:** 2 z 3 (krok iba s dokumentom).
+
+**Ďalší krok:** návrh T5 (2D záloha truhlice, vypnuté animácie, meranie, zoznam zvukov) na schválenie.

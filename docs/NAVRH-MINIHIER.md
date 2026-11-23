@@ -80,6 +80,24 @@ Rozhodnutie z 21. 11. 2026.
 | 4 Academia | **kryptex**, rok založenia 1465 | Príbeh miesta („bola založená v roku 1465“) a krátky text artefaktu („bola založená v roku 1465“). Z nápovede 1 bol rok odstránený 21. 11. 2026. Nahraté texty scény rok nemajú. | Pred M3 vynechať rok z príbehu a artefaktu (napríklad „v 15. storočí“). |
 | 5 Mirbachov palác | **hľadanie rozdielov** rytina a priečelie | Zadanie opisuje „výzdobu zakončenú korunou“, príbeh „erb pod grófskou korunou“, nápoveda 1 „ornament s dvoma farebnými medailónmi“. | Rozdiely voliť mimo erbu, koruny a medailónov (okná, nadokenice s mušľou, zábradlie balkóna, pilastre, mreže, portály). Inak text prezradí, kde rozdiel hľadať. |
 
+### Podmienky pred stavbou mini hier
+
+Rozhodnutia autora z 23. 11. 2026. Každá podmienka sa splní **v tom istom kroku**, v ktorom sa stavia daná mini hra, a jej test ju skontroluje.
+
+- **Scéna 3 – šifra (krok M4):**
+  - v príbehu miesta a v nápovede 1 úlohy sa latinský nápis skráti na „Quidquid agis…“ so slovenským prekladom,
+  - celú vetu a jej slová (kľúč šifry) musí hráč nájsť na fasáde lekárne,
+  - nahratý Hlas pátrača (#22) sa nemení.
+- **Scéna 4 – kryptex (krok M3):**
+  - v príbehu miesta a v artefakte bude „v 15. storočí“ namiesto roku 1465,
+  - rok založenia je iba na pamätnej tabuli (a v 3. nápovede kryptexu).
+- **Scéna 5 – hľadanie rozdielov (krok M8):**
+  - rozdiely budú v oknách, balkóne, pilastroch, mrežiach a portáloch, nie na erbe (ani na korune a medailónoch),
+  - stále platí: rozdiely na tvaroch a počte, nie na farbách.
+- **Scéna 9 – dátum na číselníkoch (hotové):**
+  - rok 1805 ostáva v texte hry (príbeh a artefakt),
+  - deň a mesiac sú iba na tabuli (a v 3. nápovede mini hry).
+
 ## Typy mini hier
 
 | Typ | Ako sa hrá | Väzba na miesto | Nápovedy (3 stupne) | Kde v kapitole I |
