@@ -6469,3 +6469,37 @@ Všetky dĺžky sú v rozpätí zo zoznamu zvukov.
 **Build:** prešiel. **Typy:** bez chýb. **Lint:** v upravených súboroch žiadny problém.
 
 **Krokov od poslednej celej série:** 4 z 3 (celá séria je na rade pri ďalšom kroku alebo pred testermi).
+
+---
+
+## 23. 11. 2026 – Záver dňa
+
+**Hotové dnes:**
+- podmienky pred stavbou mini hier v `docs/NAVRH-MINIHIER.md`,
+- **T5a až T5c:** 2D záloha truhlice, vypnuté animácie a meranie, spoločný zoznam zvukov,
+- celá séria v prehliadači po T5 (N1 s nabíjačkou OK),
+- vyradené zvuky starej truhlice,
+- prvá dávka zvukov pridaná a po kontrole používateľa zamietnutá (znie umelo), vrátené tiché miesta,
+- vrátená oprava 1 (rub fotografie podľa T3a), používateľ ju na mobile overil: v poriadku.
+
+**Kontroly bez zmeny súborov (na žiadosť používateľa):**
+- ikony hlasu a súbory: všetkých 24 hlasov existuje, žiadna ikona nie je bez súboru,
+- texty pri hlasoch sa zhodujú so súpisom; používateľ ich prešiel a sedia,
+- **hlasy scény 9 (hlas-057, hlas-058):** používateľ si nepamätá, že by ich generoval.
+  - Zistenie: súbory sú v projekte od kroku H1 (commit `f249126`, 28. 10. 2026) a prišli v balíku `hlasy-vsetky.zip` (`Projekty\mysterium-zdroje\`) spolu s ostatnými 23 hlasmi, bajt po bajte zhodné, rovnaké spracovanie (ffmpeg, 96 kb/s).
+  - Texty, ktoré čítajú, sú v hre nezmenené od 16. 7. 2026.
+  - Dĺžky (15,75 s a 14,99 s) sedia s textom ako pri ostatných scénach.
+  - Obsah nahrávky som nepočúval, overí ho iba vypočutie.
+
+**Stav:**
+- všetko je v commitoch,
+- všetky procesy sú zastavené,
+- push robí používateľ cez GitHub Desktop.
+
+**Krokov od poslednej celej série:** 4 z 3. Celá séria je na rade pri ďalšom kroku.
+
+**Otvorené na stredu (25. 11. 2026):**
+- používateľ si vypočuje hlasy scény 9 (hlas-057, hlas-058) a rozhodne, či ostanú,
+- zvuky: nové súbory dodá používateľ, potom zapnúť (`ready: false` odstrániť) a vyskúšať na mobile,
+- ďalší krok (mini hry podľa `docs/NAVRH-MINIHIER.md`) iba po potvrdení používateľa,
+- celá séria v prehliadači pri najbližšom kroku (so zapojenou nabíjačkou).
