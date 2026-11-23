@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { soundManager } from "../../../lib/soundManager";
 
 type ChestUnlockSequence = {
   isLockReleased: boolean;
@@ -45,14 +44,13 @@ export function useChestUnlockSequence(
       1680 ms   - fotografia
     */
 
+    // Stará truhlica sa v hre nepoužíva; jej zvuky sú vyradené (23. 11. 2026).
     const lockTimer = window.setTimeout(() => {
       setIsLockReleased(true);
-      soundManager.play("chest-unlock");
     }, 320);
 
     const lidTimer = window.setTimeout(() => {
       setIsLidOpen(true);
-      soundManager.play("artifact-unlock");
     }, 780);
 
     const lightTimer = window.setTimeout(() => {

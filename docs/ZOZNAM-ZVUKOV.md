@@ -2,7 +2,7 @@
 
 Spoločný zoznam všetkých zvukov hry (kapitola I): kedy zaznejú a ako majú znieť, aby ich Miloš mohol pripraviť. Stav k 23. 11. 2026 (krok T5c).
 
-**Hra má 23 zvukov.** Žiadny zvukový súbor zatiaľ nie je hotový, hra je tichá. Každý zvuk má v hre pripravené tiché miesto: kým súbor chýba alebo je prázdny, zvuk sa nespúšťa a nič sa nesťahuje.
+**Hra má 21 zvukov.** Žiadny zvukový súbor zatiaľ nie je hotový, hra je tichá. Každý zvuk má v hre pripravené tiché miesto: kým súbor chýba alebo je prázdny, zvuk sa nespúšťa a nič sa nesťahuje.
 
 ## Spoločné pravidlá
 
@@ -25,8 +25,6 @@ Spoločný zoznam všetkých zvukov hry (kapitola I): kedy zaznejú a ako majú 
 | `digit-found.mp3` | v okne „Prezrieť“ sa objaví číslica (hľadanie číslice na predmete) | krátke svetlé cinknutie, objav | 0,4–0,8 s | 0,5 | chýba | zapojený |
 | `city-ambient.mp3` | zvuk mesta v pozadí počas hry (okrem úvodnej obrazovky, artefaktu a rozhovoru), plynulé zosilnenie a zoslabenie | tiché staré mesto: kroky na dlažbe, vzdialené hlasy, holuby, bez hudby a bez áut; bez výrazných udalostí | 30–60 s, plynulá slučka (koniec nadväzuje na začiatok) | 0,3 | prázdny (0 B) | zapojený |
 | `button-click.mp3` | ťuknutie na tlačidlo | veľmi krátke tiché ťuknutie | 0,05–0,1 s | 0,35 | chýba | voliteľný, nezapojený (pri každom ťuknutí by rušil; rozhodnutie z 23. 11. 2026) |
-| `artifact-unlock.mp3` | odomknutie artefaktu v starej truhlici konca aktu | magické zažiarenie, trblietanie | 1,0–1,5 s | 0,7 | prázdny (0 B) | dnes nezapojený: stará truhlica (`components/ui/chest/Chest.tsx`) sa v hre nepoužíva a finále ho od kroku T5a nepúšťa |
-| `chest-unlock.mp3` | odomknutie starej truhlice konca aktu | cvaknutie zámku a škrípnutie veka | 0,8–1,2 s | 0,55 | prázdny (0 B) | dnes nezapojený (rovnako ako riadok vyššie) |
 
 ## Mini hry (scéna 9 a ďalšie)
 
@@ -63,7 +61,8 @@ Spoločný zoznam všetkých zvukov hry (kapitola I): kedy zaznejú a ako majú 
 
 ## Prehľad stavu
 
-- **Prázdne súbory (0 B):** `artifact-unlock`, `chest-unlock`, `city-ambient`, `npc-message`, `puzzle-success`.
+- **Prázdne súbory (0 B):** `city-ambient`, `npc-message`, `puzzle-success`.
 - **Chýbajú úplne:** ostatných 18 zvukov.
 - **Zapojené v hre:** 18 zvukov (z toho nové v kroku T5c: `puzzle-success` a `npc-message`).
-- **Nezapojené:** `button-click` (voliteľný), `tile-slide` a `minigame-correct-step` (budúce mini hry), `artifact-unlock` a `chest-unlock` (stará truhlica sa nepoužíva).
+- **Nezapojené:** `button-click` (voliteľný), `tile-slide` a `minigame-correct-step` (budúce mini hry).
+- **Vyradené (23. 11. 2026):** `artifact-unlock` a `chest-unlock`. Patrili starej truhlici konca aktu, ktorú hra nepoužíva. Ich prázdne súbory sú zmazané a nie sú ani v `lib/soundManager.ts`, ani v `docs/MEDIA-LICENCIE.md`.

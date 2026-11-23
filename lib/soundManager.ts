@@ -1,6 +1,4 @@
 export type SoundId =
-  | "artifact-unlock"
-  | "chest-unlock"
   | "puzzle-success"
   | "digit-found"
   | "button-click"
@@ -49,18 +47,10 @@ export const SOUND_SETTING_EVENT =
  * Kým súbor chýba alebo je prázdny (0 B), má ready: false – zvuk sa
  * nespúšťa a nič sa nesťahuje (tiché miesto). Po dodaní súboru stačí
  * ready: false odstrániť.
+ * Zvuky starej truhlice (artifact-unlock, chest-unlock) sú vyradené
+ * (23. 11. 2026) – stará truhlica sa v hre nepoužíva.
  */
 const sounds: Record<SoundId, SoundConfig> = {
-  "artifact-unlock": {
-    src: "/sounds/artifact-unlock.mp3",
-    volume: 0.7,
-    ready: false,
-  },
-  "chest-unlock": {
-    src: "/sounds/chest-unlock.mp3",
-    volume: 0.55,
-    ready: false,
-  },
   "puzzle-success": {
     src: "/sounds/puzzle-success.mp3",
     volume: 0.65,

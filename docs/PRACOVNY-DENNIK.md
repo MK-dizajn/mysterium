@@ -6280,3 +6280,38 @@ n1           : TEST: 1 chýb  (medián 36 ms, 95 % 67 ms)
 - **na overenie:** spustiť N1 znova so zapojenou nabíjačkou. Ak zlyhá aj vtedy, hľadať príčinu v kóde.
 
 **Krokov od poslednej celej série:** 0 z 3.
+
+---
+
+## 23. 11. 2026 – N1 s nabíjačkou a vyradenie zvukov starej truhlice
+
+**N1 so zapojenou nabíjačkou:**
+- samostatne dvakrát za sebou, **oba razy všetko OK**,
+- išlo o **zaťaženie počítača na batérii**, nie o chybu hry.
+- Pri meraní plynulosti spúšťať testy so zapojenou nabíjačkou.
+
+**Vyradené zvuky `artifact-unlock` a `chest-unlock`** (rozhodnutie používateľa, patrili starej truhlici konca aktu, ktorú hra nepoužíva):
+- odstránené z `lib/soundManager.ts` a zo starej truhlice (`components/ui/chest/useChestUnlockSequence.ts`, ktorá ich ako jediná púšťala),
+- zmazané ich prázdne súbory (0 B) v `public/sounds/`,
+- odstránené z `docs/MEDIA-LICENCIE.md`, kde je `button-click` teraz označený ako voliteľný a nezapojený,
+- `docs/ZOZNAM-ZVUKOV.md` a `docs/KONTROLA-PRED-VYDANIM.md`: hra má **21 zvukov** (3 prázdne súbory, 18 chýba), s poznámkou o vyradení.
+- Triedy vzhľadu `artifact-unlock-…` v `app/globals.css` patria oknu artefaktu, so zvukom nesúvisia, ostávajú.
+
+**Súbory:**
+- `lib/soundManager.ts`, `components/ui/chest/useChestUnlockSequence.ts`,
+- `public/sounds/artifact-unlock.mp3` a `chest-unlock.mp3` (zmazané),
+- `docs/ZOZNAM-ZVUKOV.md`, `docs/MEDIA-LICENCIE.md`, `docs/KONTROLA-PRED-VYDANIM.md`, `docs/PRACOVNY-DENNIK.md`.
+
+**Testy:**
+- **Pred zmenou:** rozšírený O14 (Node) 3 chyby.
+- **Po zmene:**
+  - O14 všetko OK: 21 zvukov, vyradené zvuky nie sú v hre, zozname, licenciách ani v `public/sounds`,
+  - starý test C5 upravený na nové znenie bodu o zvukoch,
+  - **Node:** 41 testov OK,
+  - **v prehliadači iba zvuky:** O14 v oboch režimoch OK.
+
+**Build:** prešiel. **Typy:** bez chýb. **Lint:** 14 starých problémov (jeden z nich je v `useChestUnlockSequence.ts`, riadok 30, ten tam bol už predtým). **Server:** spustený pre mobil (`npm run test:server`) na žiadosť používateľa.
+
+**Krokov od poslednej celej série:** 1 z 3.
+
+**Ďalší krok:** používateľ skúša na mobile 2D truhlicu, plnú a ľahkú 3D verziu a ceny nápovied. Mini hry až po jeho potvrdení.
