@@ -6195,3 +6195,88 @@ Texty hry sa teraz nemenia, podmienky sa splnia v kroku danej mini hry.
 **Build:** prešiel. **Typy:** bez chýb. **Lint:** v upravených súboroch žiadny problém (14 starých v iných súboroch). **Server:** zastavený.
 
 **Ďalej:** celá séria v prehliadači na pozadí (väčší celok T5), s uloženým celým výpisom.
+
+---
+
+## 23. 11. 2026 – Celá séria v prehliadači po T5
+
+- Prvé spustenie som na žiadosť používateľa zastavil po 4 behoch (presun domov), potom spustené znova.
+- **Výsledok:** 52 behov, 53 minút, server najviac 100 MB, **50 OK, 2 zlyhania.**
+
+**Celý výpis:**
+
+```
+b3b          : TEST: všetko OK
+b4b          : TEST: všetko OK
+b4c1         : TEST: všetko OK
+b4c2         : TEST: všetko OK
+b4c3         : TEST: všetko OK
+b4c3:reduced : TEST: všetko OK
+c1           : TEST: všetko OK
+d2           : TEST: 1 chýb
+    FAIL kontrast „Každá prečítaná poznámka zníži…“ aspoň 4,5 : 1 (cieľ 7) – undefined : 1
+d3a          : TEST: všetko OK
+d4           : TEST: všetko OK
+d5           : TEST: všetko OK
+c6           : TEST: všetko OK
+g1           : TEST: všetko OK
+g1:reduced   : TEST: všetko OK
+e5           : TEST: všetko OK
+e5:reduced   : TEST: všetko OK
+f3           : TEST: všetko OK
+f3:reduced   : TEST: všetko OK
+h2           : TEST: všetko OK
+h2:reduced   : TEST: všetko OK
+h3           : TEST: všetko OK
+h3:reduced   : TEST: všetko OK
+i1           : TEST: všetko OK
+i1:reduced   : TEST: všetko OK
+k2           : TEST: všetko OK
+k2:reduced   : TEST: všetko OK
+k3           : TEST: všetko OK
+k3:reduced   : TEST: všetko OK
+l1           : TEST: všetko OK
+l1:reduced   : TEST: všetko OK
+n1           : TEST: 1 chýb
+    FAIL spomalený procesor 4×: animácia plynulá (medián snímky do 34 ms) – snímok 56, medián 49 ms, 95 % 85 ms, najdlhšia 158 ms
+n1:reduced   : TEST: všetko OK
+o1           : TEST: všetko OK
+o1:reduced   : TEST: všetko OK
+o3           : TEST: všetko OK
+o3:reduced   : TEST: všetko OK
+o4           : TEST: všetko OK
+o4:reduced   : TEST: všetko OK
+o5           : TEST: všetko OK
+o5:reduced   : TEST: všetko OK
+o6           : TEST: všetko OK
+o6:reduced   : TEST: všetko OK
+o7           : TEST: všetko OK
+o7:reduced   : TEST: všetko OK
+o9           : TEST: všetko OK
+o9:reduced   : TEST: všetko OK
+o12          : TEST: všetko OK
+o12:reduced  : TEST: všetko OK
+o13          : TEST: všetko OK
+o13:reduced  : TEST: všetko OK
+o14          : TEST: všetko OK
+o14:reduced  : TEST: všetko OK
+trvanie: 53 min, server najviac 100 MB
+opakovanie samostatne:
+d2           : TEST: všetko OK
+n1           : TEST: 1 chýb  (medián 36 ms, 95 % 61 ms)
+n1           : TEST: 1 chýb  (medián 36 ms, 95 % 67 ms)
+```
+
+**D2 (moja chyba v teste):**
+- test kontrastu hľadal starú vetu „Každá prečítaná poznámka zníži…“, ktorú krok nápovied (21. 11.) zmenil na „Poznámka stojí 5 bodov, odpoveď 10 bodov.“,
+- D2 nebol v cielených testoch nápovied (patrí do časti „vzhľad celej hry“),
+- test upravený na novú vetu, potom OK.
+- **Poučenie:** pri zmene textu na obrazovke pridať do cielených testov aj D2.
+
+**N1 (plynulosť schránky v scéne 9 pri 4× spomalenom procesore):**
+- zlyhal aj dvakrát samostatne, hoci tesne: medián 36 ms pri hranici 34 ms,
+- **pravdepodobná príčina:** počítač beží na batérii (60 %, režim Legion Balance), procesor je spomalený a test ho ešte 4× spomalí,
+- kroky T5 sa schránky scény 9 nedotkli (iba tiché miesta zvukov, ktoré sa nespúšťajú),
+- **na overenie:** spustiť N1 znova so zapojenou nabíjačkou. Ak zlyhá aj vtedy, hľadať príčinu v kóde.
+
+**Krokov od poslednej celej série:** 0 z 3.
