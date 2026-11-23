@@ -6315,3 +6315,79 @@ n1           : TEST: 1 chýb  (medián 36 ms, 95 % 67 ms)
 **Krokov od poslednej celej série:** 1 z 3.
 
 **Ďalší krok:** používateľ skúša na mobile 2D truhlicu, plnú a ľahkú 3D verziu a ceny nápovied. Mini hry až po jeho potvrdení.
+
+---
+
+## 23. 11. 2026 – Prvá dávka zvukov (19 súborov)
+
+**Dodané:** 19 mp3, vlastná syntéza (Claude, 23. 11. 2026), bez licenčných obmedzení.
+
+**Zistenie pri preberaní:**
+- súbory neboli priamo v `public/sounds/`, ale v podpriečinku `public/sounds/zvuky-davka1/`, kde ich hra nehľadá,
+- `puzzle-success` a `npc-message` v `public/sounds/` boli stále prázdne,
+- presunul som ich do `public/sounds/` (prázdne súbory sa prepísali, ako chcel používateľ) a prázdny podpriečinok zmazal,
+- všetkých 19 má hlavičku mp3 (ID3).
+
+**Čo je nové:**
+- **`lib/soundManager.ts`:**
+  - 19 zvukov zapnutých (bez `ready: false`), tiché ostávajú `city-ambient` (prázdny súbor) a `button-click` (voliteľný, nezapojený),
+  - **nové pravidlo:** kým hrá nahratý hlas (rozprávač, pátrač, Strážca), krátky zvuk sa nespustí,
+  - doteraz mohol napríklad zvuk správnej odpovede zaznieť počas hlasu rozprávača v úlohe,
+  - stav hlasu sa číta z dokumentu (`data-voice-playing`, zapisuje ho prehrávač hlasov), bez vzájomného importu,
+  - zvuk mesta sa pravidla netýka (zatiaľ je aj tak tichý).
+- **Prepínač zvuku v lište:** všetky zvuky ho rešpektujú (`canPlay`). Pri vypnutom zvuku sa súbory ani nesťahujú.
+- **`docs/MEDIA-LICENCIE.md`:** 19 riadkov „vlastná syntéza (Claude, 23. 11. 2026), bez licenčných obmedzení“.
+- **`docs/ZOZNAM-ZVUKOV.md`:**
+  - stav „hotový (dávka 1)“,
+  - pravidlo o hlase,
+  - upozornenie: súbory priamo do `public/sounds/`, nie do podpriečinka.
+- **`docs/KONTROLA-PRED-VYDANIM.md`:** bod o zvukoch, čo vyskúšať na mobile (hlasitosť voči sebe a voči hlasom, prepínač, video Strážcu, zvuky počas hlasu, truhlica, mini hra, fotografia); chýba ešte `city-ambient`.
+
+**Súbory dávky 1** (prehrané v prehliadači; dĺžka, ticho na začiatku):
+
+| Zvuk | Dĺžka | Ticho na začiatku |
+|---|---|---|
+| puzzle-success | 0,6 s | 0 ms |
+| npc-message | 0,35 s | 18 ms |
+| digit-found | 0,7 s | 0 ms |
+| dial-click | 0,14 s | 0 ms |
+| minigame-wrong | 0,38 s | 0 ms |
+| hint-open | 0,45 s | 55 ms (pozvoľný šuchot) |
+| compartment-open | 1,7 s | 0 ms |
+| digit-reveal | 1,4 s | 11 ms |
+| tile-slide | 0,28 s | 2 ms |
+| minigame-correct-step | 0,27 s | 0 ms |
+| photo-piece-snap | 0,25 s | 0 ms |
+| chest-dial-click | 0,09 s | 0 ms |
+| chest-lock-open | 0,5 s | 0 ms |
+| chest-lock-wrong | 0,38 s | 0 ms |
+| chest-shine | 0,75 s | 2 ms |
+| chest-hasp-release | 0,75 s | 0 ms |
+| chest-key-insert | 0,55 s | 5 ms |
+| chest-key-turn | 0,5 s | 11 ms |
+| chest-lid-creak | 1,3 s | 9 ms |
+
+Všetky dĺžky sú v rozpätí zo zoznamu zvukov.
+
+**Súbory:**
+- `public/sounds/` (19 mp3),
+- `lib/soundManager.ts`,
+- `docs/MEDIA-LICENCIE.md`, `docs/ZOZNAM-ZVUKOV.md`, `docs/KONTROLA-PRED-VYDANIM.md`, `docs/PRACOVNY-DENNIK.md`.
+
+**Testy:**
+- **Pred zmenou:** rozšírený O14 (Node) 4 chyby.
+- **Po zmene:**
+  - **O14 (Node)** všetko OK: 19 hotových mp3, zapnuté, tiché `city-ambient` a `button-click`, v `public/sounds` nič navyše, pravidlo o hlase, licencie.
+  - **Staré testy upravené:** O3, O5, O7 (Node) čakali tiché zvuky, teraz zapnuté; C5 na nové znenie KONTROLY.
+  - **O14 v prehliadači** (prepracovaný, oba režimy), všetko OK:
+    - správna odpoveď prehrá `puzzle-success`,
+    - pri vypnutom zvuku nezaznie nič a nič sa nesťahuje,
+    - počas hlasu rozprávača `puzzle-success` nezaznie,
+    - pred videom Strážcu zaznie `npc-message` a video začne až o 0,5 s,
+    - 19 súborov sa dá dekódovať, dĺžka do 3 s, ticho na začiatku do 60 ms.
+  - **Dotknuté miesta:** O7 (otvorenie truhlice) a N1 (mini hra scény 9) OK.
+  - **Node:** 41 testov OK.
+
+**Build:** prešiel. **Typy:** bez chýb. **Lint:** v upravených súboroch žiadny problém. **Server:** spustený pre mobil.
+
+**Krokov od poslednej celej série:** 2 z 3.
