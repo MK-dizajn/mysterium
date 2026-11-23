@@ -6391,3 +6391,39 @@ Všetky dĺžky sú v rozpätí zo zoznamu zvukov.
 **Build:** prešiel. **Typy:** bez chýb. **Lint:** v upravených súboroch žiadny problém. **Server:** spustený pre mobil.
 
 **Krokov od poslednej celej série:** 2 z 3.
+
+---
+
+## 23. 11. 2026 – STOP a vrátenie opravy 1 (rub fotografie)
+
+**STOP:**
+- na pokyn používateľa som zastavil server pre mobil (séria testov nebežala),
+- necommitnuté nebolo nič, na push čakali 3 commity (záznam série, vyradenie zvukov starej truhlice, prvá dávka zvukov).
+
+**Rozhodnutie používateľa:**
+- požiadavka z opravy 1 („žiadny šev nesmie pretínať žiadny text“) bola chybná,
+- predošlé rozloženie z kroku T3a bolo dobré.
+
+**Čo je vrátené:**
+- `components/finale/photoPieces.ts` a `components/finale/FinalePhotoViewer.tsx` sú obnovené zo stavu pred opravou 1 (commit pred `10e3650`); žiadny neskorší krok sa ich nedotkol.
+- **Rub fotografie:**
+  - prvé dva riadky („Prešporok ukrýval viac než jeden kľúč.“ a „Tam, kde sa za oponou skrýva pamäť mesta, nájdeš ďalšiu stopu.“) sú hore cez celú šírku a smú prechádzať cez roztrhnutia,
+  - „Miesto: Slovenské národné divadlo“ je celé v strednom dolnom kuse, bez švu,
+  - „— pátrač“ je dole vpravo.
+- **Rub zo 4 kusov ostáva:** zrkadlové okraje, rôzne odtiene, tieň v škárach.
+- **Zrušené:** rozdeľovanie textu po kusoch (`BACK_SLOTS`), zalamovanie po slovách a zmenšovanie písma.
+- **Inventár:** prezretie jedného kusu ukazuje jeho kúsok poznámky ako v T3a.
+
+**Súbory:** `components/finale/photoPieces.ts`, `components/finale/FinalePhotoViewer.tsx`, `docs/PRACOVNY-DENNIK.md`.
+
+**Testy:**
+- **O3 upravený podľa návrhu:**
+  - **Node:** bez rozdeľovania po kusoch; ostáva kontrola, že miesto leží celé v rube útržku z truhlice,
+  - **prehliadač:** kontrola po slovách pre všetky riadky zrušená; ostáva, že „Miesto: …“ je celé v jednom útržku a čitateľné (aspoň 12 px) na 320 aj 360 px, poznámka je celá a rub kusu v Inventári ukazuje svoj kúsok poznámky.
+- **Po zmene:**
+  - **Node:** 41 testov OK,
+  - **v prehliadači iba O3**, oba režimy, všetko OK (snímka rubu zodpovedá T3a).
+
+**Build:** prešiel. **Typy:** bez chýb. **Lint:** v upravených súboroch žiadny problém.
+
+**Krokov od poslednej celej série:** 3 z 3.
