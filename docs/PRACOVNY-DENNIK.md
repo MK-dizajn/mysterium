@@ -6427,3 +6427,45 @@ Všetky dĺžky sú v rozpätí zo zoznamu zvukov.
 **Build:** prešiel. **Typy:** bez chýb. **Lint:** v upravených súboroch žiadny problém.
 
 **Krokov od poslednej celej série:** 3 z 3.
+
+---
+
+## 23. 11. 2026 – Zamietnutá prvá dávka zvukov (vrátenie)
+
+**Rozhodnutie používateľa:** prvá dávka zvukov (19 súborov, programovo vyrobené) je zlá a nepoužije sa, lebo **programovo vyrobené zvuky znejú umelo**. Súbory dodá neskôr.
+
+**Čo je vrátené** (do stavu pred dávkou, commit `ed6641c`):
+- **súbory:**
+  - zmazaných 17 nových mp3 z `public/sounds/`,
+  - `npc-message.mp3` a `puzzle-success.mp3` sú znova prázdne (0 B),
+  - `city-ambient.mp3` ostáva prázdny,
+- **`lib/soundManager.ts`:** všetkých 19 zvukov má znova `ready: false` (tiché miesta), rovnako `city-ambient` a `button-click`,
+- **`docs/MEDIA-LICENCIE.md`:** bez riadkov „vlastná syntéza“, pôvodné riadky (prázdny alebo chýba, treba vytvoriť),
+- **`docs/ZOZNAM-ZVUKOV.md` a `docs/KONTROLA-PRED-VYDANIM.md`:** stav „chýba“ alebo „prázdny“ ako pred dávkou.
+
+**Čo ostáva:**
+- celé zapojenie zvukov (`canPlay`, prepínač zvuku v lište, `puzzle-success`, `npc-message` pred videom Strážcu a v rozhovore, všetky miesta, kde sa zvuky spúšťajú),
+- pravidlo „krátky zvuk nezaznie počas nahratého hlasu“ (v `lib/soundManager.ts` doplnené späť),
+- v `docs/ZOZNAM-ZVUKOV.md`: pravidlo o hlase, upozornenie „súbory priamo do `public/sounds/`, nie do podpriečinka“ a poznámka o zamietnutej dávke.
+
+**Súbory:**
+- `public/sounds/` (17 zmazaných, 2 vrátené na 0 B),
+- `lib/soundManager.ts`,
+- `docs/MEDIA-LICENCIE.md`, `docs/ZOZNAM-ZVUKOV.md`, `docs/KONTROLA-PRED-VYDANIM.md`, `docs/PRACOVNY-DENNIK.md`.
+
+**Testy:**
+- **O14 (Node):** dávka 1 vrátená:
+  - súbory chýbajú, iba 3 sú prázdne,
+  - všetkých 21 zvukov má tiché miesto,
+  - pravidlo o hlase ostáva,
+  - v licenciách nie je vlastná syntéza.
+- **Staré testy vrátené:** O3, O5, O7 (Node) znova kontrolujú tiché miesta, C5 znova pôvodné znenie bodu o zvukoch.
+- **O14 v prehliadači** (oba režimy), všetko OK:
+  - správna odpoveď ani video Strážcu nepustia žiadny zvuk,
+  - video začne hneď, pri vypnutom zvuku ticho,
+  - nesťahuje sa žiadny zvukový súbor.
+- **Node:** 41 testov OK.
+
+**Build:** prešiel. **Typy:** bez chýb. **Lint:** v upravených súboroch žiadny problém.
+
+**Krokov od poslednej celej série:** 4 z 3 (celá séria je na rade pri ďalšom kroku alebo pred testermi).

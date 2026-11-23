@@ -49,44 +49,52 @@ export const SOUND_SETTING_EVENT =
  * ready: false odstrániť.
  * Zvuky starej truhlice (artifact-unlock, chest-unlock) sú vyradené
  * (23. 11. 2026) – stará truhlica sa v hre nepoužíva.
- * Prvá dávka 19 zvukov je hotová (23. 11. 2026); tiché ostávajú iba
- * city-ambient (prázdny súbor) a button-click (voliteľný, nezapojený).
  */
 const sounds: Record<SoundId, SoundConfig> = {
-  "puzzle-success": { src: "/sounds/puzzle-success.mp3", volume: 0.65 },
-  "digit-found": { src: "/sounds/digit-found.mp3", volume: 0.5 },
+  "puzzle-success": {
+    src: "/sounds/puzzle-success.mp3",
+    volume: 0.65,
+    ready: false,
+  },
+  "digit-found": {
+    src: "/sounds/digit-found.mp3",
+    volume: 0.5,
+    ready: false,
+  },
   // Voliteľný, nezapojený (rozhodnutie z 23. 11. 2026).
   "button-click": {
     src: "/sounds/button-click.mp3",
     volume: 0.35,
     ready: false,
   },
-  "npc-message": { src: "/sounds/npc-message.mp3", volume: 0.45 },
-  // Súbor je zatiaľ prázdny (0 B).
+  "npc-message": {
+    src: "/sounds/npc-message.mp3",
+    volume: 0.45,
+    ready: false,
+  },
   "city-ambient": {
     src: "/sounds/city-ambient.mp3",
     volume: 0.3,
     loop: true,
     ready: false,
   },
-  // Mini hry.
-  "dial-click": { src: "/sounds/dial-click.mp3", volume: 0.5 },
-  "tile-slide": { src: "/sounds/tile-slide.mp3", volume: 0.5 },
-  "minigame-correct-step": { src: "/sounds/minigame-correct-step.mp3", volume: 0.5 },
-  "minigame-wrong": { src: "/sounds/minigame-wrong.mp3", volume: 0.5 },
-  "compartment-open": { src: "/sounds/compartment-open.mp3", volume: 0.7 },
-  "digit-reveal": { src: "/sounds/digit-reveal.mp3", volume: 0.6 },
-  "hint-open": { src: "/sounds/hint-open.mp3", volume: 0.4 },
-  "photo-piece-snap": { src: "/sounds/photo-piece-snap.mp3", volume: 0.5 },
-  // Truhlica vo finále (3D aj 2D).
-  "chest-dial-click": { src: "/sounds/chest-dial-click.mp3", volume: 0.4 },
-  "chest-lock-open": { src: "/sounds/chest-lock-open.mp3", volume: 0.7 },
-  "chest-lock-wrong": { src: "/sounds/chest-lock-wrong.mp3", volume: 0.6 },
-  "chest-shine": { src: "/sounds/chest-shine.mp3", volume: 0.5 },
-  "chest-key-insert": { src: "/sounds/chest-key-insert.mp3", volume: 0.5 },
-  "chest-key-turn": { src: "/sounds/chest-key-turn.mp3", volume: 0.6 },
-  "chest-lid-creak": { src: "/sounds/chest-lid-creak.mp3", volume: 0.6 },
-  "chest-hasp-release": { src: "/sounds/chest-hasp-release.mp3", volume: 0.6 },
+  // Zvuky mini hier vyrobí Miloš; kým súbory nie sú, ready: false (ticho).
+  "dial-click": { src: "/sounds/dial-click.mp3", volume: 0.5, ready: false },
+  "tile-slide": { src: "/sounds/tile-slide.mp3", volume: 0.5, ready: false },
+  "minigame-correct-step": { src: "/sounds/minigame-correct-step.mp3", volume: 0.5, ready: false },
+  "minigame-wrong": { src: "/sounds/minigame-wrong.mp3", volume: 0.5, ready: false },
+  "compartment-open": { src: "/sounds/compartment-open.mp3", volume: 0.7, ready: false },
+  "digit-reveal": { src: "/sounds/digit-reveal.mp3", volume: 0.6, ready: false },
+  "hint-open": { src: "/sounds/hint-open.mp3", volume: 0.4, ready: false },
+  "photo-piece-snap": { src: "/sounds/photo-piece-snap.mp3", volume: 0.5, ready: false },
+  "chest-dial-click": { src: "/sounds/chest-dial-click.mp3", volume: 0.4, ready: false },
+  "chest-lock-open": { src: "/sounds/chest-lock-open.mp3", volume: 0.7, ready: false },
+  "chest-lock-wrong": { src: "/sounds/chest-lock-wrong.mp3", volume: 0.6, ready: false },
+  "chest-shine": { src: "/sounds/chest-shine.mp3", volume: 0.5, ready: false },
+  "chest-key-insert": { src: "/sounds/chest-key-insert.mp3", volume: 0.5, ready: false },
+  "chest-key-turn": { src: "/sounds/chest-key-turn.mp3", volume: 0.6, ready: false },
+  "chest-lid-creak": { src: "/sounds/chest-lid-creak.mp3", volume: 0.6, ready: false },
+  "chest-hasp-release": { src: "/sounds/chest-hasp-release.mp3", volume: 0.6, ready: false },
 };
 
 /**
