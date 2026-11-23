@@ -685,6 +685,11 @@ export type StoryVideoContent = {
   endLabel?: string;
   /** Príznak, že hráč video videl alebo preskočil. */
   seenFlagId: string;
+  /**
+   * Krátky zvuk tesne pred videom s hlasom (napríklad Strážca prehovorí).
+   * Video sa spustí až po ňom, aby zvuk neznel súčasne s hlasom.
+   */
+  cueSound?: "npc-message";
 };
 
 /**

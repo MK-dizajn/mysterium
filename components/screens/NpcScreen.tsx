@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { soundManager } from "../../lib/soundManager";
 import type { Dialogue, DialogueChoice, Npc } from "../../types/game";
 import { ActionButton } from "../ui/ActionButton";
 import { BackBar } from "../ui/BackBar";
@@ -32,6 +33,12 @@ export function NpcScreen({
   const activeNode =
     dialogue.nodes.find((node) => node.id === activeNodeId) ??
     dialogue.nodes[0];
+
+  // Krátky zvuk pri každej novej replike. Písaný rozhovor nemá nahratý hlas,
+  // takže zvuk nikdy neznie súčasne s hlasom.
+  useEffect(() => {
+    soundManager.play("npc-message");
+  }, [activeNode.id]);
 
   function handleTextComplete() {
     setIsTextComplete(true);

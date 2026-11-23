@@ -44,35 +44,49 @@ const SOUND_STORAGE_KEY = "mysterium-sound-muted";
 export const SOUND_SETTING_EVENT =
   "mysterium-sound-setting-change";
 
+/*
+ * Všetky zvuky hry a kedy zaznejú: docs/ZOZNAM-ZVUKOV.md.
+ * Kým súbor chýba alebo je prázdny (0 B), má ready: false – zvuk sa
+ * nespúšťa a nič sa nesťahuje (tiché miesto). Po dodaní súboru stačí
+ * ready: false odstrániť.
+ */
 const sounds: Record<SoundId, SoundConfig> = {
   "artifact-unlock": {
     src: "/sounds/artifact-unlock.mp3",
     volume: 0.7,
+    ready: false,
   },
   "chest-unlock": {
     src: "/sounds/chest-unlock.mp3",
     volume: 0.55,
+    ready: false,
   },
   "puzzle-success": {
     src: "/sounds/puzzle-success.mp3",
     volume: 0.65,
+    ready: false,
   },
   "digit-found": {
     src: "/sounds/digit-found.mp3",
     volume: 0.5,
+    ready: false,
   },
+  // Voliteľný, nezapojený (rozhodnutie z 23. 11. 2026).
   "button-click": {
     src: "/sounds/button-click.mp3",
     volume: 0.35,
+    ready: false,
   },
   "npc-message": {
     src: "/sounds/npc-message.mp3",
     volume: 0.45,
+    ready: false,
   },
   "city-ambient": {
     src: "/sounds/city-ambient.mp3",
     volume: 0.3,
     loop: true,
+    ready: false,
   },
   // Zvuky mini hier vyrobí Miloš; kým súbory nie sú, ready: false (ticho).
   "dial-click": { src: "/sounds/dial-click.mp3", volume: 0.5, ready: false },
@@ -143,12 +157,20 @@ class SoundManager {
     return audio;
   }
 
+  /**
+   * Zaznie zvuk? Iba keď je zapnutý prepínač zvuku v lište a súbor je
+   * pripravený (nie tiché miesto).
+   */
+  canPlay(soundId: SoundId) {
+    return (
+      typeof window !== "undefined" &&
+      !this.muted &&
+      sounds[soundId].ready !== false
+    );
+  }
+
   play(soundId: SoundId) {
-    if (
-      typeof window === "undefined" ||
-      this.muted ||
-      sounds[soundId].ready === false
-    ) {
+    if (!this.canPlay(soundId)) {
       return;
     }
 
@@ -163,7 +185,7 @@ class SoundManager {
   }
 
   fadeIn(soundId: SoundId, duration = 1500) {
-    if (typeof window === "undefined" || this.muted) {
+    if (!this.canPlay(soundId)) {
       return;
     }
 

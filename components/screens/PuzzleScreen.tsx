@@ -7,6 +7,7 @@ import {
   getSceneMapsUrl,
   isPuzzleAnswerCorrect,
 } from "../../engine";
+import { soundManager } from "../../lib/soundManager";
 import { ActionButton } from "../ui/ActionButton";
 import { RouteHint } from "../ui/RouteHint";
 import { TextInput } from "../ui/TextInput";
@@ -81,6 +82,8 @@ export function PuzzleScreen({
 
     setError("");
     setSuccessMessage("Odpoveď potvrdená. Pátračov záznam sa otvára.");
+    // Krátky zvuk správnej odpovede (tiché miesto, kým súbor nie je hotový).
+    soundManager.play("puzzle-success");
 
     window.setTimeout(() => {
       onSolved();

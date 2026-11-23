@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { useReducedMotion } from "../items/useReducedMotion";
+import { soundManager } from "../../lib/soundManager";
 import { voicePlayer } from "../../lib/voicePlayer";
 import { ActionButton } from "./ActionButton";
 
@@ -18,6 +19,8 @@ type StoryVideoProps = {
    * „Spustiť kapitolu“). Bez neho hra pokračuje hneď po videu.
    */
   endLabel?: string;
+  /** Krátky zvuk tesne pred videom (video začne až po ňom, nie súčasne s hlasom). */
+  cueSound?: "npc-message";
   /** Video skončilo alebo ho hráč preskočil (pri endLabel až po ťuknutí naň). */
   onDone: () => void;
   /** Súbor chýba alebo sa nedá prehrať: hra ukáže náhradu (text). */
@@ -28,6 +31,8 @@ type Phase = "playing" | "paused" | "ended" | "leaving";
 
 /** Dĺžka prelínania do tmy (pri vypnutých animáciách sa neprelína). */
 const FADE_OUT_MS = 500;
+/** Odstup videa od krátkeho zvuku pred ním (zvuk má najviac 0,4 s). */
+const CUE_LEAD_MS = 500;
 
 /**
  * Video v príbehu na celú obrazovku („kino“). Spustí sa hneď so zvukom –
@@ -43,6 +48,7 @@ export function StoryVideo({
   description,
   skipLabel,
   endLabel,
+  cueSound,
   onDone,
   onUnavailable,
 }: StoryVideoProps) {
@@ -93,7 +99,21 @@ export function StoryVideo({
     // Video a hlas nikdy naraz.
     voicePlayer.stop();
     toggleRef.current?.focus();
+
+    // Krátky zvuk pred videom s hlasom: video začne až po ňom. Pri vypnutom
+    // zvuku alebo bez pripraveného súboru sa video spustí hneď ako doteraz.
+    if (cueSound && soundManager.canPlay(cueSound)) {
+      soundManager.play(cueSound);
+      const timer = window.setTimeout(() => {
+        video.play().catch(() => setPhase("paused"));
+      }, CUE_LEAD_MS);
+
+      return () => window.clearTimeout(timer);
+    }
+
     video.play().catch(() => setPhase("paused"));
+    // Zvuk pred videom sa rozhoduje iba pri spustení videa.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [src]);
 
   // Titulky: prehliadač ich nekreslí (skryté), text berieme z aktívnej časti.

@@ -26,6 +26,7 @@ export function StoryVideoScreen({
       description={video.videoDescription}
       skipLabel={video.skipLabel}
       endLabel={video.endLabel}
+      cueSound={video.cueSound}
       onDone={onDone}
       onUnavailable={onUnavailable}
     />

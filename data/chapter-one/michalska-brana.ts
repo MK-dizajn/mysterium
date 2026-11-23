@@ -97,6 +97,8 @@ Pátračovo pravidlo znie: „Prvá stopa patrí mestu, ku ktorému vedie najkra
       "Video: Strážca Michalskej brány ťa víta a podáva ti zažltnutý list od pátrača.",
     skipLabel: "Preskočiť",
     seenFlagId: "seen_guardian_handover_video",
+    // Krátky zvuk „Strážca prehovorí“ tesne pred videom, nie súčasne s hlasom.
+    cueSound: "npc-message",
     completeActions: [
       ...ACCEPT_NOTE_ACTIONS,
       {

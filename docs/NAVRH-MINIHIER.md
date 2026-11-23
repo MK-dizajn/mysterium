@@ -229,19 +229,7 @@ minigame: {
 
 ## Zoznam zvukov (vyrobí Miloš)
 
-Súbory patria do `public/sounds/`, formát mp3, krátke a bez ticha na začiatku. Kým súbor chýba, hra ho nespúšťa (ticho). Licenciu zapísať do `docs/MEDIA-LICENCIE.md`.
-
-| Súbor | Kedy sa spustí | Ako má znieť | Dĺžka |
-|---|---|---|---|
-| `dial-click.mp3` | otočenie číselníka, kolieska, ružice alebo šifrovacieho kolieska o jeden krok | suché mechanické cvaknutie kovu (ako zámok s kolieskami), tiché | 0,1–0,2 s |
-| `tile-slide.mp3` | posun dielika v puzzle, položenie úlomku | krátke šúchnutie dreva alebo kameňa | 0,2–0,3 s |
-| `minigame-correct-step.mp3` | správny čiastkový krok (správny symbol v poradí, nájdený rozdiel) | jemný jasný tón, „ťing“ | 0,3 s |
-| `minigame-wrong.mp3` | nesprávny pokus (zlý dátum, zlé poradie) | tlmený tupý úder, nie nepríjemný bzučiak | 0,3–0,4 s |
-| `compartment-open.mp3` | otvorenie tajnej schránky (zlomenie pečate, vysunutie krytu) | cvaknutie, škrípnutie pántu a krátke zvonenie, tajomné | 1,2–1,8 s |
-| `digit-reveal.mp3` | číslica sa vynorí a vpíše do zápisníka | magický svetelný zvuk, trblietanie, končí čistým tónom | 1,0–1,5 s |
-| `hint-open.mp3` | otvorenie nápovedy | šuchot papiera (otočenie strany zápisníka) | 0,3–0,5 s |
-
-Existujúce prázdne súbory (0 B) z dnešnej hry (`artifact-unlock`, `chest-unlock`, `city-ambient`, `npc-message`, `puzzle-success`) ostávajú v zozname `docs/MEDIA-LICENCIE.md` ako „treba vytvoriť“.
+Zvuky mini hier sú od kroku T5c (23. 11. 2026) v **spoločnom zozname všetkých zvukov hry: `docs/ZOZNAM-ZVUKOV.md`** (kedy zaznejú, ako majú znieť, dĺžka, hlasitosť, stav súboru). Zoznam je iba tam, aby sa nerozchádzal. Nový zvuk mini hry treba pridať do neho.
 
 ## Postup po schválení (po jednej mini hre)
 

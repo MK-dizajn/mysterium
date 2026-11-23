@@ -6136,3 +6136,62 @@ Texty hry sa teraz nemenia, podmienky sa splnia v kroku danej mini hry.
 **Build:** prešiel. **Typy:** bez chýb. **Lint:** v upravených súboroch žiadny problém (14 starých v iných súboroch). **Server:** zastavený.
 
 **Krokov od poslednej celej série:** 3 z 3 (celá séria po T5c).
+
+---
+
+## 23. 11. 2026 – T5c: spoločný zoznam zvukov, puzzle-success a npc-message
+
+**Oprava návrhu:** hra má **23 zvukov**, nie 26, ako som písal v návrhu T5.
+
+**Čo je nové:**
+- **`docs/ZOZNAM-ZVUKOV.md`:** všetkých 23 zvukov, rozdelených do skupín:
+  - hra a úlohy, mini hry, fotografia, truhlica (3D aj 2D, s časmi v sekundách),
+  - pri každom: kedy zaznie, ako má znieť, dĺžka, hlasitosť, stav súboru a zapojenie,
+  - spoločné pravidlá: mp3, bez ticha na začiatku, licencia, prepínač zvuku, nie súčasne s nahratým hlasom.
+- **Tiché miesta:**
+  - všetkých 7 starších zvukov bez súboru (5 prázdnych, 2 chýbajúce) má teraz `ready: false`, takže sa nesťahujú ani nespúšťajú,
+  - doteraz to platilo iba pre zvuky mini hier a truhlice,
+  - nová funkcia `soundManager.canPlay` (zapnutý prepínač zvuku v lište a pripravený súbor),
+  - aj plynulé zapnutie zvuku mesta ju rešpektuje.
+- **`puzzle-success`:** pri správnej odpovedi v úlohe („Odpoveď potvrdená…“).
+- **`npc-message`:**
+  - pri každej novej replike v písanom rozhovore so Strážcom (ten nemá nahratý hlas, takže zvuk nikdy neznie súčasne s hlasom),
+  - **tesne pred videom Strážcu pri bráne:** zvuk zaznie a video s hlasom začne až o 0,5 s,
+  - kým súbor nie je pripravený alebo je zvuk vypnutý, video začne hneď ako doteraz (dáta `cueSound: "npc-message"`).
+- **`button-click`:** nezapojený, v zozname označený ako voliteľný.
+- **Zistenie:**
+  - `artifact-unlock` a `chest-unlock` patria starej truhlici (`components/ui/chest/Chest.tsx`), ktorá sa v hre nepoužíva,
+  - finále `artifact-unlock` od kroku T5a nepúšťa, takže dnes nezaznejú nikde,
+  - v zozname aj v KONTROLE je to označené na rozhodnutie.
+- **`docs/NAVRH-MINIHIER.md`:** tabuľka zvukov nahradená odkazom na `docs/ZOZNAM-ZVUKOV.md`.
+- **`docs/KONTROLA-PRED-VYDANIM.md`:** bod o zvukoch odkazuje na zoznam a opisuje, čo vyskúšať po dodaní súborov.
+
+**Súbory:**
+- `lib/soundManager.ts`,
+- `components/screens/PuzzleScreen.tsx`, `NpcScreen.tsx`, `StoryVideoScreen.tsx`, `components/ui/StoryVideo.tsx`,
+- `types/game.ts`, `data/chapter-one/michalska-brana.ts`,
+- `docs/ZOZNAM-ZVUKOV.md` (nový), `docs/NAVRH-MINIHIER.md`, `docs/KONTROLA-PRED-VYDANIM.md`, `docs/PRACOVNY-DENNIK.md`.
+
+**Testy:**
+- **Pred zmenou:** nový O14 (Node) 18 chýb.
+- **Po zmene:**
+  - **O14 (Node)** všetko OK:
+    - 23 zvukov,
+    - hra púšťa iba zvuky zo zoznamu,
+    - každý zvuk bez súboru má tiché miesto,
+    - `canPlay` a zvuk mesta,
+    - zapojenie `puzzle-success` a `npc-message` (aj pred videom), `button-click` nezapojený,
+    - zoznam úplný a so stavom súborov, ktorý sedí so skutočnosťou,
+    - NAVRH a KONTROLA.
+  - **Starý test C5 (Node)** kontroloval pôvodné znenie bodu o zvukoch v KONTROLE, upravený.
+  - **O14 v prehliadači** (oba režimy), všetko OK:
+    - správna odpoveď v scéne 9,
+    - video Strážcu sa po „Som pri bráne“ spustí hneď (zvuk pred ním ešte nie je pripravený),
+    - nesťahuje sa žiadny zvukový súbor, bez chýb.
+    - Test v prehliadači som napísal až po zmene, pred zmenou bežal iba Node test.
+  - **Chyba v mojom teste:** prvý beh O14 hľadal video na obrazovke úlohy, spúšťa sa však z úvodu („Som pri bráne“). Opravené podľa testu G1.
+  - **Node:** 41 testov OK.
+
+**Build:** prešiel. **Typy:** bez chýb. **Lint:** v upravených súboroch žiadny problém (14 starých v iných súboroch). **Server:** zastavený.
+
+**Ďalej:** celá séria v prehliadači na pozadí (väčší celok T5), s uloženým celým výpisom.
